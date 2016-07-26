@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>2699232493</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\..\..\source\board_cstartup_iar.s</file>
+      <file>$PROJ_DIR$\..\..\source\dbg_util.c</file>
+      <file>$PROJ_DIR$\..\..\source\dma_hardware_interface.c</file>
+      <file>$PROJ_DIR$\..\..\source\cand.c</file>
+      <file>$PROJ_DIR$\..\..\source\hamming.c</file>
+      <file>$PROJ_DIR$\..\..\source\lcd_font.c</file>
+      <file>$PROJ_DIR$\..\..\source\lcd_font10x14.c</file>
+      <file>$PROJ_DIR$\..\..\source\led.c</file>
+      <file>$PROJ_DIR$\..\..\source\gmacd.c</file>
+      <file>$PROJ_DIR$\..\..\source\board_memories.c</file>
+      <file>$PROJ_DIR$\..\..\source\dbgu_console.c</file>
+      <file>$PROJ_DIR$\..\..\source\dmad.c</file>
+      <file>$PROJ_DIR$\..\..\source\clock.c</file>
+      <file>$PROJ_DIR$\..\..\source\emacd.c</file>
+      <file>$PROJ_DIR$\..\..\source\board_lowlevel.c</file>
+      <file>$PROJ_DIR$\..\..\source\gmacb.c</file>
+      <file>$PROJ_DIR$\..\..\source\iso7816_4.c</file>
+      <file>$PROJ_DIR$\..\..\source\lcd_draw.c</file>
+      <file>$PROJ_DIR$\..\..\source\lcdd.c</file>
+      <file>$PROJ_DIR$\..\..\source\bmp.c</file>
+      <file>$PROJ_DIR$\..\..\source\wm8904.c</file>
+      <file>$PROJ_DIR$\..\..\source\rand.c</file>
+      <file>$PROJ_DIR$\..\..\source\ov5640_config.c</file>
+      <file>$PROJ_DIR$\..\..\source\ov.c</file>
+      <file>$PROJ_DIR$\..\..\source\omnivision.c</file>
+      <file>$PROJ_DIR$\..\..\source\ov7740_config.c</file>
+      <file>$PROJ_DIR$\..\..\source\tsd_com.c</file>
+      <file>$PROJ_DIR$\..\..\source\ov9740_config.c</file>
+      <file>$PROJ_DIR$\..\..\source\tsd_tsadc.c</file>
+      <file>$PROJ_DIR$\..\..\source\timetick.c</file>
+      <file>$PROJ_DIR$\..\..\source\wav.c</file>
+      <file>$PROJ_DIR$\..\..\source\mcid_dma.c</file>
+      <file>$PROJ_DIR$\..\..\source\trace.c</file>
+      <file>$PROJ_DIR$\..\..\source\macb.c</file>
+      <file>$PROJ_DIR$\..\..\source\ov2640_config.c</file>
+      <file>$PROJ_DIR$\..\..\source\math.c</file>
+      <file>$PROJ_DIR$\..\..\source\ov2643_config.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\rand.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\wav.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\board_memories.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\math.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\board_lowlevel.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\cand.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\omnivision.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcd_font10x14.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov2640_config.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\macb.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\clock.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\dbg_util.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov9740_config.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\tsd_com.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\dbgu_console.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov7740_config.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\dma_hardware_interface.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\trace.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\tsd_tsadc.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcdd.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\timetick.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov5640_config.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\mcid_dma.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\led.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\wm8904.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\board_cstartup_iar.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\bmp.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov2643_config.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\trace.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\gmacd.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\iso7816_4.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcd_draw.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\math.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\mcid_dma.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov2640_config.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov5640_config.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcd_font.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\rand.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\tsd_com.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\led.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\wav.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcd_font10x14.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\omnivision.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\gmacb.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\timetick.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\tsd_tsadc.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\wm8904.pbi</file>
+      <file>$PROJ_DIR$\..\..\lib\libboard_sama5d3x_ek_ewarm_dbg.a</file>
+      <file>$PROJ_DIR$\Debug\Obj\hamming.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\macb.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov7740_config.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\libboard_sama5d3x.pbd</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcdd.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\dmad.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\emacd.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov2643_config.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\ov9740_config.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\board_memories.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\dma_hardware_interface.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\clock.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\dbgu_console.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\hamming.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\gmacb.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\bmp.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\board_lowlevel.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\emacd.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\cand.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\dmad.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcd_draw.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\dbg_util.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\iso7816_4.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\lcd_font.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\gmacd.o</file>
+    </outputs>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\board_cstartup_iar.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 63</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\dbg_util.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 108</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\dma_hardware_interface.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 97</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 54</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\cand.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 105</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 43</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\hamming.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 100</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 86</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\lcd_font.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 110</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 74</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\lcd_font10x14.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 79</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\led.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 61</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 77</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\gmacd.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 111</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 67</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\board_memories.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 96</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 39</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\dbgu_console.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 99</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 52</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\dmad.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 106</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 92</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\clock.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 98</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\emacd.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 104</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 93</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\board_lowlevel.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 103</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\gmacb.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 101</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 81</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\iso7816_4.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 109</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 68</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\lcd_draw.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 107</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 69</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\lcdd.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 57</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 91</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\bmp.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 102</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 64</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\wm8904.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 62</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 84</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\rand.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 37</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 75</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\ov5640_config.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 59</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 73</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\ov.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 41</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 90</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\omnivision.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 44</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 80</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\ov7740_config.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 53</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 88</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\tsd_com.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 51</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 76</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\ov9740_config.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 50</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 95</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\tsd_tsadc.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 56</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\timetick.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 58</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 82</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\wav.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 38</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 78</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\mcid_dma.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 60</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 71</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\trace.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 55</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 66</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\macb.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 47</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 87</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\ov2640_config.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 46</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 72</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\math.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 40</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 70</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\source\ov2643_config.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 65</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 94</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 85</file>
+        </tool>
+      </outputs>
+    </file>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>IARCHIVE</tool>
+    </forcedrebuild>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs/>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
+  </configuration>
+</project>
+
+
