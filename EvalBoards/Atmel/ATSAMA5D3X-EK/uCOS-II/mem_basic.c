@@ -803,6 +803,7 @@ uint8_t DSP_LegacyRead(uint8_t dev_addr, uint8_t dsp_addr,uint8_t *pVal)
 
 
 /******************    USART Read/ Write Related    **************************/
+#if UNUSED
 
 uint8_t DM_SingleWrite_uart(uint8_t dev_addr,uint16_t dm_addr,uint16_t dm_val)
 {  
@@ -1143,3 +1144,4 @@ uint8_t MEM_Block_SingleWrite_uart(   uint8_t dev_addr,
     return( 0 );  
 
 }
+#endif

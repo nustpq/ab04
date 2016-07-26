@@ -14,7 +14,7 @@
 #ifndef _CMDPARASE_H_
 #define _CMDPARASE_H_ 
 
-#include "object.h"
+#include "uif_object.h"
 
 static uint8_t init_Play_Setting( void *pInstance );
 static uint8_t init_Rec_Setting( void *pInstance );

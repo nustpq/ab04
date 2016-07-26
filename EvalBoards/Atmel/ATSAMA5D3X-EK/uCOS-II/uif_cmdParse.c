@@ -14,12 +14,12 @@
 #include "stdio.h"
 #include "stdint.h"
 
-#include "usb.h"
+#include "uif_usb.h"
 
 #include "defined.h"
 //#include "debuginfo.h"
-#include "cmdParse.h"
-#include "i2s.h"
+#include "uif_cmdParse.h"
+#include "uif_i2s.h"
 
 
 /*

@@ -59,11 +59,11 @@
 
 #include "board.h"
 #include "defined.h"
-#include "object.h"
+#include "uif_object.h"
 
-#include "cmdparse.h"
-#include "i2s.h"
-#include "usb.h"
+#include "uif_cmdparse.h"
+#include "uif_i2s.h"
+#include "uif_usb.h"
 #include "uif_spi.h"
 #include "uif_twi.h"
 #include "uif_usart.h"
@@ -549,7 +549,7 @@ int main()
         source_usb.init_source(NULL,NULL);
     else
     {
-	printf("this version isn't a release version \n");
+        APP_TRACE_INFO(("this version isn't a release version \r\n"));
 	return -1;
     }
 #endif

@@ -1920,19 +1920,10 @@
       <name>$PROJ_DIR$\..\app_cfg.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\cmdParse.c</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\cpu_cfg.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\emb.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\i2s.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\i2s.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\kfifo.c</name>
@@ -1944,13 +1935,16 @@
       <name>$PROJ_DIR$\..\mem_basic.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\object.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\os_cfg.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\uif_cmdParse.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\uif_dsp.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\uif_i2s.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\uif_nandflash.c</name>
@@ -1965,7 +1959,7 @@
       <name>$PROJ_DIR$\..\uif_usart.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\usb.c</name>
+      <name>$PROJ_DIR$\..\uif_usb.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\USBDDriverDescriptors.c</name>

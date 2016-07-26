@@ -1,7 +1,7 @@
 #ifndef _TWI_H_
 #define _TWI_H_
 
-#include "object.h"
+#include "uif_object.h"
 
 #define UNAME_WR_ADDR 0x60
 #define UNAME_RX_ADDR 0x61

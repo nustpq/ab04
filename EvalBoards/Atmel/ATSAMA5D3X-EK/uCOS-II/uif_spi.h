@@ -2,7 +2,7 @@
 #define _UIF_SPI_H_
 
 #include "spi.h"
-#include "object.h"
+#include "uif_object.h"
 #include "defined.h"
 
 void SPI_Handler( void );

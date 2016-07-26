@@ -19,3 +19,5 @@ Count=0
 [Aliases]
 Count=0
 SuppressDialog=0
+[DebugChecksum]
+Checksum=1635841713

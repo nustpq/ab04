@@ -3,7 +3,7 @@
 
 #include <ucos_ii.h>
 
-#include "object.h"
+#include "uif_object.h"
 
 #define SUCCESS                          0u
 #define NO_ERR                           0u

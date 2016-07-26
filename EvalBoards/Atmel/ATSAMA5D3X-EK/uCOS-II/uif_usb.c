@@ -17,7 +17,7 @@
 
 #include  <ucos_ii.h>
 
-#include "usb.h"
+#include "uif_usb.h"
 #include "defined.h"
 
 uint8_t usbBufferBulkOut0[USBDATAEPSIZE];

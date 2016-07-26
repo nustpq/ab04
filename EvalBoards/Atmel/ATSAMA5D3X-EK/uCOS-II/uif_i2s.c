@@ -14,11 +14,11 @@
 * Note(s)       :
 *********************************************************************************************************
 */
-#include "object.h"
+#include "uif_object.h"
 #include "defined.h"
-#include "I2s.h"
+#include "uif_i2s.h"
 #include "Kfifo.h"
-#include "usb.h"
+#include "uif_usb.h"
 
 #ifndef USE_UCOS
 #include  <ucos_ii.h>

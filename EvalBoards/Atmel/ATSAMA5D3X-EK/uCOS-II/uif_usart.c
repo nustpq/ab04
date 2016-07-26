@@ -61,7 +61,7 @@ void _USART1_DmaTxCallback( uint8_t status, void* pArg )
 {
     status = status;
     pArg = pArg;
-    BSP_LED_Toggle( 3 );
+//    BSP_LED_Toggle( 3 );
     //not sure what should doing,left blank here;
 }
 
