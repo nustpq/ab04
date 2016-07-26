@@ -19,6 +19,7 @@
 
 #include <ucos_ii.h>
 
+//for compatiblility£¬this structure unused£»
 /*
 typedef struct i2c_device
 {
@@ -39,7 +40,7 @@ static const Pin pins_codec[] = {UIF_PINS_TWI_CODEC};
 static const Pin pins_fm36[] = {UIF_PINS_TWI_FM36};
 
 /** buffer declare for twi */
-extern uint8_t twi_ring_buffer[3][256];
+extern uint8_t twi_ring_buffer[ UNKNOWN ][ 256 ];
 
 
 /** TWI driver instance.*/
@@ -263,7 +264,7 @@ uint8_t twi_uname_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         if( 0 == len ) return -1;
 	
 
-	return TWID_Write(pTwid, option->address, 
+	return TWID_Write( pTwid, option->address, 
                                  option->iaddress, 
                                  option->isize, 
                                  ( uint8_t * )buf, 
@@ -306,6 +307,7 @@ uint8_t twi_codec_write(void *pInstance, const uint8_t *buf,uint32_t len  )
                                  ( uint8_t * )buf, 
                                  len, 
                                  0 );
+
 }
 
 

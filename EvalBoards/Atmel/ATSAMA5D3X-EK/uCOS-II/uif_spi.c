@@ -109,7 +109,7 @@ void _ConfigureTc1( uint32_t hz )
 
 /*
 *********************************************************************************************************
-*                                               _DmaRxCallback()
+*                                               _SPI1_DmaRxCallback()
 *
 * Description : spi callback function for DMA receiving
 *
@@ -130,7 +130,7 @@ void _SPI1_DmaRxCallback( uint8_t status, void* pArg )
 
 /*
 *********************************************************************************************************
-*                                               _DmaRxCallback()
+*                                               _SPI1_DmaTxCallback()
 *
 * Description : spi callback function for DMA transmitting
 *
@@ -257,6 +257,7 @@ void stop_spi( void * pInstance )
 *
 * Arguments   : pInstance    : data source handle
 *               spiState     : role of spi port, master or slave
+*               clk          £ºspi sclk freq£¬unit hz
 * Returns     : none
 *
 * Note(s)     : none
@@ -273,7 +274,7 @@ static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk 
     DataSource *pSource = ( DataSource * )pInstance;
     Spi *pSpi = _get_spi_instance( pSource->dev.identify );
 
-    // spi1 in slave mode 
+    // spix in slave mode 
     if ( spiState == STATE_SLAVE )
     {
         mode &= ( uint32_t ) ( ~( SPI_MR_MSTR ) ) ;

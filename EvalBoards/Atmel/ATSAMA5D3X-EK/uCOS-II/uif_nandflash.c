@@ -526,7 +526,7 @@ uint8_t uif_read_sysinfo( void *buf,uint32_t len )
 
 /*
 *********************************************************************************************************
-*                                    uif_read_sysinfo()
+*                                    uif_nandflash_readPage()
 *
 * Description :  read  data to memory, it's a unimplement and unused interface;
 *
@@ -536,7 +536,7 @@ uint8_t uif_read_sysinfo( void *buf,uint32_t len )
 *
 * Return(s)   :  error code 0:success otherwise failed.
 *
-* Note(s)     : None.
+* Note(s)     : Unused£»
 *********************************************************************************************************
 */                                                     
 uint8_t uif_nandflash_readPage(void *buf,uint16_t blockId,uint16_t pageId)
