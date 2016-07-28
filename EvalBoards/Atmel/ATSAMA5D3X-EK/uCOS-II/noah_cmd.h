@@ -278,27 +278,27 @@
 *********************************************************************************************************
 */
 typedef struct {
-    unsigned char head ;
-    unsigned char DataLen ;
-    unsigned char Data[256];
-    unsigned char checkSum ;
+    uint8_t head ;
+    uint8_t DataLen ;
+    uint8_t Data[256];
+    uint8_t checkSum ;
 }NOAH_CMD ;
 
 typedef struct {
-    unsigned char  head_sync_1 ;   //EB                             
-    unsigned char  data_len[3] ;   //MSB first
-    unsigned char  head_sync_2 ;   //90
-    unsigned char  pkt_sn ;        //1 ~31
-    unsigned char  cmd[2] ;        //MSB first
-    unsigned char  data[ NEW_CMD_DATA_MLEN ] ; 
+    uint8_t  head_sync_1 ;   //EB                             
+    uint8_t  data_len[3] ;   //MSB first
+    uint8_t  head_sync_2 ;   //90
+    uint8_t  pkt_sn ;        //1 ~31
+    uint8_t  cmd[2] ;        //MSB first
+    uint8_t  data[ NEW_CMD_DATA_MLEN ] ; 
 }*pNEW_CMD ;
 
 typedef struct {
-    unsigned int   index;    
-    unsigned int   length ;
-    unsigned char *pdata; 
-    unsigned char  data[EMB_BUF_SIZE] ;
-    unsigned char  pkt_sn;
+    uint32_t   index;    
+    uint32_t   length ;
+    uint8_t *pdata; 
+    uint8_t  data[EMB_BUF_SIZE] ;
+    uint8_t  pkt_sn;
     bool           state;
 }EMB_BUF ;
 
@@ -359,18 +359,18 @@ extern CPU_INT08U pcSendDateToBuf(  OS_EVENT   *pOS_EVENT,
                                     CPU_INT08U   ex_data_length 
                                  ) ;
 extern CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,                               
-                                 PCCMDDAT    *pPcCmdData,
-                                 CPU_INT08U   pkt_index,
-                                 CPU_INT16U   cmd_id                                 
+                                        PCCMDDAT    *pPcCmdData,
+                                        CPU_INT08U   pkt_index,
+                                        CPU_INT16U   cmd_id                                 
                                );
 extern CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type, 
-                              CPU_INT08U  *pChar, 
-                              PCCMDDAT    *pPcCmdData,
-                              CPU_INT32U  *p_emb_length);
+                                     CPU_INT08U  *pChar, 
+                                     PCCMDDAT    *pPcCmdData,
+                                     CPU_INT32U  *p_emb_length);
 
-extern CPU_INT08U CheckSum(     CPU_INT08U init_data, 
-                                CPU_INT08U *pdata, 
-                                CPU_INT16U length
+extern CPU_INT08U CheckSum( CPU_INT08U init_data, 
+                            CPU_INT08U *pdata, 
+                            CPU_INT16U length
                           );
 extern CPU_INT08U  Noah_CMD_Parse_Ruler ( NOAH_CMD    *pNoahCmd,                                 
                                           CPU_INT08U  *pSessionDone); 

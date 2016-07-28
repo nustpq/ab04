@@ -82,38 +82,48 @@
 #define DEF_VERSION_STR_LEN             ( 11 + 1 )
 #define DEF_MODEL_STR_LEN               ( 7 + 1 )
 
-typedef  unsigned char  VERSION_DATA[ DEF_VERSION_STR_LEN ] ;  
-typedef  unsigned char  MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
+typedef struct _sys_info
+{
+  uint8_t firmware_version[ 32 ];
+  uint8_t hardware_version[ 32 ];
+  uint8_t adaptor_soft_version[ 32 ];
+  uint8_t date[ 32 ]; 
+  uint8_t model[ 32 ];
+}SYSINFO;
+
+//copy these struct from uif1.0 for compatiblity and will delete if don't need
+typedef  uint8_t VERSION_DATA[ DEF_VERSION_STR_LEN ] ;  
+typedef  uint8_t MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
 
 typedef struct {    
     VERSION_DATA    mic_vendor ; //string    
     VERSION_DATA    mic_part_no ;//string 
-    unsigned char   mic_type ; 
-    unsigned char   mic_id ;   
+    uint8_t  mic_type ; 
+    uint8_t  mic_id ;   
 }MIC_INFO ;
 
 typedef struct {
     float           phase ;  
     float           sensitivity ;
     float           noise_floor ;
-    unsigned int    inlet_position ;
-    unsigned int    data_len ; //add
-    unsigned char  *p_data ; 
+    uint32_t        inlet_position ;
+    uint32_t        data_len ; //add
+    uint8_t         *p_data ; 
 }MIC_CALIB_INFO ;
 
 typedef struct {
-    unsigned int   length;
-    unsigned int   index;
-    unsigned char *pdata;
-    unsigned char  done;
+    uint32_t   length;
+    uint32_t   index;
+    uint8_t    *pdata;
+    uint8_t    done;
 }VOICE_BUF ;
 
 typedef struct _spi_cfg{
-  uint32_t   spi_speed;
-  uint8_t    spi_mode;  
-  uint8_t    gpio_irq;
-  uint8_t    reserved1;
-  uint8_t    reserved2;
+    uint32_t   spi_speed;
+    uint8_t    spi_mode;  
+    uint8_t    gpio_irq;
+    uint8_t    reserved1;
+    uint8_t    reserved2;
 }VOICE_BUF_CFG;
 
 typedef struct { 
@@ -133,12 +143,12 @@ typedef struct {
 }AUDIO_CFG ;
 
 typedef struct {
-    unsigned char    type;    //rec = 1,  play = 2, rec&play = 3   
-    unsigned char    padding; //usb first package padding
+    uint8_t    type;    //rec = 1,  play = 2, rec&play = 3   
+    uint8_t    padding; //usb first package padding
 }START_AUDIO;
 
 typedef struct {
-    unsigned char    ruler_id; 
+    uint8_t    ruler_id; 
 }READ_RULER_INFO;
 
 typedef struct {
@@ -146,132 +156,131 @@ typedef struct {
     VERSION_DATA     hw_ver ;
     VERSION_DATA     sw_ver ;      
     MIC_INFO        *p_mic_info[16] ; //H01  16?
-    unsigned char    mic_num ;
-    unsigned char    date[1];
+    uint8_t          mic_num ;
+    uint8_t          date[1];
 } RULER_INFO ;
 
 typedef struct {      
-    RULER_INFO       ruler_info; 
-    unsigned char    ruler_id;     
+    RULER_INFO  ruler_info; 
+    uint8_t     ruler_id;     
 }WRITE_RULER_INFO ;
 
 typedef struct {
-    unsigned char    ruler_id;   
-    unsigned char    mic_id;  
+    uint8_t   ruler_id;   
+    uint8_t   mic_id;  
 }READ_MIC_CLAIB_INFO ;
 
 typedef struct {
-    unsigned char    ruler_id;   
-    unsigned char    mic_id; 
+    uint8_t   ruler_id;   
+    uint8_t   mic_id; 
     MIC_CALIB_INFO   mic_calib_info;
 }WRITE_MIC_CALIB_INFO ;
  
 typedef struct {
-    unsigned char    ruler_id;   
-    unsigned char    mic_id; 
-    unsigned char    on_off;
+    uint8_t   ruler_id;   
+    uint8_t   mic_id; 
+    uint8_t   on_off;
 }TOGGLE_MIC ;
 
 typedef struct {
-    unsigned int    mic;   
-    unsigned int    lout; 
-    unsigned int    spk;
+    uint32_t    mic;   
+    uint32_t    lout; 
+    uint32_t    spk;
 }SET_VOLUME ;
 
 typedef struct {
-    unsigned char    port;   
-    unsigned char   *pdata; 
+    uint8_t   port;   
+    uint8_t  *pdata; 
 }RAW_DATA_TRANS ;
 
 typedef struct {
-    unsigned char    ruler_id;   
-    unsigned char    cmd; 
-    unsigned char   *pdata; 
+    uint8_t   ruler_id;   
+    uint8_t   cmd; 
+    uint8_t  *pdata; 
 }UPDATE_RULER_FW ;
 
 typedef struct {
-    unsigned char    cmd; 
-    unsigned char    *pdata; 
+    uint8_t   cmd; 
+    uint8_t   *pdata; 
 }UPDATE_BRIDGE_FW ;
 
 typedef struct {
-    unsigned int    f_w_state ;
-    unsigned int    f_w_counter ; //FW bin burn times counter
-    unsigned int    s_w_counter ; //state page burn times counter
-    unsigned int    bin_size ;
-    unsigned char   flag;
-    char            bin_name[30] ; //add
+    uint32_t    f_w_state ;
+    uint32_t    f_w_counter ; //FW bin burn times counter
+    uint32_t    s_w_counter ; //state page burn times counter
+    uint32_t    bin_size ;
+    uint8_t     flag;
+    int8_t      bin_name[30] ; //add
 }FLASH_INFO ;
 
 
 typedef struct {
-    unsigned char    if_type;      
-    unsigned char    attribute;
-    unsigned short   speed;
+    uint8_t   if_type;      
+    uint8_t   attribute;
+    uint16_t   speed;
 }INTERFACE_CFG ;
 
 
 typedef struct {
-    unsigned char    if_type;      
-    unsigned char    dev_addr;   
-    unsigned int     data_len;
-    unsigned char*   pdata;
+    uint8_t   if_type;      
+    uint8_t   dev_addr;   
+    uint32_t     data_len;
+    uint8_t*   pdata;
 }RAW_WRITE ;
 
 typedef struct {
-    unsigned char    if_type;      
-    unsigned char    dev_addr;
-    unsigned int     data_len_read;
-    unsigned int     data_len_write;
-    unsigned char*   pdata_read;
-    unsigned char*   pdata_write;
+    uint8_t     if_type;      
+    uint8_t     dev_addr;
+    uint32_t    data_len_read;
+    uint32_t    data_len_write;
+    uint8_t*    pdata_read;
+    uint8_t*    pdata_write;
 }RAW_READ ;
 
 typedef struct {
-    unsigned short   mem_addr_l; 
-    unsigned short   mem_addr_h; 
-    unsigned int     data_len;    
-    unsigned char*   pdata;
-    unsigned char    if_type;      
-    unsigned char    dev_addr;
-    unsigned char    mem_addr_len;
+    uint16_t   mem_addr_l; 
+    uint16_t   mem_addr_h; 
+    uint32_t   data_len;    
+    uint8_t*   pdata;
+    uint8_t    if_type;      
+    uint8_t    dev_addr;
+    uint8_t    mem_addr_len;
 }BURST_WRITE ;
 
 typedef struct {
-    unsigned char    if_type;      
-    unsigned char    dev_addr;    
-    unsigned char    data_len;
-    unsigned char    read_data_len;
-    unsigned short   mem_addr_l; 
-    unsigned short   mem_addr_h; 
-    unsigned int     mem_addr_len;
-    unsigned char*   pdata;
-    
+    uint8_t    if_type;      
+    uint8_t    dev_addr;    
+    uint8_t    data_len;
+    uint8_t    read_data_len;
+    uint16_t   mem_addr_l; 
+    uint16_t   mem_addr_h; 
+    uint32_t   mem_addr_len;
+    uint8_t*   pdata;   
 }BURST_READ ;
 
 typedef struct {
-    unsigned char    addr_index;   
-    unsigned int     data_len;
-    unsigned char*   pdata;
-    unsigned char*   pStr;
+    uint8_t    addr_index;   
+    uint32_t   data_len;
+    uint8_t*   pdata;
+    uint8_t*   pStr;
 }MCU_FLASH ;
 
 typedef struct {
-    unsigned char    vec_index_a;   
-    unsigned char    vec_index_b;
-    unsigned char    flag;
-    unsigned char    type; //41£º iM401,  51: iM501
-    unsigned int     delay; 
-    unsigned char    gpio; //irq trigger GPIO index
-    unsigned char    trigger_en;
-    unsigned char    pdm_clk_off; //trun off pdm clk after pwd or not
-    unsigned char    if_type;//1: I2C, 2:SPI
+    uint8_t    vec_index_a;   
+    uint8_t    vec_index_b;
+    uint8_t    flag;
+    uint8_t    type; //41£º iM401,  51: iM501
+    uint32_t   delay; 
+    uint8_t    gpio; //irq trigger GPIO index
+    uint8_t    trigger_en;
+    uint8_t    pdm_clk_off; //trun off pdm clk after pwd or not
+    uint8_t    if_type;//1: I2C, 2:SPI
 }SET_VEC_CFG ;  
    
 typedef struct {
-    unsigned char    gpio_num;   
-    unsigned char    gpio_value[7];
-    unsigned int     delay_us[7];
+    uint8_t    gpio_num;       
+    uint8_t    gpio_value[7];
+    uint32_t   delay_us[7];
 }GPIO_SESSION ; 
 
 
@@ -355,6 +364,6 @@ extern DataSource source_twi2;
 
 //-----------------------task syncoronize P/V---------------------------------//
 extern OS_FLAG_GRP *g_StartUSBTransfer;
-extern OS_EVENT *pPortManagerMbox;
+extern OS_EVENT    *pPortManagerMbox;
 
 #endif

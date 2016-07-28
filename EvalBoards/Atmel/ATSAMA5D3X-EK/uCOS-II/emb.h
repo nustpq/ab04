@@ -14,6 +14,7 @@
 #ifndef __EMB_H__
 #define __EMB_H__
 
+#include <stdint.h>
 
 typedef struct {
 	const char *head, *tail;
@@ -61,7 +62,7 @@ int emb_append_attr_binary(emb_builder *emb, int pos, int id, const void *data, 
 int emb_append_end(emb_builder *emb, int pos);
 int emb_append_element(emb_builder *emb, int pos, int id);
 
-int emb_get_node_replace(const emb_t *emb, int id, unsigned char data);
+int emb_get_node_replace(const emb_t *emb, int id, uint8_t data);
 
 
 #endif

@@ -22,31 +22,31 @@ static const Pin pinVbus = PIN_USB_VBUS;
 
 
 
-void UsbAudio0DataReceived(  unsigned int unused,
-                              unsigned char status,
-                              unsigned int received,
-                              unsigned int remaining );
-void UsbAudio1DataReceived(  unsigned int unused,
-                              unsigned char status,
-                              unsigned int received,
-                              unsigned int remaining );
+void UsbAudio0DataReceived(  uint32_t unused,
+                             uint8_t status,
+                             uint32_t received,
+                             uint32_t remaining );
+void UsbAudio1DataReceived(  uint32_t unused,
+                             uint8_t status,
+                             uint32_t received,
+                             uint32_t remaining );
 
-void UsbAudio0DataTransmit(  unsigned int unused,
-                              unsigned char status,
-                              unsigned int transmit,
-                              unsigned int remaining );
-void UsbAudio1DataTransmit(  unsigned int unused,
-                              unsigned char status,
-                              unsigned int transmit,
-                              unsigned int remaining );
+void UsbAudio0DataTransmit(  uint32_t unused,
+                             uint8_t status,
+                             uint32_t transmit,
+                             uint32_t remaining );
+void UsbAudio1DataTransmit(  uint32_t unused,
+                             uint8_t status,
+                             uint32_t transmit,
+                             uint32_t remaining );
 
 
-static void ISR_Vbus(const Pin *pPin);
+static void ISR_Vbus( const Pin *pPin );
 static void VBus_Configure( void );
 static void USBPower_Configure( void );
-void USBDCallbacks_Initialized(void);
-void USBDDriverCallbacks_ConfigurationChanged(unsigned char cfgnum);
-void USBDCallbacks_RequestReceived(const USBGenericRequest *request);
+void USBDCallbacks_Initialized( void );
+void USBDDriverCallbacks_ConfigurationChanged( uint8_t cfgnum );
+void USBDCallbacks_RequestReceived( const USBGenericRequest *request );
 
 void init_usb( void *pParameter,void *dParameter ); 
 

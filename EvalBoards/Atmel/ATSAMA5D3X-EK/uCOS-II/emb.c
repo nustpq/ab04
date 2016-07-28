@@ -258,7 +258,7 @@ static int emb_get_node(const emb_t *emb, int id, emb_t *node) {
 }
 
 //PQ added
-int emb_get_node_replace(const emb_t *emb, int id, unsigned char data) {
+int emb_get_node_replace(const emb_t *emb, int id, uint8_t data) {
     
 	int etype, eid;
     char *dp;

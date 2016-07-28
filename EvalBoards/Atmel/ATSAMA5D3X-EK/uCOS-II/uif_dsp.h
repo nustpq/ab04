@@ -37,31 +37,31 @@ typedef struct chip_fm36
 
 extern void Pin_Reset_FM36( void );
 
-extern unsigned char ReInit_FM36( uint16_t sr );
+extern uint8_t ReInit_FM36( uint16_t sr );
 
 
-extern unsigned char Init_FM36_AB03( uint16_t sr,                                   
-                                     unsigned char mic_num,
-                                     unsigned char lin_sp_index, 
-                                     unsigned char start_slot_index,
-                                     unsigned char bit_length,
-                                     unsigned char i2s_tdm_sel,
-                                     unsigned char force_reset );
+extern uint8_t Init_FM36_AB03( uint16_t sr,                                   
+                                     uint8_t mic_num,
+                                     uint8_t lin_sp_index, 
+                                     uint8_t start_slot_index,
+                                     uint8_t bit_length,
+                                     uint8_t i2s_tdm_sel,
+                                     uint8_t force_reset );
 
-extern unsigned char Init_FM36( unsigned short sr );
+extern uint8_t Init_FM36( uint16_t sr );
 
-extern unsigned char DMIC_PGA_Control( unsigned short gain );
+extern uint8_t DMIC_PGA_Control( uint16_t gain );
 
-extern unsigned char FM36_PWD_Bypass( void );
+extern uint8_t FM36_PWD_Bypass( void );
 
-extern unsigned char FM36_PDM_CLK_Set( unsigned char pdm_dac_clk, unsigned char pdm_adc_clk, unsigned char type );
+extern uint8_t FM36_PDM_CLK_Set( uint8_t pdm_dac_clk, uint8_t pdm_adc_clk, uint8_t type );
 
-extern unsigned char Init_FM36_AB03_Preset( void );
+extern uint8_t Init_FM36_AB03_Preset( void );
 
-extern unsigned char Init_FM36_AB03_temp(void );
+extern uint8_t Init_FM36_AB03_temp(void );
 
-extern unsigned char FM36_PDMADC_CLK_OnOff( unsigned char onoff, unsigned char fast_switch);
+extern uint8_t FM36_PDMADC_CLK_OnOff( uint8_t onoff, uint8_t fast_switch);
 
-extern unsigned char Config_PDM_PA( void );
+extern uint8_t Config_PDM_PA( void );
 
 #endif

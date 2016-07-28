@@ -42,68 +42,68 @@
 
 
 
-extern unsigned char DSP_PM_Type ; //FM36 unlock_mmreg is different from previous dsp
+extern uint8_t DSP_PM_Type ; //FM36 unlock_mmreg is different from previous dsp
 
 
-extern unsigned char HOST_SingleWrite_1(unsigned char dev_addr,unsigned char host_addr,unsigned char host_val) ; // 1bytes reg
-extern unsigned char HOST_SingleWrite_2(unsigned char dev_addr,unsigned char host_addr,unsigned short host_val); // 2bytes reg
-extern unsigned char HOST_LegacyRead(unsigned char dev_addr, unsigned char host_addr,unsigned char *pVal);
-extern unsigned char HOST_SingleWrite_1_uart(unsigned char dev_addr,unsigned char host_addr,unsigned char host_val) ; // 1bytes reg
-extern unsigned char HOST_SingleWrite_2_uart(unsigned char dev_addr,unsigned char host_addr,unsigned short host_val); // 2bytes reg
-extern unsigned char HOST_LegacyRead_uart(unsigned char dev_addr, unsigned char host_addr,unsigned char *pVal);
+extern uint8_t HOST_SingleWrite_1(uint8_t dev_addr,uint8_t host_addr,uint8_t host_val) ; // 1bytes reg
+extern uint8_t HOST_SingleWrite_2(uint8_t dev_addr,uint8_t host_addr,uint16_t host_val); // 2bytes reg
+extern uint8_t HOST_LegacyRead(uint8_t dev_addr, uint8_t host_addr,uint8_t *pVal);
+extern uint8_t HOST_SingleWrite_1_uart(uint8_t dev_addr,uint8_t host_addr,uint8_t host_val) ; // 1bytes reg
+extern uint8_t HOST_SingleWrite_2_uart(uint8_t dev_addr,uint8_t host_addr,uint16_t host_val); // 2bytes reg
+extern uint8_t HOST_LegacyRead_uart(uint8_t dev_addr, uint8_t host_addr,uint8_t *pVal);
 
 
-extern unsigned char DSP_SingleWrite_1(unsigned char dev_addr,unsigned char dsp_addr,unsigned char dsp_val) ;
-extern unsigned char DSP_SingleWrite_2(unsigned char dev_addr,unsigned char host_addr,unsigned short dsp_val);
-extern unsigned char DSP_LegacyRead(unsigned char dev_addr, unsigned char host_addr,unsigned char *pVal);
-extern unsigned char DSP_SingleWrite_1_uart(unsigned char dev_addr,unsigned char dsp_addr,unsigned char dsp_val) ;
-extern unsigned char DSP_SingleWrite_2_uart(unsigned char dev_addr,unsigned char host_addr,unsigned short dsp_val);
-extern unsigned char DSP_LegacyRead_uart(unsigned char dev_addr, unsigned char host_addr,unsigned char *pVal);
+extern uint8_t DSP_SingleWrite_1(uint8_t dev_addr,uint8_t dsp_addr,uint8_t dsp_val) ;
+extern uint8_t DSP_SingleWrite_2(uint8_t dev_addr,uint8_t host_addr,uint16_t dsp_val);
+extern uint8_t DSP_LegacyRead(uint8_t dev_addr, uint8_t host_addr,uint8_t *pVal);
+extern uint8_t DSP_SingleWrite_1_uart(uint8_t dev_addr,uint8_t dsp_addr,uint8_t dsp_val) ;
+extern uint8_t DSP_SingleWrite_2_uart(uint8_t dev_addr,uint8_t host_addr,uint16_t dsp_val);
+extern uint8_t DSP_LegacyRead_uart(uint8_t dev_addr, uint8_t host_addr,uint8_t *pVal);
 
-extern unsigned char DM_LegacyRead(unsigned char dev_addr, unsigned short dm_addr,unsigned char *pVal);
-extern unsigned char DM_SingleWrite(unsigned char dev_addr,unsigned short dm_addr,unsigned short dm_val);
-extern unsigned char DM_LegacyRead_uart(unsigned char dev_addr, unsigned short dm_addr,unsigned char *pVal);
-extern unsigned char DM_SingleWrite_uart(unsigned char dev_addr,unsigned short dm_addr,unsigned short dm_val);
+extern uint8_t DM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal);
+extern uint8_t DM_SingleWrite(uint8_t dev_addr,uint16_t dm_addr,uint16_t dm_val);
+extern uint8_t DM_LegacyRead_uart(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal);
+extern uint8_t DM_SingleWrite_uart(uint8_t dev_addr,uint16_t dm_addr,uint16_t dm_val);
 
-extern unsigned char PM_SingleWrite(unsigned char dev_addr,unsigned short dm_addr,unsigned char *pdata, unsigned int xor_key);
-extern unsigned char PM_LegacyRead(unsigned char dev_addr, unsigned short dm_addr,unsigned char *pVal);
-extern unsigned char PM_SingleWrite_uart(unsigned char dev_addr,unsigned short dm_addr,unsigned char *pdata, unsigned int xor_key);
-extern unsigned char PM_LegacyRead_uart( unsigned char dev_addr, unsigned short dm_addr,unsigned char *pVal);
+extern uint8_t PM_SingleWrite(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata, uint32_t xor_key);
+extern uint8_t PM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal);
+extern uint8_t PM_SingleWrite_uart(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata, uint32_t xor_key);
+extern uint8_t PM_LegacyRead_uart( uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal);
 
-extern unsigned char PM_BurstWrite_s(unsigned char dev_addr,unsigned short StAddr,unsigned char DatNum,void *pDat); //fake burst
+extern uint8_t PM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pDat); //fake burst
 
-extern unsigned char CM_SingleWrite(unsigned char dev_addr,unsigned short dm_addr,unsigned char *pdata);
-extern unsigned char CM_LegacyRead(unsigned char dev_addr, unsigned short dm_addr,unsigned char *pVal);
-extern unsigned char CM_SingleWrite_uart(unsigned char dev_addr,unsigned short dm_addr,unsigned char *pdata);
-extern unsigned char CM_LegacyRead_uart(unsigned char dev_addr, unsigned short dm_addr,unsigned char *pVal);
+extern uint8_t CM_SingleWrite(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata);
+extern uint8_t CM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal);
+extern uint8_t CM_SingleWrite_uart(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata);
+extern uint8_t CM_LegacyRead_uart(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal);
 
-extern unsigned char DM_FastRead(unsigned char dev_addr, unsigned short dm_addr,unsigned char *pVal);
-extern unsigned char DM_FastReadReStart(unsigned char dev_addr, unsigned short dm_addr,unsigned char *pVal) ;
-extern unsigned char DM_LegacyReadReStart(unsigned char dev_addr, unsigned short dm_addr,unsigned char *pVal);
-extern unsigned char DM_BurstWrite_s(unsigned char dev_addr,unsigned short StAddr,unsigned char DatNum,void *pDat);
+extern uint8_t DM_FastRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal);
+extern uint8_t DM_FastReadReStart(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal) ;
+extern uint8_t DM_LegacyReadReStart(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal);
+extern uint8_t DM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pDat);
 
-extern unsigned char MEM_Block_LegacyRead(     unsigned char dev_addr, 
-                                        unsigned char mem_type, 
-                                        unsigned short start_addr,
-                                        unsigned char num, 
-                                        unsigned char *pVal     );
-extern unsigned char MEM_Block_LegacyRead_uart( unsigned char  dev_addr, 
-                                         unsigned char  mem_type, 
-                                         unsigned short start_addr,
-                                         unsigned char  num, 
-                                         unsigned char *pVal     );
-extern unsigned char MEM_Block_SingleWrite(    unsigned char dev_addr,                                        
-                                        unsigned char mem_type, 
-                                        unsigned short start_addr,
-                                        unsigned char num, 
-                                        unsigned char *pVal );
-extern unsigned char MEM_Block_SingleWrite_uart(   unsigned char dev_addr,                                             
-                                            unsigned char mem_type, 
-                                            unsigned short start_addr,
-                                            unsigned char num, 
-                                            unsigned char *pVal );
+extern uint8_t MEM_Block_LegacyRead(    uint8_t dev_addr, 
+                                        uint8_t mem_type, 
+                                        uint16_t start_addr,
+                                        uint8_t num, 
+                                        uint8_t *pVal );
+extern uint8_t MEM_Block_LegacyRead_uart( uint8_t  dev_addr, 
+                                          uint8_t  mem_type, 
+                                          uint16_t start_addr,
+                                          uint8_t  num, 
+                                          uint8_t *pVal );
+extern uint8_t MEM_Block_SingleWrite( uint8_t dev_addr,                                        
+                                      uint8_t mem_type, 
+                                      uint16_t start_addr,
+                                      uint8_t num, 
+                                      uint8_t *pVal );
+extern uint8_t MEM_Block_SingleWrite_uart(  uint8_t dev_addr,                                             
+                                            uint8_t mem_type, 
+                                            uint16_t start_addr,
+                                            uint8_t num, 
+                                            uint8_t *pVal );
 
-extern unsigned char Check_IDMA( unsigned char dev_addr ) ;
+extern uint8_t Check_IDMA( uint8_t dev_addr ) ;
 
 
 

@@ -82,7 +82,7 @@ void ISR_TC1( void )
 *
 * Returns     : none.
 *
-* Note(s)     : Configure TC0 to generate an interrupt every 4ms
+* Note(s)     : Configure TC0 to generate an interrupt every 1ms
 *********************************************************************************************************
 */
 void _ConfigureTc1( uint32_t hz )

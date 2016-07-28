@@ -32,10 +32,10 @@ extern kfifo_t  ssc1_bulkin_fifo;
 extern kfifo_t  bulkout_fifo_cmd;
 extern kfifo_t  bulkin_fifo_cmd;
 
-void UsbAudio0DataReceived(  unsigned int unused,
-                              unsigned char status,
-                              unsigned int received,
-                              unsigned int remaining )
+void UsbAudio0DataReceived(  uint32_t unused,
+                              uint8_t status,
+                              uint32_t received,
+                              uint32_t remaining )
 {
     //Play          
  //   if ( ssc0_dev.status != RUNNING ) 
@@ -75,10 +75,10 @@ void UsbAudio0DataReceived(  unsigned int unused,
 }
 
 
-void UsbAudio1DataReceived(  unsigned int unused,
-                              unsigned char status,
-                              unsigned int received,
-                              unsigned int remaining )
+void UsbAudio1DataReceived(  uint32_t unused,
+                              uint8_t status,
+                              uint32_t received,
+                              uint32_t remaining )
 {
     //Play          
 //    if ( ssc1_dev.status != RUNNING ) 
@@ -112,10 +112,10 @@ void UsbAudio1DataReceived(  unsigned int unused,
     }      
 }
 
-void UsbAudio0DataTransmit(  unsigned int unused,
-                              unsigned char status,
-                              unsigned int transmit,
-                              unsigned int remaining )
+void UsbAudio0DataTransmit(  uint32_t unused,
+                              uint8_t status,
+                              uint32_t transmit,
+                              uint32_t remaining )
 {          
     //Record    
 //    if ( ssc0_dev.status != RUNNING ) 
@@ -156,10 +156,10 @@ void UsbAudio0DataTransmit(  unsigned int unused,
     
 }
 
-void UsbAudio1DataTransmit(  unsigned int unused,
-                              unsigned char status,
-                              unsigned int transmit,
-                              unsigned int remaining )
+void UsbAudio1DataTransmit(  uint32_t unused,
+                              uint8_t status,
+                              uint32_t transmit,
+                              uint32_t remaining )
 {          
     //Record    
 //    if ( ssc1_dev.status != RUNNING ) 
@@ -199,10 +199,10 @@ void UsbAudio1DataTransmit(  unsigned int unused,
     }        
 }
 
-void UsbCmdDataTransmit(  unsigned int unused,
-                              unsigned char status,
-                              unsigned int transmit,
-                              unsigned int remaining )
+void UsbCmdDataTransmit(  uint32_t unused,
+                              uint8_t status,
+                              uint32_t transmit,
+                              uint32_t remaining )
 {             
     
     if ( status == USBD_STATUS_SUCCESS  ) 
@@ -302,14 +302,14 @@ void USBDCallbacks_Initialized(void)
 }
 
 
-void USBDDriverCallbacks_ConfigurationChanged(unsigned char cfgnum)
+void USBDDriverCallbacks_ConfigurationChanged( uint8_t cfgnum)
 {
-    CDCDSerialDriver_ConfigurationChangedHandler(cfgnum);
+    CDCDSerialDriver_ConfigurationChangedHandler( cfgnum );
 }
 
-void USBDCallbacks_RequestReceived(const USBGenericRequest *request)
+void USBDCallbacks_RequestReceived( const USBGenericRequest *request )
 {
-    CDCDSerialDriver_RequestHandler(request);
+    CDCDSerialDriver_RequestHandler( request );
 }
 
 void init_usb( void *pParameter,void *dParameter )

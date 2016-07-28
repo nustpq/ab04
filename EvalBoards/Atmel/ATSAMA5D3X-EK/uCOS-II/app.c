@@ -25,7 +25,7 @@
 *
 * Filename      : app.c
 * Version       : V1.00
-* Programmer(s) : LEO
+* Programmer(s) : Leo
 * Editor        : ForteMedia SQA
 *********************************************************************************************************
 * Note(s)       : none.
@@ -71,7 +71,7 @@
 
 /*
 *********************************************************************************************************
-*                                        global object 
+*                                        global macro switch
 *********************************************************************************************************
 */
 #define UIF_COMMAND      1u
@@ -87,7 +87,11 @@
 #define UIF_TWI2	 1u
 #define UIF_USART1       1u
 
-
+/*
+*********************************************************************************************************
+*                                        global object 
+*********************************************************************************************************
+*/
 // all of data sources instance list 
 DataSource source_usb;
 DataSource source_ssc0;
@@ -111,7 +115,7 @@ uint8_t g_portMap;
 uint32_t g_portMaskMap;
 
 //twi descriptors for transmmit
- Async async;
+ Async async[ MAXTWI ];
  
 /*
 *********************************************************************************************************
@@ -120,13 +124,6 @@ uint32_t g_portMaskMap;
 */
 
 extern uint8_t g_pmeccStatus;
-#if 0 
-#define BASIC_PAGESIZE 2048
-#define SPARE_SIZE      64
-#define PAGESIZE        ( BASIC_PAGESIZE + SPARE_SIZE )
-#define BLOCKSIZE       ( 64 * PAGESIZE )
-#define PLANESIZE       ( 1024 * BLOCKSIZE )
-#endif
 
 
 /*
@@ -204,7 +201,7 @@ uint8_t spi1_ring_buffer[3072];
 
 
 //--------------------------------twi  buffer --------------------------------//
-uint8_t twi_ring_buffer[3][256];
+uint8_t twi_ring_buffer[ MAXTWI ][ 256 ];
 
 /*
 *********************************************************************************************************
@@ -566,9 +563,11 @@ int main()
     source_ssc0.peripheralParameter = ( void * )Audio_Configure_Instance0;
     
     source_ssc0.init_source = init_I2S;
+#if UNUSED
     source_ssc0.play = SSC0_Playing;
     source_ssc0.record = SSC0_Recording;
-    source_ssc0.buffer_write = NULL;
+#endif
+    source_ssc0.buffer_write = ssc0_buffer_write;
     
     if( NULL != source_ssc0.init_source )
         source_ssc0.init_source( &source_ssc0,NULL );
@@ -587,9 +586,11 @@ int main()
     source_ssc1.peripheralParameter = ( void * )Audio_Configure_Instance1;
     
     source_ssc1.init_source = init_I2S;
+#if UNUSED
     source_ssc1.play = SSC1_Playing;
     source_ssc1.record = SSC1_Recording;
-    source_ssc1.buffer_write = NULL;
+#endif
+    source_ssc1.buffer_write = ssc1_buffer_write;
     
     if( NULL != source_ssc1.init_source )
        source_ssc1.init_source( &source_ssc1,NULL );
@@ -749,7 +750,7 @@ int main()
 #endif 
 
 #if UIF_USART1
-        //initialize ssc1 object and it's operation 
+        //initialize usart1 object and it's operation 
     memset( ( void * )&source_usart1, 0 , sizeof( DataSource ) );
     source_usart1.dev.direct = ( uint8_t )BI;
     source_usart1.dev.identify = ID_USART1;
@@ -768,7 +769,7 @@ int main()
     if( NULL != source_usart1.init_source )
        source_usart1.init_source( &source_usart1,NULL );
 #endif 
-    
+      
     //config port dma
     Dma_configure( );
     
@@ -1018,11 +1019,12 @@ static  void  AppTaskSSC0 ( void *p_arg )
                         &&( ( uint8_t )RUNNING != source_ssc0.status ) )
                     {
 //                          OSSchedLock( );
-                          source_ssc0.play( &source_ssc0 );
-                          source_ssc0.record( &source_ssc0 );
+//                          source_ssc0.play( &source_ssc0 );
+                          source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_I2SBuffersOut,PINGPONG_SIZE );
+//                          source_ssc0.record( &source_ssc0 );
                           source_ssc0.status = ( uint8_t )START;
-                          source_ssc1.play( &source_ssc1 );
-                          source_ssc1.record( &source_ssc1 );
+//                          source_ssc1.play( &source_ssc1 );
+//                          source_ssc1.record( &source_ssc1 );
                           source_ssc1.status = ( uint8_t )START;
 //                          OSSchedUnlock( );
                     }                 
@@ -1114,6 +1116,8 @@ static  void  AppTaskFirmwareVecUpdate  ( void        *p_arg )
 #define RESTORE_FIRMWARE 3 
 #define STORE_VEC        4
 #define READ_VEC         5
+#define WRITE_SYSINFO    6
+#define READ_SYSINFO     7
   
     uint8_t type = 0;
     uint8_t ret = 0;
@@ -1200,7 +1204,25 @@ static  void  AppTaskFirmwareVecUpdate  ( void        *p_arg )
              if( 0 != ret )
                   APP_TRACE_INFO(("Read VEC failed!\r\n"));  
              //4.copy data to target if needed
-          break; 
+          break;
+          case WRITE_SYSINFO:
+            {
+              SYSINFO info;
+              memset( ( void * )&info, 0 , sizeof( SYSINFO ) );
+              sprintf( ( char * )info.date,"2016-07-28" );
+              sprintf( ( char * )info.firmware_version , "AB04-f-0704-0.01" );
+              sprintf( ( char * )info.adaptor_soft_version , "Tuner-0704-1.0.0" );
+              sprintf( ( char * )info.hardware_version , "AB04-h-0801-0.0.1" );
+              uif_write_sysinfo( ( void * )&info,sizeof( SYSINFO ) );
+            }
+          break;
+          case READ_SYSINFO:
+            {
+              SYSINFO info;
+              memset( ( void * )&info, 0 , sizeof( SYSINFO ) );
+              uif_read_sysinfo( ( void * )&info,sizeof( SYSINFO ) ); 
+            }
+          break;
          default:
            //do nothing;
           break;

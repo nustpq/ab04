@@ -84,12 +84,16 @@ static void _set_perpheral_instance( DataSource *pSource );
 static void _config_pins( uint32_t id );
 
 #ifdef USE_DMA
-void buffer_read( void *pInstance,const uint8_t *buf,uint32_t len );
-void buffer_write( void *pInstance,const uint8_t *buf,uint32_t len );
-void SSC0_Playing( void *pInstance );
+uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len );
+uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len );
+uint8_t ssc1_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len );
+uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len );
+#if UNUSED  //these interface will be instead with xx_buffer_xx
+void SSC0_Playing( void *pInstance );                        
 void SSC1_Playing( void *pInstance );
 void SSC0_Recording( void *pInstance );
 void SSC1_Recording( void *pInstance );
+#endif
 void _ssc_ConfigureDma( void* instance );
 #endif
 

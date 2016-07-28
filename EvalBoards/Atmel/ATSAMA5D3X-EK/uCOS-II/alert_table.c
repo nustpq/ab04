@@ -29,22 +29,22 @@
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void Alert_Sound_Gen( unsigned char *pdata, unsigned int size, unsigned int REC_SR_Set )
+void Alert_Sound_Gen( uint8_t *pdata, uint32_t size, uint32_t REC_SR_Set )
 {
     
-    unsigned int     sample_per_ms;
-    unsigned int     table_lookup_step;     
-    unsigned short  *pDest;
-    unsigned int     sample_index = 0;
-    unsigned short   temp;
+    uint32_t     sample_per_ms;
+    uint32_t     table_lookup_step;     
+    uint16_t  *pDest;
+    uint32_t     sample_index = 0;
+    uint16_t   temp;
     
-    static unsigned int    index=0;    
-    const unsigned short  *pVal;
+    static uint32_t    index=0;    
+    const uint16_t  *pVal;
     
     sample_per_ms     = REC_SR_Set / 1000 ;
     table_lookup_step = ALERT_TABLE_SR / sample_per_ms;    
-    pVal              = (const unsigned short  *)alert_table; 
-    pDest             = ( unsigned short  *)pdata; 
+    pVal              = (const uint16_t  *)alert_table; 
+    pDest             = ( uint16_t  *)pdata; 
     
         
     while( sample_index < (size>>3) ) {  //4CH      

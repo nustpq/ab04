@@ -7,7 +7,9 @@
 #ifndef  __ALERT_TABLE_H 
 #define  __ALERT_TABLE_H 
 
-extern void Alert_Sound_Gen( unsigned char *pdata, unsigned int size, unsigned int REC_SR_Set );
+#include <stdint.h>
+
+extern void Alert_Sound_Gen( uint8_t *pdata, uint32_t size, uint32_t REC_SR_Set );
 
 //------------------------------------------------------------
 //-----------       Created with 010 Editor        -----------
@@ -17,7 +19,7 @@ extern void Alert_Sound_Gen( unsigned char *pdata, unsigned int size, unsigned i
 // Address : 0 (0x0)
 // Size    : 96000 (0x17700) = 1s @48kHz,16bit,mono
 //------------------------------------------------------------
-const unsigned char alert_table[96000] = {
+const uint8_t alert_table[96000] = {
     0x04, 0x00, 0x0F, 0x00, 0x14, 0x00, 0x0E, 0x00,
     0x06, 0x00, 0xFD, 0xFF, 0xFA, 0xFF, 0xFD, 0xFF,
     0xFE, 0xFF, 0x02, 0x00, 0x05, 0x00, 0x09, 0x00,

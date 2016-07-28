@@ -17,7 +17,7 @@ typedef enum _twi_port
     UNAMED = 0,
     CODEC ,
     FM36,
-    UNKNOWN
+    MAXTWI
 }TWIPORT;
 
 typedef struct twi_option

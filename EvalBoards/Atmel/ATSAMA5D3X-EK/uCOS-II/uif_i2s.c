@@ -240,6 +240,20 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
    
 }
 
+/*
+*********************************************************************************************************
+*                                               _SSC1_DmaRxCallback()
+*
+* Description : ssc1 port rx dma callback fuction
+*
+* Arguments   : status    : transmmit of previous result
+*               pArg      : instance of ssc
+*               
+* Returns     : none
+*
+* Note(s)     : none
+*********************************************************************************************************
+*/
 void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 {    
     assert( NULL != pArg );
@@ -288,7 +302,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 *********************************************************************************************************
 */
 #ifdef USE_DMA
-#define TEST_BUF 1
+#define TEST_BUF 0
 
 #ifndef USE_EVENTGROUP
 extern OS_FLAG_GRP *g_pStartUSBTransfer;
@@ -296,6 +310,7 @@ extern OS_FLAG_GRP *g_pStartUSBTransfer;
 
 extern uint16_t TxBuffers[2][PINGPONG_SIZE];
 extern uint16_t TxBuffers1[2][PINGPONG_SIZE];
+
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
       static uint8_t error;
@@ -377,6 +392,20 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 #endif  
 }
 
+/*
+*********************************************************************************************************
+*                                               _SSC1_DmaTxCallback()
+*
+* Description : callback function for SSC1 DMA Tx
+*
+* Arguments   : status       : reserved
+*               pArg         : reserved
+*               
+* Returns     : none
+*
+* Note(s)     : none
+*********************************************************************************************************
+*/
 void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 {
       static uint8_t error;
@@ -458,11 +487,13 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 #endif  
 }
 #endif
+
+
 /*
 *********************************************************************************************************
-*                                               SSCx_Recording()
+*                                               SSC0_Recording()
 *
-* Description : SSCx recording DMA parameter config 
+* Description : SSC0 recording DMA parameter config 
 *
 * Arguments   : pInstance     :datasource object
 * Returns     : none
@@ -470,8 +501,8 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 * Note(s)     : it is NOT reentrant;
 *********************************************************************************************************
 */
-
 #ifdef USE_DMA
+#if UNUSED  //It will be instead with xx_buffer_write;
 void SSC0_Recording( void *pInstance )
 { 
         assert( NULL != pInstance );
@@ -513,7 +544,21 @@ void SSC0_Recording( void *pInstance )
         
         SSC_EnableReceiver(pSsc);          
 }
+#endif
 
+/*
+*********************************************************************************************************
+*                                               SSC1_Recording()
+*
+* Description : SSC1 recording DMA parameter config 
+*
+* Arguments   : pInstance     :datasource object
+* Returns     : none
+*
+* Note(s)     : it is NOT reentrant;
+*********************************************************************************************************
+*/
+#if UNUSED  //It will be instead with xx_buffer_write;
 void SSC1_Recording( void *pInstance )
 { 
         assert( NULL != pInstance );
@@ -559,7 +604,125 @@ void SSC1_Recording( void *pInstance )
 
 /*
 *********************************************************************************************************
-*                                               SSCx_Playing()
+*                                               ssc0_buffer_read()
+*
+* Description : transmmit via ssc0 using dma
+*
+* Arguments   : pInstance     :datasource object
+*               buf           :data
+*               len           :size of data in bytes
+* Returns     : none
+*
+* Note(s)     : it is NOT reentrant,and will use this interface to instead SSC0_Recording
+*********************************************************************************************************
+*/
+uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
+{ 
+        assert( NULL != pInstance );
+		
+	DataSource *pSource = (DataSource *)pInstance;
+	sDmaTransferDescriptor *pTds = dmaTdSSC0Rx;
+        
+        Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
+        
+        pTds[0].dwSrcAddr = ( uint32_t )&SSC0->SSC_RHR;
+        pTds[0].dwDstAddr = ( uint32_t )buf; 
+        pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
+                             | DMAC_CTRLA_SRC_WIDTH_BYTE
+                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+        pTds[0].dwCtrlB   = DMAC_CTRLB_FC_PER2MEM_DMA_FC
+                             | DMAC_CTRLB_SRC_INCR_FIXED
+                             | DMAC_CTRLB_DST_INCR_INCREMENTING
+                             | DMAC_CTRLB_SIF_AHB_IF2
+                             | DMAC_CTRLB_DIF_AHB_IF0
+                             ;      
+        pTds[0].dwDscAddr = (uint32_t) &pTds[1];
+        
+        pTds[1].dwSrcAddr = ( uint32_t )&SSC0->SSC_RHR;
+        pTds[1].dwDstAddr = ( uint32_t )( buf + len ); 
+        pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
+                             | DMAC_CTRLA_SRC_WIDTH_BYTE
+                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+        pTds[1].dwCtrlB   = DMAC_CTRLB_FC_PER2MEM_DMA_FC
+                             | DMAC_CTRLB_SRC_INCR_FIXED
+                             | DMAC_CTRLB_DST_INCR_INCREMENTING
+                             | DMAC_CTRLB_SIF_AHB_IF2
+                             | DMAC_CTRLB_DIF_AHB_IF0
+                             ;      
+        pTds[1].dwDscAddr = (uint32_t) &pTds[0];
+               
+        /* Enable recording(SSC RX) */
+        DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.rxDMAChannel, dmaTdSSC0Rx);
+        DMAD_StartTransfer(&g_dmad, pSource->dev.rxDMAChannel);
+        
+        SSC_EnableReceiver(pSsc); 
+        
+        return 0;
+}
+
+
+/*
+*********************************************************************************************************
+*                                               ssc1_buffer_read()
+*
+* Description : transmmit via ssc1 using dma
+*
+* Arguments   : pInstance     :datasource object
+*               buf           :data
+*               len           :size of data in bytes
+* Returns     : none
+*
+* Note(s)     : it is NOT reentrant,and will use this interface to instead SSC1_Recording
+*********************************************************************************************************
+*/
+uint8_t ssc1_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
+{ 
+        assert( NULL != pInstance );
+		
+	DataSource *pSource = (DataSource *)pInstance;
+	sDmaTransferDescriptor *pTds = dmaTdSSC1Rx;
+        
+        Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
+        
+        pTds[0].dwSrcAddr = ( uint32_t )&SSC1->SSC_RHR;
+        pTds[0].dwDstAddr = ( uint32_t )buf; 
+        pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
+                             | DMAC_CTRLA_SRC_WIDTH_BYTE
+                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+        pTds[0].dwCtrlB   = DMAC_CTRLB_FC_PER2MEM_DMA_FC
+                             | DMAC_CTRLB_SRC_INCR_FIXED
+                             | DMAC_CTRLB_DST_INCR_INCREMENTING
+                             | DMAC_CTRLB_SIF_AHB_IF2
+                             | DMAC_CTRLB_DIF_AHB_IF0
+                             ;      
+        pTds[0].dwDscAddr = (uint32_t) &pTds[1];
+        
+        pTds[1].dwSrcAddr = ( uint32_t )&SSC1->SSC_RHR;
+        pTds[1].dwDstAddr = ( uint32_t )( buf + len ); 
+        pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
+                             | DMAC_CTRLA_SRC_WIDTH_BYTE
+                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+        pTds[1].dwCtrlB   = DMAC_CTRLB_FC_PER2MEM_DMA_FC
+                             | DMAC_CTRLB_SRC_INCR_FIXED
+                             | DMAC_CTRLB_DST_INCR_INCREMENTING
+                             | DMAC_CTRLB_SIF_AHB_IF2
+                             | DMAC_CTRLB_DIF_AHB_IF0
+                             ;      
+        pTds[1].dwDscAddr = (uint32_t) &pTds[0];
+               
+        /* Enable recording(SSC RX) */
+        DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.rxDMAChannel, dmaTdSSC1Rx);
+        DMAD_StartTransfer(&g_dmad, pSource->dev.rxDMAChannel);
+        
+        SSC_EnableReceiver(pSsc); 
+        
+        return 0;
+}
+#endif
+
+/*
+*********************************************************************************************************
+*                                               SSC0_Playing()
 *
 * Description : SSC0 Tx DMA parameter config 
 *
@@ -571,6 +734,7 @@ void SSC1_Recording( void *pInstance )
 */
 
 #ifdef USE_DMA
+#if UNUSED  //It will be instead with xx_buffer_write;
 void SSC0_Playing( void *pInstance )
 {
 	assert( NULL != pInstance );
@@ -579,7 +743,7 @@ void SSC0_Playing( void *pInstance )
 	sDmaTransferDescriptor *pTds = dmaTdSSC0Tx;
         
         memset( TxBuffers,0x5555,sizeof( TxBuffers ) );
-//        memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ));
+        memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ));
                 
         Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
 		/* Setup TD list for TX */
@@ -606,7 +770,7 @@ void SSC0_Playing( void *pInstance )
 #if   TEST_BUF	
 		pTds[1].dwSrcAddr = (uint32_t) TxBuffers[1];
 #else
-                pTds[0].dwSrcAddr = (uint32_t) ssc0_I2SBuffersOut[ 1 ];
+                pTds[1].dwSrcAddr = (uint32_t) ssc0_I2SBuffersOut[ 1 ];
 #endif
 		pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 #if   TEST_BUF
@@ -628,10 +792,25 @@ void SSC0_Playing( void *pInstance )
 
                 SSC_EnableTransmitter( pSsc );
 }
+#endif
 
+
+/*
+*********************************************************************************************************
+*                                               SSC1_Playing()
+*
+* Description : SSC1 Tx DMA parameter config 
+*
+* Arguments   : pInstance     :datasource object
+* Returns     : none
+*
+* Note(s)     : it is NOT reentrant;
+*********************************************************************************************************
+*/
+#if UNUSED  //It will be instead with xx_buffer_write;
 void SSC1_Playing( void *pInstance )
 {
-#define TEST_BUF 1
+//#define TEST_BUF 1
 	assert( NULL != pInstance );
 		
 	DataSource *pSource = (DataSource *)pInstance;
@@ -665,7 +844,7 @@ void SSC1_Playing( void *pInstance )
 #if   TEST_BUF	
 		pTds[1].dwSrcAddr = (uint32_t) TxBuffers1[1];
 #else
-                pTds[0].dwSrcAddr = (uint32_t) ssc0_I2SBuffersOut[ 1 ];
+                pTds[1].dwSrcAddr = (uint32_t) ssc0_I2SBuffersOut[ 1 ];
 #endif
 		pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 #if   TEST_BUF
@@ -687,78 +866,124 @@ void SSC1_Playing( void *pInstance )
 
                 SSC_EnableTransmitter( pSsc );
 }
+#endif
 
 /*
 *********************************************************************************************************
-*                                               buffer_write()
+*                                               ssc0_buffer_write()
 *
 * Description : buffer write via SSC0 
 *
 * Arguments   : pInstance     :datasource object handle
-*               buf:          buf will be writed;
-*               len:          bytes of buf;
+*               buf:          :buf will be writed;
+*               len:          :bytes of buf;
 * Returns     : none
 *
-* Note(s)     : unused,it is NOT reentrant;
+* Note(s)     : it is NOT reentrant;
 *********************************************************************************************************
 */
-void buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
+uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 {
-  	assert( NULL != pInstance );
+	assert( NULL != pInstance );
 		
 	DataSource *pSource = (DataSource *)pInstance;
 	sDmaTransferDescriptor *pTds = dmaTdSSC0Tx;
         
-        memset( ( void * )buf,0x5555,len ); //PINGPONG_SIZE
-//        memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ));
+        memset( TxBuffers,0x5555,sizeof( TxBuffers ) );
+        memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ));
                 
         Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
-		/* Setup TD list for TX */
-#if   TEST_BUF      
-		pTds[0].dwSrcAddr = (uint32_t) buf[0];
-#else
-                pTds[0].dwSrcAddr = (uint32_t) ssc0_I2SBuffersOut[ 0 ];
-#endif
-                
-		pTds[0].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
-#if   TEST_BUF
-		pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
-#else
-                pTds[0].dwCtrlA  = DMAC_CTRLA_BTSIZE( len >> 1 )
-#endif
-						  | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
-		pTds[0].dwCtrlB   = 0
-						  | DMAC_CTRLB_SIF_AHB_IF0
-						  | DMAC_CTRLB_DIF_AHB_IF2
-						  | DMAC_CTRLB_FC_MEM2PER_DMA_FC
-						  | DMAC_CTRLB_SRC_INCR_INCREMENTING
-						  | DMAC_CTRLB_DST_INCR_FIXED;
-		pTds[0].dwDscAddr = (uint32_t) &pTds[1];
-#if   TEST_BUF	
-		pTds[ 1 ].dwSrcAddr = (uint32_t) ( buf[ 0 ]+len >> 1 );
-#else
-                pTds[ 1 ].dwSrcAddr = (uint32_t)( buf[ 0 ]+len >> 1 );
-#endif
-		pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
-#if   TEST_BUF
-		pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
-#else
-                pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
-#endif
-						  | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
-		pTds[1].dwCtrlB   = 0
-						  | DMAC_CTRLB_SIF_AHB_IF0
-						  | DMAC_CTRLB_DIF_AHB_IF2
-						  | DMAC_CTRLB_FC_MEM2PER_DMA_FC
-						  | DMAC_CTRLB_SRC_INCR_INCREMENTING
-						  | DMAC_CTRLB_DST_INCR_FIXED;
-		pTds[1].dwDscAddr = (uint32_t) &pTds[0];
-               
-                DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC0Tx);
-                DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
+	/* Setup TD list for TX */
+        pTds[0].dwSrcAddr = (uint32_t) buf;               
+	pTds[0].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 
-                SSC_EnableTransmitter( pSsc );
+	pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
+			    | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+	pTds[0].dwCtrlB   = 0
+			    | DMAC_CTRLB_SIF_AHB_IF0
+			    | DMAC_CTRLB_DIF_AHB_IF2
+			    | DMAC_CTRLB_FC_MEM2PER_DMA_FC
+			    | DMAC_CTRLB_SRC_INCR_INCREMENTING
+			    | DMAC_CTRLB_DST_INCR_FIXED;
+	pTds[0].dwDscAddr = (uint32_t) &pTds[1];
+	pTds[1].dwSrcAddr = (uint32_t) ( buf + len );
+	pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
+	pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
+			  | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+	pTds[1].dwCtrlB   = 0
+			  | DMAC_CTRLB_SIF_AHB_IF0
+			  | DMAC_CTRLB_DIF_AHB_IF2
+			  | DMAC_CTRLB_FC_MEM2PER_DMA_FC
+			  | DMAC_CTRLB_SRC_INCR_INCREMENTING
+			  | DMAC_CTRLB_DST_INCR_FIXED;
+	pTds[1].dwDscAddr = (uint32_t) &pTds[0];
+               
+        DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC0Tx);
+        DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
+
+        SSC_EnableTransmitter( pSsc );
+        
+        return 0;
 }
+
+/*
+*********************************************************************************************************
+*                                               ssc1_buffer_write()
+*
+* Description : buffer write via SSC1
+*
+* Arguments   : pInstance     :datasource object handle
+*               buf:          :buf will be writed;
+*               len:          :bytes of buf;
+* Returns     : none
+*
+* Note(s)     : it is NOT reentrant;
+*********************************************************************************************************
+*/
+uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
+{
+	assert( NULL != pInstance );
+		
+	DataSource *pSource = (DataSource *)pInstance;
+	sDmaTransferDescriptor *pTds = dmaTdSSC1Tx;
+        
+        memset( TxBuffers,0x5555,sizeof( TxBuffers ) );
+        memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ));
+                
+        Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
+	/* Setup TD list for TX */
+        pTds[0].dwSrcAddr = (uint32_t) buf;               
+	pTds[0].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
+
+	pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
+			    | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+	pTds[0].dwCtrlB   = 0
+			    | DMAC_CTRLB_SIF_AHB_IF0
+			    | DMAC_CTRLB_DIF_AHB_IF2
+			    | DMAC_CTRLB_FC_MEM2PER_DMA_FC
+			    | DMAC_CTRLB_SRC_INCR_INCREMENTING
+			    | DMAC_CTRLB_DST_INCR_FIXED;
+	pTds[0].dwDscAddr = (uint32_t) &pTds[1];
+	pTds[1].dwSrcAddr = (uint32_t) ( buf + len );
+	pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
+	pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
+			  | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+	pTds[1].dwCtrlB   = 0
+			  | DMAC_CTRLB_SIF_AHB_IF0
+			  | DMAC_CTRLB_DIF_AHB_IF2
+			  | DMAC_CTRLB_FC_MEM2PER_DMA_FC
+			  | DMAC_CTRLB_SRC_INCR_INCREMENTING
+			  | DMAC_CTRLB_DST_INCR_FIXED;
+	pTds[1].dwDscAddr = (uint32_t) &pTds[0];
+               
+        DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC0Tx);
+        DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
+
+        SSC_EnableTransmitter( pSsc );
+        
+        return 0;
+}
+
 #endif
 
 
@@ -852,12 +1077,12 @@ void ssc_rxRegister_set( void *instance,void *parameter )
 *********************************************************************************************************
 */
                        
-static void _SSC_Init( unsigned int id,
-                       unsigned int slave,
-                       unsigned int bitrate,
-                       unsigned int mclk, 
-                       unsigned char slot_num, 
-                       unsigned char slot_len )
+static void _SSC_Init( uint32_t id,
+                       uint32_t slave,
+                       uint32_t bitrate,
+                       uint32_t mclk, 
+                       uint8_t slot_num, 
+                       uint8_t slot_len )
 {
     assert( ( (uint32_t )ID_SSC0 == id ) || ( (uint32_t )ID_SSC1 == id ) );
     
