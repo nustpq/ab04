@@ -540,8 +540,12 @@
 
 /** Total number of MCI interface */
 #define BOARD_NUM_MCI           2
+
+#ifdef MCI0
 /** MCI0 IO pins definition. (PD0-PD9) */
 #define BOARD_MCI0_PINS        {0x3FF, PIOD, ID_PIOD, PIO_PERIPH_A, PIO_DEFAULT}
+#endif
+
 /** MCI1 IO pins definition. (PA2-PA4, PA11-PA13) */
 #define BOARD_MCI1_PINS        {0x1F80000, PIOB, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT}
 #endif
@@ -693,26 +697,29 @@
 
 #define PIN_LED_PORT0           {(PIO_PA24), PIOA, ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT}
 
-/*------------------------------------------------------------------------------*/
-#define PIN_GPIO_0              {PIO_PC15, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_1              {PIO_PC16, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_2              {PIO_PC17, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_3              {PIO_PC18, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_4              {PIO_PC19, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_5              {PIO_PC20, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_6              {PIO_PC21, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_7              {PIO_PC22, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_8              {PIO_PC23, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_9              {PIO_PC24, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_10             {PIO_PC25, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_11             {PIO_PC26, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
-#define PIN_GPIO_12             {PIO_PC27, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+/*--------------------------------------------------------------------------------------------*/
+#if 0
+#define PIN_GPIO_0              {PIO_PD0, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define PIN_GPIO_1              {PIO_PD1, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define PIN_GPIO_2              {PIO_PD2, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define PIN_GPIO_3              {PIO_PD3, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define PIN_GPIO_4              {PIO_PD4, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define PIN_GPIO_5              {PIO_PD5, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define PIN_GPIO_6              {PIO_PD6, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define PIN_GPIO_7              {PIO_PD7, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define PIN_GPIO_8              {PIO_PD8, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define PIN_GPIO_9              {PIO_PD9, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#endif
+
+#define BOARD_GPIO_REC          {0x3FF  , PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
 
 #define PIN_PMIC_IRQ            {PIO_PC31, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE PIO_IT_FALL_EDGE}
 
 
 #define PIN_1_WIRE              {PIO_PE23, PIOE, ID_PIOE, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE PIO_IT_FALL_EDGE}
 #define PIN_USER_BTN            {PIO_PE29, PIOE, ID_PIOE, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE PIO_IT_FALL_EDGE}
+
+
 #endif
  
 /** Push button #0 definition. Attributes = pull-up + debounce + interrupt on rising edge. */
