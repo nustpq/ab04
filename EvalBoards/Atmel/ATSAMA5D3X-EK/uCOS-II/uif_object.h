@@ -98,8 +98,6 @@ typedef struct _DataSource
 	void ( *set_peripheral )( void *instance,void *parameter );    //set register;
 	void ( *peripheral_start )( void *instance );                  //starting peripheral
 	void ( *peripheral_stop )( void *instance );		       //stoping peripheral
-        void ( *record )( void *instance );                            //maybe instead start function?
-        void ( *play   )( void *instance );                            //as above
   
         uint8_t ( *buffer_read )( void *pInstance,
                                   const uint8_t *buf,
