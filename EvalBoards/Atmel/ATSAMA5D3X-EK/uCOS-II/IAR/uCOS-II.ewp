@@ -1936,6 +1936,9 @@
       <name>$PROJ_DIR$\..\mem_basic.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\noah_cmd.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\os_cfg.h</name>
     </file>
     <file>
