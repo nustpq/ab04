@@ -68,6 +68,7 @@
 #include "uif_twi.h"
 #include "uif_usart.h"
 #include "uif_nandflash.h"
+#include "uif_gpio.h"
 
 /*
 *********************************************************************************************************
@@ -86,6 +87,7 @@
 #define UIF_TWI1	 1u
 #define UIF_TWI2	 1u
 #define UIF_USART1       1u
+#define UIF_GPIO         1u
 
 /*
 *********************************************************************************************************
@@ -102,6 +104,7 @@ DataSource source_twi0;
 DataSource source_twi1;
 DataSource source_twi2;
 DataSource source_usart1;
+DataSource source_gpio;
 
 //task sync variable
 OS_FLAG_GRP *g_pStartUSBTransfer;      //when one port data ready,notify usb port,
@@ -135,6 +138,14 @@ extern uint8_t g_pmeccStatus;
 
 sDmad g_dmad;                                           //dma descriptor object
 
+
+
+/*
+*********************************************************************************************************
+*                                        GPIO pin 
+*********************************************************************************************************
+*/
+extern const Pin gpio_pins[ ];
 
 /*
 *********************************************************************************************************
@@ -613,8 +624,6 @@ int main()
     
     
     source_spi0.init_source = init_spi;
-    source_spi0.play = NULL;
-    source_spi0.record = NULL;
     source_spi0.peripheral_stop = stop_spi;
     source_spi0.buffer_write = NULL;
     
@@ -640,8 +649,6 @@ int main()
     
     
     source_spi1.init_source = init_spi;
-    source_spi1.play = NULL;
-    source_spi1.record = NULL;
     source_spi1.peripheral_stop = stop_spi;
     source_spi1.buffer_write = NULL;
     
@@ -654,7 +661,7 @@ int main()
     //initialize twi0 object and it's operation     
     OPTIONPARAMETER twi0ChipConf[ 2 ];
     memset( ( void * )&twi0ChipConf[ 0 ], 0 ,sizeof( OPTIONPARAMETER ) << 1 );
-    twi0ChipConf[ 0 ].address = 0xc0;
+    twi0ChipConf[ 0 ].address = 0xc0 >> 1;
     twi0ChipConf[ 0 ].iaddress = 0;
     twi0ChipConf[ 0 ].isize = 0;
     twi0ChipConf[ 0 ].revers = 0;
@@ -669,8 +676,6 @@ int main()
     source_twi0.privateData = &twi0ChipConf[ 0 ];
 
     source_twi0.init_source = twi_init_master;
-    source_twi0.play = NULL;
-    source_twi0.record = NULL;
     source_twi0.buffer_write = twi_uname_write;
     source_twi0.buffer_read = twi_uname_read;
     
@@ -704,8 +709,6 @@ int main()
     source_twi1.privateData = &twi1_chipConf[ 0 ];
 
     source_twi1.init_source = twi_init_master;
-    source_twi1.play = NULL;
-    source_twi1.record = NULL;
     source_twi1.buffer_write = twi_uname_write;
     source_twi1.buffer_read = twi_uname_read;
     
@@ -739,8 +742,6 @@ int main()
     source_twi2.privateData = &twi2_chipConf[ 0 ];
     
     source_twi2.init_source = twi_init_master;
-    source_twi2.play = NULL;
-    source_twi2.record = NULL;
     source_twi2.buffer_write = twi_fm36_write;
     source_twi2.buffer_read = twi_fm36_read;
     
@@ -758,17 +759,33 @@ int main()
     source_usart1.status = ( uint8_t )FREE;
     source_usart1.tx_index = 0;
     source_usart1.rx_index = 0;
-//    source_usart1.peripheralParameter = ( void * )Audio_Configure_Instance1;
     
     source_usart1.init_source = usart_init;
-    source_usart1.play = NULL;
-    source_usart1.record = NULL;
     source_usart1.buffer_write = usart1_DmaTx;
     source_usart1.buffer_read = usart1_DmaRx;
     
     if( NULL != source_usart1.init_source )
        source_usart1.init_source( &source_usart1,NULL );
 #endif 
+    
+#if UIF_GPIO
+            //initialize usart1 object and it's operation 
+    memset( ( void * )&source_gpio, 0 , sizeof( DataSource ) );
+    source_gpio.dev.direct = ( uint8_t )BI;
+    source_gpio.dev.identify = ID_PIOD;
+    source_gpio.dev.instanceHandle = (uint32_t)PIOD;
+    source_gpio.status = ( uint8_t )FREE;
+    source_gpio.privateData = ( void * )gpio_pins;
+    source_gpio.tx_index = 0;
+    source_gpio.rx_index = 0;
+    
+    source_gpio.init_source = gpio_Init;
+    source_gpio.buffer_write = gpio_Pin_Set;
+    source_gpio.buffer_read = gpio_Pin_Get;
+    
+    if( NULL != source_gpio.init_source )
+       source_gpio.init_source( &source_gpio,NULL );
+#endif
       
     //config port dma
     Dma_configure( );
@@ -918,7 +935,7 @@ static  void  AppTaskLED ( void *p_arg )
         _spiDmaTx( &source_spi1 );
                
         usart1_DmaTx( &source_usart1 , NULL , 0 );
-//       twi_uname_write( &source_twi0,twi_ring_buffer[0],sizeof( twi_ring_buffer[ 0 ] ) );
+        twi_uname_write( &source_twi0,twi_ring_buffer[0],sizeof( twi_ring_buffer[ 0 ] ) >> 10 );
     }
 
 }

@@ -175,6 +175,7 @@
           <state>sama5d3x</state>
           <state>CUSTOM_USB</state>
           <state>USE_DMA</state>
+          <state>BOARD_UIF2</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -1942,6 +1943,9 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\uif_dsp.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\uif_gpio.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\uif_i2s.c</name>

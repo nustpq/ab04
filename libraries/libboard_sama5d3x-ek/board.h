@@ -698,7 +698,7 @@
 #define PIN_LED_PORT0           {(PIO_PA24), PIOA, ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT}
 
 /*--------------------------------------------------------------------------------------------*/
-#if 0
+#if 1
 #define PIN_GPIO_0              {PIO_PD0, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
 #define PIN_GPIO_1              {PIO_PD1, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
 #define PIN_GPIO_2              {PIO_PD2, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
@@ -711,7 +711,10 @@
 #define PIN_GPIO_9              {PIO_PD9, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
 #endif
 
-#define BOARD_GPIO_REC          {0x3FF  , PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+//#define BOARD_REC_GPIO          {0x3FF  , PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
+#define BOARD_REC_GPIO          PIN_GPIO_0,PIN_GPIO_1,PIN_GPIO_2,PIN_GPIO_3,PIN_GPIO_4,PIN_GPIO_5,\
+                                PIN_GPIO_6,PIN_GPIO_7,PIN_GPIO_8,PIN_GPIO_9
+                                
 
 #define PIN_PMIC_IRQ            {PIO_PC31, PIOC, ID_PIOC, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE PIO_IT_FALL_EDGE}
 
