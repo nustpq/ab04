@@ -91,6 +91,7 @@ typedef struct _sys_info
   uint8_t model[ 32 ];
 }SYSINFO;
 
+
 //copy these struct from uif1.0 for compatiblity and will delete if don't need
 typedef  uint8_t VERSION_DATA[ DEF_VERSION_STR_LEN ] ;  
 typedef  uint8_t MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
@@ -361,6 +362,7 @@ extern DataSource source_spi1;
 extern DataSource source_twi0;
 extern DataSource source_twi1;
 extern DataSource source_twi2;
+extern DataSource source_gpio;
 
 //-----------------------task syncoronize P/V---------------------------------//
 extern OS_FLAG_GRP *g_StartUSBTransfer;
