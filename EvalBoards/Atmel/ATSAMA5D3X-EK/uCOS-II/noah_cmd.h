@@ -14,7 +14,8 @@
 #ifndef     __NOAH_CMD_H__
 #define     __NOAH_CMD_H__
 
-
+#include <stdint.h>
+#include "defined.h"
 /*
 *********************************************************************************************************
 *                                             ERROR CODES
@@ -346,39 +347,39 @@ typedef struct {
 */
 extern void Init_EMB_BUF( EMB_BUF* pEBuf ) ;
 extern void Init_CMD_Read( CMDREAD* pCMD_Read, OS_EVENT  *pOS_EVENT ) ;
-extern void Noah_CMD_Read( CMDREAD* pCMD_Read, CPU_INT08U data_byte ) ;
-//extern CPU_INT08U Noah_CMD_Parse(   CPU_INT08U  *pCmdDat, 
+extern void Noah_CMD_Read( CMDREAD* pCMD_Read, uint8_t data_byte ) ;
+//extern uint8_t Noah_CMD_Parse(   uint8_t  *pCmdDat, 
 //                                    CPU_INT32U datalen
 //                                );
-extern CPU_INT08U pcSendDateToBuf(  OS_EVENT   *pOS_EVENT, 
-                                    CPU_INT08U  frame_head, 
-                                    CPU_INT08U *pdat, 
-                                    CPU_INT08U  data_length, 
-                                    CPU_INT08U  msg_post_mode,
-                                    CPU_INT08U  *pex_dat,
-                                    CPU_INT08U   ex_data_length 
+extern uint8_t pcSendDateToBuf(  OS_EVENT   *pOS_EVENT, 
+                                    uint8_t  frame_head, 
+                                    uint8_t *pdat, 
+                                    uint8_t  data_length, 
+                                    uint8_t  msg_post_mode,
+                                    uint8_t  *pex_dat,
+                                    uint8_t   ex_data_length 
                                  ) ;
-extern CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,                               
+extern uint8_t  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,                               
                                         PCCMDDAT    *pPcCmdData,
-                                        CPU_INT08U   pkt_index,
-                                        CPU_INT16U   cmd_id                                 
+                                        uint8_t   pkt_index,
+                                        uint16_t   cmd_id                                 
                                );
-extern CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type, 
-                                     CPU_INT08U  *pChar, 
+extern uint8_t  EMB_Data_Build (  uint16_t   cmd_type, 
+                                     uint8_t  *pChar, 
                                      PCCMDDAT    *pPcCmdData,
                                      CPU_INT32U  *p_emb_length);
 
-extern CPU_INT08U CheckSum( CPU_INT08U init_data, 
-                            CPU_INT08U *pdata, 
-                            CPU_INT16U length
+extern uint8_t CheckSum( uint8_t init_data, 
+                            uint8_t *pdata, 
+                            uint16_t length
                           );
-extern CPU_INT08U  Noah_CMD_Parse_Ruler ( NOAH_CMD    *pNoahCmd,                                 
-                                          CPU_INT08U  *pSessionDone); 
-extern CPU_INT08U EMB_Data_Check( pNEW_CMD pNoahCmd, EMB_BUF *pEBuf, CPU_INT08U delay);
-extern CPU_INT08U EMB_Data_Parse ( pNEW_CMD  pNewCmd )  ;
-extern CPU_INT08U  AB_Status_Change_Report (void);
-extern void  Send_DACK (CPU_INT08U  error_id);
-extern void  Send_GACK (CPU_INT08U  error_id);
-extern void  Send_Report (CPU_INT08U pkt_sn, CPU_INT08U error_id);
+extern uint8_t  Noah_CMD_Parse_Ruler ( NOAH_CMD    *pNoahCmd,                                 
+                                          uint8_t  *pSessionDone); 
+extern uint8_t EMB_Data_Check( pNEW_CMD pNoahCmd, EMB_BUF *pEBuf, uint8_t delay);
+extern uint8_t EMB_Data_Parse ( pNEW_CMD  pNewCmd )  ;
+extern uint8_t  AB_Status_Change_Report (void);
+extern void  Send_DACK (uint8_t  error_id);
+extern void  Send_GACK (uint8_t  error_id);
+extern void  Send_Report (uint8_t pkt_sn, uint8_t error_id);
 
 #endif 
