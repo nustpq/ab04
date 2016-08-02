@@ -46,6 +46,29 @@ extern uint8_t twi_ring_buffer[ MAXTWI ][ 256 ];
 /** TWI driver instance.*/
 static Twid twid[ MAXTWI ];
 
+/** Twi Async descriptor */
+static Async async[ MAXTWI ];
+
+
+/*
+*********************************************************************************************************
+*                                    twiCallback()
+*
+* Description :  twi read/write callback routine shared with all twi port;
+*
+* Argument(s) :  none
+*			    
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+static void twiCallback( void )
+{
+    //do nothing here
+}
+
 
 /*
 *********************************************************************************************************
@@ -262,14 +285,26 @@ uint8_t twi_uname_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         
         
         if( 0 == len ) return -1;
+        
+        memset(&async[ UNAMED ], 0, sizeof(MAXTWI));
+        async[ UNAMED ].callback = ( void * ) twiCallback;
 	
-
+#ifndef SYNC
 	return TWID_Write( pTwid, option->address, 
                                  option->iaddress, 
                                  option->isize, 
                                  ( uint8_t * )buf, 
                                  len, 
                                  0 );	
+#else
+       	 TWID_Write( pTwid, option->address, 
+                                 option->iaddress, 
+                                 option->isize, 
+                                 ( uint8_t * )buf, 
+                                 len, 
+                                 &async[ UNAMED ] );  
+        while ( !ASYNC_IsFinished( &async[ UNAMED ]  ) ) ;
+#endif
 }
 
 /*
