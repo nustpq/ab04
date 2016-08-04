@@ -104,8 +104,8 @@ void  Noah_CMD_Read (CMDREAD    *pCMD_Read,
     
     uint8_t   state_mac       = pCMD_Read->state_mac ;
     pNEW_CMD     pRecvPtr        = (pNEW_CMD)pCMD_Read->pRecvPtr;
-    CPU_INT32U   PcCmdCounter    = pCMD_Read->PcCmdCounter;
-    CPU_INT32U   PcCmdDataLen    = pCMD_Read->PcCmdDataLen;
+    uint32_t   PcCmdCounter    = pCMD_Read->PcCmdCounter;
+    uint32_t   PcCmdDataLen    = pCMD_Read->PcCmdDataLen;
    
     
     switch( state_mac ) {   
@@ -364,7 +364,7 @@ uint8_t  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,
     uint8_t  *pMemPtr;
     pNEW_CMD     pSendPtr;    
     uint8_t   err;
-    CPU_INT32U   data_length;
+    uint32_t   data_length;
     
     err         = 0;  
     pSendPtr    = NULL;
@@ -686,7 +686,7 @@ void  Send_Report (uint8_t pkt_sn, uint8_t error_id)
 uint8_t  EMB_Data_Build (  uint16_t   cmd_type, 
                               uint8_t  *pChar,                          
                               PCCMDDAT    *pPcCmdData,
-                              CPU_INT32U  *p_emb_length)
+                              uint32_t  *p_emb_length)
 {
  
     uint8_t   err;
@@ -703,8 +703,8 @@ uint8_t  EMB_Data_Build (  uint16_t   cmd_type,
         case DATA_AB_STATUS :       	
             pos = emb_init_builder(pChar, EMB_BUF_SIZE, cmd_type, &builder);
             pos = emb_append_attr_uint(&builder, pos, 1, Global_Bridge_POST);
-            pos = emb_append_attr_uint(&builder, pos, 2, *(CPU_INT32U *)(&Global_Ruler_State) ); 
-            pos = emb_append_attr_uint(&builder, pos, 3, *(CPU_INT32U *)(&Global_Mic_State));    
+            pos = emb_append_attr_uint(&builder, pos, 2, *(uint32_t *)(&Global_Ruler_State) ); 
+            pos = emb_append_attr_uint(&builder, pos, 3, *(uint32_t *)(&Global_Mic_State));    
             pos = emb_append_end(&builder, pos);
             *p_emb_length = pos;             
         break;
@@ -778,19 +778,20 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     
     uint8_t    buf[3];
     uint8_t   *pdata;
-    CPU_INT32U    data_length;
+    uint32_t    data_length;
     const void   *pBin;
     uint8_t    pkt_sn;
        
     err          =  NO_ERR; 
     
-    cmd_index    = (pNewCmd->cmd[0] <<8) + pNewCmd->cmd[1];
+    cmd_index    = ( pNewCmd->cmd[ 0 ] << 8 ) + pNewCmd->cmd[ 1 ];
     pkt_sn       = pNewCmd->pkt_sn;
-    data_length  = (pNewCmd->data_len[0] <<16) + (pNewCmd->data_len[1] <<8) + pNewCmd->data_len[2] ; // pNoahCmd->DataLen ;   
+    data_length  = ( pNewCmd->data_len[ 0 ] << 16 ) + ( pNewCmd->data_len[ 1 ] << 8 ) + pNewCmd->data_len[ 2 ] ; // pNoahCmd->DataLen ;   
       
     emb_attach( pNewCmd->data, data_length, &root );        
-    cmd_type = emb_get_id(&root);   
-    if( cmd_type != cmd_index ) {
+    cmd_type = emb_get_id( &root );   
+    if( cmd_type != cmd_index ) 
+    {
         APP_TRACE_INFO(("\r\nWARN: CMD Index(%d) != EMB Element ID(%d)\r\n",cmd_index,cmd_type));
     }
     
@@ -905,7 +906,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.raw_write.dev_addr = (uint8_t)temp; 
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
-            PCCmd.raw_write.data_len = (CPU_INT32U)temp;                        
+            PCCmd.raw_write.data_len = (uint32_t)temp;                        
             pBin = emb_get_attr_binary(&root, 4, (int*)&temp);
             if(pBin == NULL ) { err = EMB_CMD_ERR;   break; }
             PCCmd.raw_write.pdata = (uint8_t *)pBin; 
@@ -926,10 +927,10 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.raw_read.dev_addr = (uint8_t)temp;            
             temp = emb_get_attr_int(&root, 3, -1);           
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
-            PCCmd.raw_read.data_len_read = (CPU_INT32U)temp;              
+            PCCmd.raw_read.data_len_read = (uint32_t)temp;              
             temp = emb_get_attr_int(&root, 4, -1);
             if(temp == -1 ) {  temp = 0;};
-            PCCmd.raw_read.data_len_write = (CPU_INT32U)temp;             
+            PCCmd.raw_read.data_len_write = (uint32_t)temp;             
             pBin = emb_get_attr_binary(&root, 5, (int*)&temp);
             if((pBin == NULL) && temp) { err = EMB_CMD_ERR;  break; }            
             PCCmd.raw_read.pdata_write = (uint8_t *)pBin; 
@@ -952,7 +953,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.mcu_flash.addr_index = (uint8_t)temp;             
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.mcu_flash.data_len = (CPU_INT32U)temp;        
+            PCCmd.mcu_flash.data_len = (uint32_t)temp;        
             pBin = emb_get_attr_binary(&root, 3, (int*)&temp);
             if(pBin == NULL ) { err = EMB_CMD_ERR;  break; }
             PCCmd.mcu_flash.pdata = (uint8_t *)pBin;
@@ -973,7 +974,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.set_vec_cfg.vec_index_b = (uint8_t)temp;
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.set_vec_cfg.delay = (CPU_INT32U)temp;  
+            PCCmd.set_vec_cfg.delay = (uint32_t)temp;  
             temp = emb_get_attr_int(&root, 4, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
             PCCmd.set_vec_cfg.type = (uint8_t)temp; 
@@ -1030,7 +1031,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
 //            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }           
 //            temp2 = emb_get_attr_int(&root, 2, -1); //timeout ms
 //            if(temp2 == -1 ) { Send_GACK(EMB_CMD_ERR); break; }         
-//            err = Record_iM501_Voice_Buffer( (CPU_INT32U)temp, (CPU_INT32U)temp2 );              
+//            err = Record_iM501_Voice_Buffer( (uint32_t)temp, (uint32_t)temp2 );              
 //            
 //        break;
 //        
@@ -1125,7 +1126,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
 //            PCCmd.burst_write.mem_addr_len = (uint8_t)temp;            
 //            temp = emb_get_attr_int(&root, 6, -1);
 //            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }
-//            PCCmd.burst_write.data_len = (CPU_INT32U)temp;             
+//            PCCmd.burst_write.data_len = (uint32_t)temp;             
 //            pBin = emb_get_attr_binary(&root, 7, (int*)&PCCmd.burst_write.data_len);
 //            if(pBin == NULL ) { Send_GACK(EMB_CMD_ERR);  break; }
 //            PCCmd.burst_write.pdata = (uint8_t *)pBin;             
@@ -1255,13 +1256,13 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             Send_DACK(err);
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.mic = (CPU_INT32U)temp;
+            PCCmd.set_volume.mic = (uint32_t)temp;
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.lout = (CPU_INT32U)temp;
+            PCCmd.set_volume.lout = (uint32_t)temp;
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.spk = (CPU_INT32U)temp;      
+            PCCmd.set_volume.spk = (uint32_t)temp;      
             err = Set_Volume( &PCCmd.set_volume ) ;
             Send_GACK(err);    
         break ;
