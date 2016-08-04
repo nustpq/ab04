@@ -54,12 +54,17 @@ void emb_attach(const void *buf, int len, emb_t *emb) {
  * return: pointer to next node, NULL means failed
 */
 
-static const char *emb_parse_uint(const char *head, const char *tail, int *val) {
+static const char *emb_parse_uint( const char *head, const char *tail, int *val ) 
+{
 	int v, shift;
-	for (v = 0, shift = 0; head < tail; shift += 7) {
+	for ( v = 0, shift = 0; head < tail; shift += 7 ) 
+        {
 		int s = *head++;
-		v += (s & 0x7F) << shift;
-		if ((s & 0x80) == 0) {
+                
+		v += ( s & 0x7F ) << shift;
+                
+		if ( ( s & 0x80 ) == 0 ) 
+                {
 			*val = v;
 			return head;
 		}
@@ -69,13 +74,16 @@ static const char *emb_parse_uint(const char *head, const char *tail, int *val) 
 
 #define MASK	~(1 << (sizeof(int) - 1))
 
-static const char *emb_parse_sint(const char *head, const char *tail, int *val) {
-	head = emb_parse_uint(head, tail, val);
-	if (head != NULL) {
+static const char *emb_parse_sint(const char *head, const char *tail, int *val) 
+{
+	head = emb_parse_uint( head, tail, val );
+	if ( head != NULL ) 
+        {
 		int sign = *val & 1;
-		*val = (*val >> 1) & MASK;
-		if (sign) { // negative
-			*val = -(*val) - 1;
+		*val = ( *val >> 1 ) & MASK;
+		if (sign) 
+                { // negative
+                    *val = -(*val) - 1;
 		}
 		return head;
 	}
