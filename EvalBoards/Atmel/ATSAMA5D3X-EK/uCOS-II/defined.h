@@ -5,6 +5,7 @@
 
 #include "uif_object.h"
 
+
 #define SUCCESS                          0u
 #define NO_ERR                           0u
 
@@ -82,6 +83,136 @@
 #define DEF_VERSION_STR_LEN             ( 11 + 1 )
 #define DEF_MODEL_STR_LEN               ( 7 + 1 )
 
+/*
+*********************************************************************************************************
+*                                        define contant for ruler
+*Note: copy this from uif-1.0 ruler.h
+*********************************************************************************************************
+*/
+
+#define TIMEOUT_AUDIO_COM    2000    //Max 2s timeout
+#define TIMEOUT_RULER_COM    5000    //Max 5s timeout
+
+#define RULER_TYPE_RULER                  0
+#define RULER_TYPE_HANDSET                1
+#define RULER_TYPE_MASK( type )           ( (type>>7) & 0x01 )
+
+#define RULER_TYPE_R01                    0x00
+#define RULER_TYPE_R02                    0x01
+#define RULER_TYPE_R03                    0x02
+
+#define RULER_TYPE_TA01                   0x10
+#define RULER_TYPE_TD01                   0x11
+
+#define RULER_TYPE_WT01                   0x20
+
+#define RULER_TYPE_H01                    0x80
+#define RULER_TYPE_H02                    0x81
+#define RULER_TYPE_H03                    0x82
+
+#define RULER_ID_DEFAULT                  0xFF
+
+#define SAMPLE_LENGTH                     16
+#define SAMPLE_RATE_DEF                   16000
+#define SET_VOLUME_MUTE                   1000
+//ruler state defines
+#define  RULER_STATE_DETACHED           0x00
+#define  RULER_STATE_ATTACHED           0x01
+#define  RULER_STATE_CONFIGURED         0x02
+#define  RULER_STATE_SELECTED           0x03
+#define  RULER_STATE_RUN                0x04
+
+//audio mcu cmd parameters
+#define  AUDIO_START_REC                0x01
+#define  AUDIO_START_PLAY               0x02
+#define  AUDIO_START_PALYREC            0x03
+#define  AUDIO_TYPE_REC                 0x00
+#define  AUDIO_TYPE_PLAY                0x01
+
+//host mcu cmd defines 
+#define  RULER_CMD_SET_AUDIO_CFG        0x01
+#define  RULER_CMD_START_AUDIO          0x02
+#define  RULER_CMD_STOP_AUDIO           0x03
+#define  RULER_CMD_SET_RULER            0x04
+#define  RULER_CMD_RAED_RULER_STATUS    0x05
+#define  RULER_CMD_RAED_RULER_INFO      0x06
+#define  RULER_CMD_WRITE_RULER_INFO     0x07     
+#define  RULER_CMD_READ_MIC_CALI_DATA   0x08
+#define  RULER_CMD_WRITE_MIC_CALI_DATA  0x09
+#define  RULER_CMD_TOGGLE_MIC           0x0A
+#define  RULER_CMD_GET_AUDIO_VERSION    0x0B
+#define  RULER_CMD_GET_RULER_TYPE       0x0C
+#define  RULER_CMD_ACTIVE_CTR           0x0D
+#define  RULER_CMD_GET_RULER_VERSION    0x0E
+#define  RULER_CMD_SETUP_SYNC           0x0F
+#define  RULER_CMD_RESET_AUDIO          0x10
+#define  RULER_CMD_START_RD_VOICE_BUF   0x11
+ 
+/////////////////  Flash store Vec file related defines  ///////////////////////
+#define AT91C_IFLASH1	 (0x00100000)                   // this macro is from sam3u4c header file
+#define AT91C_IFLASH_PAGE_SIZE  256                    //so,these macro will be redefine accorder hardware
+
+
+#define FW_DOWNLAD_CMD_START           1
+#define FW_DOWNLAD_CMD_DOING           2
+#define FW_DOWNLAD_CMD_DONE            3
+
+#define FW_DOWNLAD_STATE_INITIALIZE    0xFF
+#define FW_DOWNLAD_STATE_UNFINISHED    0xAA
+#define FW_DOWNLAD_STATE_FINISHED      0x55
+
+#define FLASH_RULER_FW_BIN_MAX_SIZE  ( 0x10000 )  //64kB max for ruler fw bin
+#define FLASH_ADDR_FW_STATE          ( AT91C_IFLASH1 )  //from 128kB-
+#define FLASH_ADDR_FW_BIN            ( FLASH_ADDR_FW_STATE + AT91C_IFLASH_PAGE_SIZE ) //from 128kB+256
+
+#define FLASH_ADDR_FW_VEC_SIZE       ( 0x2000 ) //8kB
+#define FLASH_ADDR_FW_VEC_NUM        ( 7 )      //(64kB = 8kB*7 
+#define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH1 +  FLASH_RULER_FW_BIN_MAX_SIZE  ) //256*4
+#define FLASH_ADDR_FW_VEC            ( FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * FLASH_ADDR_FW_VEC_NUM ) //from 128kB + 64kB + (0.256*4)kB
+#define FLASH_HOST_FW_BIN_MAX_SIZE   ( 0x1C000 ) //128kB for host MCU fw bi
+
+/*
+*********************************************************************************************************
+*                                        define contant for 
+*Note: copy this from uif-1.0 uif.h 
+*********************************************************************************************************
+*/
+#define   UIF_TYPE_CMD_NUM                     9
+
+#define   UIF_TYPE_I2C                         1
+#define   UIF_TYPE_SPI                         2
+#define   UIF_TYPE_GPIO                        3
+#define   UIF_TYPE_FM36_PATH                   4
+#define   UIF_TYPE_I2C_GPIO                    5
+#define   UIF_TYPE_I2C_Mixer                   6
+#define   UIF_TYPE_FM36_PDMCLK                 7
+#define   UIF_TYPE_GPIO_CLK                    8
+#define   UIF_TYPE_DUT_ID                      9
+ 
+////////////////// UIF ATTRIBUTE
+ 
+#define   ATTRI_DUT_ID_IM501                   501
+#define   ATTRI_DUT_ID_FM1388                  1388
+#define   ATTRI_I2C_IM501_LOAD_CODE_IRAM       52
+#define   ATTRI_I2C_IM501_LOAD_CODE_DRAM       51
+#define   ATTRI_I2C_IM401_LOAD_CODE            41
+#define   ATTRI_SPI_FM1388_LOAD_CODE           31
+#define   ATTRI_I2C_FM1388_LOAD_EEPROM         21
+#define   ATTRI_I2C_IM205                      11
+
+#define   ATTRI_SPI_IM501_CPHA0_CPOL0          0 //iM501_CPHA_CPOL
+#define   ATTRI_SPI_IM501_CPHA0_CPOL1          1
+#define   ATTRI_SPI_IM501_CPHA1_CPOL0          2
+#define   ATTRI_SPI_IM501_CPHA1_CPOL1          3
+
+#define   FM1388_ALLOWED_DATA_PACK_SIZE        (240+6)
+#define   EEPROM_ALLOWED_DATA_PACK_SIZE        (128+2)
+
+#define   ATTRI_FM36_PATH_NORMAL           0
+#define   ATTRI_FM36_PATH_PWD_BP           1
+
+/*----------------------------------------------------------------------------*/
+
 typedef struct _sys_info
 {
   uint8_t firmware_version[ 32 ];
@@ -123,8 +254,8 @@ typedef struct _spi_cfg{
     uint32_t   spi_speed;
     uint8_t    spi_mode;  
     uint8_t    gpio_irq;
-    uint8_t    reserved1;
-    uint8_t    reserved2;
+    uint8_t    slave;
+    uint8_t    chip_id;
 }VOICE_BUF_CFG;
 
 typedef struct { 
@@ -184,9 +315,10 @@ typedef struct {
 }TOGGLE_MIC ;
 
 typedef struct {
-    uint32_t    mic;   
-    uint32_t    lout; 
-    uint32_t    spk;
+    int32_t    mic;   
+    int32_t    lout; 
+    int32_t    spk;
+    int32_t     lin;
 }SET_VOLUME ;
 
 typedef struct {
@@ -285,34 +417,7 @@ typedef struct {
 }GPIO_SESSION ; 
 
 
-#define   UIF_TYPE_CMD_NUM      8
-
-#define   UIF_TYPE_I2C          1
-#define   UIF_TYPE_SPI          2
-#define   UIF_TYPE_GPIO         3
-#define   UIF_TYPE_FM36_PATH    4
-#define   UIF_TYPE_I2C_GPIO     5
-#define   UIF_TYPE_I2C_Mixer    6
-#define   UIF_TYPE_FM36_PDMCLK  7
-#define   UIF_TYPE_GPIO_CLK     8
-
-
-#define   ATTRI_I2C_IM501_LOAD_CODE_IRAM       52
-#define   ATTRI_I2C_IM501_LOAD_CODE_DRAM       51
-#define   ATTRI_I2C_IM401_LOAD_CODE            41
-#define   ATTRI_SPI_FM1388_LOAD_CODE           31
-#define   ATTRI_I2C_FM1388_LOAD_EEPROM         21
-#define   ATTRI_I2C_IM205                      11
-#define   ATTRI_SPI_IM501_CPHA0_CPOL0          0 //iM501_CPHA_CPOL
-#define   ATTRI_SPI_IM501_CPHA0_CPOL1          1
-#define   ATTRI_SPI_IM501_CPHA1_CPOL0          2
-#define   ATTRI_SPI_IM501_CPHA1_CPOL1          3
-
-#define   FM1388_ALLOWED_DATA_PACK_SIZE    (240+6)
-#define   EEPROM_ALLOWED_DATA_PACK_SIZE    (128+2)
-
-#define   ATTRI_FM36_PATH_NORMAL           0
-#define   ATTRI_FM36_PATH_PWD_BP           1
+extern SET_VEC_CFG  Global_VEC_Cfg;
 
 extern INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];
 extern AUDIO_CFG  Audio_Configure_Instance0[ 2 ];
@@ -358,6 +463,7 @@ extern sDmad g_dmad;
 extern DataSource source_usb;
 extern DataSource source_ssc0;
 extern DataSource source_ssc1;
+extern DataSource source_spi0;
 extern DataSource source_spi1;
 extern DataSource source_twi0;
 extern DataSource source_twi1;
