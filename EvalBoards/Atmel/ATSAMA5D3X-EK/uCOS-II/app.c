@@ -625,7 +625,9 @@ int main()
     
     source_spi0.init_source = init_spi;
     source_spi0.peripheral_stop = stop_spi;
-    source_spi0.buffer_write = NULL;
+    source_spi0.buffer_write = _spiDmaTx;
+    source_spi0.buffer_read = _spiDmaRx;
+    source_spi0.set_peripheral = spi_register_set;
     
     if( NULL != source_spi0.init_source )
        source_spi0.init_source( &source_spi0,&spi0_cfg );
@@ -650,7 +652,9 @@ int main()
     
     source_spi1.init_source = init_spi;
     source_spi1.peripheral_stop = stop_spi;
-    source_spi1.buffer_write = NULL;
+    source_spi1.buffer_write = _spiDmaTx;
+    source_spi0.buffer_read = _spiDmaRx;
+    source_spi1.set_peripheral = spi_register_set;
     
     if( NULL != source_spi1.init_source )
        source_spi1.init_source( &source_spi1,&spi1_cfg );
@@ -709,8 +713,8 @@ int main()
     source_twi1.privateData = &twi1_chipConf[ 0 ];
 
     source_twi1.init_source = twi_init_master;
-    source_twi1.buffer_write = twi_uname_write;
-    source_twi1.buffer_read = twi_uname_read;
+    source_twi1.buffer_write = twi_codec_write;
+    source_twi1.buffer_read = twi_codec_read;
     
     if( NULL != source_twi1.init_source )
         source_twi1.init_source( &source_twi1,&twi_hz );
@@ -931,8 +935,8 @@ static  void  AppTaskLED ( void *p_arg )
  
         spi_clear_status( &source_spi1 );
         memset( spi1_buffer[ 1 ], 0, sizeof( spi1_ring_buffer ) );
-        _spiDmaRx( &source_spi1 );
-        _spiDmaTx( &source_spi1 );
+        _spiDmaRx( &source_spi1 ,source_spi1.privateData,4096);
+        _spiDmaTx( &source_spi1 ,source_spi1.privateData,4096);
                
         usart1_DmaTx( &source_usart1 , NULL , 0 );
         twi_uname_write( &source_twi0,twi_ring_buffer[0],sizeof( twi_ring_buffer[ 0 ] ) >> 10 );
