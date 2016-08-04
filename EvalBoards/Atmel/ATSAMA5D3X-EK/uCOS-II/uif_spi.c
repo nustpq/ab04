@@ -381,13 +381,14 @@ static void ISR_SPI_DMA1( void )
 * Description : spi dma transmmit via dma
 *
 * Arguments   : pInstance    : data source handle
-*               startBuffer  : buffer handle 
+*               buf          : buffer handle 
+*               len          : size of buf
 * Returns     : none
 *
 * Note(s)     : none
 *********************************************************************************************************
 */
-void _spiDmaRx( void *pInstance )
+uint8_t _spiDmaRx( void *pInstance ,const uint8_t *buf,uint32_t len  )
 {
     assert( NULL != pInstance );
     
@@ -396,7 +397,8 @@ void _spiDmaRx( void *pInstance )
     
     sDmaTransferDescriptor td;
     td.dwSrcAddr = (uint32_t)&pSpi->SPI_RDR;
-    td.dwDstAddr = (uint32_t) pSource->buffer;
+//    td.dwDstAddr = (uint32_t) pSource->buffer;
+    td.dwDstAddr = (uint32_t) buf;
     td.dwCtrlA   = SPI_BUFFER_SIZE | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR 
                    | DMAC_CTRLB_DST_DSCR
@@ -408,6 +410,8 @@ void _spiDmaRx( void *pInstance )
     td.dwDscAddr = 0;
     DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.rxDMAChannel, &td );
     DMAD_StartTransfer( &g_dmad, pSource->dev.rxDMAChannel );
+    
+    return 0;
 }
 
 
@@ -426,7 +430,7 @@ void _spiDmaRx( void *pInstance )
 * Note(s)     : none
 *********************************************************************************************************
 */
-void _spiDmaTx( void *pInstance )
+uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  )
 {  
     assert( NULL != pInstance );
     
@@ -435,7 +439,8 @@ void _spiDmaTx( void *pInstance )
     
     sDmaTransferDescriptor td;
 
-    td.dwSrcAddr = (uint32_t) pSource->privateData;
+//    td.dwSrcAddr = (uint32_t) pSource->privateData;
+    td.dwSrcAddr = (uint32_t) buf;
     td.dwDstAddr = (uint32_t)&pSpi->SPI_TDR;
     td.dwCtrlA   = SPI_BUFFER_SIZE | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR 
@@ -448,6 +453,8 @@ void _spiDmaTx( void *pInstance )
     td.dwDscAddr = 0;
     DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.txDMAChannel, &td );
     DMAD_StartTransfer( &g_dmad, pSource->dev.txDMAChannel );
+    
+    return 0;
   
 }
 
@@ -617,4 +624,58 @@ static void spi_master_transfer( void *pInstance,
 
 }
 #endif
+
+
+/*
+*********************************************************************************************************
+*                                               spi_register_set()
+*
+* Description : reconfig spi used special parameter
+*
+* Arguments   : pInstance : device instance handle
+*             : parameter : spi config parameter
+*             
+*             
+* Returns     : none
+*
+* Note(s)     : 
+*********************************************************************************************************
+*/
+void spi_register_set( void *instance,void *parameter )
+{
+   assert( NULL != instance );
+   assert( NULL != parameter );
+   
+   uint32_t csr0 ; 
+   
+   stop_spi( instance );
+   
+   DataSource *pSource = ( DataSource * )instance;
+   Spi *pSpi = _get_spi_instance( pSource->dev.identify );
+   
+   VOICE_BUF_CFG *cfg = ( VOICE_BUF_CFG * )parameter;
+      
+   uint32_t mode = cfg->spi_mode ;
+   
+    // spix in slave mode 
+    if ( cfg->slave == STATE_SLAVE )
+    {
+        mode &= ( uint32_t ) ( ~( SPI_MR_MSTR ) ) ;
+    }
+    
+    csr0 = SPI_CSR_BITS_8_BIT|SPI_CSR_DLYBS( 0x0 ) ;
+    
+    // spi clock 
+    if ( cfg->slave == STATE_MASTER )
+    {
+         csr0 |= ( ( BOARD_MCK / cfg->spi_speed ) << 8 ) ;
+    }
+    
+     // configure SPI mode 
+     SPI_Configure( pSpi, pSource->dev.identify, mode ) ;
+    
+     // configure SPI csr0
+     SPI_ConfigureNPCS( pSpi, 0, csr0 ) ;
+     SPI_Enable( pSpi ) ;  
+}
 
