@@ -78,8 +78,11 @@
 #define AUD_CFG_PLAY_CH_ERR            200u
 #define AUD_CFG_MIC_NUM_DISMATCH_ERR   201u
 #define AUD_CFG_PLAY_CH_ZERO_ERR       202u
+#define AUD_CFG_ERR                    203u
+#define UIF_TYPE_NOT_SUPPORT           204u
+#define AUD_CFG_SPI_REC_CONFLICT       205u
 
-#define UIF_TYPE_NOT_SUPPORT           203u
+//#define UIF_TYPE_NOT_SUPPORT           203u   //------conflict
 
 #define FW_BIN_STATE_ERR         211u
 #define FW_BIN_STATE_0_ERR       212u
@@ -106,7 +109,9 @@
 #define CODEC_SR_NOT_SUPPORT_ERR 234u
 #define CODEC_SR_LEN_NOT_SUPPORT_ERR 235u
 #define CODEC_FUNC_NOT_SUPPORT   236u
-
+#define CODEC_BIT_LEN_NOT_SUPPORT_ERR 237u
+#define CODEC_FORMAT_NOT_SUPPORT_ERR  238u
+#define CODEC_CH_NUM_NOT_SUPPORT_ERR  239u
 
 
 
