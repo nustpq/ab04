@@ -124,6 +124,24 @@ typedef  struct  atsama5_reg_pio {
 *********************************************************************************************************
 */
 
+#define LED_D3   1
+#define LED_D4   2
+#define LED_D5   3
+
+#define BUZZER_OFF 1
+#define BUZZER_ON 0
+
+#define FPGA_OE         0
+#define FPGA_RST        1
+#define CODEC1_RST      2
+#define CODEC0_RST      3
+#define FM36_RST        4
+#define PA_SHUTDOWN     5
+#define FAST_PLUS_RST   7
+#define V5_UIF_EN       9
+#define HDMI_UIF_PWR_EN 10
+#define LEVEL_SHIFT_OE  11
+
 void  BSP_LED_Init ( void );
 
 void  BSP_LED_On ( CPU_INT32U led );
@@ -131,6 +149,24 @@ void  BSP_LED_On ( CPU_INT32U led );
 void  BSP_LED_Off ( CPU_INT32U led );
 
 void BSP_LED_Toggle( CPU_INT32U led );
+
+void BSP_BUZZER_Toggle( CPU_INT32U state );
+
+void BSP_LED_FLIP( CPU_INT32U state, CPU_INT32U order );
+
+void UIF_LED_Init( void );
+
+void UIF_LED_On ( CPU_INT32U led );
+
+void UIF_LED_Off ( CPU_INT32U led );
+
+void UIF_LED_Toggle( CPU_INT32U led );
+
+void UIF_Misc_Init( void );
+
+void UIF_Misc_On ( CPU_INT32U id );
+
+void UIF_Misc_Off ( CPU_INT32U id );
 
 
 #endif  /* BSP_PRESENT */
