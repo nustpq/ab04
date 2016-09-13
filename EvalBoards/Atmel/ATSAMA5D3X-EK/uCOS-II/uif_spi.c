@@ -106,6 +106,46 @@ void _ConfigureTc1( uint32_t hz )
     TC1->TC_CHANNEL[0].TC_IER = TC_IER_CPCS;
 }
 
+/*
+*********************************************************************************************************
+*                                               _SPI0_DmaRxCallback()
+*
+* Description : spi callback function for DMA receiving
+*
+* Arguments   : status: dma channel state of perivious transmmit.
+*               pArg  : instance of data source
+* Returns     : none.
+*
+* Note(s)     : none
+*********************************************************************************************************
+*/
+void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
+{
+  
+    status = status;
+    pArg = pArg;    
+}
+
+/*
+*********************************************************************************************************
+*                                               _SPI0_DmaTxCallback()
+*
+* Description : spi callback function for DMA transmitting
+*
+* Arguments   : status: dma channel state of perivious transmmit.
+*               pArg  : instance of data source
+* Returns     : none.
+*
+* Note(s)     : none
+*********************************************************************************************************
+*/
+void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
+{
+    status = status;
+    pArg = pArg;
+    
+//    BSP_LED_Toggle( 3 );
+}
 
 /*
 *********************************************************************************************************
