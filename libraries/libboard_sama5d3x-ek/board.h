@@ -365,17 +365,17 @@
 #define PINS_SSC_CODEC  PIN_SSC_TD, PIN_SSC_TK, PIN_SSC_TF, PIN_SSC_RD, PIN_SSC_RK, PIN_SSC_RF
 
 /** List of all SSC1 pin definitions. */   
-#define PIN_SSC1_TD      {0x1 << 6, PIOB, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT}
+#define PIN_SSC1_TD      {0x1 << 6, PIOB, ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT}
 /** SSC pin Transmitter Clock (TK) */
-#define PIN_SSC1_TK      {0x1 << 2, PIOB, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT}
+#define PIN_SSC1_TK      {0x1 << 2, PIOB, ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT}
 /** SSC pin Transmitter FrameSync (TF) */
-#define PIN_SSC1_TF      {0x1 << 3, PIOB, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT}
+#define PIN_SSC1_TF      {0x1 << 3, PIOB, ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT}
 /** SSC pin RD */
-#define PIN_SSC1_RD      {0x1 << 11, PIOB, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT}
+#define PIN_SSC1_RD      {0x1 << 11, PIOB, ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT}
 /** SSC pin RK */
-#define PIN_SSC1_RK      {0x1 << 7, PIOB, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT}
+#define PIN_SSC1_RK      {0x1 << 7, PIOB, ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT}
 /** SSC pin RF */
-#define PIN_SSC1_RF      {0x1 << 10, PIOB, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT}
+#define PIN_SSC1_RF      {0x1 << 10, PIOB, ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT}
 /** SSC pins definition for hdmi. */
 #define PINS_SSC_HDMI  PIN_SSC1_TD, PIN_SSC1_TK, PIN_SSC1_TF, PIN_SSC1_RD, PIN_SSC1_RK, PIN_SSC1_RF   
 
