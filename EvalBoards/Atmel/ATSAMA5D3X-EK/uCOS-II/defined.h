@@ -34,7 +34,7 @@
 
 
 #define I2S_IN_BUFFER_SIZE              ( 192 * 16 )            //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
-#define I2S_OUT_BUFFER_SIZE             9600000//( 192 * 16 )            // 
+#define I2S_OUT_BUFFER_SIZE             ( 192 * 16 )            // 
 #define USBDATAEPSIZE                   64                      // force use 64Bytes
 //#define PINGPONG_SIZE                   USBDATAEPSIZE
 #define PINGPONG_SIZE                   ( 192 * 16 )

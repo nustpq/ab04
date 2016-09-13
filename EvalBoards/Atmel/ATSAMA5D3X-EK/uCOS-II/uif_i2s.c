@@ -338,12 +338,12 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 //     temp = kfifo_get_data_size( pSource->usbBulkOut );
 //
 //     //update played buffer(the first is buffer0)
-//     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut[ pSource->tx_index ], 
-//                      sizeof( ssc0_I2SBuffersOut ) >> 1,  
-//                      8000 );
+     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut[ pSource->tx_index ], 
+                      sizeof( ssc0_I2SBuffersOut[ pSource->tx_index ] ),  
+                      8000 );
        //install the buffer will be played(the buffer1)
 //     pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];     
-     /*
+     //
      if( pSource->warmWaterLevel <= temp ) 
      {
               //update buffer point;
@@ -382,12 +382,12 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
                     //error proccess;
             }
      }
-     */
+     //
 #endif
      
 #if 1      
      //step 3:change current buffer index 
-//     pSource->tx_index = 1 - pSource->tx_index;
+     pSource->tx_index = 1 - pSource->tx_index;
       
      //step 4:send semphone       
 #ifndef USE_EVENTGROUP
@@ -439,21 +439,22 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
     
      //step 2:copy buffer to ring buffer 
      temp = kfifo_get_data_size( pSource->usbBulkOut );
+     Alert_Sound_Gen1( ( uint8_t * )ssc1_I2SBuffersOut[ pSource->tx_index ], 
+                         sizeof( ssc1_I2SBuffersOut[ pSource->tx_index ] ),  
+                         8000 );
+       //install the buffer will be played(the buffer1)
+//     pSource->i2sBufferOut = ( uint8_t * )&ssc1_I2SBuffersOut[ 1 - pSource->tx_index ];
+//     
      if( pSource->warmWaterLevel <= temp ) 
      {
               //update buffer point;
-#if TEST_BUF
-       pSource->i2sBufferOut = ( uint8_t * )&TxBuffers1[ pSource->tx_index ];
-
-#else
        pSource->i2sBufferOut = ( uint8_t * )&ssc1_I2SBuffersOut[ pSource->tx_index ];
-#endif              
+             
               //get data from buffer;
               kfifo_get( pSource->usbBulkOut, 
                          pSource->i2sBufferOut,
-//                        ( uint8_t * )&ssc0_I2SBuffersOut[ pSource->tx_index ],
-//                         pSource->warmWaterLevel 
-                           192
+//                         ssc0_I2SBuffersOut[ pSource->tx_index ],
+                         pSource->warmWaterLevel 
                            ); 
               //update state machine of this port;
 #if 1
@@ -479,8 +480,9 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
                     //error proccess;
             }
      }
+//      
 #endif
-     
+    
       
      //step 3:change current buffer index 
      pSource->tx_index = 1 - pSource->tx_index;
@@ -889,6 +891,8 @@ void SSC1_Playing( void *pInstance )
 * Returns     : none
 *
 * Note(s)     : it is NOT reentrant;
+*             : The correct calculation of the length of buffer is the responsibility of the caller,
+*             : For the sake of simplicity, i set DMA bit width is 16;
 *********************************************************************************************************
 */
 uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
@@ -898,16 +902,13 @@ uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 	DataSource *pSource = (DataSource *)pInstance;
 	sDmaTransferDescriptor *pTds = dmaTdSSC0Tx;
         
-//        memset( TxBuffers,0x5555,sizeof( TxBuffers ) );
-//        memset( ssc0_I2SBuffersOut, 0xff, sizeof( ssc0_I2SBuffersOut ));
-                
+               
         Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
 	/* Setup TD list for TX */
         pTds[0].dwSrcAddr = (uint32_t) buf;               
 	pTds[0].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 
-	pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-//			    | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+	pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
                             | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
 	pTds[0].dwCtrlB   = 0
 			    | DMAC_CTRLB_SIF_AHB_IF0
@@ -918,8 +919,7 @@ uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 	pTds[0].dwDscAddr = (uint32_t) &pTds[1];
 	pTds[1].dwSrcAddr = (uint32_t) ( buf + len );
 	pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
-	pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-//			  | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+	pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
                           | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
 	pTds[1].dwCtrlB   = 0
 			  | DMAC_CTRLB_SIF_AHB_IF0
@@ -964,8 +964,9 @@ uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
         pTds[0].dwSrcAddr = (uint32_t) buf;               
 	pTds[0].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 
-	pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-			    | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+	pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
+//			    | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+                            | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;        
 	pTds[0].dwCtrlB   = 0
 			    | DMAC_CTRLB_SIF_AHB_IF0
 			    | DMAC_CTRLB_DIF_AHB_IF2
@@ -973,10 +974,12 @@ uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 			    | DMAC_CTRLB_SRC_INCR_INCREMENTING
 			    | DMAC_CTRLB_DST_INCR_FIXED;
 	pTds[0].dwDscAddr = (uint32_t) &pTds[1];
+        
 	pTds[1].dwSrcAddr = (uint32_t) ( buf + len );
 	pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
-	pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-			  | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+	pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
+//			  | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+                          | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;        
 	pTds[1].dwCtrlB   = 0
 			  | DMAC_CTRLB_SIF_AHB_IF0
 			  | DMAC_CTRLB_DIF_AHB_IF2
