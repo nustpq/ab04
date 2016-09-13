@@ -363,7 +363,7 @@ void UIF_LED_Off ( CPU_INT32U led )
             SAMA5_REG_PIOA_SODR = DEF_BIT_22;
             break;
             
-        case LED_D5:
+        case LED_D5:  //hdmi interface status indicate;
             SAMA5_REG_PIOA_SODR = DEF_BIT_24;
             break;                    
 
@@ -454,8 +454,11 @@ void UIF_Misc_Init( void )
     SAMA5_REG_PIOA_OER = ( DEF_BIT_00 | DEF_BIT_01 | DEF_BIT_02 | DEF_BIT_03    \
                            | DEF_BIT_04 | DEF_BIT_05 |  DEF_BIT_07              \
                            | DEF_BIT_09 | DEF_BIT_10 | DEF_BIT_11 );
-       
-    return;
+                           
+//    SAMA5_REG_PIOA_PER = ( DEF_BIT_00 | DEF_BIT_01 | DEF_BIT_02 );//| DEF_BIT_03 );   
+
+//    SAMA5_REG_PIOA_OER = ( DEF_BIT_00 | DEF_BIT_01 | DEF_BIT_02 );//| DEF_BIT_03 );   
+                         
   
 }
 
