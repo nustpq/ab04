@@ -7,7 +7,7 @@
 *                                             on the
 *                                      Unified EVM Interface Board 2.0
 *
-* Filename      : i2s.c
+* Filename      : uif_i2s.c
 * Version       : V0.0.1
 * Programmer(s) : Leo
 *********************************************************************************************************
@@ -36,7 +36,7 @@ sDmaTransferDescriptor dmaTdSSC0Tx[2];
 sDmaTransferDescriptor dmaTdSSC1Rx[2];
 sDmaTransferDescriptor dmaTdSSC1Tx[2];
 
-#ifdef USE_BACKUP_DEBUG_INFO
+#ifndef USE_BACKUP_DEBUG_INFO
 static const char* DMA_INFO[ DMAD_CANCELED + 1 ] = { "DMAD_OK",
 						     "DMAD_BUSY",
 						     "DMAD_PARTITAL_DONE",
@@ -322,7 +322,8 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     DataSource *pSource = ( DataSource *)pArg;
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
-#ifdef ENABLE_PRINT    
+#ifdef ENABLE_PRINT 
+    static int cnt;
     if (status != DMAD_OK) 
     { 
           printf("Tx DMA Status :%d-%s,line:%d,cnt(%d)\r\n",status,DMA_INFO[ status ],__LINE__,cnt++);
@@ -334,23 +335,29 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
      //step 1:get current buffer index 
     
      //step 2:copy buffer to ring buffer 
-     temp = kfifo_get_data_size( pSource->usbBulkOut );
+//     temp = kfifo_get_data_size( pSource->usbBulkOut );
+//
+//     //update played buffer(the first is buffer0)
+//     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut[ pSource->tx_index ], 
+//                      sizeof( ssc0_I2SBuffersOut ) >> 1,  
+//                      8000 );
+       //install the buffer will be played(the buffer1)
+//     pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];     
+     /*
      if( pSource->warmWaterLevel <= temp ) 
      {
               //update buffer point;
-#if TEST_BUF
-       pSource->i2sBufferOut = ( uint8_t * )&TxBuffers[ pSource->tx_index ];
-
-#else
-       pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ pSource->tx_index ];
-#endif              
+       pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];
+              
               //get data from buffer;
-              kfifo_get( pSource->usbBulkOut, 
-                         pSource->i2sBufferOut,
+//       
+//              kfifo_get( pSource->usbBulkOut, 
+//                         pSource->i2sBufferOut,
 //                        ( uint8_t * )&ssc0_I2SBuffersOut[ pSource->tx_index ],
 //                         pSource->warmWaterLevel 
-                           192
-                           ); 
+//                           192
+//                           );
+//       
               //update state machine of this port;
 #if 1
                       CDCDSerialDriver_Read(  usbBufferBulkOut0,               \
@@ -375,11 +382,12 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
                     //error proccess;
             }
      }
+     */
 #endif
      
-      
+#if 1      
      //step 3:change current buffer index 
-     pSource->tx_index = 1 - pSource->tx_index;
+//     pSource->tx_index = 1 - pSource->tx_index;
       
      //step 4:send semphone       
 #ifndef USE_EVENTGROUP
@@ -389,7 +397,8 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
                     OS_FLAG_SET, //
                     &error
                 );
-#endif  
+#endif 
+#endif
 }
 
 /*
@@ -734,7 +743,7 @@ uint8_t ssc1_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
 */
 
 #ifdef USE_DMA
-#if UNUSED  //It will be instead with xx_buffer_write;
+#ifndef UNUSED  //It will be instead with xx_buffer_write;
 void SSC0_Playing( void *pInstance )
 {
 	assert( NULL != pInstance );
@@ -807,7 +816,7 @@ void SSC0_Playing( void *pInstance )
 * Note(s)     : it is NOT reentrant;
 *********************************************************************************************************
 */
-#if UNUSED  //It will be instead with xx_buffer_write;
+#ifndef UNUSED  //It will be instead with xx_buffer_write;
 void SSC1_Playing( void *pInstance )
 {
 //#define TEST_BUF 1
@@ -889,8 +898,8 @@ uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 	DataSource *pSource = (DataSource *)pInstance;
 	sDmaTransferDescriptor *pTds = dmaTdSSC0Tx;
         
-        memset( TxBuffers,0x5555,sizeof( TxBuffers ) );
-        memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ));
+//        memset( TxBuffers,0x5555,sizeof( TxBuffers ) );
+//        memset( ssc0_I2SBuffersOut, 0xff, sizeof( ssc0_I2SBuffersOut ));
                 
         Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
 	/* Setup TD list for TX */
@@ -898,7 +907,8 @@ uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 	pTds[0].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 
 	pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-			    | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+//			    | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+                            | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
 	pTds[0].dwCtrlB   = 0
 			    | DMAC_CTRLB_SIF_AHB_IF0
 			    | DMAC_CTRLB_DIF_AHB_IF2
@@ -909,7 +919,8 @@ uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 	pTds[1].dwSrcAddr = (uint32_t) ( buf + len );
 	pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 	pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-			  | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+//			  | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+                          | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
 	pTds[1].dwCtrlB   = 0
 			  | DMAC_CTRLB_SIF_AHB_IF0
 			  | DMAC_CTRLB_DIF_AHB_IF2
@@ -946,9 +957,7 @@ uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 		
 	DataSource *pSource = (DataSource *)pInstance;
 	sDmaTransferDescriptor *pTds = dmaTdSSC1Tx;
-        
-        memset( TxBuffers,0x5555,sizeof( TxBuffers ) );
-        memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ));
+       
                 
         Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
 	/* Setup TD list for TX */
@@ -976,7 +985,7 @@ uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 			  | DMAC_CTRLB_DST_INCR_FIXED;
 	pTds[1].dwDscAddr = (uint32_t) &pTds[0];
                
-        DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC0Tx);
+        DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC1Tx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
 
         SSC_EnableTransmitter( pSsc );
@@ -1098,43 +1107,43 @@ static void _SSC_Init( uint32_t id,
     if( NULL == pSSC )
 	return;
 
-    
+    bitrate = 0;//1228810
     SSC_Configure(  pSSC,
                     bitrate,  //0:slave not gen clk 1:gen clk
                     mclk 
                  );    
       
-    tcmr.cks    = 0 ;   // 0:MCK 1:RK 2:TK
-    rcmr.cks    = 1 ;   // 0:MCK 1:TK 2:RK
+    tcmr.cks    = 2 ;   // 0:MCK 1:RK 2:TK
+    rcmr.cks    = 1 ;   // 0:MCK 1:TK 2:RK  0-->1
     
-    tcmr.cko    = 1 ;   // 0:input only 1:continus 2:only transfer
+    tcmr.cko    = 0 ;   // 0:input only 1:continus 2:only transfer
     rcmr.cko    = 0 ;   // 0:input only 1:continus 2:only transfer
     
     tcmr.cki    = 0;    // 0: falling egde send
     rcmr.cki    = 1;    // 1: rising edge lock  
     
     tcmr.start  = 4;    // 4: falling edge trigger for low left, 5: rising edge trigger for high left,
-    rcmr.start  = 4;    //0:continuous 1:transmit 2:RF_LOW 3:RF_HIGH 4:RF_FAILLING
-    					//5:RF_RISING 6:RF_LEVEL 7:RF_EDGE 8:CMP_0
+    rcmr.start  = 4;    // 0: continuous 1:transmit 2:RF_LOW 3:RF_HIGH 4:RF_FAILLING
+    			// 5: RF_RISING 6:RF_LEVEL 7:RF_EDGE 8:CMP_0
     tcmr.sttdly = 1;
     rcmr.sttdly = 1;   
 	
-    tcmr.period = 15;   // period ;  slave not use 0-->15
-    rcmr.period = 0;    // period ;  slave not use
+    tcmr.period = 0;   // period ;  slave not use 0-->15
+    rcmr.period = 0;   // period ;  slave not use
     
     tcmr.ckg    = 0 ;   //slave not use
     rcmr.ckg    = 0 ;   //slave not use
        
-    tfmr.fsos   = 1 ;   //input only
+    tfmr.fsos   = 0 ;   //input only
     rfmr.fsos   = 0 ;   //input only
     
-    tfmr.datnb  = slot_num-1;	//5 ; //6 slot TDM
-    rfmr.datnb  = slot_num-1;	//5 ; 
+    tfmr.datnb  = slot_num-1;	//8 ; 
+    rfmr.datnb  = slot_num-1;	//8 ; 
     
     tfmr.datlen = slot_len-1;	//31 ; //32bits
     rfmr.datlen = slot_len-1;	//31 ;
     
-    tfmr.fslen  = 15 ; 	//frame sync is not used
+    tfmr.fslen  = 0 ; 	//frame sync is not used 0-->15
     rfmr.fslen  = 0 ; 	//frame sync is not used
        
     tfmr.fsedge = 1 ;
@@ -1146,7 +1155,7 @@ static void _SSC_Init( uint32_t id,
     tfmr.datdef = 0 ;
     tfmr.fsden  = 0 ;
     
-    rfmr.loop   = 1 ; //0:normal 1:loop 
+    rfmr.loop   = 0 ; //0:normal 1:loop 
     
     SSC_ConfigureTransmitter( pSSC,  tcmr.value,  tfmr.value );
     SSC_DisableTransmitter( pSSC );
@@ -1186,7 +1195,7 @@ static void _init_I2S( void *pInstance,void *dParameter )
     IRQ_DisableIT( pSource->dev.identify );
 
     /* initialize ssc port to default state,if other config,invoke set_parameter interface */
-    _SSC_Init( pSource->dev.identify ,pSource->dev.direct,1520000,BOARD_MCK , 8 , 16 );    
+    _SSC_Init( pSource->dev.identify ,pSource->dev.direct,0,BOARD_MCK , 2 , 16 );    
 }
 
                                                   

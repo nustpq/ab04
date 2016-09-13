@@ -61,6 +61,10 @@
 #include "defined.h"
 #include "uif_object.h"
 
+
+#include "codec.h"
+#include "sine_table.h"
+
 #include "uif_cmdparse.h"
 #include "uif_i2s.h"
 #include "uif_usb.h"
@@ -69,6 +73,9 @@
 #include "uif_usart.h"
 #include "uif_nandflash.h"
 #include "uif_gpio.h"
+#include "uif_led.h"
+#include "uif_act8865.h"
+#include "uif_dsp.h"
 
 /*
 *********************************************************************************************************
@@ -88,6 +95,10 @@
 #define UIF_TWI2	 1u
 #define UIF_USART1       1u
 #define UIF_GPIO         1u
+
+
+#define UIF_AIC3204      1u
+#define UIF_FM36         1u
 
 /*
 *********************************************************************************************************
@@ -117,6 +128,7 @@ uint8_t g_portMap;
 // unmask flag for port 
 uint32_t g_portMaskMap;
 
+extern Twid twid[ 3 ];
 //twi descriptors for transmmit
  Async async[ MAXTWI ];
  
@@ -268,6 +280,8 @@ extern void _SSC0_DmaRxCallback( uint8_t status, void *pArg);
 extern void _SSC1_DmaRxCallback( uint8_t status, void *pArg);
 extern void _SSC0_DmaTxCallback( uint8_t status, void *pArg);
 extern void _SSC1_DmaTxCallback( uint8_t status, void *pArg);
+extern void _SPI0_DmaRxCallback( uint8_t status, void* pArg );
+extern void _SPI0_DmaTxCallback( uint8_t status, void* pArg );
 extern void _SPI1_DmaRxCallback( uint8_t status, void* pArg );
 extern void _SPI1_DmaTxCallback( uint8_t status, void* pArg );
 extern void _USART1_DmaRxCallback( uint8_t status, void* pArg );
@@ -285,8 +299,9 @@ static void Dma_configure(void)
     IRQ_ConfigureIT( ID_DMAC1, 0, ISR_HDMA );
     IRQ_EnableIT(ID_DMAC0);
     IRQ_EnableIT(ID_DMAC1);
-    
-    /* Allocate DMA channels for SSC0 */
+
+/*----------------------------------------------------------------------------*/    
+    // Allocate DMA channels for SSC0 
     source_ssc0.dev.txDMAChannel = DMAD_AllocateChannel( pDmad, DMAD_TRANSFER_MEMORY, ID_SSC0);
     source_ssc0.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad, ID_SSC0, DMAD_TRANSFER_MEMORY);
     if (   source_ssc0.dev.txDMAChannel == DMAD_ALLOC_FAILED || source_ssc0.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
@@ -295,13 +310,13 @@ static void Dma_configure(void)
         while(1);
     }
 
-    /* Set RX callback */
+    // Set RX callback 
     DMAD_SetCallback(pDmad, source_ssc0.dev.rxDMAChannel,
                     (DmadTransferCallback)_SSC0_DmaRxCallback, ( void * )&source_ssc0 );
-    /* Set TX callback */
+    // Set TX callback 
     DMAD_SetCallback(pDmad, source_ssc0.dev.txDMAChannel,
                     (DmadTransferCallback)_SSC0_DmaTxCallback, ( void * )&source_ssc0 );
-    /* Configure DMA RX channel */
+    // Configure DMA RX channel 
     iController = (source_ssc0.dev.rxDMAChannel >> 8);
     dwCfg = 0
             | DMAC_CFG_SRC_PER(
@@ -309,7 +324,7 @@ static void Dma_configure(void)
             | DMAC_CFG_SRC_H2SEL       
             | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_ssc0.dev.rxDMAChannel, dwCfg );
-    /* Configure DMA TX channel */
+    // Configure DMA TX channel 
     iController = ( source_ssc0.dev.txDMAChannel >> 8);
     dwCfg = 0
             | DMAC_CFG_DST_PER(
@@ -317,8 +332,8 @@ static void Dma_configure(void)
             | DMAC_CFG_DST_H2SEL
             | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_ssc0.dev.txDMAChannel, dwCfg );
-    
-        // Allocate DMA channels for SSC1 
+/*----------------------------------------------------------------------------*/    
+    // Allocate DMA channels for SSC1 
     source_ssc1.dev.txDMAChannel = DMAD_AllocateChannel( pDmad, DMAD_TRANSFER_MEMORY, ID_SSC1);
     source_ssc1.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad, ID_SSC1, DMAD_TRANSFER_MEMORY);
     if (   source_ssc1.dev.txDMAChannel == DMAD_ALLOC_FAILED || source_ssc1.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
@@ -352,9 +367,49 @@ static void Dma_configure(void)
             | DMAC_CFG_DST_H2SEL
             | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_ssc1.dev.txDMAChannel, dwCfg );
-
+/*----------------------------------------------------------------------------*/
+     // Allocate DMA channels for SPI0 
+    source_spi0.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
+                                              DMAD_TRANSFER_MEMORY, ID_SPI0);
+    source_spi0.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad,
+                                              ID_SPI0, DMAD_TRANSFER_MEMORY);
+    if (   source_spi0.dev.txDMAChannel == DMAD_ALLOC_FAILED 
+        || source_spi0.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
+    {
+        printf("DMA channel allocat error\n\r");
+        while(1);
+    }
+    // Set RX callback 
+    DMAD_SetCallback(pDmad, source_spi0.dev.rxDMAChannel,
+                    (DmadTransferCallback)_SPI0_DmaRxCallback, 0);
+    // Configure DMA RX channel 
+    iController = (source_spi0.dev.rxDMAChannel >> 8);
+    dwCfg = 0
+           | DMAC_CFG_SRC_PER(
+                DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_RX )& 0x0F)
+           | DMAC_CFG_SRC_PER_MSB(
+                (DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_RX )& 0xF0) >> 4 )
+           | DMAC_CFG_SRC_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_spi0.dev.rxDMAChannel, dwCfg );
+    
+    // Configure DMA TX channel 
+    DMAD_SetCallback(pDmad, source_spi0.dev.txDMAChannel,
+                    (DmadTransferCallback)_SPI0_DmaTxCallback, 0);
+    iController = (source_spi0.dev.txDMAChannel >> 8);
+    dwCfg = 0           
+           | DMAC_CFG_DST_PER(
+                DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_TX )& 0x0F)
+           | DMAC_CFG_DST_PER_MSB(
+                (DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_TX )& 0xF0) >> 4 )
+           | DMAC_CFG_DST_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_spi0.dev.txDMAChannel, dwCfg );    
+/*----------------------------------------------------------------------------*/
 #if 1   
-     /* Allocate DMA channels for SPI1 */
+     // Allocate DMA channels for SPI1 
     source_spi1.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
                                               DMAD_TRANSFER_MEMORY, ID_SPI1);
     source_spi1.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad,
@@ -393,45 +448,8 @@ static void Dma_configure(void)
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_spi1.dev.txDMAChannel, dwCfg );
-    
-#if 0   
-    /* Allocate DMA channels for USART1 */
-    source_usart1.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
-                                              DMAD_TRANSFER_MEMORY, ID_USART1);
-    source_usart1.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad,
-                                              ID_USART1, DMAD_TRANSFER_MEMORY);
-    if (   source_usart1.dev.txDMAChannel == DMAD_ALLOC_FAILED 
-        || source_usart1.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
-    {
-        printf("DMA channel allocat error\n\r");
-        while(1);
-    }
-    /* Set RX callback */
-    DMAD_SetCallback( pDmad, source_usart1.dev.rxDMAChannel, (DmadTransferCallback)_USART1_DmaRxCallback, 0);
-    /* Configure DMA RX channel */
-    iController = (source_usart1.dev.rxDMAChannel >> 8);
-    dwCfg = 0
-           | DMAC_CFG_SRC_PER(
-             DMAIF_Get_ChannelNumber( iController, ID_USART1, DMAD_TRANSFER_RX ))
-           | DMAC_CFG_SRC_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_usart1.dev.rxDMAChannel, dwCfg );
-    
-    /* Set TX callback */
-    DMAD_SetCallback( pDmad, source_usart1.dev.txDMAChannel, (DmadTransferCallback)_USART1_DmaTxCallback, 0);
-    /* Configure DMA TX channel */
-    iController = (source_usart1.dev.txDMAChannel >> 8);
-    dwCfg = 0
-           | DMAC_CFG_DST_PER(
-             DMAIF_Get_ChannelNumber( iController, ID_USART1, DMAD_TRANSFER_TX ))
-           | DMAC_CFG_DST_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_usart1.dev.txDMAChannel, dwCfg );
-#endif
-
-#if 1
+/*----------------------------------------------------------------------------*/    
+    // Allocate DMA channels for USART1 
     source_usart1.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
                                               DMAD_TRANSFER_MEMORY, ID_USART1);
     source_usart1.dev.rxDMAChannel = DMAD_AllocateChannel( &g_dmad,
@@ -442,12 +460,12 @@ static void Dma_configure(void)
         printf("DMA channel allocat error\n\r");
         while(1);
     }
-    /* Set RX callback */
+    // Set RX callback 
     DMAD_SetCallback(&g_dmad, source_usart1.dev.txDMAChannel,
                     (DmadTransferCallback)_USART1_DmaTxCallback, 0);
     DMAD_SetCallback(&g_dmad, source_usart1.dev.rxDMAChannel,
                     (DmadTransferCallback)_USART1_DmaRxCallback, 0);
-    /* Configure DMA RX channel */
+    // Configure DMA RX channel 
     iController = ( source_usart1.dev.rxDMAChannel >> 8 );
     dwCfg = 0
            | DMAC_CFG_SRC_PER(
@@ -456,7 +474,7 @@ static void Dma_configure(void)
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( &g_dmad, source_usart1.dev.rxDMAChannel, dwCfg );
-    /* Configure DMA TX channel */
+    // Configure DMA TX channel 
     iController = ( source_usart1.dev.txDMAChannel >> 8);
     dwCfg = 0 
            | DMAC_CFG_DST_PER(
@@ -464,9 +482,8 @@ static void Dma_configure(void)
            | DMAC_CFG_DST_H2SEL
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, source_usart1.dev.txDMAChannel, dwCfg );
-#endif    
-    
+    DMAD_PrepareChannel( &g_dmad, source_usart1.dev.txDMAChannel, dwCfg ); 
+/*----------------------------------------------------------------------------*/    
 #endif
 }
 
@@ -534,18 +551,37 @@ extern void _ConfigureTc1( uint32_t hz );
 int main()
 {
     CPU_INT08U  os_err;
-    uint32_t twi_hz = 400000;
+    uint32_t twi_hz = 100000;
 
-    APP_TRACE_INFO(("Application start!\r\n"));
+    CODEC_SETS codec_set;
+
+
+    printf(("\nApplication start!\r\n"));
 
     CPU_Init();
 
     Mem_Init();
-    
+
+    //Led/Buzzer initialize;
     BSP_LED_Init();
-    BSP_LED_Off( 3 );   
-
-
+    UIF_LED_Init();
+    BSP_LED_Off( 3 ); 
+    BSP_BUZZER_Toggle( BUZZER_OFF );
+    UIF_LED_On( LED_D3 );
+    UIF_LED_Off( LED_D3 );
+    UIF_LED_On( LED_D4 );
+    UIF_LED_Off( LED_D4 );  
+    
+    //Misc switch initialize
+    UIF_Misc_Init( );
+//    UIF_Misc_On( HDMI_UIF_PWR_EN );
+    UIF_Misc_On ( CODEC1_RST );
+    
+    //test D5
+    UIF_LED_On( LED_D5 );
+    UIF_LED_Off( LED_D5 );
+   
+    
 #if UIF_USB
     //initialize usb object and it's operation 
     source_usb.init_source = init_usb;
@@ -579,6 +615,7 @@ int main()
     source_ssc0.record = SSC0_Recording;
 #endif
     source_ssc0.buffer_write = ssc0_buffer_write;
+    source_ssc0.buffer_read  = ssc0_buffer_read;
     
     if( NULL != source_ssc0.init_source )
         source_ssc0.init_source( &source_ssc0,NULL );
@@ -602,6 +639,7 @@ int main()
     source_ssc1.record = SSC1_Recording;
 #endif
     source_ssc1.buffer_write = ssc1_buffer_write;
+    source_ssc1.buffer_read  = ssc1_buffer_read;
     
     if( NULL != source_ssc1.init_source )
        source_ssc1.init_source( &source_ssc1,NULL );
@@ -619,7 +657,7 @@ int main()
     source_spi0.tx_index = 0;
     source_spi0.rx_index = 0;
     source_spi0.privateData = spi0_ring_buffer;
-    spi0_cfg.spi_speed = 4 * 1000 * 1000;
+    spi0_cfg.spi_speed = 10 * 1000 * 1000;
     spi0_cfg.spi_mode = 1;
     
     
@@ -646,14 +684,14 @@ int main()
     source_spi1.rx_index = 0;
     source_spi1.privateData = spi1_ring_buffer;
     source_spi1.buffer = spi1_buffer[ 1 ];
-    spi1_cfg.spi_speed = 40 * 1000 * 1000;
+    spi1_cfg.spi_speed = 10 * 1000 * 1000;
     spi1_cfg.spi_mode  = 1;
     
     
     source_spi1.init_source = init_spi;
     source_spi1.peripheral_stop = stop_spi;
     source_spi1.buffer_write = _spiDmaTx;
-    source_spi0.buffer_read = _spiDmaRx;
+    source_spi1.buffer_read = _spiDmaRx;
     source_spi1.set_peripheral = spi_register_set;
     
     if( NULL != source_spi1.init_source )
@@ -680,8 +718,8 @@ int main()
     source_twi0.privateData = &twi0ChipConf[ 0 ];
 
     source_twi0.init_source = twi_init_master;
-    source_twi0.buffer_write = twi_uname_write;
-    source_twi0.buffer_read = twi_uname_read;
+    source_twi0.buffer_write = twi0_uname_write;
+    source_twi0.buffer_read = twi0_uname_read;
     
     if( NULL != source_twi0.init_source )
         source_twi0.init_source( &source_twi0,&twi_hz );
@@ -693,12 +731,12 @@ int main()
     //initialize twi0 object and it's operation  
     OPTIONPARAMETER twi1_chipConf[ 2 ];
     memset( ( void * )&twi1_chipConf[ 0 ], 0 ,sizeof( OPTIONPARAMETER ) << 1 );
-    twi1_chipConf[ 0 ].address = 0xc0;
+    twi1_chipConf[ 0 ].address = 0x18;
     twi1_chipConf[ 0 ].iaddress = 0;
     twi1_chipConf[ 0 ].isize = 0;
     twi1_chipConf[ 0 ].revers = 0;
     
-    twi1_chipConf[ 1 ].address = 0x30;
+    twi1_chipConf[ 1 ].address = 0x18;
     twi1_chipConf[ 1 ].iaddress = 0;
     twi1_chipConf[ 1 ].isize = 0;
     twi1_chipConf[ 1 ].revers = 0;
@@ -713,12 +751,12 @@ int main()
     source_twi1.privateData = &twi1_chipConf[ 0 ];
 
     source_twi1.init_source = twi_init_master;
-    source_twi1.buffer_write = twi_codec_write;
-    source_twi1.buffer_read = twi_codec_read;
+    source_twi1.buffer_write = twi1_write;
+    source_twi1.buffer_read = twi1_read;
     
     if( NULL != source_twi1.init_source )
         source_twi1.init_source( &source_twi1,&twi_hz );
-
+       
 #endif
 
 
@@ -726,12 +764,12 @@ int main()
     //initialize twi2 object and it's operation      
     OPTIONPARAMETER twi2_chipConf[ 2 ];
     memset( ( void * )&twi2_chipConf[ 0 ], 0 ,sizeof( OPTIONPARAMETER ) << 1 );
-    twi2_chipConf[ 0 ].address = 0xc0;
+    twi2_chipConf[ 0 ].address = 0x18;
     twi2_chipConf[ 0 ].iaddress = 0;
     twi2_chipConf[ 0 ].isize = 0;
     twi2_chipConf[ 0 ].revers = 0;
     
-    twi2_chipConf[ 1 ].address = 0x30;
+    twi2_chipConf[ 1 ].address = 0x18;
     twi2_chipConf[ 1 ].iaddress = 0;
     twi2_chipConf[ 1 ].isize = 0;
     twi2_chipConf[ 1 ].revers = 0;    
@@ -746,8 +784,8 @@ int main()
     source_twi2.privateData = &twi2_chipConf[ 0 ];
     
     source_twi2.init_source = twi_init_master;
-    source_twi2.buffer_write = twi_fm36_write;
-    source_twi2.buffer_read = twi_fm36_read;
+    source_twi2.buffer_write = twi2_write;
+    source_twi2.buffer_read = twi2_read;
     
     if( NULL != source_twi2.init_source )
         source_twi2.init_source( &source_twi2,&twi_hz );
@@ -790,16 +828,48 @@ int main()
     if( NULL != source_gpio.init_source )
        source_gpio.init_source( &source_gpio,NULL );
 #endif
-      
+
+#ifdef UIF_AIC3204
+/*----------------------------------------------------*/
+    codec_set.sr = 8000;
+    codec_set.sample_len = 16;
+    codec_set.format = 1;
+    codec_set.slot_num = 2;
+    codec_set.m_s_sel = 0;
+    codec_set.bclk_polarity = 1;
+    codec_set.flag = 1;
+    codec_set.delay = 0;
+    Init_CODEC( &source_twi1,codec_set );
+    codec_set.sr = 8000;
+    codec_set.sample_len = 16;
+    codec_set.format = 1;
+    codec_set.slot_num = 2;
+    codec_set.m_s_sel = 0;
+    codec_set.bclk_polarity = 1;
+    codec_set.flag = 1;
+    codec_set.delay = 0;
+    Init_CODEC( &source_twi2,codec_set );
+/*---------------------------------------------------*/
+#endif
+    
+#ifndef UIF_FM36
+    Init_FM36_AB03( 48000, 
+                        1, 
+                        0, 
+                        0, 
+                       16,
+                        0,
+                       1);
+#endif
+    
     //config port dma
     Dma_configure( );
     
     //initialize Tc1 interval = 1ms    
-    _ConfigureTc1( 1000u );
-
+    _ConfigureTc1( 1000u );  
   
     OSInit();
- 
+
 #if UIF_LED
     // create led flash task 
     os_err = OSTaskCreateExt( AppTaskLED,   
@@ -930,16 +1000,22 @@ static  void  AppTaskLED ( void *p_arg )
     {
         OSTimeDlyHMSM(0, 0, 1, 0);
 
-        BSP_LED_Toggle( 1 );
+//        BSP_LED_Toggle( 1 );
+        UIF_LED_Toggle( LED_D4 );
         
  
-        spi_clear_status( &source_spi1 );
-        memset( spi1_buffer[ 1 ], 0, sizeof( spi1_ring_buffer ) );
-        _spiDmaRx( &source_spi1 ,source_spi1.privateData,4096);
-        _spiDmaTx( &source_spi1 ,source_spi1.privateData,4096);
+//        spi_clear_status( &source_spi1 );
+//        memset( spi1_ring_buffer, 0x55, sizeof( spi1_ring_buffer ) );
+//        _spiDmaRx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_ring_buffer ));
+//        _spiDmaTx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_ring_buffer ));
+        
+//        spi_clear_status( &source_spi0 );
+//        memset( spi0_ring_buffer, 0x55, sizeof( spi0_ring_buffer ) );
+//        _spiDmaRx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_ring_buffer ));
+//        _spiDmaTx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_ring_buffer ));
                
-        usart1_DmaTx( &source_usart1 , NULL , 0 );
-        twi_uname_write( &source_twi0,twi_ring_buffer[0],sizeof( twi_ring_buffer[ 0 ] ) >> 10 );
+//        usart1_DmaTx( &source_usart1 , NULL , 0 );
+ //       twi0_uname_write( &source_twi0,twi_ring_buffer[0],sizeof( twi_ring_buffer[ 0 ] ) >> 10 );
     }
 
 }
@@ -965,6 +1041,8 @@ static  void  AppTaskCmdParase ( void *p_arg )
 {
     static uint8_t taskMsg;
     static uint8_t isUsbConnected = 0;
+    
+    static uint8_t transmitStart = 0;
     
     g_pPortManagerMbox = OSMboxCreate( (void * )taskMsg );
       
@@ -996,8 +1074,13 @@ static  void  AppTaskCmdParase ( void *p_arg )
          Audio_State_Control( &taskMsg );
           
          //step3:post message mailbox to start other task;
-         taskMsg = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );
-         OSMboxPost( g_pPortManagerMbox, (void *)taskMsg );     
+         if( !transmitStart )
+         {
+            taskMsg = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );
+            OSMboxPost( g_pPortManagerMbox, (void *)taskMsg ); 
+            transmitStart = 1;
+            taskMsg = 0;
+         }
        
          //let this task running periodic per second enough;
          OSTimeDlyHMSM( 0, 0, 0, 500 );
@@ -1021,10 +1104,61 @@ static  void  AppTaskCmdParase ( void *p_arg )
 */
 
 #if UIF_SSC0
+extern void Alert_Sound_Gen( uint8_t *pdata, uint32_t size, uint32_t REC_SR_Set );
+
 static  void  AppTaskSSC0 ( void *p_arg )
 {
     uint8_t err = 0;
     uint8_t receiveTaskMsg = 0; 
+    uint16_t *pInt = NULL;
+    uint32_t i ;
+    
+    memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ) );
+    memset( ssc1_I2SBuffersOut, 0x5555, sizeof( ssc1_I2SBuffersOut ) );  
+    memset( ssc0_I2SBuffersIn, 0 , sizeof( ssc0_I2SBuffersIn ) );
+    memset( ssc1_I2SBuffersIn, 0 , sizeof( ssc1_I2SBuffersIn ) ); 
+
+#if 1    
+    Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut, 
+                      sizeof( ssc0_I2SBuffersOut[0] ),  
+                      8000 );
+    
+    Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut, 
+                      sizeof( ssc0_I2SBuffersOut[1] ),  
+                      8000 );    
+    
+    Alert_Sound_Gen( ( uint8_t * )ssc1_I2SBuffersOut, 
+                      sizeof( ssc1_I2SBuffersOut ),  
+                      8000 );
+#endif
+    
+#if 0
+    pInt = ( uint16_t * )ssc0_I2SBuffersOut[0] ;
+    for( i = 0; i< ( sizeof( ssc1_I2SBuffersOut ) );  ) 
+    {        
+       *(pInt+i++) = 0x1122 ;      
+       *(pInt+i++) = 0x3344 ;
+       *(pInt+i++) = 0x5566 ;
+       *(pInt+i++) = 0x7788 ;     
+       *(pInt+i++) = 0x99aa ;
+       *(pInt+i++) = 0xbbcc ;   
+       *(pInt+i++) = 0xddee ;
+       *(pInt+i++) = 0xff00 ; 
+    } 
+    
+    pInt = ( uint16_t * )ssc1_I2SBuffersOut[0] ;
+    for( i = 0; i< ( sizeof( ssc1_I2SBuffersOut ) ); ) 
+    {        
+       *(pInt+i++) = 0x1122 ;      
+       *(pInt+i++) = 0x3344 ;
+       *(pInt+i++) = 0x5566 ;
+       *(pInt+i++) = 0x7788 ;     
+       *(pInt+i++) = 0x99aa ;
+       *(pInt+i++) = 0xbbcc ;   
+       *(pInt+i++) = 0xddee ;
+       *(pInt+i++) = 0xff00 ; 
+    }  
+#endif    
     
     for(;;) 
     {
@@ -1040,12 +1174,16 @@ static  void  AppTaskSSC0 ( void *p_arg )
                         &&( ( uint8_t )RUNNING != source_ssc0.status ) )
                     {
 //                          OSSchedLock( );
-//                          source_ssc0.play( &source_ssc0 );
-                          source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_I2SBuffersOut,PINGPONG_SIZE );
-//                          source_ssc0.record( &source_ssc0 );
+                          source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_I2SBuffersOut,
+                                                   sizeof(ssc0_I2SBuffersOut ) >> 1 );
+                          source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_I2SBuffersIn,
+                                                   sizeof(ssc0_I2SBuffersIn ) );                          
                           source_ssc0.status = ( uint8_t )START;
-//                          source_ssc1.play( &source_ssc1 );
-//                          source_ssc1.record( &source_ssc1 );
+                    
+                          source_ssc1.buffer_write( &source_ssc1,( uint8_t * )ssc1_I2SBuffersOut,
+                                                   sizeof(ssc1_I2SBuffersOut )/2 );
+                          source_ssc1.buffer_read( &source_ssc1,( uint8_t * )ssc1_I2SBuffersIn,
+                                                   sizeof(ssc1_I2SBuffersIn )/2 );                            
                           source_ssc1.status = ( uint8_t )START;
 //                          OSSchedUnlock( );
                     }                 
@@ -1082,7 +1220,7 @@ static  void  AppTaskUSB (void *p_arg)
     for(;;) 
     {
 
-#if 1               
+#if 0               
         evFlags = OSFlagQuery( g_pStartUSBTransfer, &err );
 
         //maybe transfer according events,not waiting for all event happend;
