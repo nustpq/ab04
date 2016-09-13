@@ -575,6 +575,7 @@ int main()
     //Misc switch initialize
     UIF_Misc_Init( );
 //    UIF_Misc_On( HDMI_UIF_PWR_EN );
+    UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
     
     //test D5
@@ -1120,16 +1121,19 @@ static  void  AppTaskSSC0 ( void *p_arg )
 
 #if 1    
     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut, 
-                      sizeof( ssc0_I2SBuffersOut[0] ),  
+                      sizeof( ssc0_I2SBuffersOut[ 0 ] ),  
                       8000 );
     
-    Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut, 
-                      sizeof( ssc0_I2SBuffersOut[1] ),  
+    Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut[1], 
+                      sizeof( ssc0_I2SBuffersOut[ 1 ] ),  
                       8000 );    
     
-    Alert_Sound_Gen( ( uint8_t * )ssc1_I2SBuffersOut, 
-                      sizeof( ssc1_I2SBuffersOut ),  
-                      8000 );
+    Alert_Sound_Gen1( ( uint8_t * )ssc1_I2SBuffersOut, 
+                       sizeof( ssc1_I2SBuffersOut[ 0 ] ),  
+                       8000 );
+    Alert_Sound_Gen1( ( uint8_t * )ssc1_I2SBuffersOut, 
+                       sizeof( ssc1_I2SBuffersOut[ 1 ] ),  
+                       8000 );
 #endif
     
 #if 0
@@ -1181,9 +1185,9 @@ static  void  AppTaskSSC0 ( void *p_arg )
                           source_ssc0.status = ( uint8_t )START;
                     
                           source_ssc1.buffer_write( &source_ssc1,( uint8_t * )ssc1_I2SBuffersOut,
-                                                   sizeof(ssc1_I2SBuffersOut )/2 );
+                                                   sizeof(ssc1_I2SBuffersOut ) >> 1 );
                           source_ssc1.buffer_read( &source_ssc1,( uint8_t * )ssc1_I2SBuffersIn,
-                                                   sizeof(ssc1_I2SBuffersIn )/2 );                            
+                                                   sizeof(ssc1_I2SBuffersIn ) >> 1 );                            
                           source_ssc1.status = ( uint8_t )START;
 //                          OSSchedUnlock( );
                     }                 
