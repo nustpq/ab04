@@ -28,6 +28,7 @@
 * Filename      : bsp.h
 * Version       : V1.00
 * Programmer(s) : JBL
+* Modify	: Leo
 *********************************************************************************************************
 */
 
@@ -154,6 +155,7 @@ void BSP_BUZZER_Toggle( CPU_INT32U state );
 
 void BSP_LED_FLIP( CPU_INT32U state, CPU_INT32U order );
 
+//interface for AB-04 board led;
 void UIF_LED_Init( void );
 
 void UIF_LED_On ( CPU_INT32U led );
@@ -162,6 +164,7 @@ void UIF_LED_Off ( CPU_INT32U led );
 
 void UIF_LED_Toggle( CPU_INT32U led );
 
+//interface for AB-04 board control pins;
 void UIF_Misc_Init( void );
 
 void UIF_Misc_On ( CPU_INT32U id );
