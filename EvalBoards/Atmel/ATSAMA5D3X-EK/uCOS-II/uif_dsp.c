@@ -972,7 +972,7 @@ uint8_t Config_PDM_PA( void )
         buf[2] = para_table_pdm_pa[i][1];
         
 //        err = TWID_Write( MAX98504>>1, 0, 0, buf, sizeof(buf), NULL);
-        err = twi_fm36_write( &source_twi2,buf,sizeof( buf ) );
+        err = twi2_write( &source_twi2,buf,sizeof( buf ) );
         
         if( OS_ERR_NONE != err ) 
         {
