@@ -75,7 +75,7 @@ uint8_t nand_patternBuf[ 1024 * 1024 ];
 */
 uint8_t nfc_init( void *parameter )
 {
-      parameter = parameter;
+      volatile static uint8_t isNfcInitResult = 0;
       
       uint8_t const nandflash_bus_width = 8;
       BOARD_ConfigureNandFlash( nandflash_bus_width );
@@ -126,7 +126,10 @@ uint8_t nfc_init( void *parameter )
         printf("-E- Device Unknown\n\r");
         return 0;
     } 
-  
+    
+    if( NULL != parameter )
+        *(uint8_t * )parameter = 1;
+    
     return 0;
 }
 
