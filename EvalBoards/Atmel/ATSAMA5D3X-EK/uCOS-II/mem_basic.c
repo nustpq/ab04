@@ -77,7 +77,7 @@ uint8_t DM_SingleWrite( uint8_t dev_addr,uint16_t dm_addr,uint16_t dm_val)
     option = ( OPTIONPARAMETER * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
-    state = twi_fm36_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );
+    state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );
 
    
     return( state );
@@ -92,7 +92,7 @@ uint8_t PM_SingleWrite(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata, unsigne
     OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
-    state = twi_fm36_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );
+    state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );
     
     return state;
 }
@@ -107,7 +107,7 @@ uint8_t CM_SingleWrite(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata)
     OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
-    state = twi_fm36_write( ( void * )pTwiSource, ( uint8_t * )buf,sizeof( buf ) ); 
+    state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf,sizeof( buf ) ); 
    
     return state ;
 }
@@ -126,7 +126,7 @@ uint8_t DM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
-    state = twi_fm36_write( ( void * )pTwiSource, ( uint8_t * )buf,sizeof( buf ) ); 
+    state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf,sizeof( buf ) ); 
     if (state != SUCCESS)
     {
         return state ;
@@ -136,13 +136,13 @@ uint8_t DM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     buf[3] = 0x25; 
 
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL); 
-    state = twi_fm36_write( ( void * )pTwiSource, ( uint8_t * )buf, 4 );
+    state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, 4 );
     if (state != SUCCESS)
     {
         return state ;
     }   
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal++, 1, NULL) ;
-    state = twi_fm36_read( ( void * )pTwiSource, pVal++, 1 );
+    state = twi2_read( ( void * )pTwiSource, pVal++, 1 );
     if (state != SUCCESS)
     {
         return state ;
@@ -150,14 +150,14 @@ uint8_t DM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
        
     buf[3] = 0x26; 
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL); 
-    state = twi_fm36_write( ( void * )pTwiSource, ( uint8_t * )buf, 4 );    
+    state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, 4 );    
     if (state != SUCCESS)
     {
         return state ;
     } 
     
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-    state = twi_fm36_read( ( void * )pTwiSource, pVal++, 4 ); 
+    state = twi2_read( ( void * )pTwiSource, pVal++, 4 ); 
     if (state != SUCCESS)
     {
         return state  ;
@@ -186,7 +186,7 @@ uint8_t PM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     Unlock_PM(DSP_PM_Type);    
       
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
-    state = twi_fm36_write( (void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) ); 
+    state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) ); 
     if (state != SUCCESS)
     {
         return state ;
@@ -195,13 +195,13 @@ uint8_t PM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     buf[2] = FM_CMD_HOST_RD;
     buf[3] = 0x24; 
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL); 
-    state = twi_fm36_write( (void * )pTwiSource, ( uint8_t * )buf, 4 );     
+    state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, 4 );     
     if (state != SUCCESS)
     {
         return state ;
     }   
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-    state = twi_fm36_write( (void * )pTwiSource, pVal++, 1 );    
+    state = twi2_write( (void * )pTwiSource, pVal++, 1 );    
     if (state != SUCCESS)
     {
         return state ;
@@ -209,13 +209,13 @@ uint8_t PM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
    
     buf[3] = 0x25;
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL); 
-    state = twi_fm36_write( (void * )pTwiSource, (uint8_t *)buf, 4 );    
+    state = twi2_write( (void * )pTwiSource, (uint8_t *)buf, 4 );    
     if (state != SUCCESS)
     {
         return state ;
     }   
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-    state = twi_fm36_read( (void * )pTwiSource, pVal++, 1 );     
+    state = twi2_read( (void * )pTwiSource, pVal++, 1 );     
     if (state != SUCCESS)
     {
         return state ;
@@ -223,14 +223,14 @@ uint8_t PM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
 
     buf[3] = 0x26;
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL);
-    state = twi_fm36_write( (void * )pTwiSource, (uint8_t *)buf, 4 );      
+    state = twi2_write( (void * )pTwiSource, (uint8_t *)buf, 4 );      
     if (state != SUCCESS)
     {
         return state ;
     } 
     
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-    state = twi_fm36_read( (void * )pTwiSource, pVal++, 1 );    
+    state = twi2_read( (void * )pTwiSource, pVal++, 1 );    
     if (state != SUCCESS)
     {
         return state ;
@@ -247,9 +247,12 @@ uint8_t CM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     
     OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
+    option->iaddress = 0;
+    option->isize = 0;
+    option->revers = 0;
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
-    state = twi_fm36_write( (void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );     
+    state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );     
     if (state != SUCCESS)
     {
         return state ;
@@ -258,14 +261,14 @@ uint8_t CM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     buf[2] = FM_CMD_HOST_RD;
     buf[3] = 0x25;
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL);
-    state = twi_fm36_write( (void * )pTwiSource, ( uint8_t * )buf, 4 );     
+    state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, 4 );     
     if (state != SUCCESS)
     {
         return state ;
     }
     
 //    state =  TWID_Read(  dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-    state = twi_fm36_read( (void * )pTwiSource, pVal++, 1 );     
+    state = twi2_read( (void * )pTwiSource, pVal++, 1 );     
     if (state != SUCCESS)
     {
         return state ;
@@ -273,13 +276,13 @@ uint8_t CM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
 
     buf[3] = 0x26;
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL);
-    state = twi_fm36_write( (void * )pTwiSource, ( uint8_t * )buf, 4 ); 
+    state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, 4 ); 
     if (state != SUCCESS)
     {
         return state ;
     }   
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-    state = twi_fm36_read( (void * )pTwiSource, pVal++, 1 ); 
+    state = twi2_read( (void * )pTwiSource, pVal++, 1 ); 
     if (state != SUCCESS)
     {
         return state ;
@@ -306,7 +309,7 @@ uint8_t DM_BurstWrite(  uint8_t dev_addr,
    
     uint8_t buf[] = { 0x00, 0x1C,0,0 };
 //    state =  TWID_Write( dev_addr>>1, 0, 0 , buf, 2, NULL); 
-    state = twi_fm36_write( (void * )pTwiSource, ( uint8_t * )buf, 2 );     
+    state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, 2 );     
     if (state != SUCCESS) {
         return state;
     }
@@ -317,7 +320,7 @@ uint8_t DM_BurstWrite(  uint8_t dev_addr,
         buf[2] = (pDat[i].dm_val>>8)&0xFF ;
         buf[3] = pDat[i].dm_val&0xFF ;
 //        state =  TWID_Write(  dev_addr>>1, 0xFCF33B, 3 , buf, sizeof(buf), NULL); 
-        state = twi_fm36_write( (void * )pTwiSource, ( uint8_t * )buf, 2 );         
+        state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, 2 );         
     }
    
     return state;	
@@ -338,7 +341,7 @@ uint8_t DM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
     option->isize = 3;
 
 //    state =  TWID_Write(  dev_addr>>1, 0xFCF33B, 3 , buf, sizeof(buf), NULL);
-    state = twi_fm36_write( (void * )pTwiSource,( uint8_t * )buf,
+    state = twi2_write( (void * )pTwiSource,( uint8_t * )buf,
                                      sizeof( buf ));
 
     if (state != SUCCESS) {
@@ -351,7 +354,7 @@ uint8_t DM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
     buf[ 3 ] = *pDmDat++;
 
 //    state =  TWID_Write(  dev_addr>>1, 0xFCF33B, 3 , buf, sizeof(buf), NULL);
-    state = twi_fm36_write( (void * )pTwiSource,( uint8_t * )buf,
+    state = twi2_write( (void * )pTwiSource,( uint8_t * )buf,
                                      sizeof( buf ));
     
     if (state != SUCCESS) 
@@ -363,7 +366,7 @@ uint8_t DM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
     option->isize = 3;
 
 //    state =  TWID_Write(  dev_addr>>1, 0xFCF3B8, 3 , pDmDat, data_num +1 , NULL);
-    state = twi_fm36_write( (void * )pTwiSource,
+    state = twi2_write( (void * )pTwiSource,
                                      pDmDat,
                                      data_num +1);
    
@@ -391,7 +394,7 @@ uint8_t PM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
     option->isize = 3;
     
 //    state =  TWID_Write(  dev_addr>>1, 0xFCF33B, 3 , buf, 4, NULL); 
-    state = twi_fm36_write( ( void * )pTwiSource,
+    state = twi2_write( ( void * )pTwiSource,
                             ( uint8_t * )buf,
                                          4 );
     
@@ -408,7 +411,7 @@ uint8_t PM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
 //    state =  TWID_Write(  dev_addr>>1, 0xFCF30D, 3 , buf, sizeof(buf), NULL);
     option->iaddress = 0xFCF30D;
     option->isize = 3;
-    state = twi_fm36_write( (void * )pTwiSource,
+    state = twi2_write( (void * )pTwiSource,
                             ( uint8_t * )buf,
                             sizeof( buf ) );
     
@@ -419,7 +422,7 @@ uint8_t PM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
 //   state =  TWID_Write(  dev_addr>>1, 0xFCF388, 3 , pDmDat, data_num + 1 , NULL);
     option->iaddress = 0xFCF388;
     option->isize = 3;
-    state = twi_fm36_write( (void * )pTwiSource,
+    state = twi2_write( (void * )pTwiSource,
                                      pDmDat,
                                      data_num + 1);
  
@@ -449,7 +452,7 @@ uint8_t PM_FastWrite_s( uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
     
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_PM_WR,(StAddr>>8)&0xFF, (StAddr)&0xFF, *(pDmDat++),*(pDmDat++),*(pDmDat++) } ; //??
 //    state =  TWID_Write( dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);  //???
-    state = twi_fm36_write( (void * )pTwiSource, ( uint8_t * )buf, 4 );
+    state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, 4 );
     
     if (state != SUCCESS) {
         return state;
@@ -469,13 +472,13 @@ uint8_t DM_FastRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     option->address = dev_addr >> 1;
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
-    state = twi_fm36_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof(buf) );    
+    state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof(buf) );    
     if (state != SUCCESS) {
         return state ;
     } 
     
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal,2, NULL) ;
-    state = twi_fm36_read( ( void * )pTwiSource, pVal, 2 );
+    state = twi2_read( ( void * )pTwiSource, pVal, 2 );
      
     return state;
 }
@@ -549,7 +552,7 @@ uint8_t MEM_Block_LegacyRead( uint8_t dev_addr,
         start_addr ++ ;
         
 //        state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
-        state = twi_fm36_write( ( void * )pTwiSource, buf, sizeof(buf) );        
+        state = twi2_write( ( void * )pTwiSource, buf, sizeof(buf) );        
         if (state != SUCCESS) 
         {          
             return state ;
@@ -558,14 +561,14 @@ uint8_t MEM_Block_LegacyRead( uint8_t dev_addr,
         buf[2] = FM_CMD_HOST_RD;
         buf[3] = 0x26;      
 //        state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL);
-        state = twi_fm36_write( ( void * )pTwiSource, buf, 4 );          
+        state = twi2_write( ( void * )pTwiSource, buf, 4 );          
         if (state != SUCCESS) 
         {
             return state ;
         }
         
 //        state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-        state = twi_fm36_read( ( void * )pTwiSource, pVal++, 1 );         
+        state = twi2_read( ( void * )pTwiSource, pVal++, 1 );         
         if (state != SUCCESS) 
         {
             return state ;
@@ -573,13 +576,13 @@ uint8_t MEM_Block_LegacyRead( uint8_t dev_addr,
         
         buf[3] = 0x25;
 //        state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL); 
-        state = twi_fm36_write( ( void * )pTwiSource, buf, 4 ); 
+        state = twi2_write( ( void * )pTwiSource, buf, 4 ); 
         if (state != SUCCESS) 
         {
             return state ;
         }   
 //        state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-        state = twi_fm36_read( ( void * )pTwiSource, pVal++, 1 );          
+        state = twi2_read( ( void * )pTwiSource, pVal++, 1 );          
         if (state != SUCCESS) 
         {
             return state ;
@@ -591,13 +594,13 @@ uint8_t MEM_Block_LegacyRead( uint8_t dev_addr,
           
             buf[3] = 0x24;
 //            state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL); 
-            state = twi_fm36_write( ( void * )pTwiSource, buf, 4 ); 
+            state = twi2_write( ( void * )pTwiSource, buf, 4 ); 
             if (state != SUCCESS) 
             {
                 return state ;
             }   
 //            state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-            state = twi_fm36_read( ( void * )pTwiSource, pVal++, 1 );             
+            state = twi2_read( ( void * )pTwiSource, pVal++, 1 );             
             if (state != SUCCESS) 
             {
                 return state ;
@@ -644,7 +647,7 @@ uint8_t MEM_Block_SingleWrite( uint8_t dev_addr,
         }
        
 //        state =  TWID_Write( dev_addr>>1, 0, 0 , buf, data_length+5, NULL);
-        state = twi_fm36_write( ( void * )pTwiSource, buf, data_length+5 ); 
+        state = twi2_write( ( void * )pTwiSource, buf, data_length+5 ); 
         if (state != SUCCESS) {
             return state ;
         } 
@@ -670,7 +673,7 @@ uint8_t HOST_SingleWrite_1(uint8_t dev_addr,uint8_t host_addr,uint8_t host_val)
     option->address = dev_addr >> 1;
      
 //     state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
-     state = twi_fm36_write( ( void * )pTwiSource, buf, sizeof(buf) ); 
+     state = twi2_write( ( void * )pTwiSource, buf, sizeof(buf) ); 
      
      return state;
 }
@@ -687,7 +690,7 @@ uint8_t HOST_SingleWrite_2(uint8_t dev_addr,uint8_t host_addr,uint16_t host_val)
      
 //     state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
      
-     state = twi_fm36_write( ( void * )pTwiSource, buf, sizeof(buf) ); 
+     state = twi2_write( ( void * )pTwiSource, buf, sizeof(buf) ); 
      
     return state;
 }
@@ -702,13 +705,13 @@ uint8_t HOST_LegacyRead(uint8_t dev_addr, uint8_t host_addr,uint8_t *pVal)
     option->address = dev_addr >> 1;
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
-     state = twi_fm36_write( ( void * )pTwiSource, buf, sizeof(buf) );      
+     state = twi2_write( ( void * )pTwiSource, buf, sizeof(buf) );      
     if (state != SUCCESS)
     {
         return state ;
     }   
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal,1, NULL) ;
-     state = twi_fm36_read( ( void * )pTwiSource, pVal, 1 );     
+     state = twi2_read( ( void * )pTwiSource, pVal, 1 );     
     if (state != SUCCESS)
     {
         return state ;
@@ -729,7 +732,7 @@ uint8_t DSP_SingleWrite_1(uint8_t dev_addr,uint8_t dsp_addr,uint8_t dsp_val)
     option->address = dev_addr >> 1;
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);  
-    state = twi_fm36_write( ( void * )pTwiSource, buf, sizeof(buf) );  
+    state = twi2_write( ( void * )pTwiSource, buf, sizeof(buf) );  
     
     return state;
 }
@@ -744,7 +747,7 @@ uint8_t DSP_SingleWrite_2(uint8_t dev_addr,uint8_t dsp_addr,uint16_t dsp_val)
     OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
-    state = twi_fm36_write( ( void * )pTwiSource, buf, sizeof(buf) );      
+    state = twi2_write( ( void * )pTwiSource, buf, sizeof(buf) );      
      
     return state;
 }
@@ -759,7 +762,7 @@ uint8_t DSP_LegacyRead(uint8_t dev_addr, uint8_t dsp_addr,uint8_t *pVal)
     OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
 
-    state = twi_fm36_write( ( void * )pTwiSource, buf, sizeof(buf) );    
+    state = twi2_write( ( void * )pTwiSource, buf, sizeof(buf) );    
     if (state != SUCCESS) {
         return state ;
     }  
@@ -767,26 +770,26 @@ uint8_t DSP_LegacyRead(uint8_t dev_addr, uint8_t dsp_addr,uint8_t *pVal)
     buf[2] = FM_CMD_HOST_RD;
     buf[3] = 0x4B;      
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL); 
-    state = twi_fm36_write( ( void * )pTwiSource, buf, 4 );      
+    state = twi2_write( ( void * )pTwiSource, buf, 4 );      
     if (state != SUCCESS) {
         return state ;
     }   
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-    state = twi_fm36_read( ( void * )pTwiSource, pVal++, 1 );      
+    state = twi2_read( ( void * )pTwiSource, pVal++, 1 );      
     if (state != SUCCESS) {
         return state ;
     }
         
     buf[3] = 0x4A;      
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, 4, NULL);
-    state = twi_fm36_write( ( void * )pTwiSource, buf, 4 );    
+    state = twi2_write( ( void * )pTwiSource, buf, 4 );    
     if (state != SUCCESS) 
     {
         return state ;
     } 
     
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal,1, NULL) ;
-    state = twi_fm36_read( ( void * )pTwiSource, pVal, 1 );    
+    state = twi2_read( ( void * )pTwiSource, pVal, 1 );    
     if (state != SUCCESS) {
         return state ;
     } 
