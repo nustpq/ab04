@@ -47,14 +47,14 @@ void Alert_Sound_Gen( uint8_t *pdata, uint32_t size, uint32_t REC_SR_Set )
     pDest             = ( uint16_t  *)pdata; 
     
         
-    while( sample_index < (size>>3) ) {  //4CH      
+    while( sample_index < (size>>2) ) {  //3--2 ==> 4ch-->2ch      
        temp =   *(pVal+index) ;
        *( pDest )   =  temp;
        *( pDest+1 ) =  temp;
-       *( pDest+2 ) =  temp;
-       *( pDest+3 ) =  temp;     
+       //*( pDest+2 ) =  temp;            //4channel时打开
+       //*( pDest+3 ) =  temp;            //4channel时打开
        sample_index++;
-       pDest+=4;   
+       pDest+=2;                          //4channel时，步长为4
        index = ( index + table_lookup_step ) % ALERT_TABLE_POINT ;
     
     }  
