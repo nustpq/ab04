@@ -44,10 +44,10 @@ extern uint8_t twi_ring_buffer[ MAXTWI ][ 256 ];
 
 
 /** TWI driver instance.*/
-static Twid twid[ MAXTWI ];
+Twid twid[ PMIC ];
 
 /** Twi Async descriptor */
-static Async async[ MAXTWI ];
+static Async async[ PMIC ];
 
 
 /*
@@ -99,7 +99,7 @@ static void TWI1_IrqHandler( void )
     OS_CPU_SR cpu_sr;
     
     OS_ENTER_CRITICAL( );
-    TWID_Handler( &twid[ CODEC ] );
+    TWID_Handler( &twid[ CODEC1 ] );
     OS_EXIT_CRITICAL();
 }
 
@@ -111,6 +111,98 @@ static void TWI2_IrqHandler( void )
     TWID_Handler( &twid[ FM36 ] );
     OS_EXIT_CRITICAL();
 }
+
+
+/*
+*********************************************************************************************************
+*                                    twi0_init_master()
+*
+* Description :  Initialize twix as master
+*
+* Argument(s) :  freq      : twi clock frequency;
+*		 
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+static void twi0_init_master( uint32_t freq ) 
+{
+    // Configure TWI pins. 
+    PIO_Configure( pins_uname , PIO_LISTSIZE( pins_uname ));
+    // Enable TWI peripheral clock 
+    PMC_EnablePeripheral(ID_TWI0);
+
+    // Configure TWI 
+    TWI_ConfigureMaster( TWI0, freq, BOARD_MCK );
+    TWID_Initialize(&twid[ UNAMED ], TWI0 );
+
+    // Configure TWI interrupts 
+    IRQ_ConfigureIT( ID_TWI0, 0, TWI0_IrqHandler );
+    IRQ_EnableIT( ID_TWI0 );
+}
+
+/*
+*********************************************************************************************************
+*                                    twi1_init_master()
+*
+* Description :  Initialize twix as master
+*
+* Argument(s) :  freq      : twi clock frequency;
+*		 
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+static void twi1_init_master( uint32_t freq ) 
+{
+    // Configure TWI pins. 
+    PIO_Configure( pins_codec , PIO_LISTSIZE( pins_codec ));
+    // Enable TWI peripheral clock 
+    PMC_EnablePeripheral(ID_TWI1);
+
+    // Configure TWI 
+    TWI_ConfigureMaster( TWI1, freq, BOARD_MCK );
+    TWID_Initialize(&twid[ CODEC1 ], TWI1 );
+
+    // Configure TWI interrupts 
+    IRQ_ConfigureIT( ID_TWI1, 0, TWI1_IrqHandler );
+    IRQ_EnableIT( ID_TWI1 );
+}
+
+/*
+*********************************************************************************************************
+*                                    twi2_init_master()
+*
+* Description :  Initialize twix as master
+*
+* Argument(s) :  freq      : twi clock frequency;
+*		 
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+static void twi2_init_master( uint32_t freq ) 
+{
+    // Configure TWI pins. 
+    PIO_Configure( pins_fm36 , PIO_LISTSIZE( pins_fm36 ));
+    // Enable TWI peripheral clock 
+    PMC_EnablePeripheral(ID_TWI2);
+
+    // Configure TWI 
+    TWI_ConfigureMaster( TWI2, freq, BOARD_MCK );
+    TWID_Initialize(&twid[ FM36 ], TWI2 );
+
+    // Configure TWI interrupts 
+    IRQ_ConfigureIT( ID_TWI2, 0, TWI2_IrqHandler );
+    IRQ_EnableIT( ID_TWI2 );
+}
+
 
 
 /*
@@ -137,56 +229,24 @@ void twi_init_master( void *pInstance, void * pFreq )
     
     uint32_t hz = *( uint32_t * )pFreq;   
     assert( 0 != hz );
-    
-    /* Configure TWI pins. no other choice,so hardcode here*/
-	if( ID_TWI0 == pSource->dev.identify )
-	{
-        PIO_Configure( pins_uname, PIO_LISTSIZE( pins_uname ) );
-	}
-	else if( ID_TWI1 == pSource->dev.identify )
-	{
-		PIO_Configure( pins_codec, PIO_LISTSIZE( pins_codec ) );
-	}
-	else if( ID_TWI2 == pSource->dev.identify )
-	{
-		PIO_Configure( pins_fm36, PIO_LISTSIZE( pins_fm36 ) );	
-	}
-	else
-	{
-		APP_TRACE_INFO(("ALERT:error deive used,please check it!\n\t"));
-	}
-    /* Enable TWI peripheral clock */
-    PMC_EnablePeripheral( pSource->dev.identify );
-
-    /* Configure TWI */
-    TWI_ConfigureMaster( pTwi, hz , BOARD_MCK );
  
-    /* Configure TWI interrupts */
     if( ID_TWI0 == pSource->dev.identify )
     {
-          TWID_Initialize(&twid[ UNAMED ], pTwi);
-          IRQ_ConfigureIT( pSource->dev.identify, 0, TWI0_IrqHandler );      
+        twi0_init_master( hz ); 
     }
     else if( ID_TWI1 == pSource->dev.identify )
     {
-	TWID_Initialize(&twid[ CODEC ], pTwi);
-        IRQ_ConfigureIT( pSource->dev.identify, 0, TWI1_IrqHandler );        
+        twi1_init_master( hz ); 
     }
     else if( ID_TWI2 == pSource->dev.identify )
     {
-	TWID_Initialize(&twid[ FM36 ], pTwi);	
-        IRQ_ConfigureIT( pSource->dev.identify, 0, TWI2_IrqHandler );
+        twi2_init_master( hz ); 
     }
     else
     {
 	APP_TRACE_INFO(("ALERT:error deive used,please check it!\n\t"));
-    }
-
-
-//    IRQ_ConfigureIT( pSource->dev.identify, 0, TWI1_IrqHandler );
-    IRQ_EnableIT( pSource->dev.identify );
+    }    
 }
-
 
 
 /*
@@ -272,7 +332,7 @@ void twi_init_slave( void *pInstance, void* pSlave )
 *********************************************************************************************************
 */
 
-uint8_t twi_uname_write(void *pInstance, const uint8_t *buf,uint32_t len  )
+uint8_t twi0_uname_write(void *pInstance, const uint8_t *buf,uint32_t len  )
 {     
         assert( NULL != pInstance );
         assert( NULL != buf );
@@ -286,7 +346,7 @@ uint8_t twi_uname_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         
         if( 0 == len ) return -1;
         
-        memset(&async[ UNAMED ], 0, sizeof(MAXTWI));
+        memset(&async[ UNAMED ], 0, sizeof(Async));
         async[ UNAMED ].callback = ( void * ) twiCallback;
 	
 #ifndef SYNC
@@ -309,7 +369,7 @@ uint8_t twi_uname_write(void *pInstance, const uint8_t *buf,uint32_t len  )
 
 /*
 *********************************************************************************************************
-*                                    twi_codec_write()
+*                                    twi1_write()
 *
 * Description :  write special data via twi1
 *
@@ -323,7 +383,7 @@ uint8_t twi_uname_write(void *pInstance, const uint8_t *buf,uint32_t len  )
 *********************************************************************************************************
 */
 
-uint8_t twi_codec_write(void *pInstance, const uint8_t *buf,uint32_t len  )
+uint8_t twi1_write(void *pInstance, const uint8_t *buf,uint32_t len  )
 {        
         assert( NULL != pInstance );
         assert( NULL != buf );
@@ -331,7 +391,7 @@ uint8_t twi_codec_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         DataSource *pSource = ( DataSource * )pInstance;
         OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pSource->privateData;         
 
-	Twid *pTwid = &twid[ CODEC ];
+	Twid *pTwid = &twid[ CODEC1 ];
 	assert( NULL != pTwid->pTwi );		
        
         if( 0 == len ) return -1;
@@ -348,7 +408,7 @@ uint8_t twi_codec_write(void *pInstance, const uint8_t *buf,uint32_t len  )
 
 /*
 *********************************************************************************************************
-*                                    twi_fm36_write()
+*                                    twi2_write()
 *
 * Description :  write special data via twi2
 *
@@ -362,7 +422,7 @@ uint8_t twi_codec_write(void *pInstance, const uint8_t *buf,uint32_t len  )
 *********************************************************************************************************
 */
 
-uint8_t twi_fm36_write(void *pInstance, const uint8_t *buf,uint32_t len  )
+uint8_t twi2_write(void *pInstance, const uint8_t *buf,uint32_t len  )
 {        
         assert( NULL != pInstance );
         assert( NULL != buf );
@@ -400,7 +460,7 @@ uint8_t twi_fm36_write(void *pInstance, const uint8_t *buf,uint32_t len  )
 *********************************************************************************************************
 */
 
-uint8_t twi_uname_read( void *pInstance, const uint8_t *buf,uint32_t len  )
+uint8_t twi0_uname_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 {        
         assert( NULL != pInstance );
         assert( NULL != buf );
@@ -424,7 +484,7 @@ uint8_t twi_uname_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 
 /*
 *********************************************************************************************************
-*                                    twi_codec_read()
+*                                    twi1_read()
 *
 * Description :  read  data via twi1
 *
@@ -438,7 +498,7 @@ uint8_t twi_uname_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 *********************************************************************************************************
 */
 
-uint8_t twi_codec_read( void *pInstance, const uint8_t *buf,uint32_t len  )
+uint8_t twi1_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 {        
         assert( NULL != pInstance );
         assert( NULL != buf );
@@ -446,7 +506,7 @@ uint8_t twi_codec_read( void *pInstance, const uint8_t *buf,uint32_t len  )
         DataSource *pSource = ( DataSource * )pInstance;
         OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pSource->privateData;
 
-	Twid *pTwid = &twid[ CODEC ];
+	Twid *pTwid = &twid[ CODEC1 ];
 	assert( NULL != pTwid->pTwi );		
         
         if( 0 == len ) return -1;
@@ -461,7 +521,7 @@ uint8_t twi_codec_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 
 /*
 *********************************************************************************************************
-*                                    twi_fm36_read()
+*                                    twi2_read()
 *
 * Description :  read  data via twi2
 *
@@ -475,7 +535,7 @@ uint8_t twi_codec_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 *********************************************************************************************************
 */
 
-uint8_t twi_fm36_read( void *pInstance, const uint8_t *buf,uint32_t len  )
+uint8_t twi2_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 {        
         assert( NULL != pInstance );
         assert( NULL != buf );

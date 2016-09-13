@@ -1,5 +1,22 @@
-#ifndef _TWI_H_
-#define _TWI_H_
+/*
+*********************************************************************************************************
+*
+*                                          APP PACKAGE
+*
+*                                         Atmel  AT91SAMA5D3
+*                                             on the
+*                                      Unified EVM Interface Board 2.0
+*
+* Filename      : uif_twi.h
+* Version       : V0.0.1
+* Programmer(s) : Leo
+*********************************************************************************************************
+* Note(s)       :
+*********************************************************************************************************
+*/
+
+#ifndef _UIF_TWI_H_
+#define _UIF_TWI_H_
 
 #include "uif_object.h"
 
@@ -15,8 +32,10 @@
 typedef enum _twi_port
 {
     UNAMED = 0,
-    CODEC ,
+    CODEC1 ,
     FM36,
+    PMIC,    
+    CODEC0,
     MAXTWI
 }TWIPORT;
 
@@ -33,13 +52,13 @@ typedef struct twi_option
 void twi_init_master( void *pInstance, void* pFreq );
 void twi_init_slave( void *pInstance, void* pSlave );
 
-uint8_t twi_uname_write(void *pInstance, const uint8_t *buf,uint32_t len );
-uint8_t twi_codec_write(void *pInstance, const uint8_t *buf,uint32_t len );
-uint8_t twi_fm36_write(void *pInstance, const uint8_t *buf,uint32_t len  );
+uint8_t twi0_uname_write(void *pInstance, const uint8_t *buf,uint32_t len );
+uint8_t twi1_write(void *pInstance, const uint8_t *buf,uint32_t len );
+uint8_t twi2_write(void *pInstance, const uint8_t *buf,uint32_t len  );
 
-uint8_t twi_uname_read(void *pInstance, const uint8_t *buf,uint32_t len  );
-uint8_t twi_codec_read(void *pInstance, const uint8_t *buf,uint32_t len  );
-uint8_t twi_fm36_read(void *pInstance, const uint8_t *buf,uint32_t len   );
+uint8_t twi0_uname_read(void *pInstance, const uint8_t *buf,uint32_t len  );
+uint8_t twi1_read(void *pInstance, const uint8_t *buf,uint32_t len  );
+uint8_t twi2_read(void *pInstance, const uint8_t *buf,uint32_t len   );
 
 
 
