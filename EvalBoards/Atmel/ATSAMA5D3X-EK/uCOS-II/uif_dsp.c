@@ -35,6 +35,7 @@
 #include "uif_dsp.h"
 #include "mem_basic.h"
 #include "noah_cmd.h"
+#include "bsp.h"
 
 //Note: This routine do NOT support reentrance
 INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];
@@ -317,9 +318,10 @@ static uint16_t fm36_para_table_3[][2] =
 
 void Pin_Reset_FM36( void )
 {
-    
+    UIF_Misc_Off( FM36_RST );
 //    PIO_Clear(&pinsGpios[11]);
     OSTimeDly(20) ;
+    UIF_Misc_On( FM36_RST );    
 //    PIO_Set(&pinsGpios[11]);
     OSTimeDly(50) ;
      
