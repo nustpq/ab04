@@ -853,7 +853,7 @@ int main()
 /*---------------------------------------------------*/
 #endif
     
-#ifndef UIF_FM36
+#ifdef UIF_FM36
     Init_FM36_AB03( 48000, 
                         1, 
                         0, 
@@ -1001,7 +1001,6 @@ static  void  AppTaskLED ( void *p_arg )
     {
         OSTimeDlyHMSM(0, 0, 1, 0);
 
-//        BSP_LED_Toggle( 1 );
         UIF_LED_Toggle( LED_D4 );
         
  
@@ -1113,13 +1112,14 @@ static  void  AppTaskSSC0 ( void *p_arg )
     uint8_t receiveTaskMsg = 0; 
     uint16_t *pInt = NULL;
     uint32_t i ;
-    
-    memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ) );
-    memset( ssc1_I2SBuffersOut, 0x5555, sizeof( ssc1_I2SBuffersOut ) );  
+//    kfifo_init_static(&ssc0_bulkin_fifo,( uint8_t * )ssc0_I2SBuffersIn,sizeof( ssc0_I2SBuffersIn ) );
+    kfifo_init_static(&ssc0_bulkin_fifo,( uint8_t * )ssc0_FIFOBufferBulkIn,sizeof( ssc0_FIFOBufferBulkIn ) );
+    memset( ssc0_I2SBuffersOut, 0, sizeof( ssc0_I2SBuffersOut ) );
+    memset( ssc1_I2SBuffersOut, 0, sizeof( ssc1_I2SBuffersOut ) );  
     memset( ssc0_I2SBuffersIn, 0 , sizeof( ssc0_I2SBuffersIn ) );
     memset( ssc1_I2SBuffersIn, 0 , sizeof( ssc1_I2SBuffersIn ) ); 
 
-#if 1    
+#if 0    
     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut, 
                       sizeof( ssc0_I2SBuffersOut[ 0 ] ),  
                       8000 );
@@ -1178,10 +1178,12 @@ static  void  AppTaskSSC0 ( void *p_arg )
                         &&( ( uint8_t )RUNNING != source_ssc0.status ) )
                     {
 //                          OSSchedLock( );
+                          source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_I2SBuffersIn,
+                                                   sizeof(ssc0_I2SBuffersIn ) >> 1 ); 
+//                          OSTimeDlyHMSM(0, 0, 0, 2);  
                           source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_I2SBuffersOut,
                                                    sizeof(ssc0_I2SBuffersOut ) >> 1 );
-                          source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_I2SBuffersIn,
-                                                   sizeof(ssc0_I2SBuffersIn ) );                          
+                         
                           source_ssc0.status = ( uint8_t )START;
                     
                           source_ssc1.buffer_write( &source_ssc1,( uint8_t * )ssc1_I2SBuffersOut,
