@@ -29,6 +29,8 @@ extern DataSource source_ssc1;
 
 extern OS_FLAG_GRP *g_pStartUSBTransfer; 
 
+static uint8_t mutex = 0;
+
 /* Tx descriptors */
 sDmaTransferDescriptor dmaTdSSC0Rx[2];
 sDmaTransferDescriptor dmaTdSSC0Tx[2];
@@ -194,7 +196,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
     
     uint32_t temp;
     INT8U error;
-      
+    
     DataSource *pSource = ( DataSource *)pArg;
 
 #ifdef ENABLE_PRINT 
@@ -204,9 +206,28 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
           return;
       }
 #endif
-        
+//      if( 1 == mutex )
+//        return;
+      
+      mutex = 1;
      /*step 1:calculate buffer space */ 
-     temp = kfifo_get_data_size( &ssc0_bulkin_fifo );
+     temp = kfifo_get_free_space( &ssc0_bulkin_fifo );
+     if( temp  >=  sizeof( ssc0_I2SBuffersIn[ pSource-> rx_index ] ) )
+     {
+          kfifo_put( &ssc0_bulkin_fifo,
+                      ( uint8_t * )ssc0_I2SBuffersIn[ pSource-> rx_index ],
+                      sizeof( ssc0_I2SBuffersIn[ pSource-> rx_index ] ) );
+//          memset( ssc0_I2SBuffersIn[ pSource-> rx_index ],
+//                  0,
+//          sizeof( ssc0_I2SBuffersIn[ pSource-> rx_index ] ) );   
+          pSource->rx_index = 1 - pSource->rx_index;           
+     }
+     else
+     {
+       printf( "There is No Space in Fifo \t\n");
+       return;
+     }
+//     mutex = 0;
      /*step 2:check buffer space according condition */  
      if( temp <= pSource->warmWaterLevel )
      {
@@ -228,7 +249,9 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                                0);
 #endif     
     /*step 4:change current buffer index */
-     pSource->rx_index = 1 - pSource->rx_index; 
+//     pSource->rx_index = 1 - pSource->rx_index; 
+
+#if 1     
     /*step 5:send semphone */ 
                    OSFlagPost( 
                     g_pStartUSBTransfer,
@@ -236,7 +259,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                     OS_FLAG_SET, 
                     &error
                 );   
-  
+#endif  
    
 }
 
@@ -313,10 +336,10 @@ extern uint16_t TxBuffers1[2][PINGPONG_SIZE];
 
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
-      static uint8_t error;
-      uint16_t temp = 0;
+    static uint8_t error;
+    uint16_t temp = 0;
 
-   
+     
     assert( NULL != pArg );
     
     DataSource *pSource = ( DataSource *)pArg;
@@ -338,16 +361,37 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 //     temp = kfifo_get_data_size( pSource->usbBulkOut );
 //
 //     //update played buffer(the first is buffer0)
-     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut[ pSource->tx_index ], 
-                      sizeof( ssc0_I2SBuffersOut[ pSource->tx_index ] ),  
-                      8000 );
+//     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut[ pSource->tx_index ], 
+//                      sizeof( ssc0_I2SBuffersOut[ pSource->tx_index ] ),  
+//                      8000 );
        //install the buffer will be played(the buffer1)
 //     pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];     
      //
+//     if( 1 == mutex )
+//       return;
+    
+//     mutex = 1;
+     
+     pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];    
+     temp = kfifo_get_data_size( &ssc0_bulkin_fifo );
+     if( temp  >=  sizeof( ssc0_I2SBuffersOut[ pSource-> tx_index ] ) )
+     {
+          kfifo_get( &ssc0_bulkin_fifo,
+                      ( uint8_t * )ssc0_I2SBuffersOut[ pSource-> tx_index ],
+                      sizeof( ssc0_I2SBuffersOut[ pSource-> tx_index ] ) );
+          pSource->tx_index = 1 - pSource->tx_index;        
+     }
+     else
+     {
+        printf( "There is No Data in Fifo,data size = %d \r\n",temp);
+        return;
+     }
+//     mutex = 0;
+     
      if( pSource->warmWaterLevel <= temp ) 
      {
               //update buffer point;
-       pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];
+//       pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];
               
               //get data from buffer;
 //       
@@ -384,12 +428,12 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
      }
      //
 #endif
-     
-#if 1      
+         
      //step 3:change current buffer index 
-     pSource->tx_index = 1 - pSource->tx_index;
+//     pSource->tx_index = 1 - pSource->tx_index;
       
-     //step 4:send semphone       
+     //step 4:send semphone  
+#if 1     
 #ifndef USE_EVENTGROUP
      OSFlagPost(    //send group event
                     g_pStartUSBTransfer,
@@ -397,7 +441,8 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
                     OS_FLAG_SET, //
                     &error
                 );
-#endif 
+#endif
+     
 #endif
 }
 
@@ -521,7 +566,7 @@ void SSC0_Recording( void *pInstance )
 	DataSource *pSource = (DataSource *)pInstance;
 	sDmaTransferDescriptor *pTds = dmaTdSSC0Rx;
         
-        Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
+        Ssc* pSsc = _get_ssc_instance( pSource->dev.identify );
         
         pTds[0].dwSrcAddr = ( uint32_t )&SSC0->SSC_RHR;
         pTds[0].dwDstAddr = ( uint32_t )ssc0_I2SBuffersIn[ 0 ]; 
@@ -634,13 +679,15 @@ uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
 	DataSource *pSource = (DataSource *)pInstance;
 	sDmaTransferDescriptor *pTds = dmaTdSSC0Rx;
         
-        Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
+        Ssc* pSsc = _get_ssc_instance( pSource->dev.identify );
         
         pTds[0].dwSrcAddr = ( uint32_t )&SSC0->SSC_RHR;
         pTds[0].dwDstAddr = ( uint32_t )buf; 
-        pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-                             | DMAC_CTRLA_SRC_WIDTH_BYTE
-                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+        pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
+//                             | DMAC_CTRLA_SRC_WIDTH_BYTE
+//                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+                               | DMAC_CTRLA_SRC_WIDTH_HALF_WORD 
+                               | DMAC_CTRLA_DST_WIDTH_HALF_WORD;          
         pTds[0].dwCtrlB   = DMAC_CTRLB_FC_PER2MEM_DMA_FC
                              | DMAC_CTRLB_SRC_INCR_FIXED
                              | DMAC_CTRLB_DST_INCR_INCREMENTING
@@ -651,9 +698,11 @@ uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
         
         pTds[1].dwSrcAddr = ( uint32_t )&SSC0->SSC_RHR;
         pTds[1].dwDstAddr = ( uint32_t )( buf + len ); 
-        pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-                             | DMAC_CTRLA_SRC_WIDTH_BYTE
-                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+        pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
+//                             | DMAC_CTRLA_SRC_WIDTH_BYTE
+//                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+                               | DMAC_CTRLA_SRC_WIDTH_HALF_WORD 
+                               | DMAC_CTRLA_DST_WIDTH_HALF_WORD;          
         pTds[1].dwCtrlB   = DMAC_CTRLB_FC_PER2MEM_DMA_FC
                              | DMAC_CTRLB_SRC_INCR_FIXED
                              | DMAC_CTRLB_DST_INCR_INCREMENTING
@@ -697,9 +746,11 @@ uint8_t ssc1_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
         
         pTds[0].dwSrcAddr = ( uint32_t )&SSC1->SSC_RHR;
         pTds[0].dwDstAddr = ( uint32_t )buf; 
-        pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-                             | DMAC_CTRLA_SRC_WIDTH_BYTE
-                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+        pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1)
+//                             | DMAC_CTRLA_SRC_WIDTH_BYTE
+//                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+                               | DMAC_CTRLA_SRC_WIDTH_HALF_WORD 
+                               | DMAC_CTRLA_DST_WIDTH_HALF_WORD;        
         pTds[0].dwCtrlB   = DMAC_CTRLB_FC_PER2MEM_DMA_FC
                              | DMAC_CTRLB_SRC_INCR_FIXED
                              | DMAC_CTRLB_DST_INCR_INCREMENTING
@@ -710,9 +761,11 @@ uint8_t ssc1_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
         
         pTds[1].dwSrcAddr = ( uint32_t )&SSC1->SSC_RHR;
         pTds[1].dwDstAddr = ( uint32_t )( buf + len ); 
-        pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len )
-                             | DMAC_CTRLA_SRC_WIDTH_BYTE
-                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+        pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
+//                             | DMAC_CTRLA_SRC_WIDTH_BYTE
+//                             | DMAC_CTRLA_DST_WIDTH_BYTE;
+                               | DMAC_CTRLA_SRC_WIDTH_HALF_WORD 
+                               | DMAC_CTRLA_DST_WIDTH_HALF_WORD;        
         pTds[1].dwCtrlB   = DMAC_CTRLB_FC_PER2MEM_DMA_FC
                              | DMAC_CTRLB_SRC_INCR_FIXED
                              | DMAC_CTRLB_DST_INCR_INCREMENTING
