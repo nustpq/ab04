@@ -150,16 +150,30 @@ void gpio_Init( void *pInstance,void *dParameter )
 
     DataSource *pSource = ( DataSource * )pInstance;
     Pin *pPins = ( Pin * )pSource->privateData;
-  
-    pPins->pio->PIO_IDR = pPins->mask;
     
-    pPins->pio->PIO_PUER = pPins->mask;  //enable
-    pPins->pio->PIO_MDDR = pPins->mask;
+    if( pSource->dev.direct == IN )
+    {
+          _ConfigureRecGpios( );
+    }
+    else if( pSource->dev.direct == OUT )
+    {
+      pPins->pio->PIO_IDR = pPins->mask;     //disable interrupt
+    
+
+      pPins->pio->PIO_PUER = pPins->mask;    //pull-up enabled
+      pPins->pio->PIO_MDDR = pPins->mask;    //multi-driver disabled
     
     // Enable filter(s)
-    pPins->pio->PIO_IFER = pPins->mask;  //enable
+      pPins->pio->PIO_IFER = pPins->mask;    //glitch input filter enable
    
-    pPins->pio->PIO_PER = pPins->mask;    
+      pPins->pio->PIO_PER = pPins->mask;     //pio  enable  
+    }
+    else
+    {
+      printf( "Please set gpio direct IN or OUT \t\n");
+    }
+    
+
 }
 
 
@@ -233,16 +247,19 @@ uint8_t  gpio_Pin_Get( void *pInstance, const uint8_t * pdata,uint32_t mask )
     assert( NULL != pdata );
     assert( 0 < mask );
     
-    uint16_t gpio_data[ 8 ] = { 0 };
+    const uint8_t pinCnt = 10;
+    
+    uint16_t gpio_data[ 10 ] = { 0 };
     uint8_t temp = 0;
     
     DataSource *pSource = ( DataSource * )pInstance;
     Pin *pPins = ( Pin * )pSource->privateData;
     GPIO_REC_CFG *gpio_cfg = ( GPIO_REC_CFG * )pSource->peripheralParameter;
+    gpio_cfg->mask = mask;
     
     temp = pPins->pio->PIO_PDSR;
     
-    for( uint8_t i = 0, n = 0 ; i < 8 ; i++ ) 
+    for( uint8_t i = 0, n = 0 ; i < pinCnt ; i++ ) 
     {
      
         if( gpio_cfg->mask & ( 1<< i ) ) 

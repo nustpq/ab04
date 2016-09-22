@@ -1921,6 +1921,9 @@
       <name>$PROJ_DIR$\..\app_cfg.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\codec.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\cpu_cfg.h</name>
     </file>
     <file>

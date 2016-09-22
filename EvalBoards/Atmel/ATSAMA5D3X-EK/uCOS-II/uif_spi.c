@@ -122,8 +122,10 @@ void _ConfigureTc1( uint32_t hz )
 void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
 {
   
-    status = status;
-    pArg = pArg;    
+    status = status;    
+    assert( NULL != pArg );
+    
+    DataSource *pSource = ( DataSource *)pArg;
 }
 
 /*

@@ -246,13 +246,13 @@ void Init_Bulk_FIFO( void )
     //initialize ring buffer relavent ssc0;
     pfifo = &ssc0_bulkout_fifo;
     kfifo_init_static(pfifo, ssc0_FIFOBufferBulkOut, USB_OUT_BUFFER_SIZE);
-    pfifo = &ssc0_bulkout_fifo;
+    pfifo = &ssc0_bulkin_fifo;
     kfifo_init_static(pfifo, ssc0_FIFOBufferBulkIn, USB_IN_BUFFER_SIZE);
     
     //initialize ring buffer relavent ssc1,extend from old structure;
     pfifo = &ssc1_bulkout_fifo;
     kfifo_init_static(pfifo, ssc1_FIFOBufferBulkOut, USB_OUT_BUFFER_SIZE);
-    pfifo = &ssc1_bulkout_fifo;
+    pfifo = &ssc1_bulkin_fifo;
     kfifo_init_static(pfifo, ssc1_FIFOBufferBulkIn, USB_IN_BUFFER_SIZE);
     
     pfifo = &bulkout_fifo_cmd;
@@ -381,7 +381,7 @@ static void Dma_configure(void)
     }
     // Set RX callback 
     DMAD_SetCallback(pDmad, source_spi0.dev.rxDMAChannel,
-                    (DmadTransferCallback)_SPI0_DmaRxCallback, 0);
+                    (DmadTransferCallback)_SPI0_DmaRxCallback, ( void * )&source_spi0 );
     // Configure DMA RX channel 
     iController = (source_spi0.dev.rxDMAChannel >> 8);
     dwCfg = 0
@@ -396,7 +396,7 @@ static void Dma_configure(void)
     
     // Configure DMA TX channel 
     DMAD_SetCallback(pDmad, source_spi0.dev.txDMAChannel,
-                    (DmadTransferCallback)_SPI0_DmaTxCallback, 0);
+                    (DmadTransferCallback)_SPI0_DmaTxCallback, ( void * )&source_spi0 );
     iController = (source_spi0.dev.txDMAChannel >> 8);
     dwCfg = 0           
            | DMAC_CFG_DST_PER(
@@ -422,7 +422,7 @@ static void Dma_configure(void)
     }
     /* Set RX callback */
     DMAD_SetCallback(pDmad, source_spi1.dev.rxDMAChannel,
-                    (DmadTransferCallback)_SPI1_DmaRxCallback, 0);
+                    (DmadTransferCallback)_SPI1_DmaRxCallback, ( void * )&source_spi1 );
     /* Configure DMA RX channel */
     iController = (source_spi1.dev.rxDMAChannel >> 8);
     dwCfg = 0
@@ -437,7 +437,7 @@ static void Dma_configure(void)
     
     /* Configure DMA TX channel */
     DMAD_SetCallback(pDmad, source_spi1.dev.txDMAChannel,
-                    (DmadTransferCallback)_SPI1_DmaTxCallback, 0);
+                    (DmadTransferCallback)_SPI1_DmaTxCallback, ( void * )&source_spi1 );
     iController = (source_spi1.dev.txDMAChannel >> 8);
     dwCfg = 0           
            | DMAC_CFG_DST_PER(
@@ -546,6 +546,7 @@ static  void  AppTaskFirmwareVecUpdate  (void        *p_arg);
 * Note(s)     : none.
 *********************************************************************************************************
 */
+static  uint8_t isUsbConnected = 0;
 extern void _ConfigureTc1( uint32_t hz );
 
 int main()
@@ -561,6 +562,8 @@ int main()
     CPU_Init();
 
     Mem_Init();
+    
+    Init_Bulk_FIFO(  );
 
     //Led/Buzzer initialize;
     BSP_LED_Init();
@@ -577,6 +580,7 @@ int main()
 //    UIF_Misc_On( HDMI_UIF_PWR_EN );
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
+    UIF_Misc_On ( FAST_PLUS_RST );    
     
     //test D5
     UIF_LED_On( LED_D5 );
@@ -814,7 +818,7 @@ int main()
 #if UIF_GPIO
             //initialize usart1 object and it's operation 
     memset( ( void * )&source_gpio, 0 , sizeof( DataSource ) );
-    source_gpio.dev.direct = ( uint8_t )BI;
+    source_gpio.dev.direct = ( uint8_t )IN;
     source_gpio.dev.identify = ID_PIOD;
     source_gpio.dev.instanceHandle = (uint32_t)PIOD;
     source_gpio.status = ( uint8_t )FREE;

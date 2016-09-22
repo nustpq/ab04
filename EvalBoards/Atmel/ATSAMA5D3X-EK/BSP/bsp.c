@@ -593,6 +593,18 @@ void UIF_Misc_Off ( CPU_INT32U id )
 }
 
 
-
+void UIF_DelayUs( CPU_INT32U us )
+{
+   const CPU_INT32U limit = 75350303UL;
+   const CPU_INT08U unit = 57;
+   CPU_INT32U delayUs = 0;
+   
+   assert( us < limit );
+   
+   delayUs = us * unit;
+   
+   while( delayUs -- );
+      
+}
 
 
