@@ -14,7 +14,7 @@ Watch0=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
 Watch1=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=1336846993
+Checksum=94664170
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -22,6 +22,8 @@ StopOnThrow=_ 0
 ShowArgs=0
 [Disassembly]
 MixedMode=1
+[array_types]
+Fmt0=uint16_t[3072]	4	0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -42,12 +44,28 @@ mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{C:\WINDOWS\System32}.379.13" 0 0 1 "" 0 "" 0
 Bp1=_ 0 "EMUL_CODE" "{C:\WINDOWS\system32}.226.17" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\libraries\libchip_sama5d3x\source\twid.c}.397.9" 0 0 1 "" 0 "" 0
-Count=3
+Bp2=_ 0 "EMUL_CODE" "{C:\WINDOWS\System32}.397.9" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\im501_comm.c}.618.1" 0 0 1 "" 0 "" 0
+Bp4=_ 0 "EMUL_CODE" "{C:\WINDOWS\System32}.365.13" 0 0 1 "" 0 "" 0
+Bp5=_ 0 "EMUL_CODE" "{C:\WINDOWS\system32}.334.9" 0 0 1 "" 0 "" 0
+Bp6=_ 0 "EMUL_CODE" "{C:\WINDOWS\system32}.365.13" 0 0 1 "" 0 "" 0
+Bp7=_ 0 "EMUL_CODE" "{C:\WINDOWS\system32}.371.13" 0 0 1 "" 0 "" 0
+Bp8=_ 0 "EMUL_CODE" "{C:\WINDOWS\system32}.383.17" 0 0 1 "" 0 "" 0
+Bp9=_ 0 "EMUL_CODE" "{C:\WINDOWS\system32}.389.17" 0 0 1 "" 0 "" 0
+Bp10=_ 0 "EMUL_CODE" "{C:\WINDOWS\system32}.404.13" 0 0 1 "" 0 "" 0
+Bp11=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\uif_usb.c}.253.9" 0 0 1 "" 0 "" 0
+Bp12=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\uif_usb.c}.248.9" 0 0 1 "" 0 "" 0
+Bp13=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\uif_usb.c}.277.9" 0 0 1 "" 0 "" 0
+Bp14=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\app.c}.1080.13" 0 0 1 "" 0 "" 0
+Count=15
 [Aliases]
-A0=_ "E:\newversion\Software\libraries\libchip_sama5d3x\source\smcNfc.c" ""
-A1=_ "E:\newversion\Software\libraries\libchip_sama5d3x\source\twi.c" "E:\uif_gitrepos\AB04\libraries\libchip_sama5d3x\source\twi.c"
-A2=_ "E:\newversion\Software\libraries\libchip_sama5d3x\source\twid.c" "E:\uif_gitrepos\AB04\libraries\libchip_sama5d3x\source\twid.c"
-A3=_ "E:\temp\ucos-uif-100-temp\libraries\libboard_sama5d3x-ek\source\board_memories.c" "E:\uif_gitrepos\AB04\libraries\libboard_sama5d3x-ek\source\board_memories.c"
-Count=4
+A0=_ "E:\newversion\Software\libraries\libchip_sama5d3x\source\USBD_HAL.c" "E:\uif_gitrepos\AB04\libraries\libchip_sama5d3x\source\USBD_HAL.c"
+A1=_ "E:\newversion\Software\libraries\libchip_sama5d3x\source\pmc.c" ""
+A2=_ "E:\newversion\Software\libraries\libchip_sama5d3x\source\smcNfc.c" ""
+A3=_ "E:\newversion\Software\libraries\libchip_sama5d3x\source\ssc.c" "E:\uif_gitrepos\AB04\libraries\libchip_sama5d3x\source\ssc.c"
+A4=_ "E:\newversion\Software\libraries\libchip_sama5d3x\source\twi.c" "E:\uif_gitrepos\AB04\libraries\libchip_sama5d3x\source\twi.c"
+A5=_ "E:\newversion\Software\libraries\libchip_sama5d3x\source\twid.c" "E:\uif_gitrepos\AB04\libraries\libchip_sama5d3x\source\twid.c"
+A6=_ "E:\temp\ucos-uif-100-temp\libraries\libboard_sama5d3x-ek\source\board_memories.c" "E:\uif_gitrepos\AB04\libraries\libboard_sama5d3x-ek\source\board_memories.c"
+A7=_ "E:\temp\ucos-uif-100-temp\libraries\libboard_sama5d3x-ek\source\dmad.c" "E:\uif_gitrepos\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c"
+Count=8
 SuppressDialog=1

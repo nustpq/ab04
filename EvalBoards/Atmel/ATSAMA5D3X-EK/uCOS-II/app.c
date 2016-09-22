@@ -217,14 +217,21 @@ uint8_t FIFOBufferBulkOutCmd[ USB_CMD_OUT_BUFFER_SIZE ] ;
 uint8_t FIFOBufferBulkInCmd[ USB_CMD_IN_BUFFER_SIZE ]  ;
 
 //--------------------------------spi  buffer --------------------------------//
-uint8_t spi0_buffer[2][2048];
-uint8_t spi1_buffer[2][2048];
-uint8_t spi0_ring_buffer[3072];
-uint8_t spi1_ring_buffer[3072];
+uint8_t spi0_buffer[2][I2S_OUT_BUFFER_SIZE];
+uint8_t spi1_buffer[2][I2S_OUT_BUFFER_SIZE];
+uint8_t spi0_ring_buffer[I2S_OUT_BUFFER_SIZE];
+uint8_t spi1_ring_buffer[I2S_OUT_BUFFER_SIZE];
 
 
 //--------------------------------twi  buffer --------------------------------//
 uint8_t twi_ring_buffer[ MAXTWI ][ 256 ];
+
+/*
+*********************************************************************************************************
+*                                      GLOBAL FUNCTION PROTOTYPES
+*********************************************************************************************************
+*/
+
 
 /*
 *********************************************************************************************************
@@ -246,13 +253,13 @@ void Init_Bulk_FIFO( void )
     //initialize ring buffer relavent ssc0;
     pfifo = &ssc0_bulkout_fifo;
     kfifo_init_static(pfifo, ssc0_FIFOBufferBulkOut, USB_OUT_BUFFER_SIZE);
-    pfifo = &ssc0_bulkout_fifo;
+    pfifo = &ssc0_bulkin_fifo;
     kfifo_init_static(pfifo, ssc0_FIFOBufferBulkIn, USB_IN_BUFFER_SIZE);
     
     //initialize ring buffer relavent ssc1,extend from old structure;
     pfifo = &ssc1_bulkout_fifo;
     kfifo_init_static(pfifo, ssc1_FIFOBufferBulkOut, USB_OUT_BUFFER_SIZE);
-    pfifo = &ssc1_bulkout_fifo;
+    pfifo = &ssc1_bulkin_fifo;
     kfifo_init_static(pfifo, ssc1_FIFOBufferBulkIn, USB_IN_BUFFER_SIZE);
     
     pfifo = &bulkout_fifo_cmd;
@@ -381,7 +388,7 @@ static void Dma_configure(void)
     }
     // Set RX callback 
     DMAD_SetCallback(pDmad, source_spi0.dev.rxDMAChannel,
-                    (DmadTransferCallback)_SPI0_DmaRxCallback, 0);
+                    (DmadTransferCallback)_SPI0_DmaRxCallback, ( void * )&source_spi0 );
     // Configure DMA RX channel 
     iController = (source_spi0.dev.rxDMAChannel >> 8);
     dwCfg = 0
@@ -396,7 +403,7 @@ static void Dma_configure(void)
     
     // Configure DMA TX channel 
     DMAD_SetCallback(pDmad, source_spi0.dev.txDMAChannel,
-                    (DmadTransferCallback)_SPI0_DmaTxCallback, 0);
+                    (DmadTransferCallback)_SPI0_DmaTxCallback, ( void * )&source_spi0 );
     iController = (source_spi0.dev.txDMAChannel >> 8);
     dwCfg = 0           
            | DMAC_CFG_DST_PER(
@@ -422,7 +429,7 @@ static void Dma_configure(void)
     }
     /* Set RX callback */
     DMAD_SetCallback(pDmad, source_spi1.dev.rxDMAChannel,
-                    (DmadTransferCallback)_SPI1_DmaRxCallback, 0);
+                    (DmadTransferCallback)_SPI1_DmaRxCallback, ( void * )&source_spi1 );
     /* Configure DMA RX channel */
     iController = (source_spi1.dev.rxDMAChannel >> 8);
     dwCfg = 0
@@ -437,7 +444,7 @@ static void Dma_configure(void)
     
     /* Configure DMA TX channel */
     DMAD_SetCallback(pDmad, source_spi1.dev.txDMAChannel,
-                    (DmadTransferCallback)_SPI1_DmaTxCallback, 0);
+                    (DmadTransferCallback)_SPI1_DmaTxCallback, ( void * )&source_spi1 );
     iController = (source_spi1.dev.txDMAChannel >> 8);
     dwCfg = 0           
            | DMAC_CFG_DST_PER(
@@ -546,6 +553,7 @@ static  void  AppTaskFirmwareVecUpdate  (void        *p_arg);
 * Note(s)     : none.
 *********************************************************************************************************
 */
+static  uint8_t isUsbConnected = 0;
 extern void _ConfigureTc1( uint32_t hz );
 
 int main()
@@ -553,6 +561,7 @@ int main()
     CPU_INT08U  os_err;
     uint32_t twi_hz = 100000;
 
+    
     CODEC_SETS codec_set;
 
 
@@ -561,6 +570,8 @@ int main()
     CPU_Init();
 
     Mem_Init();
+    
+    Init_Bulk_FIFO(  );
 
     //Led/Buzzer initialize;
     BSP_LED_Init();
@@ -577,6 +588,7 @@ int main()
 //    UIF_Misc_On( HDMI_UIF_PWR_EN );
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
+    UIF_Misc_On ( FAST_PLUS_RST );    
     
     //test D5
     UIF_LED_On( LED_D5 );
@@ -597,6 +609,7 @@ int main()
         APP_TRACE_INFO(("this version isn't a release version \r\n"));
 	return -1;
     }
+//    UIF_DelayUs( 1000 * 100 );
 #endif
     
 #if UIF_SSC0
@@ -812,9 +825,10 @@ int main()
 #endif 
     
 #if UIF_GPIO
-            //initialize usart1 object and it's operation 
+    uint16_t keyState[ 8 ] = {0};
+    //initialize gpio object and it's operation 
     memset( ( void * )&source_gpio, 0 , sizeof( DataSource ) );
-    source_gpio.dev.direct = ( uint8_t )BI;
+    source_gpio.dev.direct = ( uint8_t )IN;
     source_gpio.dev.identify = ID_PIOD;
     source_gpio.dev.instanceHandle = (uint32_t)PIOD;
     source_gpio.status = ( uint8_t )FREE;
@@ -828,11 +842,14 @@ int main()
     
     if( NULL != source_gpio.init_source )
        source_gpio.init_source( &source_gpio,NULL );
+    
+//    gpio_Pin_Set( &source_gpio, &keyState,63 );
+    gpio_Pin_Get( &source_gpio, ( uint8_t *)keyState,0x1f );
 #endif
 
 #ifdef UIF_AIC3204
 /*----------------------------------------------------*/
-    codec_set.sr = 8000;
+    codec_set.sr = 24000;
     codec_set.sample_len = 16;
     codec_set.format = 1;
     codec_set.slot_num = 2;
@@ -840,8 +857,8 @@ int main()
     codec_set.bclk_polarity = 1;
     codec_set.flag = 1;
     codec_set.delay = 0;
-    Init_CODEC( &source_twi1,codec_set );
-    codec_set.sr = 8000;
+    Init_CODEC( &source_twi1,codec_set,CODEC1_RST );
+    codec_set.sr = 48000;
     codec_set.sample_len = 16;
     codec_set.format = 1;
     codec_set.slot_num = 2;
@@ -849,12 +866,12 @@ int main()
     codec_set.bclk_polarity = 1;
     codec_set.flag = 1;
     codec_set.delay = 0;
-    Init_CODEC( &source_twi2,codec_set );
+    Init_CODEC( &source_twi2,codec_set,CODEC0_RST );
 /*---------------------------------------------------*/
 #endif
     
 #ifdef UIF_FM36
-    Init_FM36_AB03( 48000, 
+    Init_FM36_AB03( 24000, 
                         1, 
                         0, 
                         0, 
@@ -868,6 +885,7 @@ int main()
     
     //initialize Tc1 interval = 1ms    
     _ConfigureTc1( 1000u );  
+    
   
     OSInit();
 
@@ -1004,17 +1022,17 @@ static  void  AppTaskLED ( void *p_arg )
         UIF_LED_Toggle( LED_D4 );
         
  
-//        spi_clear_status( &source_spi1 );
-//        memset( spi1_ring_buffer, 0x55, sizeof( spi1_ring_buffer ) );
-//        _spiDmaRx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_ring_buffer ));
-//        _spiDmaTx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_ring_buffer ));
+        spi_clear_status( &source_spi1 );
+        memset( spi1_ring_buffer, 0x55, sizeof( spi1_ring_buffer ) );
+        _spiDmaRx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_ring_buffer ));
+        _spiDmaTx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_ring_buffer ));
         
-//        spi_clear_status( &source_spi0 );
-//        memset( spi0_ring_buffer, 0x55, sizeof( spi0_ring_buffer ) );
-//        _spiDmaRx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_ring_buffer ));
-//        _spiDmaTx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_ring_buffer ));
+        spi_clear_status( &source_spi0 );
+        memset( spi0_ring_buffer, 0x55, sizeof( spi0_ring_buffer ) );
+        _spiDmaRx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_ring_buffer ));
+        _spiDmaTx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_ring_buffer ));
                
-//        usart1_DmaTx( &source_usart1 , NULL , 0 );
+        usart1_DmaTx( &source_usart1 , NULL , 0 );
  //       twi0_uname_write( &source_twi0,twi_ring_buffer[0],sizeof( twi_ring_buffer[ 0 ] ) >> 10 );
     }
 
@@ -1040,7 +1058,7 @@ static  void  AppTaskLED ( void *p_arg )
 static  void  AppTaskCmdParase ( void *p_arg )
 {
     static uint8_t taskMsg;
-    static uint8_t isUsbConnected = 0;
+//    static uint8_t isUsbConnected = 0;
     
     static uint8_t transmitStart = 0;
     
@@ -1063,6 +1081,8 @@ static  void  AppTaskCmdParase ( void *p_arg )
             TC_Start(TC1, 0);
         }
         
+        if( isUsbConnected ) {
+        
         //step1:get cmd from usb cmd endpoint;
         CDCDSerialDriver_Read_CmdEp(  usbCmdBufferBulkOut,
                                 USBCMDDATAEPSIZE ,
@@ -1084,8 +1104,8 @@ static  void  AppTaskCmdParase ( void *p_arg )
        
          //let this task running periodic per second enough;
          OSTimeDlyHMSM( 0, 0, 0, 500 );
+      }
     }
-
 }
 #endif
 
@@ -1110,10 +1130,8 @@ static  void  AppTaskSSC0 ( void *p_arg )
 {
     uint8_t err = 0;
     uint8_t receiveTaskMsg = 0; 
-    uint16_t *pInt = NULL;
-    uint32_t i ;
-//    kfifo_init_static(&ssc0_bulkin_fifo,( uint8_t * )ssc0_I2SBuffersIn,sizeof( ssc0_I2SBuffersIn ) );
-    kfifo_init_static(&ssc0_bulkin_fifo,( uint8_t * )ssc0_FIFOBufferBulkIn,sizeof( ssc0_FIFOBufferBulkIn ) );
+
+//    kfifo_init_static(&ssc0_bulkin_fifo,( uint8_t * )ssc0_FIFOBufferBulkIn,sizeof( ssc0_FIFOBufferBulkIn ) );
     memset( ssc0_I2SBuffersOut, 0, sizeof( ssc0_I2SBuffersOut ) );
     memset( ssc1_I2SBuffersOut, 0, sizeof( ssc1_I2SBuffersOut ) );  
     memset( ssc0_I2SBuffersIn, 0 , sizeof( ssc0_I2SBuffersIn ) );
@@ -1122,21 +1140,23 @@ static  void  AppTaskSSC0 ( void *p_arg )
 #if 0    
     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut, 
                       sizeof( ssc0_I2SBuffersOut[ 0 ] ),  
-                      8000 );
+                      48000 );
     
     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut[1], 
                       sizeof( ssc0_I2SBuffersOut[ 1 ] ),  
-                      8000 );    
+                      48000 );    
     
     Alert_Sound_Gen1( ( uint8_t * )ssc1_I2SBuffersOut, 
                        sizeof( ssc1_I2SBuffersOut[ 0 ] ),  
-                       8000 );
+                       48000 );
     Alert_Sound_Gen1( ( uint8_t * )ssc1_I2SBuffersOut, 
                        sizeof( ssc1_I2SBuffersOut[ 1 ] ),  
-                       8000 );
+                       48000 );
 #endif
     
 #if 0
+    uint32_t i ;
+    uint16_t *pInt = NULL;    
     pInt = ( uint16_t * )ssc0_I2SBuffersOut[0] ;
     for( i = 0; i< ( sizeof( ssc1_I2SBuffersOut ) );  ) 
     {        
@@ -1178,9 +1198,11 @@ static  void  AppTaskSSC0 ( void *p_arg )
                         &&( ( uint8_t )RUNNING != source_ssc0.status ) )
                     {
 //                          OSSchedLock( );
+                        if( isUsbConnected )
+                        {
                           source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_I2SBuffersIn,
                                                    sizeof(ssc0_I2SBuffersIn ) >> 1 ); 
-//                          OSTimeDlyHMSM(0, 0, 0, 2);  
+ 
                           source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_I2SBuffersOut,
                                                    sizeof(ssc0_I2SBuffersOut ) >> 1 );
                          
@@ -1191,6 +1213,7 @@ static  void  AppTaskSSC0 ( void *p_arg )
                           source_ssc1.buffer_read( &source_ssc1,( uint8_t * )ssc1_I2SBuffersIn,
                                                    sizeof(ssc1_I2SBuffersIn ) >> 1 );                            
                           source_ssc1.status = ( uint8_t )START;
+                        }
 //                          OSSchedUnlock( );
                     }                 
             break;
@@ -1225,6 +1248,18 @@ static  void  AppTaskUSB (void *p_arg)
    
     for(;;) 
     {
+//            /* Device is not configured */
+//        if (USBD_GetState() < USBD_STATE_CONFIGURED)
+//        {
+//            if (isUsbConnected)
+//            {
+//                isUsbConnected = 0;
+//            }
+//        }
+//        else if (isUsbConnected == 0)
+//        {
+//            isUsbConnected = 1;
+//        }      
 
 #if 0               
         evFlags = OSFlagQuery( g_pStartUSBTransfer, &err );

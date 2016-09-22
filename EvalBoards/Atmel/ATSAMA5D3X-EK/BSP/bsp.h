@@ -171,5 +171,7 @@ void UIF_Misc_On ( CPU_INT32U id );
 
 void UIF_Misc_Off ( CPU_INT32U id );
 
+void UIF_DelayUs( CPU_INT32U us );
+
 
 #endif  /* BSP_PRESENT */

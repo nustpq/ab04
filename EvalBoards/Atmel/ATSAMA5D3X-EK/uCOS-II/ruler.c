@@ -357,6 +357,7 @@ uint8_t Setup_Audio( AUDIO_CFG *pAudioCfg )
 #else
 uint8_t Setup_Audio( AUDIO_CFG *pAudioCfg )
 {
+  return 0;
 }
 #endif
 
@@ -445,7 +446,8 @@ uint8_t Update_Audio( void )
     ////////////////////////////////////////////////////////////////////////////
     
     return 0 ; 
- */   
+ */ 
+    return 0;
 }
 
 
@@ -501,6 +503,7 @@ uint8_t Start_Audio( START_AUDIO start_audio )
 #else
 uint8_t Start_Audio( START_AUDIO start_audio )
 {
+  return 0;
 }
 #endif
 

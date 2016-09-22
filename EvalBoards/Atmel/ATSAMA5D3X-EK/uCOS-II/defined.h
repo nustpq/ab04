@@ -40,7 +40,7 @@
 #define PINGPONG_SIZE                   ( 192 * 16 )
 #define USBCMDDATAEPSIZE                USBDATAEPSIZE
 #define USB_OUT_BUFFER_SIZE             16384           //USB audio data, size MUST be 2^n .2^14=16384
-#define USB_IN_BUFFER_SIZE              (8192)          //USB audio data, size MUST be 2^n .2^14=16384
+#define USB_IN_BUFFER_SIZE              (8192 * 8 )          //USB audio data, size MUST be 2^n .2^14=16384
 #define USB_CMD_OUT_BUFFER_SIZE         1024            //USB cmd data, size MUST be 2^n .
 #define USB_CMD_IN_BUFFER_SIZE          1024            //USB cmd data, size MUST be 2^n .
 

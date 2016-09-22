@@ -38,16 +38,16 @@
 
 static const DataSource *pSource; 
 
-static void Pin_Reset_Codec( void )
+static void Pin_Reset_Codec( uint8_t ord )
 {
-
 //    PIO_Clear(&pinsGpios[12]);
-    UIF_Misc_Off ( CODEC1_RST );  
-    OSTimeDly(10) ;
+    UIF_Misc_Off ( ord );  
+//    OSTimeDly(10) ;
+    UIF_DelayUs( 10 * 100 );
 //    PIO_Set(&pinsGpios[12]);
-    UIF_Misc_On ( CODEC1_RST );
-    OSTimeDly(10) ;
-     
+    UIF_Misc_On ( ord );
+//    OSTimeDly(10) ;
+    UIF_DelayUs( 10 * 100 );     
 }
 
 void enable_PA( bool en )
@@ -1080,7 +1080,7 @@ uint8_t Set_Codec_PLL( const DataSource *pSource,uint32_t sr, uint8_t sample_len
 
 CODEC_SETS codec_set_saved;
  
-uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set ) 
+uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set,uint8_t ord ) 
 
 {
     uint8_t err;
@@ -1098,8 +1098,8 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
         codec_set_saved = codec_set;  
     }
          
-//    Pin_Reset_Codec();
-//    OSTimeDly(2000); //test
+//    Pin_Reset_Codec( ord );
+//    UIF_DelayUs( 2000 * 100 );
    
     err = Check_SR_Support( codec_set.sr );
     if( OS_ERR_NONE != err ){

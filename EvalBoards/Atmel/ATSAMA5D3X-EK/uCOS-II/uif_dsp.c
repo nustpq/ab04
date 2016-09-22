@@ -318,12 +318,13 @@ static uint16_t fm36_para_table_3[][2] =
 
 void Pin_Reset_FM36( void )
 {
+    uint32_t i = 1000 * 1000;
     UIF_Misc_Off( FM36_RST );
-//    PIO_Clear(&pinsGpios[11]);
-    OSTimeDly(20) ;
+    while( i -- );
+//    OSTimeDly(20) ;
     UIF_Misc_On( FM36_RST );    
-//    PIO_Set(&pinsGpios[11]);
-    OSTimeDly(50) ;
+//    OSTimeDly(50) ;
+    i = 1000 * 1000 * 50;
      
 }
 
@@ -773,7 +774,8 @@ uint8_t Init_FM36_AB03( uint16_t sr,
     uint32_t   i;
     uint16_t temp, temp2 ;
     uint16_t addr, val; 
-    uint8_t  err ;     
+    uint8_t  err ; 
+    int32_t delay = 1000*1000*1;    
     
     if( sr               == sr_saved  &&  \
         mic_num          == mic_num_saved && \
@@ -795,10 +797,14 @@ uint8_t Init_FM36_AB03( uint16_t sr,
     }   
     
     Pin_Reset_FM36();
+    while( delay-- );
     flag_state_pwd  = false ;
 
     //check chip type by rom id 
     err = CM_LegacyRead( FM36_I2C_ADDR, 0x2FFF,(uint8_t *)&temp ) ;
+    
+    delay = 1000*1000*1;
+    while( delay-- );  
     if( OS_ERR_NONE != err ) {
         err = FM36_RD_CM_ERR;
         return FM36_RD_CM_ERR ;

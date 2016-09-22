@@ -1921,10 +1921,16 @@
       <name>$PROJ_DIR$\..\app_cfg.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\codec.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\cpu_cfg.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\emb.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\im501_comm.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\kfifo.c</name>
@@ -1940,6 +1946,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\os_cfg.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\ruler.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\uif_act8865.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\uif_cmdParse.c</name>
@@ -2009,6 +2021,9 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\BSP\IAR\sama5d3x-ek-ddram.mac</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\BSP\uif_led.c</name>
     </file>
   </group>
   <group>
