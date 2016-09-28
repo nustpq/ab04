@@ -168,7 +168,7 @@ const CDCDSerialDriverConfigurationDescriptors configurationDescriptorsFS = {
         USBGenericDescriptor_INTERFACE,
         0, // This is interface #1  ----changed from 1--->0 by leo after reducing interface
         0, // This is alternate setting #0 for this interface  
-        4, // This interface uses 2 endpoints  ----uif will use 4 endpoints,so changed from 2 -->4
+        6, // This interface uses 2 endpoints  ----uif will use 6 endpoints,so changed from 2 -->6
         0xFF, //CDCDataInterfaceDescriptor_CLASS,
         0xFF, //CDCDataInterfaceDescriptor_SUBCLASS,
         0xFF, //CDCDataInterfaceDescriptor_NOPROTOCOL,
@@ -215,6 +215,28 @@ const CDCDSerialDriverConfigurationDescriptors configurationDescriptorsFS = {
                                       CDCDSerialDriverDescriptors_CMDDATAIN),
         USBEndpointDescriptor_BULK,
         MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_CMDDATAIN),
+            USBEndpointDescriptor_MAXBULKSIZE_FS),
+        0 // Must be 0 for full-speed bulk endpoints  
+    },
+    // Bulk-OUT endpoint standard descriptor  
+    {
+        sizeof(USBEndpointDescriptor),
+        USBGenericDescriptor_ENDPOINT,
+        USBEndpointDescriptor_ADDRESS(USBEndpointDescriptor_OUT,
+                                      CDCDSerialDriverDescriptors_AUDIODATAOUT1 ),
+        USBEndpointDescriptor_BULK,
+        MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_AUDIODATAOUT1),
+            USBEndpointDescriptor_MAXBULKSIZE_FS),
+        0 // Must be 0 for full-speed bulk endpoints  
+    },
+    // Bulk-IN endpoint descriptor  
+    {
+        sizeof(USBEndpointDescriptor),
+        USBGenericDescriptor_ENDPOINT,
+        USBEndpointDescriptor_ADDRESS(USBEndpointDescriptor_IN,
+                                      CDCDSerialDriverDescriptors_AUDIODATAIN1),
+        USBEndpointDescriptor_BULK,
+        MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_AUDIODATAIN1),
             USBEndpointDescriptor_MAXBULKSIZE_FS),
         0 // Must be 0 for full-speed bulk endpoints  
     }
@@ -296,7 +318,7 @@ const CDCDSerialDriverConfigurationDescriptors otherSpeedDescriptorsFS = {
         USBGenericDescriptor_INTERFACE,
         0, // This is interface #1  
         0, // This is alternate setting #0 for this interface  
-        4, // This interface uses 2 endpoints  
+        6, // This interface uses 2 endpoints  
         0xFF, //CDCDataInterfaceDescriptor_CLASS,
         0xFF, //CDCDataInterfaceDescriptor_SUBCLASS,
         0xFF, //CDCDataInterfaceDescriptor_NOPROTOCOL,
@@ -346,7 +368,29 @@ const CDCDSerialDriverConfigurationDescriptors otherSpeedDescriptorsFS = {
         MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_CMDDATAIN),
             USBEndpointDescriptor_MAXBULKSIZE_HS),
         0 // Must be 0 for full-speed bulk endpoints  
-    }
+    },
+    // Bulk-OUT endpoint standard descriptor  
+    {
+        sizeof(USBEndpointDescriptor), 
+        USBGenericDescriptor_ENDPOINT,
+        USBEndpointDescriptor_ADDRESS(USBEndpointDescriptor_OUT,
+                                      CDCDSerialDriverDescriptors_AUDIODATAOUT1),
+        USBEndpointDescriptor_BULK,
+        MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_AUDIODATAOUT1),
+            USBEndpointDescriptor_MAXBULKSIZE_HS),
+        0 // Must be 0 for full-speed bulk endpoints  
+    },
+    // Bulk-IN endpoint descriptor  
+    {
+        sizeof(USBEndpointDescriptor),
+        USBGenericDescriptor_ENDPOINT,
+        USBEndpointDescriptor_ADDRESS(USBEndpointDescriptor_IN,
+                                      CDCDSerialDriverDescriptors_AUDIODATAIN1),
+        USBEndpointDescriptor_BULK,
+        MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_AUDIODATAIN1),
+            USBEndpointDescriptor_MAXBULKSIZE_HS),
+        0 // Must be 0 for full-speed bulk endpoints  
+    },
 };
 
 /// Configuration descriptor (when in high-speed).  
@@ -424,7 +468,7 @@ const CDCDSerialDriverConfigurationDescriptors configurationDescriptorsHS = {
         USBGenericDescriptor_INTERFACE,
         0, // This is interface #1  
         0, // This is alternate setting #0 for this interface  
-        4, // This interface uses 2 endpoints  
+        6, // This interface uses 2 endpoints  
         0xFF, //CDCDataInterfaceDescriptor_CLASS,
         0xFF, //CDCDataInterfaceDescriptor_SUBCLASS,
         0xFF, //CDCDataInterfaceDescriptor_NOPROTOCOL,
@@ -475,7 +519,29 @@ const CDCDSerialDriverConfigurationDescriptors configurationDescriptorsHS = {
         MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_CMDDATAIN),
             USBEndpointDescriptor_MAXBULKSIZE_HS),
         0 // Must be 0 for full-speed bulk endpoints  
-    }
+    },
+    // Bulk-OUT endpoint standard descriptor  
+    {
+        sizeof(USBEndpointDescriptor), 
+        USBGenericDescriptor_ENDPOINT,
+        USBEndpointDescriptor_ADDRESS(USBEndpointDescriptor_OUT,
+                                      CDCDSerialDriverDescriptors_AUDIODATAOUT1),
+        USBEndpointDescriptor_BULK,
+        MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_AUDIODATAOUT1),
+            USBEndpointDescriptor_MAXBULKSIZE_HS),//USBEndpointDescriptor_MAXBULKSIZE_HS
+        0 // Must be 0 for full-speed bulk endpoints  
+    },
+    // Bulk-IN endpoint descriptor  
+    {
+        sizeof(USBEndpointDescriptor),
+        USBGenericDescriptor_ENDPOINT,
+        USBEndpointDescriptor_ADDRESS(USBEndpointDescriptor_IN,
+                                      CDCDSerialDriverDescriptors_AUDIODATAIN1),
+        USBEndpointDescriptor_BULK,
+        MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_AUDIODATAIN1),
+            USBEndpointDescriptor_MAXBULKSIZE_HS),//USBEndpointDescriptor_MAXBULKSIZE_HS
+        0 // Must be 0 for full-speed bulk endpoints  
+    }    
 };
 
 /// Other-speed configuration descriptor (when in high-speed).  
@@ -553,7 +619,7 @@ const CDCDSerialDriverConfigurationDescriptors otherSpeedDescriptorsHS = {
         USBGenericDescriptor_INTERFACE,
         0, // This is interface #1  
         0, // This is alternate setting #0 for this interface  
-        4, // This interface uses 2 endpoints  
+        6, // This interface uses 2 endpoints  
         0xFF, //CDCDataInterfaceDescriptor_CLASS,
         0xFF, //CDCDataInterfaceDescriptor_SUBCLASS,
         0xFF, //CDCDataInterfaceDescriptor_NOPROTOCOL,
@@ -603,7 +669,29 @@ const CDCDSerialDriverConfigurationDescriptors otherSpeedDescriptorsHS = {
         MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_CMDDATAIN),
             USBEndpointDescriptor_MAXBULKSIZE_HS),
         0 // Must be 0 for full-speed bulk endpoints  
-    }
+    },
+    // Bulk-OUT endpoint standard descriptor  
+    {
+        sizeof(USBEndpointDescriptor), 
+        USBGenericDescriptor_ENDPOINT,
+        USBEndpointDescriptor_ADDRESS(USBEndpointDescriptor_OUT,
+                                      CDCDSerialDriverDescriptors_AUDIODATAOUT1),
+        USBEndpointDescriptor_BULK,
+        MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_AUDIODATAOUT1),
+            USBEndpointDescriptor_MAXBULKSIZE_HS),
+        0 // Must be 0 for full-speed bulk endpoints  
+    },
+    // Bulk-IN endpoint descriptor  
+    {
+        sizeof(USBEndpointDescriptor),
+        USBGenericDescriptor_ENDPOINT,
+        USBEndpointDescriptor_ADDRESS(USBEndpointDescriptor_IN,
+                                      CDCDSerialDriverDescriptors_AUDIODATAIN1),
+        USBEndpointDescriptor_BULK,
+        MIN(CHIP_USB_ENDPOINTS_MAXPACKETSIZE(CDCDSerialDriverDescriptors_AUDIODATAIN1),
+            USBEndpointDescriptor_MAXBULKSIZE_HS),
+        0 // Must be 0 for full-speed bulk endpoints  
+    }    
 };
 
 /// Language ID string descriptor  
@@ -640,11 +728,12 @@ const unsigned char manufacturerDescriptor[] = {
 /// Product string descriptor  
 const unsigned char productStringDescriptor[] = {
 
-    USBStringDescriptor_LENGTH(9),
+    USBStringDescriptor_LENGTH(10),
     USBGenericDescriptor_STRING,
-    USBStringDescriptor_UNICODE('U'),
-    USBStringDescriptor_UNICODE('I'),
-    USBStringDescriptor_UNICODE('F'),
+    USBStringDescriptor_UNICODE('A'),
+    USBStringDescriptor_UNICODE('B'),
+    USBStringDescriptor_UNICODE('0'),
+    USBStringDescriptor_UNICODE('4'),    
     USBStringDescriptor_UNICODE(' '),
     USBStringDescriptor_UNICODE('B'),
     USBStringDescriptor_UNICODE('o'),

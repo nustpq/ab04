@@ -1,5 +1,5 @@
-#ifndef _USB_H
-#define _USB_H
+#ifndef _UIF_USB_H
+#define _UIF_USB_H
 
 #include "board.h"
 #include "kfifo.h"
@@ -8,8 +8,6 @@
 
 
 #define PIN_USB_VBUS      {PIO_PE9, PIOE, ID_PIOE, PIO_INPUT, PIO_PULLUP} 
-
-#define USBDATAEPSIZE   64
 
 extern void USBD_IrqHandler(void);
 

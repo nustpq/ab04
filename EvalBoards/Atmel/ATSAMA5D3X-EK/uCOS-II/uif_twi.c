@@ -225,7 +225,7 @@ void twi_init_master( void *pInstance, void * pFreq )
     assert( ( NULL != pInstance ) && ( NULL != pFreq ) );
     
     DataSource *pSource = ( DataSource * )pInstance;
-    Twi *pTwi = ( Twi * )pSource->dev.instanceHandle;
+//    Twi *pTwi = ( Twi * )pSource->dev.instanceHandle;
     
     uint32_t hz = *( uint32_t * )pFreq;   
     assert( 0 != hz );

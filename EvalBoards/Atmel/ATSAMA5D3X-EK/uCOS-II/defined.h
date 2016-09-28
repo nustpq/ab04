@@ -1,3 +1,20 @@
+/*
+*********************************************************************************************************
+*
+*                                          APP PACKAGE
+*
+*                                         Atmel  AT91SAMA5D3
+*                                             on the
+*                                      Unified EVM Interface Board 2.0
+*
+* Filename      : define.h
+* Version       : V0.0.1
+* Programmer(s) : Leo
+*********************************************************************************************************
+* Note(s)       :
+*********************************************************************************************************
+*/
+
 #ifndef _DEFINED_H_
 #define _DEFINED_H_
 
@@ -33,16 +50,16 @@
 #define  ERR_TDM_FORMAT                 253u
 
 
-#define I2S_IN_BUFFER_SIZE              ( 192 * 16 )            //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
-#define I2S_OUT_BUFFER_SIZE             ( 192 * 16 )            // 
-#define USBDATAEPSIZE                   64                      // force use 64Bytes
-//#define PINGPONG_SIZE                   USBDATAEPSIZE
-#define PINGPONG_SIZE                   ( 192 * 16 )
-#define USBCMDDATAEPSIZE                USBDATAEPSIZE
-#define USB_OUT_BUFFER_SIZE             16384           //USB audio data, size MUST be 2^n .2^14=16384
-#define USB_IN_BUFFER_SIZE              (8192)          //USB audio data, size MUST be 2^n .2^14=16384
-#define USB_CMD_OUT_BUFFER_SIZE         1024            //USB cmd data, size MUST be 2^n .
-#define USB_CMD_IN_BUFFER_SIZE          1024            //USB cmd data, size MUST be 2^n .
+#define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*2*4 )            //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
+#define I2S_PINGPONG_OUT_SIZE_3K           I2S_PINGPONG_IN_SIZE_3K    // 
+#define USB_DATAEP_SIZE_64B                   (    64    )            // force use 64Bytes
+#define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
+#define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )               //USB audio data, size MUST be 2^n .2^14=16384
+#define USB_RINGIN_SIZE_16K                ( 16384 * 8 )               //USB audio data, size MUST be 2^n .2^14=16384
+#define SPI_RINGOUT_SIZE_16K               ( 245760UL )               //3072B/s * 10 = 30720B
+#define SPI_RINGIN_SIZE_16K                ( 245760UL )               //3072B/s * 10 = 30720B
+#define USB_CMD_RINGOUT_SIZE_1K            ( 1024  )               //USB cmd data, size MUST be 2^n .
+#define USB_CMD_RINGIN_SIZE_1k             ( 1024  )               //USB cmd data, size MUST be 2^n .
 
 #define PLAY_BUF_DLY_CNT                  5
 
@@ -429,33 +446,53 @@ extern AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
 *Note: Maybe should move all of these defines to a standard-alone file? that read easier;
 *********************************************************************************************************
 */
-
 //Buffer Level 1:  USB data stream buffer : 64 B
-extern uint8_t usbBufferBulkOut0[USBDATAEPSIZE];
-extern uint8_t usbBufferBulkOut1[USBDATAEPSIZE];
-extern uint8_t usbBufferBulkIn0[USBDATAEPSIZE];
-extern uint8_t usbBufferBulkIn1[USBDATAEPSIZE];
+extern uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B] ;
+extern uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B] ; 
+extern uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B] ;
+extern uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B] ; 
 
-//Buffer Level 2:  FIFO Loop Data Buffer : 16384 B
-extern uint8_t ssc0_FIFOBufferBulkOut[USB_OUT_BUFFER_SIZE] ;
-extern uint8_t ssc0_FIFOBufferBulkIn[USB_IN_BUFFER_SIZE] ;
-extern uint8_t ssc1_FIFOBufferBulkOut[USB_OUT_BUFFER_SIZE] ;
-extern uint8_t ssc1_FIFOBufferBulkIn[USB_IN_BUFFER_SIZE] ;
-
-//Buffer Level 3:  Double-buffer for I2S data : MAX 48*2*8*2*2 = 3072 B
-extern uint16_t ssc0_I2SBuffersOut[2][I2S_OUT_BUFFER_SIZE];  // Play 
-extern uint16_t ssc0_I2SBuffersIn[2][I2S_IN_BUFFER_SIZE] ;   // Record
-extern uint16_t ssc1_I2SBuffersOut[2][I2S_OUT_BUFFER_SIZE];  // Play 
-extern uint16_t ssc1_I2SBuffersIn[2][I2S_IN_BUFFER_SIZE] ;   // Record
-
-//------------------------usb cmd buffer copy from uif1.0 defined-------------// 
 //Buffer Level 1:  USB Cmd data stream buffer : 64 B
-extern uint8_t usbCmdBufferBulkOut[ USBCMDDATAEPSIZE ] ;
-extern uint8_t usbCmdBufferBulkIn[ USBCMDDATAEPSIZE ]  ;
+extern uint8_t usbCmdCacheBulkOut[ USB_CMDEP_SIZE_64B ] ;            
+extern uint8_t usbCmdCacheBulkIn[ USB_CMDEP_SIZE_64B ]  ;             
 
-//Buffer Level 2:  FIFO Loop Data Buffer : 1024 B
-extern uint8_t FIFOBufferBulkOutCmd[ USB_CMD_OUT_BUFFER_SIZE ] ;
-extern uint8_t FIFOBufferBulkInCmd[ USB_CMD_IN_BUFFER_SIZE ]  ;
+////Buffer Level 2:  Ring Data Buffer for usb: 16384 B
+extern uint8_t usbRingBufferBulkOut0[ USB_RINGOUT_SIZE_16K ] ;        
+extern uint8_t usbRingBufferBulkIn0[ USB_RINGIN_SIZE_16K ] ;          
+extern uint8_t usbRingBufferBulkOut1[ USB_RINGOUT_SIZE_16K ] ;        
+extern uint8_t usbRingBufferBulkIn1[ USB_RINGIN_SIZE_16K ] ;          
+
+//Buffer Level 2:  Ring CMD Buffer : 1024 B
+extern uint8_t usbCmdRingBulkOut[ USB_CMD_RINGOUT_SIZE_1K ] ;         
+extern uint8_t usbCmdRingBulkIn[ USB_CMD_RINGIN_SIZE_1k ]  ;          
+
+//Buffer Level 3:  Ring  Data Buffer for audio port include ssc and spi: 16384 B
+extern uint8_t ssc0_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             
+extern uint8_t ssc0_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               
+extern uint8_t ssc1_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             
+extern uint8_t ssc1_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               
+
+extern uint16_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_16K ];
+extern uint16_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_16K];
+extern uint16_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_16K ];
+extern uint16_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_16K ];
+
+//Buffer Level 4:  PingPong buffer for audio data : MAX 48*2*8*2*2 = 3072 B
+//these buffer is private 
+extern uint16_t ssc0_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         
+extern uint16_t ssc0_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          
+extern uint16_t ssc1_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         
+extern uint16_t ssc1_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          
+
+extern uint16_t spi0_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
+extern uint16_t spi0_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
+extern uint16_t spi1_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
+extern uint16_t spi1_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
+
+// gpio has no private ring buffer, it share with ssc0;
+extern uint16_t gpio_PingPong_bufferOut[2][I2S_PINGPONG_OUT_SIZE_3K];
+extern uint16_t gpio_PingPong_bufferIn[2][I2S_PINGPONG_IN_SIZE_3K];
+
 
 
 //------------------------port list instance export for other-----------------//

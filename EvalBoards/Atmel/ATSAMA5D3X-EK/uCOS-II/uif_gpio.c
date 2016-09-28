@@ -244,22 +244,28 @@ uint8_t  gpio_Pin_Set( void *pInstance, const uint8_t * pdata,uint32_t mask )
 uint8_t  gpio_Pin_Get( void *pInstance, const uint8_t * pdata,uint32_t mask )
 {
     assert( NULL != pInstance );
-    assert( NULL != pdata );
+    assert( NULL != pdata );  
     assert( 0 < mask );
     
     const uint8_t pinCnt = 10;
     
     uint16_t gpio_data[ 10 ] = { 0 };
-    uint8_t temp = 0;
+    uint8_t temp = 0, i = 0,j,n;
     
     DataSource *pSource = ( DataSource * )pInstance;
     Pin *pPins = ( Pin * )pSource->privateData;
     GPIO_REC_CFG *gpio_cfg = ( GPIO_REC_CFG * )pSource->peripheralParameter;
+    ///todo: this struct should be initialzed after receieved command from usb;
+    // here,just for test Cpu performence;
     gpio_cfg->mask = mask;
+    gpio_cfg->sampleCnt = 4;
+    gpio_cfg->gpioscnt = 8;
+    gpio_cfg->tdmChannelCnt = 4;
+    gpio_cfg->index = 0;
     
     temp = pPins->pio->PIO_PDSR;
     
-    for( uint8_t i = 0, n = 0 ; i < pinCnt ; i++ ) 
+    for( i = 0, n = 0 ; i < pinCnt ; i++ ) 
     {
      
         if( gpio_cfg->mask & ( 1<< i ) ) 
@@ -274,9 +280,29 @@ uint8_t  gpio_Pin_Get( void *pInstance, const uint8_t * pdata,uint32_t mask )
             }
         }
     }
+
+/*    
+  uint8_t mask;             //bitmap for gpio which used for rec-->global_rec_gpio_mask
+  uint8_t gpioscnt;         //count pins in using-->global_rec_gpio_num
+  uint8_t index;            //start index-->global_rec_gpio_index
+  uint8_t data_mask;        //bitmap for gpio level which used
+  
+  uint8_t tdmChannelCnt;    //how much channels for tdm --->global_rec_num
+  uint8_t sampleCnt;        //samples per package of one interruption-->global_rec_samples     
+*/    
+    for( i = 0; i < gpio_cfg->sampleCnt ; i++ ) 
+    { //2ms buffer        
+      for( j = 0; j < gpio_cfg->gpioscnt ; j ++ ) 
+      {      
+
+         *( uint8_t * )( pdata + gpio_cfg->index + j ) = gpio_data[ j ];
+        }
+        
+        pdata += gpio_cfg->tdmChannelCnt ;
+    }
     
     //copy data to target address.Because it is const,so...
-    memcpy( ( void * )pdata, gpio_data,sizeof( gpio_data ) );
+    //memcpy( ( void * )pdata, gpio_data,sizeof( gpio_data ) );
     
     return 0;
 }

@@ -20,13 +20,15 @@
 
 #define STATE_SLAVE 0
 #define STATE_MASTER ( !STATE_SLAVE )
-#define SPI_BUFFER_SIZE ( 4096 )
 
 extern sDmad g_dmad;
+
+#ifndef USE_EVENTGROUP
+extern OS_FLAG_GRP *g_pStartUSBTransfer;
+#endif
+
 sDmad spi_dmad;
 
-//const Pin spi0_pins[] = { PINS_SPI0,PIN_SPI0_NPCS0};					 
-//const Pin spi1_pins[] = { PINS_SPI1,PIN_SPI1_NPCS0};
 const Pin spi0_pins[] = { PINS_SPI0 };					 
 const Pin spi1_pins[] = { PINS_SPI1 };                     
 
@@ -125,7 +127,51 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
     status = status;    
     assert( NULL != pArg );
     
+    uint8_t error;
+    uint32_t temp = 0;
+    
     DataSource *pSource = ( DataSource *)pArg;
+    
+    /*step 1:calculate buffer space */ 
+    temp = kfifo_get_free_space( pSource->pRingBulkIn );
+
+     /*step 2:insert data to RingBuffer from PingPong buffer */  
+     if( temp >= pSource->warmWaterLevel )
+     {        
+       kfifo_put( pSource->pRingBulkIn,
+                  ( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
+                  pSource->rxSize );
+ 
+       pSource->rx_index = 1 - pSource->rx_index; 
+       //update state machine of this port;                    
+       pSource->status[ IN ] = ( uint8_t )RUNNING;
+     }
+     else
+     {
+         //if this port was started,but no enough data in buffer,
+         //flag this port in buffering state;
+         if( ( uint8_t )START <= pSource->status[ IN ] )
+         {
+              pSource->status[ IN ] = ( uint8_t )BUFFERED;
+              ///TODO:error proccess;
+              return;
+         }
+         else
+         {
+             //if there has no enough space for data,error 
+             printf( "SPI0-Rx:There is No Space in RingBuffer,data size = %d \r\n",temp);
+             ///TODO:error proccess
+             return;
+         }
+     }
+   
+    /*step 3:send semphone */ 
+                   OSFlagPost( 
+                    g_pStartUSBTransfer,
+                    (OS_FLAGS)(SPI0_IN), 
+                    OS_FLAG_SET, 
+                    &error
+                ); 
 }
 
 /*
@@ -142,11 +188,55 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
 *********************************************************************************************************
 */
 void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
-{
-    status = status;
-    pArg = pArg;
+{    
+    status = status;    
+    assert( NULL != pArg );
     
-//    BSP_LED_Toggle( 3 );
+    uint8_t error;
+    uint32_t temp = 0;
+    
+    DataSource *pSource = ( DataSource *)pArg;
+    
+     /*step 1:calculate buffer space */ 
+     temp = kfifo_get_data_size( pSource->pRingBulkOut );
+
+     /*step 2:get data from spi RingBuffer */  
+     if( temp >= pSource->warmWaterLevel )
+     {        
+         kfifo_get( pSource->pRingBulkOut,
+                    ( uint8_t * )pSource->pBufferOut[ pSource-> tx_index ],
+                    pSource->txSize );
+ 
+         pSource->tx_index = 1 - pSource->tx_index;
+         //update state machine of this port;                    
+         pSource->status[ OUT ] = ( uint8_t )RUNNING;
+     }
+     else
+     {
+         //if this port was started,but no enough data in buffer,
+         //flag this port in buffering state;
+         if( ( uint8_t )START <= pSource->status[ OUT ] )
+         {
+              pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+              ///TODO:error proccess;
+              return;
+         }
+         else
+         {
+             //if there has no enough space for data,error 
+             printf( "SPI0-Tx:There is No data in RingBuffer,data size = %d \r\n",temp);
+             ///TODO:error proccess
+             return;
+         }
+     }
+     
+      /*step 3:send semphone */ 
+      OSFlagPost( 
+                 g_pStartUSBTransfer,
+                 (OS_FLAGS)(SPI0_OUT), 
+                 OS_FLAG_SET, 
+                 &error
+                ); 
 }
 
 /*
@@ -165,8 +255,55 @@ void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
 void _SPI1_DmaRxCallback( uint8_t status, void* pArg )
 {
   
-    status = status;
-    pArg = pArg;    
+     status = status;
+
+     static uint8_t error;
+     uint32_t temp = 0;
+
+     
+     assert( NULL != pArg );
+    
+     DataSource *pSource = ( DataSource *)pArg;
+              
+     pSource->pBufferIn = ( uint16_t * )spi1_2MSIn[ 1 - pSource->rx_index ];
+
+     temp = kfifo_get_free_space( pSource->pRingBulkIn );
+    
+     if( temp  >=  pSource->rxSize ) 
+     {
+          kfifo_put( pSource->pRingBulkIn,
+                      ( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
+                      pSource->rxSize );
+          pSource->rx_index = 1 - pSource->rx_index;
+          //update state machine of this port;                    
+          pSource->status[ IN ] = ( uint8_t )RUNNING;
+     }
+     else
+     {
+            //if this port was started,but no enough data in buffer,
+            //flag this port in buffering state;
+            if( ( uint8_t )START <= pSource->status[ IN ] )
+            {
+                    pSource->status[ IN ] = ( uint8_t )BUFFERED;
+                    //error proccess;
+                    return;
+            }
+            else
+            {
+                    printf( "SPI1-Rx:There is No Space in RingBuffer,space size = %d \r\n",temp);
+                    return;
+            }
+     }
+
+//spi1 is connected to fpga, so it's not need to sync with others
+#if 0     
+     OSFlagPost(    //send group event
+                    g_pStartUSBTransfer,
+                    (OS_FLAGS)(SPI1_IN), //
+                    OS_FLAG_SET, //
+                    &error
+                );
+#endif 
 }
 
 
@@ -184,11 +321,58 @@ void _SPI1_DmaRxCallback( uint8_t status, void* pArg )
 *********************************************************************************************************
 */
 void  _SPI1_DmaTxCallback( uint8_t status, void* pArg )
-{
-    status = status;
-    pArg = pArg;
+{    
+    status = status;    
+    assert( NULL != pArg );
     
-//    BSP_LED_Toggle( 3 );
+    uint8_t error;
+    uint32_t temp = 0;
+    
+    DataSource *pSource = ( DataSource *)pArg;
+    
+     /*step 1:calculate buffer space */ 
+     temp = kfifo_get_data_size( pSource->pRingBulkOut );
+
+     /*step 2:get data from spi RingBuffer */  
+     if( temp >= pSource->warmWaterLevel )
+     {        
+       kfifo_get( pSource->pRingBulkOut,
+                  ( uint8_t * )pSource->pBufferOut[ pSource-> tx_index ],
+                  pSource->txSize );
+ 
+       pSource->tx_index = 1 - pSource->tx_index;
+       //update state machine of this port;                    
+       pSource->status[ OUT ] = ( uint8_t )RUNNING;
+     }
+     else
+     {
+         //if this port was started,but no enough data in buffer,
+         //flag this port in buffering state;
+         if( ( uint8_t )START <= pSource->status[ OUT ] )
+         {
+              pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+              ///TODO:error proccess;
+              return;
+         }
+         else
+         {
+             //if there has no enough space for data,error 
+             printf( "SPI1-Tx:There is No Data in RingBuffer,data size = %d \r\n",temp);
+             ///TODO:error proccess
+             return;
+         }
+     }
+     
+//spi1 is connected to fpga, so it's not need to sync with others
+#if 0
+      OSFlagPost( 
+                 g_pStartUSBTransfer,
+                 (OS_FLAGS)(SPI1_OUT), 
+                 OS_FLAG_SET, 
+                 &error
+                );
+#endif
+     
 }
 
 
@@ -286,7 +470,8 @@ void stop_spi( void * pInstance )
     DMAD_StopTransfer( &spi_dmad, pSource->dev.rxDMAChannel );
     DMAD_StopTransfer( &spi_dmad, pSource->dev.txDMAChannel );
     
-    pSource->status = ( uint8_t )STOP;
+    pSource->status[ IN ] = ( uint8_t )STOP;
+    pSource->status[ OUT ] = ( uint8_t )STOP;
 }
 
 
@@ -441,7 +626,7 @@ uint8_t _spiDmaRx( void *pInstance ,const uint8_t *buf,uint32_t len  )
     td.dwSrcAddr = (uint32_t)&pSpi->SPI_RDR;
 //    td.dwDstAddr = (uint32_t) pSource->buffer;
     td.dwDstAddr = (uint32_t) buf;
-    td.dwCtrlA   = SPI_BUFFER_SIZE | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+    td.dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 ) | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;   
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR 
                    | DMAC_CTRLB_DST_DSCR
                    | DMAC_CTRLB_SIF_AHB_IF2 
@@ -484,7 +669,7 @@ uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  )
 //    td.dwSrcAddr = (uint32_t) pSource->privateData;
     td.dwSrcAddr = (uint32_t) buf;
     td.dwDstAddr = (uint32_t)&pSpi->SPI_TDR;
-    td.dwCtrlA   = SPI_BUFFER_SIZE | DMAC_CTRLA_SRC_WIDTH_BYTE | DMAC_CTRLA_DST_WIDTH_BYTE;
+    td.dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 ) | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR 
                    | DMAC_CTRLB_DST_DSCR
                    | DMAC_CTRLB_SIF_AHB_IF0 

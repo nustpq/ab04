@@ -30,7 +30,6 @@
 #include <ucos_ii.h>
 #include "bsp.h"
 
-
 #include "codec.h"
 #include "noah_cmd.h"
 #include "uif_twi.h"

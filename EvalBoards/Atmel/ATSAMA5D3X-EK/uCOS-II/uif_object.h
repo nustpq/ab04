@@ -30,7 +30,7 @@
 //define stream direct
 typedef enum _port_direct
 {
-	IN = 0,             //A keepspace with lib function
+	IN = 0,             
 	OUT,
 	BI,
 	INVALIDDIR,
@@ -39,7 +39,7 @@ typedef enum _port_direct
 //define application layer direct
 typedef enum _audio_direct
 {
-	REC = 0,             //A keepspace with lib function
+	REC = 0,             
 	PLAY,
 	INVALIDAUDIODIR,
 }AUDIODIRECT;
@@ -73,7 +73,7 @@ typedef enum _uif_port_mask
       SSC1_IN  =  4,
       SSC1_OUT =  8,
       SPI0_IN  =  16,
-      SPI0_OUT =  32,
+      SPI0_OUT =  32,     
       GPIO_IN  =  64,
       INVALIDMASK       
 }UIFPORTMASK;
@@ -123,15 +123,18 @@ typedef struct _DataSource
         uint32_t warmWaterLevel;    //corresponding to i2s_play_buffer_size,maybe
                                     //should move it to another struct?
 //these points followed pointed public buffers        
-        kfifo_t *usbBulkOut;        //the out ring buffer that this port relevant
-        kfifo_t *usbBulkIn;         //the in  ring buffer that this port relevant
-        uint8_t *i2sBufferIn;       //the pointer pointed global i2s buffer in
-        uint8_t *i2sBufferOut;      //the pointer pointed global i2s buffer out
-	uint8_t status;
+        kfifo_t *pRingBulkOut;      //the out ring buffer that this port relevant
+        kfifo_t *pRingBulkIn;       //the in  ring buffer that this port relevant
+        uint16_t *pBufferIn;        //the pointer pointed PingPong buffer in
+        uint16_t *pBufferOut;       //the pointer pointed PingPong buffer out
+	uint8_t status[BI];         //state machine of port
+        uint16_t unused;            //keep alive
         
 #ifdef PINGPONG
         uint8_t tx_index;           //indicate current buffer is Ping or Pong;
         uint8_t rx_index;
+        uint32_t txSize;            //indicate actul data size of 2ms
+        uint32_t rxSize;
 #endif
 }DataSource;
 	
