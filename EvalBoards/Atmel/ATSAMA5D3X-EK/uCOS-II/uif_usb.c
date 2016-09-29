@@ -44,6 +44,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
                               uint32_t remaining )
 {   
     remaining = remaining;
+    uint32_t size;
     
     if ( status == USBD_STATUS_SUCCESS ) 
     {     
@@ -51,9 +52,10 @@ void UsbAudio0DataReceived(  uint32_t unused,
          // LED_CLEAR_DATA;
       
         //copy data from usb endpoit to fifo
-        kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);         
-        
-        if ( USB_DATAEP_SIZE_64B <= kfifo_get_free_space( &ep0BulkOut_fifo ) ) 
+        kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);
+
+        size = kfifo_get_free_space( &ep0BulkOut_fifo );
+        if ( USB_DATAEP_SIZE_64B <=  size ) 
         { 
             //enough free buffer                      
             CDCDSerialDriver_Read(    usbCacheBulkOut0,
@@ -64,8 +66,9 @@ void UsbAudio0DataReceived(  uint32_t unused,
        else 
        { 
             //usb out too fast                     
-
-            
+            printf( "\r\nERROR : UsbAudio0DataReceived: Usb Transfer fast\r\n" );
+            ///Todo:maybe send a feedback to pc and let it wait a moment?
+            return;           
        }     
 //       total_received += received ; 
      

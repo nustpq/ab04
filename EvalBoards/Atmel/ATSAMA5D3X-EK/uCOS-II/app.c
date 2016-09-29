@@ -949,7 +949,7 @@ int main()
 
 #ifdef UIF_AIC3204
 /*----------------------------------------------------*/
-    codec_set.sr = 8000;
+    codec_set.sr = 48000;
     codec_set.sample_len = 16;
     codec_set.format = 1;
     codec_set.slot_num = 2;
@@ -958,7 +958,7 @@ int main()
     codec_set.flag = 1;
     codec_set.delay = 0;
     Init_CODEC( &source_twi1,codec_set );
-    codec_set.sr = 8000;
+    codec_set.sr = 48000;
     codec_set.sample_len = 16;
     codec_set.format = 1;
     codec_set.slot_num = 2;
@@ -1113,6 +1113,7 @@ static  void  AppTaskLED ( void *p_arg )
     memset( twi_ring_buffer[ 0 ],0x55,sizeof( twi_ring_buffer[ 0 ] ));
     memset( usartBuffer[ 0 ], 0x55 , 1024 );
     memset( usartBuffer[ 1 ], 0x55 , 1024 );
+    memset( spi0_RingBulkOut, 0x55, sizeof( spi0_RingBulkOut ) );    
     
     for(;;) 
     {
@@ -1142,7 +1143,7 @@ static  void  AppTaskLED ( void *p_arg )
         }           
             
         spi_clear_status( &source_spi0 );
-        memset( spi0_RingBulkOut, 0x55, sizeof( spi0_RingBulkOut ) );
+
         _spiDmaRx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_RingBulkOut ));
         _spiDmaTx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_RingBulkOut ));
                
@@ -1217,6 +1218,7 @@ static  void  AppTaskCmdParase ( void *p_arg )
          Audio_State_Control( &taskMsg );
           
          //step3:post message mailbox to start other task;
+#if 1         
          if( !transmitStart )
          {
             taskMsg = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );
@@ -1224,7 +1226,7 @@ static  void  AppTaskCmdParase ( void *p_arg )
             transmitStart = 1;
             taskMsg = 0;
          }
-       
+#endif       
          //let this task running periodic per second enough;
          OSTimeDlyHMSM( 0, 0, 0, 500 );
     }
@@ -1366,18 +1368,19 @@ static  void  AppTaskUSB (void *p_arg)
 {
     uint8_t err = 0;
     uint8_t evFlags = 0; 
-    uint32_t sizecnt = 0,sizecnt2 = 0;
+    static uint8_t taskMsg;
+    static uint32_t sizecnt = 0,sizecnt2 = 0;
     memset( ( uint8_t * )tmpInBuffer , 0x32 , sizeof( tmpInBuffer ) ); 
     for(;;) 
     {
         UIF_LED_Toggle( LED_D4 );
 #if 1               
-        evFlags = OSFlagQuery( g_pStartUSBTransfer, &err );
+//        evFlags = OSFlagQuery( g_pStartUSBTransfer, &err );
 
         //maybe transfer according events,not waiting for all event happend;
         //
  
-/**-------------------proccess up link --------------------------------------**/          
+/**-------------------proccess up link ----------------------------------------          
             //copy data from ssc0 in ring buffer to usb in ring buffer;
             // ssc0 ring -----> tmpInbuffer
             sizecnt = kfifo_get_data_size( &ssc0_bulkin_fifo );
@@ -1389,20 +1392,18 @@ static  void  AppTaskUSB (void *p_arg)
             kfifo_put( &ep0BulkIn_fifo,
                       ( uint8_t * )tmpInBuffer,
                        6144 ); 
-//            printf( "\nsizecnt=(%d)\n\n",sizecnt );
-/*============================================================================*/            
+//============================================================================//            
             //copy data from ssc1 in ring buffer to usb in ring buffer;
             // ssc1 ring -----> tmpInbuffer 
             sizecnt2 = kfifo_get_data_size( &ssc1_bulkin_fifo );
             kfifo_get( &ssc1_bulkin_fifo,
                       ( uint8_t * )tmpInBuffer,
-                       sizecnt2 );
+                       6144 );
          
             // tmpInbuffer -----> ep1 ring            
             kfifo_put( &ep1BulkIn_fifo,
                       ( uint8_t * )tmpInBuffer,
-                       sizecnt2 );
-//            printf( "\nsizecnt2=(%d)\n\n",sizecnt2 );
+                       6144 );
             
             memset( usbRingBufferBulkIn0, 0x33 , sizeof( usbRingBufferBulkIn0 ) );
             // ep0 ring --> usb cache
@@ -1410,9 +1411,9 @@ static  void  AppTaskUSB (void *p_arg)
                       ( uint8_t * )usbCacheBulkIn0,
                        USB_DATAEP_SIZE_64B );            
          
-          
+            // send ep0 data ---> pc
             CDCDSerialDriver_Write( usbCacheBulkIn0,
-                                    sizecnt,
+                                    6144,
                                     (TransferCallback)UsbAudio0DataTransmit,
                                     0);
             
@@ -1421,41 +1422,46 @@ static  void  AppTaskUSB (void *p_arg)
             kfifo_get( &ep1BulkIn_fifo,
                       ( uint8_t * )usbCacheBulkIn1,
                        USB_DATAEP_SIZE_64B );
-            
+            // send ep1 data ---> pc
             CDCDSerialDriver_Write_SecondEp( usbCacheBulkIn1,
-                                   sizecnt2,
+                                   6144,
                                   (TransferCallback)UsbAudio1DataTransmit,
                                    0); 
            
 
-/**-------------------proccess down link ------------------------------------**/
+---------------------proccess down link ------------------------------------**/
             // usb cache --> ep0 ring 
-#if 0            
+#if 1   
             CDCDSerialDriver_Read( usbCacheBulkOut0,
                                    USB_DATAEP_SIZE_64B,
                                    (TransferCallback) UsbAudio0DataReceived,
-                                   0); 
-            
+                                    0); 
+
+
+#if 1  
             //copy data from  usb ring buffer to temp buffer ;
             //ep0 ring ---> tmpOutbuffer;
-            kfifo_get( &ep0BulkOut_fifo,
+            if( 6144 == kfifo_get( &ep0BulkOut_fifo,
                       ( uint8_t * )tmpOutBuffer,
-                       sizeof( source_ssc0.rxSize ) );
+                       6144 ) ) 
             //tmpOutBuffer --> ssc0 ring
             kfifo_put( &ssc0_bulkout_fifo,
                       ( uint8_t * )tmpOutBuffer,
-                       sizeof( source_ssc0.rxSize ) );            
+                       6144 );
+        
+#endif            
             //copy data from  usb ring buffer to spi0 in ring buffer ;
             //ep0 ring ---> tmpOutBuffer;
-            
+#if 1            
             kfifo_get( &ep0BulkOut_fifo,
                       ( uint8_t * )tmpOutBuffer,
-                       sizeof( source_spi0.rxSize ) ); 
+                       6144  ); 
             //tmpOutBuffer ---> spi0 ring
             kfifo_put( &spi0_bulkOut_fifo,
                       ( uint8_t * )tmpOutBuffer,
-                       sizeof( source_spi0.rxSize ) );             
-
+                       6144  );             
+#endif
+#if 0            
             CDCDSerialDriver_Read_SecondEp( usbCacheBulkOut1,
                                             USB_DATAEP_SIZE_64B,
                                             (TransferCallback) UsbAudio1DataReceived,
@@ -1465,22 +1471,23 @@ static  void  AppTaskUSB (void *p_arg)
             //ep1 ring ---> tmpOutbuffer;            
             kfifo_get( &ep1BulkOut_fifo,
                       ( uint8_t * )tmpOutBuffer,
-                       sizeof( source_ssc1.rxSize ) );
+                       sizeof( source_ssc1.rxSize )  );
             //tmpOutBuffer --> ssc1 ring            
             kfifo_put( &ssc1_bulkout_fifo,
                       ( uint8_t * )tmpOutBuffer,
-                       sizeof( source_ssc1.rxSize ) );             
-
+                       sizeof( source_ssc1.rxSize )  );             
+#endif
            //copy data from  usb ring buffer to spi1 in ring buffer ;
             //ep1 ring ---> tmpOutbuffer; 
-         
+ /*        
             kfifo_get( &ep1BulkOut_fifo,
                       ( uint8_t * )tmpOutBuffer,
-                       sizeof( source_spi1.txSize ) ); 
+                       sizeof( source_spi1.txSize )  << 1); 
             //tmpOutBuffer --> spi1 ring                 
             kfifo_put( &spi1_bulkOut_fifo,
                       ( uint8_t * )tmpOutBuffer,
-                       sizeof( source_spi1.txSize ) );  
+                       sizeof( source_spi1.txSize ) << 1 );  
+*/            
 #endif        
 
 #endif
