@@ -21,7 +21,7 @@
 *                                      Unified EVM Interface Board
 *
 * Filename      : uif_dsp.c
-* Version       : V1.0.0
+* Version       : V0.0.1
 * Programmer(s) : PQ
 *********************************************************************************************************
 * Note(s)       : This file copy directly from uif-1.0
@@ -959,7 +959,7 @@ uint8_t Config_PDM_PA( void )
     uint8_t  buf[3] ;  
 
 //has problem 
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )source_twi2.privateData;
+    TWI_CFG *option = ( TWI_CFG * )source_twi2.privateData;
     option->address = MAX98504 >> 1;
     option->iaddress = 0;
     option->isize = 0;
