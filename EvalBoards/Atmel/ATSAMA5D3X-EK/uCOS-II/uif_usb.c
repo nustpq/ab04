@@ -7,7 +7,7 @@
 *                                                   on the
 *                                      Unified EVM Interface Board
 *
-* Filename         : usb.c
+* Filename         : uif_usb.c
 * Version          : V0.0.1
 * Programmer(s)    : Leo
 *********************************************************************************************************
@@ -48,8 +48,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
     
     if ( status == USBD_STATUS_SUCCESS ) 
     {     
-         // Check every data package:        
-         // LED_CLEAR_DATA;
+        // Check every data package:        
       
         //copy data from usb endpoit to fifo
         kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);
@@ -94,7 +93,7 @@ void UsbAudio1DataReceived(  uint32_t unused,
          // Check every data package:        
           // LED_CLEAR_DATA;
 
-        kfifo_put(&ep1BulkOut_fifo, usbCacheBulkOut1, received);         
+        kfifo_put( &ep1BulkOut_fifo, usbCacheBulkOut1, received );         
         
         if ( USB_DATAEP_SIZE_64B <= kfifo_get_free_space( &ep1BulkOut_fifo ) ) { //enouth free buffer                      
             CDCDSerialDriver_Read(    usbCacheBulkOut1,
