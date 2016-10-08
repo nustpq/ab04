@@ -331,7 +331,7 @@ typedef union  {
     MCU_FLASH             mcu_flash;
     SET_VEC_CFG           set_vec_cfg;
     VOICE_BUF             voice_buf_data;
-    VOICE_BUF_CFG         voice_buf_cfg;
+    SPI_CFG         voice_buf_cfg;
     GPIO_SESSION          gpio_session;
 }PCCMDDAT, *pPCCMDDAT ;
 
