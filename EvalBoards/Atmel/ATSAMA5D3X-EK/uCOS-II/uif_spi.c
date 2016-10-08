@@ -16,6 +16,7 @@
 */
 
 #include "uif_spi.h"
+#include "kfifo.h"
 #include  <ucos_ii.h>
 
 #define STATE_SLAVE 0
@@ -62,11 +63,10 @@ void ISR_TC1( void )
     OS_ENTER_CRITICAL();
     if( 0 == state )
     {
-//      BSP_LED_Off( 3 );
     }
     else
     {
-//      BSP_LED_On( 3 );
+
     }
   
     state = 1 - state;
@@ -257,7 +257,6 @@ void _SPI1_DmaRxCallback( uint8_t status, void* pArg )
   
      status = status;
 
-     static uint8_t error;
      uint32_t temp = 0;
 
      
@@ -325,7 +324,6 @@ void  _SPI1_DmaTxCallback( uint8_t status, void* pArg )
     status = status;    
     assert( NULL != pArg );
     
-    uint8_t error;
     uint32_t temp = 0;
     
     DataSource *pSource = ( DataSource *)pArg;
@@ -458,20 +456,30 @@ void start_spi( void * pInstance )
 * Note(s)     : none
 *********************************************************************************************************
 */
+extern void kfifo_reset(kfifo_t *fifo);
 void stop_spi( void * pInstance )
 {
     assert( NULL != pInstance );
     
     DataSource *pSource = ( DataSource * )pInstance;
     Spi *pSpi = ( Spi * )pSource->dev.instanceHandle;
-  
+    
+    //step1: stop spi port  
     SPI_Disable( pSpi );
     
+    //step2: stop dma channel    
     DMAD_StopTransfer( &spi_dmad, pSource->dev.rxDMAChannel );
     DMAD_StopTransfer( &spi_dmad, pSource->dev.txDMAChannel );
     
+    //step3:clear buffer about this port
+    memset( pSource->pBufferIn, 0 , sizeof( uint16_t ) * I2S_PINGPONG_IN_SIZE_3K );
+    memset( pSource->pBufferOut, 0 , sizeof( uint16_t ) * I2S_PINGPONG_OUT_SIZE_3K );
+    kfifo_reset( pSource->pRingBulkIn );
+    kfifo_reset( pSource->pRingBulkOut );
+    
+    //step4:reset port state machine
     pSource->status[ IN ] = ( uint8_t )STOP;
-    pSource->status[ OUT ] = ( uint8_t )STOP;
+    pSource->status[ OUT ] = ( uint8_t )STOP;    
 }
 
 
@@ -546,7 +554,7 @@ void init_spi( void *pInstance,void *parameter )
     
     parameter = parameter;
     DataSource *pSource = ( DataSource * )pInstance;
-    VOICE_BUF_CFG *pSpi_Cfg = ( VOICE_BUF_CFG * )parameter;
+    SPI_CFG *pSpi_Cfg = ( SPI_CFG * )parameter;
     
     if( ID_SPI0 == pSource->dev.identify )
       PIO_Configure( spi0_pins, PIO_LISTSIZE( spi0_pins ) ) ;                                              //fill code initialize spi0 pins
@@ -880,7 +888,7 @@ void spi_register_set( void *instance,void *parameter )
    DataSource *pSource = ( DataSource * )instance;
    Spi *pSpi = _get_spi_instance( pSource->dev.identify );
    
-   VOICE_BUF_CFG *cfg = ( VOICE_BUF_CFG * )parameter;
+   SPI_CFG *cfg = ( SPI_CFG * )parameter;
       
    uint32_t mode = cfg->spi_mode ;
    
