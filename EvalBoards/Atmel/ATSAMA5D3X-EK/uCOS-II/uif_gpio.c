@@ -264,27 +264,15 @@ uint8_t  gpio_Pin_Get( void *pInstance, const uint8_t * pdata,uint32_t mask )
     const uint8_t pinCnt = 10;
     
     uint16_t gpio_data[ 10 ] = { 0 };
-<<<<<<< HEAD
-    uint8_t temp = 0;
-=======
     uint8_t temp = 0, i = 0,j,n;
->>>>>>> remotes/origin/0922
     
     DataSource *pSource = ( DataSource * )pInstance;
     Pin *pPins = ( Pin * )pSource->privateData;
     GPIO_REC_CFG *gpio_cfg = ( GPIO_REC_CFG * )pSource->peripheralParameter;
-<<<<<<< HEAD
-    gpio_cfg->mask = mask;
-    
-    temp = pPins->pio->PIO_PDSR;
-    
-    for( uint8_t i = 0, n = 0 ; i < pinCnt ; i++ ) 
-=======
         
     temp = pPins->pio->PIO_PDSR;
     
     for( i = 0, n = 0 ; i < pinCnt ; i++ ) 
->>>>>>> remotes/origin/0922
     {
      
         if( gpio_cfg->mask & ( 1<< i ) ) 

@@ -208,17 +208,6 @@ uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B] ;
 uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B] ;
 uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B] ; 
 
-<<<<<<< HEAD
-//Buffer Level 2:  FIFO Loop Data Buffer : 1024 B
-uint8_t FIFOBufferBulkOutCmd[ USB_CMD_OUT_BUFFER_SIZE ] ;
-uint8_t FIFOBufferBulkInCmd[ USB_CMD_IN_BUFFER_SIZE ]  ;
-
-//--------------------------------spi  buffer --------------------------------//
-uint8_t spi0_buffer[2][I2S_OUT_BUFFER_SIZE];
-uint8_t spi1_buffer[2][I2S_OUT_BUFFER_SIZE];
-uint8_t spi0_ring_buffer[I2S_OUT_BUFFER_SIZE];
-uint8_t spi1_ring_buffer[I2S_OUT_BUFFER_SIZE];
-=======
 //Buffer Level 1:  USB Cmd data stream buffer : 64 B
 uint8_t usbCmdCacheBulkOut[ USB_CMDEP_SIZE_64B ] ;             //64B
 uint8_t usbCmdCacheBulkIn[ USB_CMDEP_SIZE_64B ]  ;             //64B
@@ -262,18 +251,10 @@ uint16_t gpio_PingPong_bufferIn[2][I2S_PINGPONG_IN_SIZE_3K];
 
 uint16_t tmpInBuffer[ I2S_PINGPONG_IN_SIZE_3K * 4];
 uint16_t tmpOutBuffer[ I2S_PINGPONG_OUT_SIZE_3K *4];
->>>>>>> remotes/origin/0922
 
 
 //--------------------------------twi  buffer --------------------------------//
 uint8_t twi_ring_buffer[ MAXTWI ][ 256 ];
-
-/*
-*********************************************************************************************************
-*                                      GLOBAL FUNCTION PROTOTYPES
-*********************************************************************************************************
-*/
-
 
 /*
 *********************************************************************************************************
@@ -294,17 +275,6 @@ void Init_Bulk_FIFO( void )
     
     //initialize ring buffer relavent ssc0;
     pfifo = &ssc0_bulkout_fifo;
-<<<<<<< HEAD
-    kfifo_init_static(pfifo, ssc0_FIFOBufferBulkOut, USB_OUT_BUFFER_SIZE);
-    pfifo = &ssc0_bulkin_fifo;
-    kfifo_init_static(pfifo, ssc0_FIFOBufferBulkIn, USB_IN_BUFFER_SIZE);
-    
-    //initialize ring buffer relavent ssc1,extend from old structure;
-    pfifo = &ssc1_bulkout_fifo;
-    kfifo_init_static(pfifo, ssc1_FIFOBufferBulkOut, USB_OUT_BUFFER_SIZE);
-    pfifo = &ssc1_bulkin_fifo;
-    kfifo_init_static(pfifo, ssc1_FIFOBufferBulkIn, USB_IN_BUFFER_SIZE);
-=======
     kfifo_init_static(pfifo, ssc0_RingBulkOut, USB_RINGOUT_SIZE_16K );
     pfifo = &ssc0_bulkin_fifo;
     kfifo_init_static(pfifo, ssc0_RingBulkIn, USB_RINGIN_SIZE_16K );
@@ -327,7 +297,6 @@ void Init_Bulk_FIFO( void )
     kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkOut, SPI_RINGOUT_SIZE_16K );
     pfifo = &spi0_bulkIn_fifo;
     kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkIn, SPI_RINGIN_SIZE_16K );
->>>>>>> remotes/origin/0922
     
     //initialize ring buffer relavent spi1;
     pfifo = &spi1_bulkOut_fifo;
@@ -639,7 +608,6 @@ static  void  AppTaskFirmwareVecUpdate  (void        *p_arg);
 * Note(s)     : none.
 *********************************************************************************************************
 */
-static  uint8_t isUsbConnected = 0;
 extern void _ConfigureTc1( uint32_t hz );
 
 
@@ -657,14 +625,10 @@ int main()
 
     Mem_Init();
     
-<<<<<<< HEAD
-    Init_Bulk_FIFO(  );
-=======
     Init_Bulk_FIFO( );
     
     memset( ( void * )tmpInBuffer, 0, sizeof( tmpInBuffer ) );
     memset( ( void * )tmpOutBuffer, 0, sizeof( tmpOutBuffer ) ); 
->>>>>>> remotes/origin/0922
 
     //Led/Buzzer initialize;
     BSP_LED_Init();
@@ -681,11 +645,7 @@ int main()
 //    UIF_Misc_On( HDMI_UIF_PWR_EN );
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
-<<<<<<< HEAD
-    UIF_Misc_On ( FAST_PLUS_RST );    
-=======
     UIF_Misc_On ( FAST_PLUS_RST );      
->>>>>>> remotes/origin/0922
     
     //test D5
     UIF_LED_On( LED_D5 );
@@ -957,12 +917,8 @@ int main()
 #endif 
     
 #if UIF_GPIO
-    uint16_t keyState[ 8 ] = {0};
-    //initialize gpio object and it's operation 
+            //initialize usart1 object and it's operation 
     memset( ( void * )&source_gpio, 0 , sizeof( DataSource ) );
-<<<<<<< HEAD
-    source_gpio.dev.direct = ( uint8_t )IN;
-=======
     
     memset( ( void * )&gpio_PingPong_bufferOut, 
               0 , 
@@ -981,7 +937,6 @@ int main()
     gpio_cfg.index = 0;
 
     source_gpio.dev.direct = ( uint8_t )BI;
->>>>>>> remotes/origin/0922
     source_gpio.dev.identify = ID_PIOD;
     source_gpio.dev.instanceHandle = (uint32_t)PIOD;
     source_gpio.status[ IN ] = ( uint8_t )FREE;
@@ -1004,18 +959,11 @@ int main()
     
     if( NULL != source_gpio.init_source )
        source_gpio.init_source( &source_gpio,NULL );
-    
-//    gpio_Pin_Set( &source_gpio, &keyState,63 );
-    gpio_Pin_Get( &source_gpio, ( uint8_t *)keyState,0x1f );
 #endif
 
 #ifdef UIF_AIC3204
 /*----------------------------------------------------*/
-<<<<<<< HEAD
-    codec_set.sr = 24000;
-=======
     codec_set.sr = 48000;
->>>>>>> remotes/origin/0922
     codec_set.sample_len = 16;
     codec_set.format = 1;
     codec_set.slot_num = 2;
@@ -1023,11 +971,7 @@ int main()
     codec_set.bclk_polarity = 1;
     codec_set.flag = 1;
     codec_set.delay = 0;
-<<<<<<< HEAD
-    Init_CODEC( &source_twi1,codec_set,CODEC1_RST );
-=======
     Init_CODEC( &source_twi1,codec_set );
->>>>>>> remotes/origin/0922
     codec_set.sr = 48000;
     codec_set.sample_len = 16;
     codec_set.format = 1;
@@ -1036,12 +980,12 @@ int main()
     codec_set.bclk_polarity = 1;
     codec_set.flag = 1;
     codec_set.delay = 0;
-    Init_CODEC( &source_twi2,codec_set,CODEC0_RST );
+    Init_CODEC( &source_twi2,codec_set );
 /*---------------------------------------------------*/
 #endif
     
-#ifdef UIF_FM36
-    Init_FM36_AB03( 24000, 
+#ifndef UIF_FM36
+    Init_FM36_AB03( 48000, 
                         1, 
                         0, 
                         0, 
@@ -1187,25 +1131,6 @@ static  void  AppTaskLED ( void *p_arg )
     
     for(;;) 
     {
-<<<<<<< HEAD
-        OSTimeDlyHMSM(0, 0, 1, 0);
-
-        UIF_LED_Toggle( LED_D4 );
-        
- 
-        spi_clear_status( &source_spi1 );
-        memset( spi1_ring_buffer, 0x55, sizeof( spi1_ring_buffer ) );
-        _spiDmaRx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_ring_buffer ));
-        _spiDmaTx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_ring_buffer ));
-        
-        spi_clear_status( &source_spi0 );
-        memset( spi0_ring_buffer, 0x55, sizeof( spi0_ring_buffer ) );
-        _spiDmaRx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_ring_buffer ));
-        _spiDmaTx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_ring_buffer ));
-               
-        usart1_DmaTx( &source_usart1 , NULL , 0 );
- //       twi0_uname_write( &source_twi0,twi_ring_buffer[0],sizeof( twi_ring_buffer[ 0 ] ) >> 10 );
-=======
         OSTimeDlyHMSM(0, 0, 0, 10);  //change this interval about 10ms to fit fm1388
         UIF_LED_Toggle( LED_D5 );
 #if 0 
@@ -1239,7 +1164,6 @@ static  void  AppTaskLED ( void *p_arg )
         usart1_DmaTx( &source_usart1 , NULL , 0 );
 //        twi0_uname_write( &source_twi0,twi_ring_buffer[0],sizeof( twi_ring_buffer[ 0 ] ) >> 10 );
 //        OSTaskSuspend( OS_PRIO_SELF );
->>>>>>> remotes/origin/0922
     }
 
 }
@@ -1264,7 +1188,7 @@ static  void  AppTaskLED ( void *p_arg )
 static  void  AppTaskCmdParase ( void *p_arg )
 {
     static uint8_t taskMsg;
-//    static uint8_t isUsbConnected = 0;
+    static uint8_t isUsbConnected = 0;
     
     static uint8_t transmitStart = 0;
     
@@ -1299,8 +1223,6 @@ static  void  AppTaskCmdParase ( void *p_arg )
             TC_Start(TC1, 0);
         }
         
-        if( isUsbConnected ) {
-        
         //step1:get cmd from usb cmd endpoint;
         CDCDSerialDriver_Read_CmdEp(  usbCmdCacheBulkOut,
                                 USB_CMDEP_SIZE_64B ,
@@ -1323,8 +1245,8 @@ static  void  AppTaskCmdParase ( void *p_arg )
 #endif       
          //let this task running periodic per second enough;
          OSTimeDlyHMSM( 0, 0, 0, 500 );
-      }
     }
+
 }
 #endif
 
@@ -1351,36 +1273,6 @@ static  void  AppTaskSSC0 ( void *p_arg )
     uint8_t err = 0;
     uint8_t receiveTaskMsg = 0; 
 
-<<<<<<< HEAD
-//    kfifo_init_static(&ssc0_bulkin_fifo,( uint8_t * )ssc0_FIFOBufferBulkIn,sizeof( ssc0_FIFOBufferBulkIn ) );
-    memset( ssc0_I2SBuffersOut, 0, sizeof( ssc0_I2SBuffersOut ) );
-    memset( ssc1_I2SBuffersOut, 0, sizeof( ssc1_I2SBuffersOut ) );  
-    memset( ssc0_I2SBuffersIn, 0 , sizeof( ssc0_I2SBuffersIn ) );
-    memset( ssc1_I2SBuffersIn, 0 , sizeof( ssc1_I2SBuffersIn ) ); 
-
-#if 0    
-    Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut, 
-                      sizeof( ssc0_I2SBuffersOut[ 0 ] ),  
-                      48000 );
-    
-    Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut[1], 
-                      sizeof( ssc0_I2SBuffersOut[ 1 ] ),  
-                      48000 );    
-    
-    Alert_Sound_Gen1( ( uint8_t * )ssc1_I2SBuffersOut, 
-                       sizeof( ssc1_I2SBuffersOut[ 0 ] ),  
-                       48000 );
-    Alert_Sound_Gen1( ( uint8_t * )ssc1_I2SBuffersOut, 
-                       sizeof( ssc1_I2SBuffersOut[ 1 ] ),  
-                       48000 );
-#endif
-    
-#if 0
-    uint32_t i ;
-    uint16_t *pInt = NULL;    
-    pInt = ( uint16_t * )ssc0_I2SBuffersOut[0] ;
-    for( i = 0; i< ( sizeof( ssc1_I2SBuffersOut ) );  ) 
-=======
     
     memset( ssc0_PingPongOut, 0x5555, sizeof( ssc0_PingPongOut ) );
     memset( ssc1_PingPongOut, 0x5555, sizeof( ssc1_PingPongOut ) );  
@@ -1409,7 +1301,6 @@ static  void  AppTaskSSC0 ( void *p_arg )
     uint32_t i ;
     pInt = ( uint16_t * )ssc0_PingPongOut[0] ;
     for( i = 0; i< ( sizeof( ssc1_PingPongOut ) );  ) 
->>>>>>> remotes/origin/0922
     {        
        *(pInt+i++) = 0x1122 ;      
        *(pInt+i++) = 0x3344 ;
@@ -1449,24 +1340,6 @@ static  void  AppTaskSSC0 ( void *p_arg )
                         &&( ( uint8_t )RUNNING != source_ssc0.status[ IN ] ) )
                     {
 //                          OSSchedLock( );
-<<<<<<< HEAD
-                        if( isUsbConnected )
-                        {
-                          source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_I2SBuffersIn,
-                                                   sizeof(ssc0_I2SBuffersIn ) >> 1 ); 
- 
-                          source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_I2SBuffersOut,
-                                                   sizeof(ssc0_I2SBuffersOut ) >> 1 );
-                         
-                          source_ssc0.status = ( uint8_t )START;
-                    
-                          source_ssc1.buffer_write( &source_ssc1,( uint8_t * )ssc1_I2SBuffersOut,
-                                                   sizeof(ssc1_I2SBuffersOut ) >> 1 );
-                          source_ssc1.buffer_read( &source_ssc1,( uint8_t * )ssc1_I2SBuffersIn,
-                                                   sizeof(ssc1_I2SBuffersIn ) >> 1 );                            
-                          source_ssc1.status = ( uint8_t )START;
-                        }
-=======
                           source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_PingPongOut,
                                                    sizeof( ssc0_PingPongOut ) >> 1 );
                           source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_PingPongIn,
@@ -1480,7 +1353,6 @@ static  void  AppTaskSSC0 ( void *p_arg )
                                                    sizeof( ssc1_PingPongIn ) >> 1 );                            
                           source_ssc1.status[ IN ] = ( uint8_t )START;
                           source_ssc1.status[ OUT ] = ( uint8_t )START;  
->>>>>>> remotes/origin/0922
 //                          OSSchedUnlock( );
 //                          OSTaskSuspend( OS_PRIO_SELF );
                     }                 
@@ -1516,25 +1388,8 @@ static  void  AppTaskUSB (void *p_arg)
     memset( ( uint8_t * )tmpInBuffer , 0x32 , sizeof( tmpInBuffer ) ); 
     for(;;) 
     {
-<<<<<<< HEAD
-//            /* Device is not configured */
-//        if (USBD_GetState() < USBD_STATE_CONFIGURED)
-//        {
-//            if (isUsbConnected)
-//            {
-//                isUsbConnected = 0;
-//            }
-//        }
-//        else if (isUsbConnected == 0)
-//        {
-//            isUsbConnected = 1;
-//        }      
-
-#if 0               
-=======
         UIF_LED_Toggle( LED_D4 );
 #if 1               
->>>>>>> remotes/origin/0922
         evFlags = OSFlagQuery( g_pStartUSBTransfer, &err );
 
         //maybe transfer according events,not waiting for all event happend;

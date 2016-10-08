@@ -127,9 +127,6 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
     status = status;    
     assert( NULL != pArg );
     
-<<<<<<< HEAD
-    DataSource *pSource = ( DataSource *)pArg;
-=======
     uint8_t error;
     uint32_t temp = 0;
     
@@ -175,7 +172,6 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
                     OS_FLAG_SET, 
                     &error
                 ); 
->>>>>>> remotes/origin/0922
 }
 
 /*

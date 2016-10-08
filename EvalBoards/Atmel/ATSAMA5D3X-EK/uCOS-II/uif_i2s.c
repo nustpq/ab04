@@ -218,42 +218,12 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
           return;
       }
 #endif
-<<<<<<< HEAD
-      
-#if 0      
-//      if( 1 == mutex )
-//        return;
-      
-      mutex = 1;
-
-     temp = kfifo_get_free_space( &ssc0_bulkin_fifo );
-     if( temp  >=  sizeof( ssc0_I2SBuffersIn[ pSource-> rx_index ] ) )
-     {
-          kfifo_put( &ssc0_bulkin_fifo,
-                      ( uint8_t * )ssc0_I2SBuffersIn[ pSource-> rx_index ],
-                      sizeof( ssc0_I2SBuffersIn[ pSource-> rx_index ] ) );
- 
-          pSource->rx_index = 1 - pSource->rx_index;           
-     }
-     else
-     {
-       printf( "There is No Space in Fifo \t\n");
-       return;
-     }
-//     mutex = 0;
-#endif
-     
-     /*step 1:calculate buffer space */      
-     /*step 2:check buffer space according condition */  
-     if( temp <= pSource->warmWaterLevel )
-=======
       
      /*step 1:calculate buffer space */ 
      temp = kfifo_get_free_space( pSource->pRingBulkIn );
 
      /*step 2:merge buffer according condition */  
      if( temp >= pSource->warmWaterLevel )
->>>>>>> remotes/origin/0922
      {
        ///Todo: 0xf should be instead with mask;
        source_gpio.buffer_read( &source_gpio, 
@@ -288,21 +258,6 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
      }
      /*step3:copy data to buffer*/
 #if 0     
-<<<<<<< HEAD
-     CDCDSerialDriver_Read(     usbBufferBulkOut0,                             \
-                                USBDATAEPSIZE,                                 \
-                                (TransferCallback) UsbAudio0DataReceived,      \
-                                  0);
-
-     
-     CDCDSerialDriver_Write(    usbBufferBulkIn0,                              \
-                                 USBDATAEPSIZE,                                \
-                               (TransferCallback) UsbAudio0DataTransmit,       \
-                               0);
-#endif      
-    /*step 4:change current buffer index */
-//     pSource->rx_index = 1 - pSource->rx_index; 
-=======
      CDCDSerialDriver_Read(     usbCacheBulkOut0,                              \
                                 USB_DATAEP_SIZE_64B,                           \
                                 (TransferCallback) UsbAudio0DataReceived,      \
@@ -312,7 +267,6 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                                (TransferCallback) UsbAudio0DataTransmit,       \
                                0);
 #endif     
->>>>>>> remotes/origin/0922
 
 
    
@@ -437,79 +391,6 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     } 
 #endif
 
-<<<<<<< HEAD
-#if 1   
-     //step 1:get current buffer index 
-    
-     //step 2:copy buffer to ring buffer 
-//     temp = kfifo_get_data_size( pSource->usbBulkOut );
-//
-/**------------------------------Play simulation wave------------------------**/    
-#if 0
-     //update played buffer(the first is buffer0)
-     Alert_Sound_Gen( ( uint8_t * )ssc0_I2SBuffersOut[ pSource->tx_index ], 
-                      sizeof( ssc0_I2SBuffersOut[ pSource->tx_index ] ),  
-                      48000 );
-       //install the buffer will be played(the buffer1)
-     pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];
-     pSource->tx_index = 1 - pSource->tx_index; 
-#endif
-/**--------------------------------------------------------------------------**/     
-     
-/**------------------------------Play wave from J25--------------------------**/     
-#if 0
-//     if( 1 == mutex )
-//       return;
-    
-//     mutex = 1;
-     
-     pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];    
-     temp = kfifo_get_data_size( &ssc0_bulkin_fifo );
-     if( temp  >=  sizeof( ssc0_I2SBuffersOut[ pSource-> tx_index ] ) * 4 )
-     {
-          kfifo_get( &ssc0_bulkin_fifo,
-                      ( uint8_t * )ssc0_I2SBuffersOut[ pSource-> tx_index ],
-                      sizeof( ssc0_I2SBuffersOut[ pSource-> tx_index ] ) );
- //         memset( ssc0_I2SBuffersOut[ pSource-> tx_index ], 0 , sizeof( ssc0_I2SBuffersOut[ pSource-> tx_index ] ) );
-          pSource->tx_index = 1 - pSource->tx_index;        
-     }
-     else
-     {
-        printf( "There is No Data in Fifo,data size = %d \r\n",temp);
-        return;
-     }
-//     mutex = 0;
-#endif
-/**--------------------------------------------------------------------------**/
-     
-     if( pSource->warmWaterLevel <= temp ) 
-     {
-              //update buffer point;
-//       pSource->i2sBufferOut = ( uint8_t * )&ssc0_I2SBuffersOut[ 1 - pSource->tx_index ];
-              
-              //get data from buffer;
-//       
-//              kfifo_get( pSource->usbBulkOut, 
-//                         pSource->i2sBufferOut,
-//                        ( uint8_t * )&ssc0_I2SBuffersOut[ pSource->tx_index ],
-//                         pSource->warmWaterLevel 
-//                           192
-//                           );
-//       
-              //update state machine of this port;
-#if 0
-                      CDCDSerialDriver_Read(  usbBufferBulkOut0,               \
-                                USBCMDDATAEPSIZE ,                             \
-                                (TransferCallback)UsbAudio0DataReceived,       \
-                                0);
-#endif                       
-                      CDCDSerialDriver_Write(  usbBufferBulkIn0,                \
-                                 USBDATAEPSIZE,                                 \
-                                 (TransferCallback) UsbAudio0DataTransmit,      \
-                                 0);
-                     
-              pSource->status = ( uint8_t )RUNNING;
-=======
             
      pSource->pBufferOut = ( uint16_t * )ssc0_PingPongOut[ 1 - pSource->tx_index ];
 #if 1
@@ -522,7 +403,6 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
           pSource->tx_index = 1 - pSource->tx_index;
           //update state machine of this port;                    
           pSource->status[ OUT ] = ( uint8_t )RUNNING;
->>>>>>> remotes/origin/0922
      }
      else
      {
@@ -598,57 +478,21 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
           return;
     } 
 #endif
-    
-//     pSource->i2sBufferOut = ( uint8_t * )&ssc1_I2SBuffersOut[ 1 - pSource->tx_index ];    
-//     temp = kfifo_get_data_size( &ssc0_bulkin_fifo );
-//     if( temp  >=  sizeof( ssc0_I2SBuffersOut[ pSource-> tx_index ] ) )
-//     {
-//          kfifo_get( &ssc0_bulkin_fifo,
-//                      ( uint8_t * )ssc1_I2SBuffersOut[ pSource-> tx_index ],
-//                      sizeof( ssc1_I2SBuffersOut[ pSource-> tx_index ] ) );
-//          pSource->tx_index = 1 - pSource->tx_index;        
-//     }
-//     else
-//     {
-//        printf( "There is No Data in Fifo,data size = %d \r\n",temp);
-//        return;
-//     }
 
 #if 0   
      //step 1:get current buffer index 
     
      //step 2:copy buffer to ring buffer 
-<<<<<<< HEAD
-     temp = kfifo_get_data_size( pSource->usbBulkOut );
-     Alert_Sound_Gen1( ( uint8_t * )ssc1_I2SBuffersOut[ pSource->tx_index ], 
-                         sizeof( ssc1_I2SBuffersOut[ pSource->tx_index ] ),  
-                         48000 );
-       //install the buffer will be played(the buffer1)
-//     pSource->i2sBufferOut = ( uint8_t * )&ssc1_I2SBuffersOut[ 1 - pSource->tx_index ];
-//     
-=======
      temp = kfifo_get_data_size( pSource->pRingBulkOut );
      Alert_Sound_Gen1( ( uint8_t * )ssc1_PingPongOut[ pSource->tx_index ], 
                          sizeof( ssc1_PingPongOut[ pSource->tx_index ] ),  
                          8000 );
     
->>>>>>> remotes/origin/0922
      if( pSource->warmWaterLevel <= temp ) 
      {
           //update buffer point;
           pSource->pBufferOut = ( uint16_t * )&ssc1_PingPongOut[ pSource->tx_index ];
              
-<<<<<<< HEAD
-              //get data from buffer;
-              kfifo_get( pSource->usbBulkOut, 
-                         pSource->i2sBufferOut,
-                         pSource->warmWaterLevel 
-                           ); 
-              //update state machine of this port;
-#if 0
-                      CDCDSerialDriver_Read(  usbBufferBulkOut0,               \
-                                USBCMDDATAEPSIZE ,                             \
-=======
           //get data from buffer;
           kfifo_get( pSource->pRingBulkOut, 
                      ( uint8_t * )pSource->pBufferOut,
@@ -657,7 +501,6 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 
                       CDCDSerialDriver_Read(  usbCacheBulkOut0,                \
                                 USB_CMDEP_SIZE_64B ,                           \
->>>>>>> remotes/origin/0922
                                 (TransferCallback)UsbAudio1DataReceived,       \
                                 0);
                       
@@ -1372,7 +1215,7 @@ static void _SSC_Init( uint32_t id,
                     mclk 
                  );    
       
-    tcmr.cks    = 2 ;   // 0:MCK 1:RK 2:TK  2
+    tcmr.cks    = 2 ;   // 0:MCK 1:RK 2:TK
     rcmr.cks    = 1 ;   // 0:MCK 1:TK 2:RK  0-->1
     
     tcmr.cko    = 0 ;   // 0:input only 1:continus 2:only transfer
@@ -1388,7 +1231,7 @@ static void _SSC_Init( uint32_t id,
     rcmr.sttdly = 1;   
 	
     tcmr.period = 0;   // period ;  slave not use 0-->15
-    rcmr.period = 0;   // period ;  slave not use 0-->15
+    rcmr.period = 0;   // period ;  slave not use
     
     tcmr.ckg    = 0 ;   //slave not use
     rcmr.ckg    = 0 ;   //slave not use

@@ -50,18 +50,6 @@
 #define  ERR_TDM_FORMAT                 253u
 
 
-<<<<<<< HEAD
-#define I2S_IN_BUFFER_SIZE              ( 192 * 16 )            //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
-#define I2S_OUT_BUFFER_SIZE             ( 192 * 16 )            // 
-#define USBDATAEPSIZE                   64                      // force use 64Bytes
-//#define PINGPONG_SIZE                   USBDATAEPSIZE
-#define PINGPONG_SIZE                   ( 192 * 16 )
-#define USBCMDDATAEPSIZE                USBDATAEPSIZE
-#define USB_OUT_BUFFER_SIZE             16384           //USB audio data, size MUST be 2^n .2^14=16384
-#define USB_IN_BUFFER_SIZE              (8192 * 8 )          //USB audio data, size MUST be 2^n .2^14=16384
-#define USB_CMD_OUT_BUFFER_SIZE         1024            //USB cmd data, size MUST be 2^n .
-#define USB_CMD_IN_BUFFER_SIZE          1024            //USB cmd data, size MUST be 2^n .
-=======
 #define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*2*4 )               //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
 #define I2S_PINGPONG_OUT_SIZE_3K           I2S_PINGPONG_IN_SIZE_3K    // 
 #define USB_DATAEP_SIZE_64B                   (    64    )            // force use 64Bytes
@@ -72,7 +60,6 @@
 #define SPI_RINGIN_SIZE_16K                ( 245760UL )               //3072B/s * 10 = 30720B
 #define USB_CMD_RINGOUT_SIZE_1K            ( 1024  )                  //USB cmd data, size MUST be 2^n .
 #define USB_CMD_RINGIN_SIZE_1k             ( 1024  )                  //USB cmd data, size MUST be 2^n .
->>>>>>> remotes/origin/0922
 
 #define PLAY_BUF_DLY_CNT                  5
 

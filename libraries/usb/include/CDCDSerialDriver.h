@@ -152,17 +152,10 @@ typedef struct _CDCDSerialDriverConfigurationDescriptors {
     USBEndpointDescriptor cmdOut;
     /** Cmd IN endpoint descriptor. */
     USBEndpointDescriptor cmdIn;
-<<<<<<< HEAD
-    /** Data OUT endpoint descriptor. */   //add AB04 second  pair endpoint
-    USBEndpointDescriptor data1Out;
-    /** Data IN endpoint descriptor. */
-    USBEndpointDescriptor data1In;    
-=======
     /** Data OUT endpoint descriptor. */
     USBEndpointDescriptor dataOut1;
     /** Data IN endpoint descriptor. */
     USBEndpointDescriptor dataIn1;    
->>>>>>> remotes/origin/0922
     
 
 } __attribute__ ((__packed__)) CDCDSerialDriverConfigurationDescriptors;
