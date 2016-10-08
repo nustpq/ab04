@@ -67,13 +67,12 @@ extern void BSP_LED_Off( uint32_t );
 #ifdef USE_DMA
 void ISR_HDMA( void )
 {  
-     OS_CPU_SR cpu_sr;
-     
-//    BSP_LED_On( 3 );
+    OS_CPU_SR cpu_sr;
+
     OS_ENTER_CRITICAL();
     DMAD_Handler(&g_dmad);
     OS_EXIT_CRITICAL();
-//    BSP_LED_Off( 3 );
+
 }
 #endif
 
@@ -114,18 +113,31 @@ Ssc * _get_ssc_instance( uint32_t id )
 * Note(s)     : none.
 *********************************************************************************************************
 */
+extern void kfifo_reset( kfifo_t *fifo );
 void stop_ssc( void *pInstance )
 {
     pInstance = pInstance;
     DataSource *pSource = ( DataSource *)pInstance;
     
     Ssc *pSSC = ( Ssc * )pSource->dev.instanceHandle;
-    
+ 
+    //step1: stop ssc port
     SSC_DisableTransmitter( pSSC );
     SSC_DisableReceiver( pSSC );
     
+    //step2: stop dma channel
     DMAD_StopTransfer(&g_dmad, pSource->dev.rxDMAChannel);
     DMAD_StopTransfer(&g_dmad, pSource->dev.txDMAChannel);
+    
+    //step3:clear buffer about this port
+    memset( pSource->pBufferIn, 0 , sizeof( uint16_t ) * I2S_PINGPONG_IN_SIZE_3K );
+    memset( pSource->pBufferOut, 0 , sizeof( uint16_t ) * I2S_PINGPONG_OUT_SIZE_3K );
+    kfifo_reset( pSource->pRingBulkIn );
+    kfifo_reset( pSource->pRingBulkOut );
+    
+    //step4:reset port state machine
+    pSource->status[ IN ] = ( uint8_t )STOP;
+    pSource->status[ OUT ] = ( uint8_t )STOP;
 }
 
 
@@ -396,22 +408,26 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
      {
             //if this port was started,but no enough data in buffer,
             //flag this port in buffering state;
-            if( ( uint8_t )START == pSource->status[ OUT ] )
+            if( ( uint8_t )START == pSource->status[ OUT ] 
+                    || ( uint8_t )BUFFERED == pSource->status[ OUT ] )               
             {
                     pSource->status[ OUT ] = ( uint8_t )BUFFERED;
-                    //error proccess;
+                    //Todo : error proccess--here do nothing 
+                     printf( "SSC0-Tx:Data buffering,data size = (%d) \r\n",temp);
                     return;
             }
-            else if( ( uint8_t )BUFFERED == pSource->status[ OUT ] 
-                    || ( uint8_t )RUNNING == pSource->status[ OUT ] )
-            {
-                    
+            else if( ( uint8_t )RUNNING == pSource->status[ OUT ] )
+            {                    
                     printf( "SSC0-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
+                    ///Todo: error proccess
+                    // filled invalid data to ringbuffer and send it to pc that is a tip;
                     return;
             }
             else
-            {
+            {       //
                     printf( "SSC0-Tx:Port not ready!\n");
+                    //port machine state is wrong, firmware has bug;
+                    assert( 0 );
                     return;
             }
      }
@@ -537,22 +553,25 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
      }
      else
      {
-            if( ( uint8_t )START == pSource->status[ OUT ] )
+            //if this port was started,but no enough data in buffer,
+            //flag this port in buffering state;
+            if( ( uint8_t )START == pSource->status[ OUT ] 
+                    || ( uint8_t )BUFFERED == pSource->status[ OUT ] )               
             {
                     pSource->status[ OUT ] = ( uint8_t )BUFFERED;
                     //error proccess;
+                     printf( "SSC1-Tx:Data buffering,data size = (%d) \r\n",temp);
                     return;
             }
-            else if( ( uint8_t )BUFFERED == pSource->status[ OUT ] 
-                    || ( uint8_t )RUNNING == pSource->status[ OUT ] )              
-            {
-                    
-//                    printf( "SSC1-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
+            else if( ( uint8_t )RUNNING == pSource->status[ OUT ] )
+            {                    
+                    printf( "SSC1-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
                     return;
             }
             else
             {
-                    printf( "SSC1-Tx:Port not ready!\r\n");
+                    printf( "SSC1-Tx:Port not ready!\n");
+                    assert( 0 );
                     return;
             }
 
