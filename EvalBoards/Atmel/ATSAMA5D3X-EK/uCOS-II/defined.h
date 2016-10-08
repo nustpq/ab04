@@ -50,16 +50,16 @@
 #define  ERR_TDM_FORMAT                 253u
 
 
-#define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*2*4 )            //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
+#define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*2*4 )               //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
 #define I2S_PINGPONG_OUT_SIZE_3K           I2S_PINGPONG_IN_SIZE_3K    // 
 #define USB_DATAEP_SIZE_64B                   (    64    )            // force use 64Bytes
 #define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
-#define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )               //USB audio data, size MUST be 2^n .2^14=16384
-#define USB_RINGIN_SIZE_16K                ( 16384 * 8 )               //USB audio data, size MUST be 2^n .2^14=16384
+#define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
+#define USB_RINGIN_SIZE_16K                ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
 #define SPI_RINGOUT_SIZE_16K               ( 245760UL )               //3072B/s * 10 = 30720B
 #define SPI_RINGIN_SIZE_16K                ( 245760UL )               //3072B/s * 10 = 30720B
-#define USB_CMD_RINGOUT_SIZE_1K            ( 1024  )               //USB cmd data, size MUST be 2^n .
-#define USB_CMD_RINGIN_SIZE_1k             ( 1024  )               //USB cmd data, size MUST be 2^n .
+#define USB_CMD_RINGOUT_SIZE_1K            ( 1024  )                  //USB cmd data, size MUST be 2^n .
+#define USB_CMD_RINGIN_SIZE_1k             ( 1024  )                  //USB cmd data, size MUST be 2^n .
 
 #define PLAY_BUF_DLY_CNT                  5
 
@@ -267,13 +267,28 @@ typedef struct {
     uint8_t    done;
 }VOICE_BUF ;
 
-typedef struct _spi_cfg{
+typedef struct _spi_parameter
+{
     uint32_t   spi_speed;
     uint8_t    spi_mode;  
     uint8_t    gpio_irq;
     uint8_t    slave;
     uint8_t    chip_id;
-}VOICE_BUF_CFG;
+}SPI_CFG;
+
+typedef struct _usart_parameter
+{
+  uint32_t mode;
+  uint32_t baudrate;
+}USART_CFG;
+
+typedef struct twi_parameter
+{
+  uint32_t address;
+  uint32_t iaddress;
+  uint8_t  isize;
+  uint8_t  revers;
+}TWI_CFG;
 
 typedef struct { 
     uint8_t     channels ; //mic num 1~6 
