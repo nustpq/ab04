@@ -23,15 +23,18 @@
 * Filename      : codec.c
 * Version       : V2.0.0
 * Programmer(s) : PQ
+* Porting       : Leo
 *********************************************************************************************************
 * Note(s)       :
 *********************************************************************************************************
 */
+
 #include <ucos_ii.h>
 #include "bsp.h"
 
 #include "codec.h"
 #include "noah_cmd.h"
+
 #include "uif_twi.h"
 #include "uif_object.h"
 
@@ -60,7 +63,7 @@ void enable_PA( bool en )
 
 uint8_t Codec_Read(const DataSource *pSource,uint8_t dev_addr,uint8_t reg,uint8_t *pVal)
 {
-    OPTIONPARAMETER *twi_option = ( OPTIONPARAMETER * )pSource->privateData;
+    TWI_CFG *twi_option = ( TWI_CFG * )pSource->privateData;
     
     uint8_t state = 0;
     
@@ -79,7 +82,7 @@ uint8_t Codec_Write(const DataSource *pSource,uint8_t dev_addr,uint8_t reg,uint8
     uint8_t buf[] = {  data };     
     uint8_t state;
     
-    OPTIONPARAMETER *twi_option = ( OPTIONPARAMETER * )pSource->privateData;
+    TWI_CFG *twi_option = ( TWI_CFG * )pSource->privateData;
     
     twi_option->address = dev_addr >> 1 ;
     twi_option->iaddress = reg;
@@ -121,7 +124,7 @@ uint8_t Codec_Mixer(const DataSource *pSource,uint8_t i2c_channel )
      
      state = 0xe0 ; 
      
-     OPTIONPARAMETER *twi_option = ( OPTIONPARAMETER * )pSource->privateData;
+     TWI_CFG *twi_option = ( TWI_CFG * )pSource->privateData;
      
      twi_option->address = PCA9548A_ADDRESS >> 1 ;
      twi_option->iaddress = 0;
@@ -482,7 +485,6 @@ uint8_t CODEC_LOUT_Small_Gain_En( bool small_gain )
      return CODEC_FUNC_NOT_SUPPORT;
     
 }
-
 
 uint8_t encode( int8_t value )
 {
