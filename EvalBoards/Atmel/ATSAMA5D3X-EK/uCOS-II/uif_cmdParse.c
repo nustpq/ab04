@@ -17,7 +17,6 @@
 #include "uif_usb.h"
 
 #include "defined.h"
-//#include "debuginfo.h"
 #include "uif_cmdParse.h"
 #include "uif_i2s.h"
 
@@ -31,7 +30,7 @@
 *                                               on the
 *                                      Unified EVM Interface Board
 *
-* Filename      : cmdparse.c
+* Filename      : uif_cmdparse.c
 * Version       : V0.0.1
 * Programmer(s) : Leo
 *********************************************************************************************************
