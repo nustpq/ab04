@@ -107,7 +107,21 @@ void Disable_GPIO_Interrupt( void *pInstance )
         
 }
 
-
+/*
+*********************************************************************************************************
+*                                    _ConfigureRecGpios()
+*
+* Description :  configure  special pin 
+*
+* Argument(s) :  none 
+*		 
+*                
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
 static void _ConfigureRecGpios( void )
 {
     uint8_t const GPIO_PRIORITY = 3;
@@ -255,14 +269,7 @@ uint8_t  gpio_Pin_Get( void *pInstance, const uint8_t * pdata,uint32_t mask )
     DataSource *pSource = ( DataSource * )pInstance;
     Pin *pPins = ( Pin * )pSource->privateData;
     GPIO_REC_CFG *gpio_cfg = ( GPIO_REC_CFG * )pSource->peripheralParameter;
-    ///todo: this struct should be initialzed after receieved command from usb;
-    // here,just for test Cpu performence;
-    gpio_cfg->mask = mask;
-    gpio_cfg->sampleCnt = 4;
-    gpio_cfg->gpioscnt = 8;
-    gpio_cfg->tdmChannelCnt = 4;
-    gpio_cfg->index = 0;
-    
+        
     temp = pPins->pio->PIO_PDSR;
     
     for( i = 0, n = 0 ; i < pinCnt ; i++ ) 
