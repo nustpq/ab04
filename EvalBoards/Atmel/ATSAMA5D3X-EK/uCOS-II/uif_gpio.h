@@ -6,10 +6,13 @@
 //gpio rec configure
 typedef struct _gpio_rec_parameter
 {
-  uint8_t mask;                     //bitmap for gpio which used for rec
-  uint8_t cnt;                      //count pins in using
-  uint8_t index;                    //start index
-  uint8_t data_mask;                //bitmap for gpio level which used
+  uint8_t mask;             //bitmap for gpio which used for rec-->global_rec_gpio_mask
+  uint8_t gpioscnt;         //count pins in using-->global_rec_gpio_num
+  uint8_t index;            //start index-->global_rec_gpio_index
+  uint8_t data_mask;        //bitmap for gpio level which used
+  
+  uint8_t tdmChannelCnt;    //how much channels for tdm --->global_rec_num
+  uint8_t sampleCnt;        //samples per package of one interruption-->global_rec_samples 
 }GPIO_REC_CFG;
 
 

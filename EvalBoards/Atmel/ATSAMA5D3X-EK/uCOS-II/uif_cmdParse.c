@@ -17,7 +17,6 @@
 #include "uif_usb.h"
 
 #include "defined.h"
-//#include "debuginfo.h"
 #include "uif_cmdParse.h"
 #include "uif_i2s.h"
 
@@ -31,7 +30,7 @@
 *                                               on the
 *                                      Unified EVM Interface Board
 *
-* Filename      : cmdparse.c
+* Filename      : uif_cmdparse.c
 * Version       : V0.0.1
 * Programmer(s) : Leo
 *********************************************************************************************************
@@ -356,7 +355,7 @@ void Audio_State_Control( uint8_t *msg )
                 { //32
                     temp = Audio_Configure_Instance1[ PLAY ].sr / 1000 *  Audio_Configure_Instance1[ PLAY ].channels * 2 * 4;        
                 }            
-                if( ( temp * PLAY_BUF_DLY_CNT ) > USB_OUT_BUFFER_SIZE ) 
+                if( ( temp * PLAY_BUF_DLY_CNT ) > USB_RINGOUT_SIZE_16K ) 
                 { //play pre-buffer must not exceed whole play buffer
                     err = ERR_AUD_CFG;
                 }              

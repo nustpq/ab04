@@ -39,13 +39,7 @@ typedef enum _twi_port
     MAXTWI
 }TWIPORT;
 
-typedef struct twi_option
-{
-  uint32_t address;
-  uint32_t iaddress;
-  uint8_t  isize;
-  uint8_t  revers;
-}OPTIONPARAMETER;
+
 
 
 

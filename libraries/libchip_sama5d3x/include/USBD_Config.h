@@ -133,13 +133,22 @@
 /// Cmd Data IN endpoint number.
 #define CDCDSerialDriverDescriptors_CMDDATAIN           4
 
+/// Audio Data OUT endpoint number.
+#define CDCDSerialDriverDescriptors_AUDIODATAOUT1        5
+/// Audio Data IN endpoint number.
+#define CDCDSerialDriverDescriptors_AUDIODATAIN1         6
+
 /// Notification endpoint number.
+<<<<<<< HEAD
 #define CDCDSerialDriverDescriptors_NOTIFICATION        5
    
 /// Audio Data OUT endpoint number.
 #define CDCDSerialDriverDescriptors_AUDIODATAOUT1       6
 /// Audio Data IN endpoint number.
 #define CDCDSerialDriverDescriptors_AUDIODATAIN1        7   
+=======
+#define CDCDSerialDriverDescriptors_NOTIFICATION        7
+>>>>>>> remotes/origin/0922
 
 #endif
 

@@ -29,7 +29,7 @@ extern DataSource source_ssc1;
 
 extern OS_FLAG_GRP *g_pStartUSBTransfer; 
 
-static uint8_t mutex = 0;
+//static uint8_t mutex = 0;
 
 /* Tx descriptors */
 sDmaTransferDescriptor dmaTdSSC0Rx[2];
@@ -38,7 +38,7 @@ sDmaTransferDescriptor dmaTdSSC0Tx[2];
 sDmaTransferDescriptor dmaTdSSC1Rx[2];
 sDmaTransferDescriptor dmaTdSSC1Tx[2];
 
-#ifndef USE_BACKUP_DEBUG_INFO
+#ifdef USE_BACKUP_DEBUG_INFO
 static const char* DMA_INFO[ DMAD_CANCELED + 1 ] = { "DMAD_OK",
 						     "DMAD_BUSY",
 						     "DMAD_PARTITAL_DONE",
@@ -67,13 +67,12 @@ extern void BSP_LED_Off( uint32_t );
 #ifdef USE_DMA
 void ISR_HDMA( void )
 {  
-     OS_CPU_SR cpu_sr;
-     
-//    BSP_LED_On( 3 );
+    OS_CPU_SR cpu_sr;
+
     OS_ENTER_CRITICAL();
     DMAD_Handler(&g_dmad);
     OS_EXIT_CRITICAL();
-//    BSP_LED_Off( 3 );
+
 }
 #endif
 
@@ -114,18 +113,31 @@ Ssc * _get_ssc_instance( uint32_t id )
 * Note(s)     : none.
 *********************************************************************************************************
 */
+extern void kfifo_reset( kfifo_t *fifo );
 void stop_ssc( void *pInstance )
 {
     pInstance = pInstance;
     DataSource *pSource = ( DataSource *)pInstance;
     
     Ssc *pSSC = ( Ssc * )pSource->dev.instanceHandle;
-    
+ 
+    //step1: stop ssc port
     SSC_DisableTransmitter( pSSC );
     SSC_DisableReceiver( pSSC );
     
+    //step2: stop dma channel
     DMAD_StopTransfer(&g_dmad, pSource->dev.rxDMAChannel);
     DMAD_StopTransfer(&g_dmad, pSource->dev.txDMAChannel);
+    
+    //step3:clear buffer about this port
+    memset( pSource->pBufferIn, 0 , sizeof( uint16_t ) * I2S_PINGPONG_IN_SIZE_3K );
+    memset( pSource->pBufferOut, 0 , sizeof( uint16_t ) * I2S_PINGPONG_OUT_SIZE_3K );
+    kfifo_reset( pSource->pRingBulkIn );
+    kfifo_reset( pSource->pRingBulkOut );
+    
+    //step4:reset port state machine
+    pSource->status[ IN ] = ( uint8_t )STOP;
+    pSource->status[ OUT ] = ( uint8_t )STOP;
 }
 
 
@@ -206,6 +218,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
           return;
       }
 #endif
+<<<<<<< HEAD
       
 #if 0      
 //      if( 1 == mutex )
@@ -233,15 +246,49 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
      /*step 1:calculate buffer space */      
      /*step 2:check buffer space according condition */  
      if( temp <= pSource->warmWaterLevel )
+=======
+      
+     /*step 1:calculate buffer space */ 
+     temp = kfifo_get_free_space( pSource->pRingBulkIn );
+
+     /*step 2:merge buffer according condition */  
+     if( temp >= pSource->warmWaterLevel )
+>>>>>>> remotes/origin/0922
      {
-       //if there has no enough space for data,error
+       ///Todo: 0xf should be instead with mask;
+       source_gpio.buffer_read( &source_gpio, 
+                                ( uint8_t * )&source_gpio.pBufferIn[ pSource-> rx_index ], 
+                                 10 );            
+
+       kfifo_put( pSource->pRingBulkIn,
+                  ( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
+                  pSource->rxSize );
+       
+       kfifo_put( pSource->pRingBulkIn,
+                  ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
+                  source_gpio.rxSize );
+ 
+       pSource->rx_index = 1 - pSource->rx_index;
+       
+       //update state machine of this port;                    
+       pSource->status[ IN ] = ( uint8_t )RUNNING;
      }
      else
      {
-       
+            if( ( uint8_t )START <= pSource->status[ IN ] )
+            {
+                pSource->status[ IN ] = ( uint8_t )BUFFERED;
+                    //error proccess;
+            }
+            else
+            {
+               printf( "SSC0-Rx:There is No Space in Fifo,space size = (%d) \r\n",temp);
+               return;
+            }
      }
      /*step3:copy data to buffer*/
 #if 0     
+<<<<<<< HEAD
      CDCDSerialDriver_Read(     usbBufferBulkOut0,                             \
                                 USBDATAEPSIZE,                                 \
                                 (TransferCallback) UsbAudio0DataReceived,      \
@@ -255,8 +302,20 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 #endif      
     /*step 4:change current buffer index */
 //     pSource->rx_index = 1 - pSource->rx_index; 
+=======
+     CDCDSerialDriver_Read(     usbCacheBulkOut0,                              \
+                                USB_DATAEP_SIZE_64B,                           \
+                                (TransferCallback) UsbAudio0DataReceived,      \
+                                  0);
+     CDCDSerialDriver_Write(    usbCacheBulkIn0,                               \
+                                 USB_DATAEP_SIZE_64B,                          \
+                               (TransferCallback) UsbAudio0DataTransmit,       \
+                               0);
+#endif     
+>>>>>>> remotes/origin/0922
 
-#if 1     
+
+   
     /*step 5:send semphone */ 
                    OSFlagPost( 
                     g_pStartUSBTransfer,
@@ -264,7 +323,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                     OS_FLAG_SET, 
                     &error
                 );   
-#endif  
+ 
    
 }
 
@@ -286,6 +345,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 {    
     assert( NULL != pArg );
     INT8U error;
+    uint32_t temp = 0;
       
     DataSource *pSource = ( DataSource *)pArg;
 
@@ -296,14 +356,35 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
           return;
       }
 #endif
-        
-    /*step 1:get current buffer index */ 
       
-    /*step 2:copy buffer */ 
-      
-    /*step 3:change current buffer index */
-    pSource->rx_index = 1 - pSource->rx_index;  
-      
+     /*step 1:calculate buffer space */ 
+     temp = kfifo_get_free_space( pSource->pRingBulkIn );
+
+     /*step 2:merge buffer according condition */  
+     if( temp >= pSource->warmWaterLevel )
+     {         
+       kfifo_put( pSource->pRingBulkIn,
+                  ( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
+                  pSource->rxSize );
+ 
+       pSource->rx_index = 1 - pSource->rx_index; 
+                   
+       pSource->status[ IN ] = ( uint8_t )RUNNING;
+     }
+     else
+     {
+            if( ( uint8_t )START <= pSource->status[ IN ] )
+            {
+                pSource->status[ IN ] = ( uint8_t )BUFFERED;
+                    //error proccess;
+            }
+            else
+            {
+               printf( "SSC1-Rx:There is No Space in Fifo,space size = (%d) \r\n",temp);
+               return;
+            }
+     }      
+     
     /*step 4:send semphone */
                 OSFlagPost( 
                     g_pStartUSBTransfer,
@@ -311,7 +392,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
                     OS_FLAG_SET, 
                     &error
                 );
-  
+   
    
 }
 #endif
@@ -336,13 +417,10 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 extern OS_FLAG_GRP *g_pStartUSBTransfer;
 #endif
 
-extern uint16_t TxBuffers[2][PINGPONG_SIZE];
-extern uint16_t TxBuffers1[2][PINGPONG_SIZE];
-
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
     static uint8_t error;
-    uint16_t temp = 0;
+    uint32_t temp = 0;
 
      
     assert( NULL != pArg );
@@ -359,6 +437,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     } 
 #endif
 
+<<<<<<< HEAD
 #if 1   
      //step 1:get current buffer index 
     
@@ -430,35 +509,61 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
                                  0);
                      
               pSource->status = ( uint8_t )RUNNING;
+=======
+            
+     pSource->pBufferOut = ( uint16_t * )ssc0_PingPongOut[ 1 - pSource->tx_index ];
+#if 1
+     temp = kfifo_get_data_size( pSource->pRingBulkOut );
+     if( temp  >=  pSource->txSize ) 
+     {
+          kfifo_get( pSource->pRingBulkOut,
+                      ( uint8_t * )pSource->pBufferOut[ pSource-> tx_index ],
+                      pSource->txSize );
+          pSource->tx_index = 1 - pSource->tx_index;
+          //update state machine of this port;                    
+          pSource->status[ OUT ] = ( uint8_t )RUNNING;
+>>>>>>> remotes/origin/0922
      }
      else
      {
             //if this port was started,but no enough data in buffer,
             //flag this port in buffering state;
-            if( ( uint8_t )START <= pSource->status )
+            if( ( uint8_t )START == pSource->status[ OUT ] 
+                    || ( uint8_t )BUFFERED == pSource->status[ OUT ] )               
             {
-                    pSource->status = ( uint8_t )BUFFERED;
-                    //error proccess;
+                    pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+                    //Todo : error proccess--here do nothing 
+                     printf( "SSC0-Tx:Data buffering,data size = (%d) \r\n",temp);
+                    return;
+            }
+            else if( ( uint8_t )RUNNING == pSource->status[ OUT ] )
+            {                    
+                    printf( "SSC0-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
+                    ///Todo: error proccess
+                    // filled invalid data to ringbuffer and send it to pc that is a tip;
+                    return;
+            }
+            else
+            {       //
+                    printf( "SSC0-Tx:Port not ready!\n");
+                    //port machine state is wrong, firmware has bug;
+                    assert( 0 );
+                    return;
             }
      }
-     //
 #endif
-         
-     //step 3:change current buffer index 
-//     pSource->tx_index = 1 - pSource->tx_index;
-      
-     //step 4:send semphone  
-#if 1     
+
+     
+//step 4:send semphone     
 #ifndef USE_EVENTGROUP
      OSFlagPost(    //send group event
                     g_pStartUSBTransfer,
                     (OS_FLAGS)(SSC0_OUT), //
-                    OS_FLAG_SET, //
+                    OS_FLAG_SET,          //
                     &error
                 );
 #endif
      
-#endif
 }
 
 /*
@@ -478,7 +583,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 {
       static uint8_t error;
-      uint16_t temp = 0;
+      uint32_t temp = 0;
 
    
     assert( NULL != pArg );
@@ -509,10 +614,11 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 //        return;
 //     }
 
-#if 1   
+#if 0   
      //step 1:get current buffer index 
     
      //step 2:copy buffer to ring buffer 
+<<<<<<< HEAD
      temp = kfifo_get_data_size( pSource->usbBulkOut );
      Alert_Sound_Gen1( ( uint8_t * )ssc1_I2SBuffersOut[ pSource->tx_index ], 
                          sizeof( ssc1_I2SBuffersOut[ pSource->tx_index ] ),  
@@ -520,11 +626,19 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
        //install the buffer will be played(the buffer1)
 //     pSource->i2sBufferOut = ( uint8_t * )&ssc1_I2SBuffersOut[ 1 - pSource->tx_index ];
 //     
+=======
+     temp = kfifo_get_data_size( pSource->pRingBulkOut );
+     Alert_Sound_Gen1( ( uint8_t * )ssc1_PingPongOut[ pSource->tx_index ], 
+                         sizeof( ssc1_PingPongOut[ pSource->tx_index ] ),  
+                         8000 );
+    
+>>>>>>> remotes/origin/0922
      if( pSource->warmWaterLevel <= temp ) 
      {
-              //update buffer point;
-       pSource->i2sBufferOut = ( uint8_t * )&ssc1_I2SBuffersOut[ pSource->tx_index ];
+          //update buffer point;
+          pSource->pBufferOut = ( uint16_t * )&ssc1_PingPongOut[ pSource->tx_index ];
              
+<<<<<<< HEAD
               //get data from buffer;
               kfifo_get( pSource->usbBulkOut, 
                          pSource->i2sBufferOut,
@@ -534,39 +648,99 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 #if 0
                       CDCDSerialDriver_Read(  usbBufferBulkOut0,               \
                                 USBCMDDATAEPSIZE ,                             \
+=======
+          //get data from buffer;
+          kfifo_get( pSource->pRingBulkOut, 
+                     ( uint8_t * )pSource->pBufferOut,
+                      pSource->warmWaterLevel 
+                      ); 
+
+                      CDCDSerialDriver_Read(  usbCacheBulkOut0,                \
+                                USB_CMDEP_SIZE_64B ,                           \
+>>>>>>> remotes/origin/0922
                                 (TransferCallback)UsbAudio1DataReceived,       \
                                 0);
                       
-                      CDCDSerialDriver_Write(  usbBufferBulkIn1,                \
-                                 USBDATAEPSIZE,                                 \
-                                 (TransferCallback) UsbAudio1DataTransmit,      \
+                      CDCDSerialDriver_Write(  usbCacheBulkIn1,                \
+                                 USB_DATAEP_SIZE_64B,                          \
+                                 (TransferCallback) UsbAudio1DataTransmit,     \
                                  0);
-#endif                      
-              pSource->status = ( uint8_t )RUNNING;
+                    
+              pSource->status[ OUT ] = ( uint8_t )RUNNING;
+     }
+     else
+     {
+            if( ( uint8_t )START == pSource->status[ OUT ] )
+            {
+                    pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+                    //error proccess;
+                    return;
+            }
+            else if( ( uint8_t )BUFFERED == pSource->status[ OUT ] 
+                    || ( uint8_t )RUNNING == pSource->status[ OUT ] )
+            {
+                    
+//                    printf( "SSC1-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
+                    return;
+            }
+            else
+            {
+                    printf( "SSC1-Tx:Port not ready!\r\n");
+                    return;
+            }
+     }
+//      
+#endif
+/*----------------------------------------------------------------------------*/
+#if 1     
+     //step1: switch Ping-Pong buffer to empty part;
+     pSource->pBufferOut = ( uint16_t * )ssc1_PingPongOut[ 1 - pSource->tx_index ];  
+     //step2: calculate data size of ringbuffer;
+     temp = kfifo_get_data_size( pSource->pRingBulkOut );
+     //step3: copy data to ringbuffer, this will prepare data for usb ringbuffer;
+     if( temp  >=  pSource->txSize ) 
+     {
+          kfifo_get( pSource->pRingBulkOut,
+                      ( uint8_t * )pSource->pBufferOut[ pSource-> tx_index ],
+                      pSource->txSize  );
+          pSource->tx_index = 1 - pSource->tx_index;  
+          
+          // change port machine states;
+          pSource->status[ OUT ] = ( uint8_t )RUNNING;
      }
      else
      {
             //if this port was started,but no enough data in buffer,
             //flag this port in buffering state;
-            if( ( uint8_t )START <= pSource->status )
+            if( ( uint8_t )START == pSource->status[ OUT ] 
+                    || ( uint8_t )BUFFERED == pSource->status[ OUT ] )               
             {
-                    pSource->status = ( uint8_t )BUFFERED;
+                    pSource->status[ OUT ] = ( uint8_t )BUFFERED;
                     //error proccess;
+                     printf( "SSC1-Tx:Data buffering,data size = (%d) \r\n",temp);
+                    return;
             }
+            else if( ( uint8_t )RUNNING == pSource->status[ OUT ] )
+            {                    
+                    printf( "SSC1-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
+                    return;
+            }
+            else
+            {
+                    printf( "SSC1-Tx:Port not ready!\n");
+                    assert( 0 );
+                    return;
+            }
+
      }
-//      
-#endif
-    
-      
-     //step 3:change current buffer index 
-     pSource->tx_index = 1 - pSource->tx_index;
-      
-     //step 4:send semphone       
+#endif          
+/*----------------------------------------------------------------------------*/           
+//step 4:send semphone       
 #ifndef USE_EVENTGROUP
      OSFlagPost(    //send group event
                     g_pStartUSBTransfer,
                     (OS_FLAGS)( SSC1_OUT ), //
-                    OS_FLAG_SET, //
+                    OS_FLAG_SET,            //
                     &error
                 );
 #endif  
@@ -587,7 +761,7 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 *********************************************************************************************************
 */
 #ifdef USE_DMA
-#if UNUSED  //It will be instead with xx_buffer_write;
+#ifdef UNUSED  //It will be instead with xx_buffer_write;
 void SSC0_Recording( void *pInstance )
 { 
         assert( NULL != pInstance );
@@ -598,7 +772,7 @@ void SSC0_Recording( void *pInstance )
         Ssc* pSsc = _get_ssc_instance( pSource->dev.identify );
         
         pTds[0].dwSrcAddr = ( uint32_t )&SSC0->SSC_RHR;
-        pTds[0].dwDstAddr = ( uint32_t )ssc0_I2SBuffersIn[ 0 ]; 
+        pTds[0].dwDstAddr = ( uint32_t )ssc0_PingPongIn[ 0 ]; 
         pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE(I2S_IN_BUFFER_SIZE)
                              | DMAC_CTRLA_SRC_WIDTH_BYTE
                              | DMAC_CTRLA_DST_WIDTH_BYTE;
@@ -611,7 +785,7 @@ void SSC0_Recording( void *pInstance )
         pTds[0].dwDscAddr = (uint32_t) &pTds[1];
         
         pTds[1].dwSrcAddr = ( uint32_t )&SSC0->SSC_RHR;
-        pTds[1].dwDstAddr = ( uint32_t )ssc0_I2SBuffersIn[ 1 ]; 
+        pTds[1].dwDstAddr = ( uint32_t )ssc0_PingPongIn[ 1 ]; 
         pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE(I2S_IN_BUFFER_SIZE)
                              | DMAC_CTRLA_SRC_WIDTH_BYTE
                              | DMAC_CTRLA_DST_WIDTH_BYTE;
@@ -643,7 +817,7 @@ void SSC0_Recording( void *pInstance )
 * Note(s)     : it is NOT reentrant;
 *********************************************************************************************************
 */
-#if UNUSED  //It will be instead with xx_buffer_write;
+#ifdef UNUSED  //It will be instead with xx_buffer_write;
 void SSC1_Recording( void *pInstance )
 { 
         assert( NULL != pInstance );
@@ -654,7 +828,7 @@ void SSC1_Recording( void *pInstance )
         Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
         
         pTds[0].dwSrcAddr = ( uint32_t )&SSC1->SSC_RHR;
-        pTds[0].dwDstAddr = ( uint32_t )ssc1_I2SBuffersIn[ 0 ]; 
+        pTds[0].dwDstAddr = ( uint32_t )ssc1_PingPongIn[ 0 ]; 
         pTds[0].dwCtrlA   = DMAC_CTRLA_BTSIZE(I2S_IN_BUFFER_SIZE)
                              | DMAC_CTRLA_SRC_WIDTH_BYTE
                              | DMAC_CTRLA_DST_WIDTH_BYTE;
@@ -667,7 +841,7 @@ void SSC1_Recording( void *pInstance )
         pTds[0].dwDscAddr = (uint32_t) &pTds[1];
         
         pTds[1].dwSrcAddr = ( uint32_t )&SSC1->SSC_RHR;
-        pTds[1].dwDstAddr = ( uint32_t )ssc1_I2SBuffersIn[ 1 ]; 
+        pTds[1].dwDstAddr = ( uint32_t )ssc1_PingPongIn[ 1 ]; 
         pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE(I2S_IN_BUFFER_SIZE)
                              | DMAC_CTRLA_SRC_WIDTH_BYTE
                              | DMAC_CTRLA_DST_WIDTH_BYTE;
@@ -827,7 +1001,7 @@ uint8_t ssc1_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
 */
 
 #ifdef USE_DMA
-#ifndef UNUSED  //It will be instead with xx_buffer_write;
+#ifdef UNUSED  //It will be instead with xx_buffer_write;
 void SSC0_Playing( void *pInstance )
 {
 	assert( NULL != pInstance );
@@ -836,14 +1010,14 @@ void SSC0_Playing( void *pInstance )
 	sDmaTransferDescriptor *pTds = dmaTdSSC0Tx;
         
         memset( TxBuffers,0x5555,sizeof( TxBuffers ) );
-        memset( ssc0_I2SBuffersOut, 0x5555, sizeof( ssc0_I2SBuffersOut ));
+        memset( ssc0_PingPongOut, 0x5555, sizeof( ssc0_PingPongOut ));
                 
         Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
 		/* Setup TD list for TX */
 #if   TEST_BUF      
 		pTds[0].dwSrcAddr = (uint32_t) TxBuffers[0];
 #else
-                pTds[0].dwSrcAddr = (uint32_t) ssc0_I2SBuffersOut[ 0 ];
+                pTds[0].dwSrcAddr = (uint32_t) ssc0_PingPongOut[ 0 ];
 #endif
                 
 		pTds[0].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
@@ -863,7 +1037,7 @@ void SSC0_Playing( void *pInstance )
 #if   TEST_BUF	
 		pTds[1].dwSrcAddr = (uint32_t) TxBuffers[1];
 #else
-                pTds[1].dwSrcAddr = (uint32_t) ssc0_I2SBuffersOut[ 1 ];
+                pTds[1].dwSrcAddr = (uint32_t) ssc0_PingPongOut[ 1 ];
 #endif
 		pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 #if   TEST_BUF
@@ -900,7 +1074,7 @@ void SSC0_Playing( void *pInstance )
 * Note(s)     : it is NOT reentrant;
 *********************************************************************************************************
 */
-#ifndef UNUSED  //It will be instead with xx_buffer_write;
+#ifdef UNUSED  //It will be instead with xx_buffer_write;
 void SSC1_Playing( void *pInstance )
 {
 //#define TEST_BUF 1
@@ -910,14 +1084,14 @@ void SSC1_Playing( void *pInstance )
 	sDmaTransferDescriptor *pTds = dmaTdSSC1Tx;
         
         memset( TxBuffers1,0x5555,sizeof( TxBuffers1 ) );
-//        memset( ssc1_I2SBuffersOut, 0x5555, sizeof( ssc1_I2SBuffersOut ));
+//        memset( ssc1_PingPongOut, 0x5555, sizeof( ssc1_PingPongOut ));
                 
         Ssc* pSsc = _get_ssc_instance(pSource->dev.identify);
 		/* Setup TD list for TX */
 #if   TEST_BUF      
 		pTds[0].dwSrcAddr = (uint32_t) TxBuffers1[0];
 #else
-                pTds[0].dwSrcAddr = (uint32_t) ssc1_I2SBuffersOut[ 0 ];
+                pTds[0].dwSrcAddr = (uint32_t) ssc1_PingPongOut[ 0 ];
 #endif
                 
 		pTds[0].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
@@ -937,7 +1111,7 @@ void SSC1_Playing( void *pInstance )
 #if   TEST_BUF	
 		pTds[1].dwSrcAddr = (uint32_t) TxBuffers1[1];
 #else
-                pTds[1].dwSrcAddr = (uint32_t) ssc0_I2SBuffersOut[ 1 ];
+                pTds[1].dwSrcAddr = (uint32_t) ssc0_PingPongOut[ 1 ];
 #endif
 		pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 #if   TEST_BUF
@@ -1310,7 +1484,15 @@ void init_I2S(void *pParameter,void *dParameter)
         /* Configure SSC port */
         _init_I2S( ( void * )pSource,NULL );
 
-	pSource->status = (uint8_t)CONFIGURED;
+        if( pSource->dev.direct == ( uint8_t )IN )
+            pSource->status[ IN ] = (uint8_t)CONFIGURED;
+        else if( pSource->dev.direct == ( uint8_t )OUT )
+            pSource->status[ OUT ] = (uint8_t)CONFIGURED;
+        else
+        {
+            pSource->status[ IN ] = (uint8_t)CONFIGURED;
+            pSource->status[ OUT ] = (uint8_t)CONFIGURED;
+        }
         
 }
 

@@ -14,7 +14,7 @@
 * Note(s)           : twi communicate implement
 *********************************************************************************************************
 */
-
+#include "defined.h"
 #include "uif_twi.h"
 
 #include <ucos_ii.h>
@@ -24,8 +24,8 @@
 typedef struct i2c_device
 {
   DataSource *pI2c;
-  OPTIONPARAMETER *first; 
-  OPTIONPARAMETER *second;
+  TWI_CFG *first; 
+  TWI_CFG *second;
   OS_EVENT *lock;
 }FM36,CODEC;
 */
@@ -225,7 +225,7 @@ void twi_init_master( void *pInstance, void * pFreq )
     assert( ( NULL != pInstance ) && ( NULL != pFreq ) );
     
     DataSource *pSource = ( DataSource * )pInstance;
-    Twi *pTwi = ( Twi * )pSource->dev.instanceHandle;
+//    Twi *pTwi = ( Twi * )pSource->dev.instanceHandle;
     
     uint32_t hz = *( uint32_t * )pFreq;   
     assert( 0 != hz );
@@ -338,7 +338,7 @@ uint8_t twi0_uname_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         assert( NULL != buf );
                
         DataSource *pSource = ( DataSource * )pInstance;
-        OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pSource ->privateData;
+        TWI_CFG *option = ( TWI_CFG * )pSource ->privateData;
 
 	Twid *pTwid = &twid[ UNAMED ];
 	assert( NULL != pTwid->pTwi );		
@@ -389,7 +389,7 @@ uint8_t twi1_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         assert( NULL != buf );
         
         DataSource *pSource = ( DataSource * )pInstance;
-        OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pSource->privateData;         
+        TWI_CFG *option = ( TWI_CFG * )pSource->privateData;         
 
 	Twid *pTwid = &twid[ CODEC1 ];
 	assert( NULL != pTwid->pTwi );		
@@ -428,7 +428,7 @@ uint8_t twi2_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         assert( NULL != buf );
         
         DataSource *pSource = ( DataSource * )pInstance;
-        OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pSource->privateData;
+        TWI_CFG *option = ( TWI_CFG * )pSource->privateData;
 
 	Twid *pTwid = &twid[ FM36 ];
 	assert( NULL != pTwid->pTwi );			
@@ -466,7 +466,7 @@ uint8_t twi0_uname_read( void *pInstance, const uint8_t *buf,uint32_t len  )
         assert( NULL != buf );
         
         DataSource *pSource = ( DataSource * )pInstance;
-        OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pSource->privateData;        
+        TWI_CFG *option = ( TWI_CFG * )pSource->privateData;        
 
 	Twid *pTwid = &twid[ UNAMED ];
 	assert( NULL != pTwid->pTwi );				
@@ -504,7 +504,7 @@ uint8_t twi1_read( void *pInstance, const uint8_t *buf,uint32_t len  )
         assert( NULL != buf );
         
         DataSource *pSource = ( DataSource * )pInstance;
-        OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pSource->privateData;
+        TWI_CFG *option = ( TWI_CFG * )pSource->privateData;
 
 	Twid *pTwid = &twid[ CODEC1 ];
 	assert( NULL != pTwid->pTwi );		
@@ -541,7 +541,7 @@ uint8_t twi2_read( void *pInstance, const uint8_t *buf,uint32_t len  )
         assert( NULL != buf );
         
         DataSource *pSource = ( DataSource * )pInstance;
-        OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pSource->privateData;        
+        TWI_CFG *option = ( TWI_CFG * )pSource->privateData;        
 		
 	Twid *pTwid = &twid[ FM36 ];
 	assert( NULL != pTwid->pTwi );

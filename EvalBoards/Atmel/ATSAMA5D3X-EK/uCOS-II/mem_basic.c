@@ -71,10 +71,10 @@ uint8_t DM_SingleWrite( uint8_t dev_addr,uint16_t dm_addr,uint16_t dm_val)
     uint8_t state ;    
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_DM_WR, (dm_addr>>8)&0xFF, dm_addr&0xFF, (dm_val>>8)&0xff, dm_val&0xff};
     
-    OPTIONPARAMETER *option;    
+    TWI_CFG *option;    
     
 //    state =  TWID_Write( dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
-    option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
     state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );
@@ -89,7 +89,7 @@ uint8_t PM_SingleWrite(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata, unsigne
     uint8_t state ;      
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_PM_WR,(dm_addr>>8)&0xFF, dm_addr&0xFF, *(pdata++)^(xor_key>>16), *(pdata++)^(xor_key>>8),*(pdata++)^(xor_key) };
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
     state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );
@@ -104,7 +104,7 @@ uint8_t CM_SingleWrite(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata)
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_CM_WR, (dm_addr>>8)&0xFF, dm_addr&0xFF, *(pdata++),*(pdata++) };
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
     state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf,sizeof( buf ) ); 
@@ -123,7 +123,7 @@ uint8_t DM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_DM_RD,(dm_addr>>8)&0xFF, dm_addr&0xFF};
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
     state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf,sizeof( buf ) ); 
@@ -180,7 +180,7 @@ uint8_t PM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     uint8_t state ;   
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_PM_RD, (dm_addr>>8)&0xFF, dm_addr&0xFF}; 
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
     Unlock_PM(DSP_PM_Type);    
@@ -245,7 +245,7 @@ uint8_t CM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     uint8_t state ;    
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_CM_RD, (dm_addr>>8)&0xFF, dm_addr&0xFF}; 
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     option->iaddress = 0;
     option->isize = 0;
@@ -304,7 +304,7 @@ uint8_t DM_BurstWrite(  uint8_t dev_addr,
     uint8_t state ;
     uint8_t i ;
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
    
     uint8_t buf[] = { 0x00, 0x1C,0,0 };
@@ -335,7 +335,7 @@ uint8_t DM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
 
     uint8_t buf[] = {0x3F, 0xE8, (data_num>>8)&0xFF, data_num&0xFF}; //????
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     option->iaddress = 0xFCF33B;
     option->isize = 3;
@@ -388,7 +388,7 @@ uint8_t PM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
 
     uint8_t buf[] = {0x3F, 0xE8, (data_num>>8)&0xFF, data_num&0xFF,0};
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     option->iaddress = 0xFCF33B;
     option->isize = 3;
@@ -442,7 +442,7 @@ uint8_t PM_FastWrite_s( uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
     uint8_t *pDmDat   = (uint8_t *)pDat ; 
     uint16_t data_num = (DatNum) * 3   ; 
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
     state = HOST_SingleWrite_2( dev_addr, 0x0F, data_num );      
@@ -468,7 +468,7 @@ uint8_t DM_FastRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     uint8_t state ;
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_DM_RD,(dm_addr>>8)&0xFF, dm_addr&0xFF}; 
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
@@ -534,7 +534,7 @@ uint8_t MEM_Block_LegacyRead( uint8_t dev_addr,
     unsigned int cmd[]  = {FM_CMD_DM_RD, FM_CMD_PM_RD, FM_CMD_CM_RD}; //cmd for read : DM, PM, CM 
     uint8_t buf[] = {FM_CMD_SYN_0, FM_CMD_SYN_1, 0,(start_addr>>8)&0xFF, start_addr&0xFF};
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
      
     if( mem_type == MEM_TYPE_PM ) 
@@ -628,7 +628,7 @@ uint8_t MEM_Block_SingleWrite( uint8_t dev_addr,
     uint8_t buf[8] ;
     uint8_t  data_length  = 2; //for PM 3, CM 2, DM 2
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
     buf[0] = FM_CMD_SYN_0  ;
@@ -669,7 +669,7 @@ uint8_t HOST_SingleWrite_1(uint8_t dev_addr,uint8_t host_addr,uint8_t host_val)
      uint8_t state ;    
      uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_HOST_WR_1, host_addr, host_val}; 
      
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
      
 //     state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
@@ -685,7 +685,7 @@ uint8_t HOST_SingleWrite_2(uint8_t dev_addr,uint8_t host_addr,uint16_t host_val)
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_HOST_WR_2, host_addr, (host_val>>8)&0xff, host_val&0xff}; 
     
 
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
      
 //     state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
@@ -701,7 +701,7 @@ uint8_t HOST_LegacyRead(uint8_t dev_addr, uint8_t host_addr,uint8_t *pVal)
     uint8_t state;   
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_HOST_RD, host_addr};
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
@@ -728,7 +728,7 @@ uint8_t DSP_SingleWrite_1(uint8_t dev_addr,uint8_t dsp_addr,uint8_t dsp_val)
    
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_DSP_WR_1, dsp_addr, dsp_val};
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);  
@@ -744,7 +744,7 @@ uint8_t DSP_SingleWrite_2(uint8_t dev_addr,uint8_t dsp_addr,uint16_t dsp_val)
     
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_DSP_WR_2, dsp_addr, (dsp_val>>8)&0xff, dsp_val&0xff}; 
     
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
     state = twi2_write( ( void * )pTwiSource, buf, sizeof(buf) );      
@@ -759,7 +759,7 @@ uint8_t DSP_LegacyRead(uint8_t dev_addr, uint8_t dsp_addr,uint8_t *pVal)
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_DSP_RD, dsp_addr}; 
     
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
-    OPTIONPARAMETER *option = ( OPTIONPARAMETER * )pTwiSource->privateData;
+    TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
 
     state = twi2_write( ( void * )pTwiSource, buf, sizeof(buf) );    
