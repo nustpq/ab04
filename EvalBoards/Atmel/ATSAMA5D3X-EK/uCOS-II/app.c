@@ -561,7 +561,6 @@ int main()
     CPU_INT08U  os_err;
     uint32_t twi_hz = 100000;
 
-    
     CODEC_SETS codec_set;
 
 
@@ -609,7 +608,6 @@ int main()
         APP_TRACE_INFO(("this version isn't a release version \r\n"));
 	return -1;
     }
-//    UIF_DelayUs( 1000 * 100 );
 #endif
     
 #if UIF_SSC0
@@ -885,7 +883,6 @@ int main()
     
     //initialize Tc1 interval = 1ms    
     _ConfigureTc1( 1000u );  
-    
   
     OSInit();
 
