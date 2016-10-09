@@ -77,6 +77,8 @@
 #include "uif_act8865.h"
 #include "uif_dsp.h"
 
+#include "uif_hardware_init.h"
+
 /*
 *********************************************************************************************************
 *                                        global macro switch
@@ -614,10 +616,6 @@ extern void _ConfigureTc1( uint32_t hz );
 int main()
 {
     CPU_INT08U  os_err;
-    uint32_t twi_hz = 100000;
-
-    CODEC_SETS codec_set;
-
 
     printf(("\nApplication start!\r\n"));
 
@@ -645,353 +643,14 @@ int main()
 //    UIF_Misc_On( HDMI_UIF_PWR_EN );
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
-    UIF_Misc_On ( FAST_PLUS_RST );      
+    UIF_Misc_On ( FAST_PLUS_RST );        
     
-    //test D5
-    UIF_LED_On( LED_D5 );
-    UIF_LED_Off( LED_D5 );
-   
-    
-#if UIF_USB
-    //initialize usb object and it's operation 
-    source_usb.init_source = init_usb;
-    source_usb.buffer_read = NULL;
-    source_usb.buffer_write = NULL;
-    source_usb.get_direct = NULL;	
-
-    if(NULL != source_usb.init_source )
-        source_usb.init_source(NULL,NULL);
-    else
-    {
-        APP_TRACE_INFO(("this version isn't a release version \r\n"));
-	return -1;
-    }
-#endif
-    
-#if UIF_SSC0
-    //initialize ssc0 object and it's operation 
-    memset( ( void * )&source_ssc0, 0 , sizeof( DataSource ) );
-    memset( ( void * )ssc0_PingPongOut, 0 , sizeof( ssc0_PingPongOut ) ); 
-    memset( ( void * )ssc0_PingPongIn, 0 , sizeof( ssc0_PingPongIn ) );     
-    source_ssc0.dev.direct = ( uint8_t )BI;
-    source_ssc0.dev.identify = ID_SSC0;
-    source_ssc0.dev.instanceHandle = (uint32_t)SSC0;
-    source_ssc0.status[ IN ] = ( uint8_t )FREE;
-    source_ssc0.status[ OUT ] = ( uint8_t )FREE;    
-    source_ssc0.tx_index = 0;
-    source_ssc0.rx_index = 0;
-    source_ssc0.peripheralParameter = ( void * )Audio_Configure_Instance0;
-    source_ssc0.warmWaterLevel = 3072;
-    source_ssc0.txSize = 3072;
-    source_ssc0.rxSize = 3072;     
-    
-    source_ssc0.init_source = init_I2S;
-    source_ssc0.buffer_write = ssc0_buffer_write;
-    source_ssc0.buffer_read  = ssc0_buffer_read;
-    source_ssc0.peripheral_stop = stop_ssc;
-    
-    source_ssc0.pRingBulkOut = &ssc0_bulkout_fifo;
-    source_ssc0.pRingBulkIn = &ssc0_bulkin_fifo;
-    source_ssc0.pBufferOut = ( uint16_t * )ssc0_PingPongOut;
-    source_ssc0.pBufferIn = ( uint16_t * )ssc0_PingPongIn;
-    
-    if( NULL != source_ssc0.init_source )
-        source_ssc0.init_source( &source_ssc0,NULL );
-#endif
-    
-    
-#if UIF_SSC1
-    //initialize ssc1 object and it's operation 
-    memset( ( void * )&source_ssc1, 0 , sizeof( DataSource ) );
-    memset( ( void * )ssc1_PingPongOut, 0 , sizeof( ssc1_PingPongOut ) ); 
-    memset( ( void * )ssc1_PingPongIn, 0 , sizeof( ssc1_PingPongIn ) );      
-    source_ssc1.dev.direct = ( uint8_t )BI;
-    source_ssc1.dev.identify = ID_SSC1;
-    source_ssc1.dev.instanceHandle = (uint32_t)SSC1;
-    source_ssc1.status[ IN ] = ( uint8_t )FREE;
-    source_ssc1.status[ OUT ] = ( uint8_t )FREE; 
-    source_ssc1.tx_index = 0;
-    source_ssc1.rx_index = 0;
-    source_ssc1.peripheralParameter = ( void * )Audio_Configure_Instance1;
-    source_ssc1.warmWaterLevel = 3072; 
-    source_ssc1.txSize = 3072;
-    source_ssc1.rxSize = 3072;    
-    
-    source_ssc1.init_source = init_I2S;
-    source_ssc1.buffer_write = ssc1_buffer_write;
-    source_ssc1.buffer_read  = ssc1_buffer_read;
-    source_ssc0.peripheral_stop = stop_ssc;    
-    
-    source_ssc1.pRingBulkOut = &ssc1_bulkout_fifo;
-    source_ssc1.pRingBulkIn = &ssc1_bulkin_fifo;
-    source_ssc1.pBufferOut = ( uint16_t * )ssc1_PingPongOut;
-    source_ssc1.pBufferIn = ( uint16_t * )ssc1_PingPongIn;    
-    
-    if( NULL != source_ssc1.init_source )
-       source_ssc1.init_source( &source_ssc1,NULL );
-#endif
-    
-#if UIF_SPI0
-    //initialize spi0 object and it's operation
-    SPI_CFG spi0_cfg;
-    memset( ( void * )&source_spi0, 0 , sizeof( DataSource ) );
-    memset( ( void * )&spi0_cfg, 0 , sizeof( SPI_CFG ) );
-    source_spi0.dev.direct = ( uint8_t )BI;
-    source_spi0.dev.identify = ID_SPI0;
-    source_spi0.dev.instanceHandle = (uint32_t)SPI0;    
-    source_spi0.status[ IN ] = ( uint8_t )FREE;
-    source_spi0.status[ OUT ] = ( uint8_t )FREE; 
-    source_spi0.tx_index = 0;
-    source_spi0.rx_index = 0;
-    source_spi0.privateData = spi0_RingBulkIn;
-    spi0_cfg.spi_speed = 10 * 1000 * 1000;
-    spi0_cfg.spi_mode = 1;
-    source_spi0.warmWaterLevel = 3072; 
-    source_spi0.txSize = 3072;
-    source_spi0.rxSize = 3072;     
-    
-    source_spi0.init_source = init_spi;
-    source_spi0.peripheral_stop = stop_spi;
-    source_spi0.buffer_write = _spiDmaTx;
-    source_spi0.buffer_read = _spiDmaRx;
-    source_spi0.set_peripheral = spi_register_set;
-    
-    source_spi0.pRingBulkOut = &spi0_bulkOut_fifo;
-    source_spi0.pRingBulkIn = &spi0_bulkIn_fifo;
-    source_spi0.pBufferOut = ( uint16_t * )spi0_2MSOut;
-    source_spi0.pBufferIn = ( uint16_t * )spi0_2MSIn;  
-    
-    if( NULL != source_spi0.init_source )
-       source_spi0.init_source( &source_spi0,&spi0_cfg );
-#endif      
-    
-#if UIF_SPI1
-    //initialize spi1 object and it's operation
-    SPI_CFG spi1_cfg;
-    memset( ( void * )&source_spi1, 0 , sizeof( DataSource ) );
-    memset( ( void * )&spi1_cfg, 0 , sizeof( SPI_CFG ) );
-    source_spi1.dev.direct = ( uint8_t )BI;
-    source_spi1.dev.identify = ID_SPI1;
-    source_spi1.dev.instanceHandle = (uint32_t)SPI1;    
-    source_spi1.status[ IN ] = ( uint8_t )FREE;
-    source_spi1.status[ OUT ] = ( uint8_t )FREE; 
-    source_spi1.tx_index = 0;
-    source_spi1.rx_index = 0;
-    source_spi1.privateData = spi1_RingBulkIn;
-    source_spi1.buffer = ( uint8_t * )spi1_2MSOut;
-    spi1_cfg.spi_speed = 10 * 1000 * 1000;
-    spi1_cfg.spi_mode  = 1;
-    source_spi1.warmWaterLevel = 3072;
-    source_spi1.txSize = 3072;
-    source_spi1.rxSize = 3072;     
-    
-    source_spi1.init_source = init_spi;
-    source_spi1.peripheral_stop = stop_spi;
-    source_spi1.buffer_write = _spiDmaTx;
-    source_spi1.buffer_read = _spiDmaRx;
-    source_spi1.set_peripheral = spi_register_set;
-    
-    source_spi1.pRingBulkOut = &spi1_bulkOut_fifo;
-    source_spi1.pRingBulkIn = &spi1_bulkIn_fifo;
-    source_spi1.pBufferOut = ( uint16_t * )spi1_2MSOut;
-    source_spi1.pBufferIn = ( uint16_t * )spi1_2MSIn;      
-    
-    if( NULL != source_spi1.init_source )
-       source_spi1.init_source( &source_spi1,&spi1_cfg );
-#endif  
-
-
-#if UIF_TWI0
-    //initialize twi0 object and it's operation     
-    TWI_CFG twi0ChipConf[ 2 ];
-    memset( ( void * )&twi0ChipConf[ 0 ], 0 ,sizeof( TWI_CFG ) << 1 );
-    twi0ChipConf[ 0 ].address = 0xc0 >> 1;
-    twi0ChipConf[ 0 ].iaddress = 0;
-    twi0ChipConf[ 0 ].isize = 0;
-    twi0ChipConf[ 0 ].revers = 0;
-    
-    memset( ( void * )&source_twi0, 0 , sizeof( DataSource ) );
-    source_twi0.dev.direct = ( uint8_t )BI;
-    source_twi0.dev.identify = ID_TWI0;
-    source_twi0.dev.instanceHandle = (uint32_t)TWI0;	
-    source_twi0.status[ IN ] = ( uint8_t )FREE;
-    source_twi0.status[ OUT ] = ( uint8_t )FREE; 
-    source_twi0.tx_index = 0;
-    source_twi0.rx_index = 0;
-    source_twi0.privateData = &twi0ChipConf[ 0 ];
-
-    source_twi0.init_source = twi_init_master;
-    source_twi0.buffer_write = twi0_uname_write;
-    source_twi0.buffer_read = twi0_uname_read;
-    
-    if( NULL != source_twi0.init_source )
-        source_twi0.init_source( &source_twi0,&twi_hz );
-
-#endif
-    
-    
-#if UIF_TWI1
-    //initialize twi0 object and it's operation  
-    TWI_CFG twi1_chipConf[ 2 ];
-    memset( ( void * )&twi1_chipConf[ 0 ], 0 ,sizeof( TWI_CFG ) << 1 );
-    twi1_chipConf[ 0 ].address = 0x18;
-    twi1_chipConf[ 0 ].iaddress = 0;
-    twi1_chipConf[ 0 ].isize = 0;
-    twi1_chipConf[ 0 ].revers = 0;
-    
-    twi1_chipConf[ 1 ].address = 0x18;
-    twi1_chipConf[ 1 ].iaddress = 0;
-    twi1_chipConf[ 1 ].isize = 0;
-    twi1_chipConf[ 1 ].revers = 0;
-    
-    memset( ( void * )&source_twi1, 0 , sizeof( DataSource ) );
-    source_twi1.dev.direct = ( uint8_t )BI;
-    source_twi1.dev.identify = ID_TWI1;
-    source_twi1.dev.instanceHandle = (uint32_t)TWI1;	
-    source_twi1.status[ IN ] = ( uint8_t )FREE;
-    source_twi1.status[ OUT ] = ( uint8_t )FREE; 
-    source_twi1.tx_index = 0;
-    source_twi1.rx_index = 0;
-    source_twi1.privateData = &twi1_chipConf[ 0 ];
-
-    source_twi1.init_source = twi_init_master;
-    source_twi1.buffer_write = twi1_write;
-    source_twi1.buffer_read = twi1_read;
-    
-    if( NULL != source_twi1.init_source )
-        source_twi1.init_source( &source_twi1,&twi_hz );
-       
-#endif
-
-
-#if UIF_TWI2
-    //initialize twi2 object and it's operation      
-    TWI_CFG twi2_chipConf[ 2 ];
-    memset( ( void * )&twi2_chipConf[ 0 ], 0 ,sizeof( TWI_CFG ) << 1 );
-    twi2_chipConf[ 0 ].address = 0x18;
-    twi2_chipConf[ 0 ].iaddress = 0;
-    twi2_chipConf[ 0 ].isize = 0;
-    twi2_chipConf[ 0 ].revers = 0;
-    
-    twi2_chipConf[ 1 ].address = 0x18;
-    twi2_chipConf[ 1 ].iaddress = 0;
-    twi2_chipConf[ 1 ].isize = 0;
-    twi2_chipConf[ 1 ].revers = 0;    
-    
-    memset( ( void * )&source_twi2, 0 , sizeof( DataSource ) );
-    source_twi2.dev.direct = ( uint8_t )BI;
-    source_twi2.dev.identify = ID_TWI2;
-    source_twi2.dev.instanceHandle = (uint32_t)TWI2;	
-    source_twi2.status[ IN ] = ( uint8_t )FREE;
-    source_twi2.status[ OUT ] = ( uint8_t )FREE; 
-    source_twi2.tx_index = 0;
-    source_twi2.rx_index = 0;
-    source_twi2.privateData = &twi2_chipConf[ 0 ];
-    
-    source_twi2.init_source = twi_init_master;
-    source_twi2.buffer_write = twi2_write;
-    source_twi2.buffer_read = twi2_read;
-    
-    if( NULL != source_twi2.init_source )
-        source_twi2.init_source( &source_twi2,&twi_hz );
-
-#endif 
-
-#if UIF_USART1
-        //initialize usart1 object and it's operation 
-    memset( ( void * )&source_usart1, 0 , sizeof( DataSource ) );
-    source_usart1.dev.direct = ( uint8_t )BI;
-    source_usart1.dev.identify = ID_USART1;
-    source_usart1.dev.instanceHandle = (uint32_t)USART1;
-    source_usart1.status[ IN ] = ( uint8_t )FREE;
-    source_usart1.status[ OUT ] = ( uint8_t )FREE; 
-    source_usart1.tx_index = 0;
-    source_usart1.rx_index = 0;
-    
-    source_usart1.init_source = usart_init;
-    source_usart1.buffer_write = usart1_DmaTx;
-    source_usart1.buffer_read = usart1_DmaRx;
-    
-    if( NULL != source_usart1.init_source )
-       source_usart1.init_source( &source_usart1,NULL );
-#endif 
-    
-#if UIF_GPIO
-            //initialize usart1 object and it's operation 
-    memset( ( void * )&source_gpio, 0 , sizeof( DataSource ) );
-    
-    memset( ( void * )&gpio_PingPong_bufferOut, 
-              0 , 
-              sizeof( gpio_PingPong_bufferOut ) );    
-    memset( ( void * )&gpio_PingPong_bufferIn, 
-              0 , 
-              sizeof( gpio_PingPong_bufferIn ) ); 
-    
-        ///todo: this struct should be initialzed after receieved command from usb;
-    // here,just for test Cpu performence;
-    GPIO_REC_CFG gpio_cfg;
-    gpio_cfg.mask = 0xf;
-    gpio_cfg.sampleCnt = 4;
-    gpio_cfg.gpioscnt = 8;
-    gpio_cfg.tdmChannelCnt = 4;
-    gpio_cfg.index = 0;
-
-    source_gpio.dev.direct = ( uint8_t )BI;
-    source_gpio.dev.identify = ID_PIOD;
-    source_gpio.dev.instanceHandle = (uint32_t)PIOD;
-    source_gpio.status[ IN ] = ( uint8_t )FREE;
-    source_gpio.status[ OUT ] = ( uint8_t )FREE;
-    source_gpio.privateData = ( void * )gpio_pins;
-    source_gpio.peripheralParameter = ( void * )&gpio_cfg;
-    source_gpio.tx_index = 0;
-    source_gpio.rx_index = 0;
-    source_gpio.txSize = 3072;
-    source_gpio.rxSize = 3072;
-    
-    source_gpio.init_source = gpio_Init;
-    source_gpio.buffer_write = gpio_Pin_Set;
-    source_gpio.buffer_read = gpio_Pin_Get;
-    
-    source_gpio.pRingBulkOut = &ep0BulkOut_fifo;
-    source_gpio.pRingBulkIn = &ep0BulkIn_fifo;
-    source_gpio.pBufferOut = ( uint16_t * )gpio_PingPong_bufferOut;
-    source_gpio.pBufferIn = ( uint16_t * )gpio_PingPong_bufferIn;    
-    
-    if( NULL != source_gpio.init_source )
-       source_gpio.init_source( &source_gpio,NULL );
-#endif
+    uif_ports_init_default( );
 
 #ifdef UIF_AIC3204
 /*----------------------------------------------------*/
-    codec_set.sr = 48000;
-    codec_set.sample_len = 16;
-    codec_set.format = 1;
-    codec_set.slot_num = 2;
-    codec_set.m_s_sel = 0;
-    codec_set.bclk_polarity = 1;
-    codec_set.flag = 1;
-    codec_set.delay = 0;
-    Init_CODEC( &source_twi1,codec_set );
-    codec_set.sr = 48000;
-    codec_set.sample_len = 16;
-    codec_set.format = 1;
-    codec_set.slot_num = 2;
-    codec_set.m_s_sel = 0;
-    codec_set.bclk_polarity = 1;
-    codec_set.flag = 1;
-    codec_set.delay = 0;
-    Init_CODEC( &source_twi2,codec_set );
+  aic3204_init_default( ); 
 /*---------------------------------------------------*/
-#endif
-    
-#ifndef UIF_FM36
-    Init_FM36_AB03( 48000, 
-                        1, 
-                        0, 
-                        0, 
-                       16,
-                        0,
-                       1);
 #endif
     
     //config port dma
@@ -1384,6 +1043,7 @@ static  void  AppTaskUSB (void *p_arg)
 {
     uint8_t err = 0;
     uint8_t evFlags = 0; 
+    uint16_t byteCnt = 0;
 
     memset( ( uint8_t * )tmpInBuffer , 0x32 , sizeof( tmpInBuffer ) ); 
     for(;;) 
@@ -1453,7 +1113,7 @@ static  void  AppTaskUSB (void *p_arg)
                                     0); 
 
 
-#if 1  
+ 
             //copy data from  usb ring buffer to temp buffer ;
             //ep0 ring ---> tmpOutbuffer;
             if( source_ssc0.txSize == kfifo_get( &ep0BulkOut_fifo,
@@ -1464,10 +1124,10 @@ static  void  AppTaskUSB (void *p_arg)
                       ( uint8_t * )tmpOutBuffer,
                        source_ssc0.txSize );
         
-#endif            
+            
             //copy data from  usb ring buffer to spi0 in ring buffer ;
             //ep0 ring ---> tmpOutBuffer;
-#if 1            
+           
             kfifo_get( &ep0BulkOut_fifo,
                       ( uint8_t * )tmpOutBuffer,
                        source_ssc0.txSize  ); 
@@ -1476,47 +1136,23 @@ static  void  AppTaskUSB (void *p_arg)
                       ( uint8_t * )tmpOutBuffer,
                        source_ssc0.txSize  );             
 #endif
-//========================================================================
-//instead ep1 when linux scripts can't use ep1   
-#if 1  
-            //copy data from  usb ring buffer to temp buffer ;
-            //ep0 ring ---> tmpOutbuffer;
-            if( source_ssc0.txSize == kfifo_get( &ep0BulkOut_fifo,
-                      ( uint8_t * )tmpOutBuffer,
-                       source_ssc0.txSize ) ) 
-            //tmpOutBuffer --> ssc0 ring
-            kfifo_put( &ssc0_bulkout_fifo,
-                      ( uint8_t * )tmpOutBuffer,
-                       source_ssc0.txSize );
-        
-#endif            
-            //copy data from  usb ring buffer to spi0 in ring buffer ;
-            //ep0 ring ---> tmpOutBuffer;
+           
 #if 1            
-            kfifo_get( &ep0BulkOut_fifo,
-                      ( uint8_t * )tmpOutBuffer,
-                       source_ssc0.txSize  ); 
-            //tmpOutBuffer ---> spi0 ring
-            kfifo_put( &spi0_bulkOut_fifo,
-                      ( uint8_t * )tmpOutBuffer,
-                       source_ssc0.txSize  );             
-#endif            
-//========================================================================            
-#if 0            
             CDCDSerialDriver_Read_SecondEp( usbCacheBulkOut1,
                                             USB_DATAEP_SIZE_64B,
                                             (TransferCallback) UsbAudio1DataReceived,
                                             0); 
            
            //copy data from  usb ring buffer to ssc1 in ring buffer ; 
-            //ep1 ring ---> tmpOutbuffer;            
-            if( source_ssc1.txSize == kfifo_get( &ep1BulkOut_fifo,
-                      ( uint8_t * )tmpOutBuffer,
-                        source_ssc1.txSize ) )
-            //tmpOutBuffer --> ssc1 ring            
-            kfifo_put( &ssc1_bulkout_fifo,
-                      ( uint8_t * )tmpOutBuffer,
-                        source_ssc1.txSize );             
+            //ep1 ring ---> tmpOutbuffer; 
+            byteCnt = kfifo_get( &ep1BulkOut_fifo,
+                                 ( uint8_t * )tmpOutBuffer,
+                                 source_ssc1.txSize );
+            if( source_ssc1.txSize == byteCnt )
+                    //tmpOutBuffer --> ssc1 ring            
+                    kfifo_put( &ssc1_bulkout_fifo,
+                              ( uint8_t * )tmpOutBuffer,
+                              source_ssc1.txSize );             
 #endif
  /*  
            // spi1 connect to fpga in AB04,so it does not participate in data transmission
@@ -1534,7 +1170,7 @@ static  void  AppTaskUSB (void *p_arg)
 */            
 #endif        
 
-#endif
+
 
        OSTimeDlyHMSM( 0,0,0,1 );
     }
@@ -1674,7 +1310,8 @@ static  void  AppTaskFirmwareVecUpdate  ( void        *p_arg )
           break;
          default:
            //do nothing;
-          break;
+          
+           break;
         }
       
     }  

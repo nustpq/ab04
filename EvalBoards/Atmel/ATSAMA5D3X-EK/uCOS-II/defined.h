@@ -509,6 +509,30 @@ extern uint16_t gpio_PingPong_bufferOut[2][I2S_PINGPONG_OUT_SIZE_3K];
 extern uint16_t gpio_PingPong_bufferIn[2][I2S_PINGPONG_IN_SIZE_3K];
 
 
+//------------------------fifo list instance export for other-----------------//
+//Ring for ssc 
+extern kfifo_t  ssc0_bulkout_fifo;
+extern kfifo_t  ssc0_bulkin_fifo;
+extern kfifo_t  ssc1_bulkout_fifo;
+extern kfifo_t  ssc1_bulkin_fifo;
+
+//Ring for USB data endpoint
+extern kfifo_t  ep0BulkOut_fifo;
+extern kfifo_t  ep0BulkIn_fifo;
+extern kfifo_t  ep1BulkOut_fifo;
+extern kfifo_t  ep1BulkIn_fifo;
+
+//Ring for USB cmd endpoint
+extern kfifo_t  cmdEpBulkOut_fifo;
+extern kfifo_t  cmdEpBulkIn_fifo;
+
+//Ring for spi 
+extern kfifo_t  spi0_bulkOut_fifo;
+extern kfifo_t  spi0_bulkIn_fifo;
+extern kfifo_t  spi1_bulkOut_fifo;
+extern kfifo_t  spi1_bulkIn_fifo;
+
+
 
 //------------------------port list instance export for other-----------------//
 extern sDmad g_dmad;
@@ -521,6 +545,7 @@ extern DataSource source_twi0;
 extern DataSource source_twi1;
 extern DataSource source_twi2;
 extern DataSource source_gpio;
+extern DataSource source_usart1;
 
 //-----------------------task syncoronize P/V---------------------------------//
 extern OS_FLAG_GRP *g_StartUSBTransfer;

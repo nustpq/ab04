@@ -172,7 +172,7 @@
         </option>
         <option>
           <name>CCDefines</name>
-          <state>TRACE_LEVEL=2</state>
+          <state>TRACE_LEVEL=5</state>
           <state>CUSTOM_USB</state>
         </option>
         <option>
@@ -973,7 +973,7 @@
         <option>
           <name>Variant</name>
           <version>20</version>
-          <state>0</state>
+          <state>47</state>
         </option>
         <option>
           <name>GEndianMode</name>
@@ -986,7 +986,7 @@
         </option>
         <option>
           <name>Input description</name>
-          <state></state>
+          <state>Automatic choice of formatter.</state>
         </option>
         <option>
           <name>Output variant</name>
@@ -995,20 +995,20 @@
         </option>
         <option>
           <name>Output description</name>
-          <state></state>
+          <state>Automatic choice of formatter.</state>
         </option>
         <option>
           <name>GOutputBinary</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>FPU</name>
           <version>2</version>
-          <state>0</state>
+          <state>5</state>
         </option>
         <option>
           <name>OGCoreOrChip</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>GRuntimeLibSelect</name>
@@ -1022,7 +1022,7 @@
         </option>
         <option>
           <name>RTDescription</name>
-          <state></state>
+          <state>To be used with the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
         </option>
         <option>
           <name>OGProductVersion</name>
@@ -1030,7 +1030,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state></state>
+          <state>7.10.3.6927</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -1042,7 +1042,7 @@
         </option>
         <option>
           <name>OGChipSelectEditMenu</name>
-          <state></state>
+          <state>SAMA5D35	Atmel SAMA5D35</state>
         </option>
         <option>
           <name>GenLowLevelInterface</name>
@@ -1050,7 +1050,7 @@
         </option>
         <option>
           <name>GEndianModeBE</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>OGBufferedTerminalOutput</name>
@@ -1076,17 +1076,17 @@
         </option>
         <option>
           <name>RTConfigPath2</name>
-          <state></state>
+          <state>$TOOLKIT_DIR$\INC\c\DLib_Config_Normal.h</state>
         </option>
         <option>
           <name>GFPUCoreSlave</name>
           <version>20</version>
-          <state>1</state>
+          <state>47</state>
         </option>
         <option>
           <name>GBECoreSlave</name>
           <version>20</version>
-          <state>1</state>
+          <state>47</state>
         </option>
         <option>
           <name>OGUseCmsis</name>
@@ -1117,6 +1117,7 @@
           <name>CCDefines</name>
           <state>NDEBUG</state>
           <state>TRACE_LEVEL=2</state>
+          <state>CUSTOM_USB</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -1538,7 +1539,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state></state>
+          <state>libusb.srec</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -1592,7 +1593,7 @@
         </option>
         <option>
           <name>IlinkOutputFile</name>
-          <state>###Unitialized###</state>
+          <state>libusb.out</state>
         </option>
         <option>
           <name>IlinkDebugInfoEnable</name>
@@ -1656,7 +1657,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>lnk0t.icf</state>
+          <state>$TOOLKIT_DIR$\CONFIG\generic.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -1716,7 +1717,7 @@
         </option>
         <option>
           <name>IlinkProgramEntryLabel</name>
-          <state></state>
+          <state>__iar_program_start</state>
         </option>
         <option>
           <name>DoFill</name>

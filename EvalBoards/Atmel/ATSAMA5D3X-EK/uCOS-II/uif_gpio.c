@@ -154,7 +154,7 @@ static void _ConfigureRecGpios( void )
 *
 * Return(s)   :  None.
 *
-* Note(s)     : None.
+* Note(s)     :  None.
 *********************************************************************************************************
 */
 void gpio_Init( void *pInstance,void *dParameter )

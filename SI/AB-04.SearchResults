@@ -1,0 +1,4 @@
+---- pCdcd->bBulkOutPIPE Matches (0 in 0 files) ----
+---- pCdcd->bBulkOutPIPE Search Errors Encountered (1) ----
+The following 1 files could not be processed:
+E:\uif_gitrepos\AB04\libraries\usb\common\audio\AUDFeatureUnitRequest.c : File could not be opened.

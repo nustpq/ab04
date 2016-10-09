@@ -38,7 +38,7 @@
 /*------------------------------------------------------------------------------
  *         Headers
  *------------------------------------------------------------------------------*/
-
+#include <assert.h>
 #include <CDCDSerialPort.h>
 #include <CDCDescriptors.h>
 #include <USBLib_Trace.h>
@@ -76,6 +76,7 @@ static uint32_t _Interfaces_Parse(USBGenericDescriptor *pDesc,
                                   CDCDParseData * pArg)
 {
     CDCDSerialPort *pCdcd = pArg->pCdcd;
+    uint8_t epAddress = 0;
 
     /* Not a valid descriptor */
     if (pDesc->bLength == 0)
@@ -111,6 +112,27 @@ static uint32_t _Interfaces_Parse(USBGenericDescriptor *pDesc,
     if (pArg->pIfDesc == 0)
         return 0;
 
+/*
+#define CDCDSerialDriverDescriptors_AUDIODATAOUT        1
+/// Audio Data IN endpoint number.
+#define CDCDSerialDriverDescriptors_AUDIODATAIN         2
+
+/// Cmd Data OUT endpoint number.
+#define CDCDSerialDriverDescriptors_CMDDATAOUT          3
+/// Cmd Data IN endpoint number.
+#define CDCDSerialDriverDescriptors_CMDDATAIN           4
+
+/// Audio Data OUT endpoint number.
+#define CDCDSerialDriverDescriptors_AUDIODATAOUT1        5
+/// Audio Data IN endpoint number.
+#define CDCDSerialDriverDescriptors_AUDIODATAIN1         6
+
+/// Notification endpoint number.
+#define CDCDSerialDriverDescriptors_NOTIFICATION        7
+
+
+*/
+
     /* Find endpoint descriptors */
     if (pDesc->bDescriptorType == USBGenericDescriptor_ENDPOINT) {
         USBEndpointDescriptor *pEp = (USBEndpointDescriptor*)pDesc;
@@ -121,15 +143,62 @@ static uint32_t _Interfaces_Parse(USBGenericDescriptor *pDesc,
                 break;
             case USBEndpointDescriptor_BULK:
                 if (pEp->bEndpointAddress & 0x80)
-                    pCdcd->bBulkInPIPE = pEp->bEndpointAddress & 0x7F;
+                	{ 
+                          epAddress = pEp->bEndpointAddress & 0x7F;
+						  
+                          if( epAddress == 2 )
+                          {
+                            pCdcd->bBulkInPIPE = pEp->bEndpointAddress & 0x7F;
+                            TRACE_INFO("pCdcd->bBulkInPIPE = (%d)\n\r",pCdcd->bBulkInPIPE);
+                          }
+                          else if( epAddress == 4 )
+                          {
+                            pCdcd->bBulkInPIPECmd = pEp->bEndpointAddress & 0x7F;
+                            TRACE_INFO("pCdcd->bBulkInPIPECmd = (%d)\n\r",pCdcd->bBulkInPIPECmd);
+                          }
+                          else if( epAddress == 6 )
+                          {
+                              pCdcd->bBulkInPIPE1 = pEp->bEndpointAddress & 0x7F;
+                              TRACE_INFO("pCdcd->bBulkInPIPE1 = (%d)\n\r",pCdcd->bBulkInPIPE1);
+                          }
+                          else
+                          {
+                              assert( 0 );
+                          }
+                	}
                 else
-                    pCdcd->bBulkOutPIPE = pEp->bEndpointAddress;
+                	{
+                          epAddress = pEp->bEndpointAddress;
+                          if( epAddress == 1 )
+                          {
+                            pCdcd->bBulkOutPIPE = pEp->bEndpointAddress;
+                            TRACE_INFO("pCdcd->bBulkOutPIPE = (%d)\n\r",pCdcd->bBulkOutPIPE);
+                          }
+                          else if( epAddress == 3 )
+                          {
+                            pCdcd->bBulkOutPIPECmd = pEp->bEndpointAddress;
+                            TRACE_INFO("pCdcd->bBulkOutPIPECmd = (%d)\n\r",pCdcd->bBulkOutPIPECmd);
+                          }
+                          else if( epAddress == 5 )
+                          {
+                            pCdcd->bBulkOutPIPE1 = pEp->bEndpointAddress;
+//                          TRACE_INFO("pCdcd->bBulkOutPIPE1 = (%d)\n\r",pCdcd->bBulkOutPIPE1);
+                            printf("pCdcd->bBulkOutPIPE1 = (%d)\n\r",pCdcd->bBulkOutPIPE1);                            
+                          }
+                          else
+                          {
+                             assert( 0 );
+                          }
+                          
+                	}
         }
     }
 
     if (    pCdcd->bInterfaceNdx != 0xFF
         &&  pCdcd->bBulkInPIPE != 0
-        &&  pCdcd->bBulkOutPIPE != 0)
+        &&  pCdcd->bBulkOutPIPE != 0
+        &&  pCdcd->bBulkInPIPE1 != 0
+        &&  pCdcd->bBulkOutPIPE1 != 0  )
         return USBRC_FINISHED;
 
     return 0;

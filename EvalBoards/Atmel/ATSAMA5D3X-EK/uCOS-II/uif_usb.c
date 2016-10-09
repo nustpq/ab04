@@ -87,22 +87,29 @@ void UsbAudio1DataReceived(  uint32_t unused,
                               uint32_t received,
                               uint32_t remaining )
 {
+    remaining = remaining;
+    uint32_t size;
     
     if ( status == USBD_STATUS_SUCCESS ) 
     {     
          // Check every data package:        
           // LED_CLEAR_DATA;
 
-        kfifo_put( &ep1BulkOut_fifo, usbCacheBulkOut1, received );         
+        kfifo_put( &ep1BulkOut_fifo, usbCacheBulkOut1, received ); 
         
-        if ( USB_DATAEP_SIZE_64B <= kfifo_get_free_space( &ep1BulkOut_fifo ) ) { //enouth free buffer                      
-            CDCDSerialDriver_Read(    usbCacheBulkOut1,
-                                      USB_DATAEP_SIZE_64B,
-                                      (TransferCallback) UsbAudio1DataReceived,
-                                      0);        
-        } else 
+        size = kfifo_get_free_space( &ep1BulkOut_fifo );
+        if ( USB_DATAEP_SIZE_64B <= size ) 
         { 
-          ///Todo:usb out too fast  
+            //enouth free buffer                      
+            CDCDSerialDriver_Read_SecondEp(    usbCacheBulkOut1,
+                                               USB_DATAEP_SIZE_64B,
+                                              (TransferCallback) UsbAudio1DataReceived,
+                                              0);        
+        } 
+        else 
+        { 
+          ///Todo:usb out too fast 
+          printf( "\r\nERROR : UsbAudio1DataReceived: Usb Transfer fast\r\n" );
           return;
             
         }     
@@ -210,10 +217,10 @@ void UsbCmdDataReceived(  uint32_t unused,
         if ( USB_DATAEP_SIZE_64B <= kfifo_get_free_space( &cmdEpBulkOut_fifo ) ) 
         { 
             //enough free buffer                      
-            CDCDSerialDriver_Read(    usbCmdCacheBulkOut,
-                                      USB_DATAEP_SIZE_64B,
-                                      (TransferCallback) UsbCmdDataReceived,
-                                      0);        
+            CDCDSerialDriver_Read_CmdEp(  usbCmdCacheBulkOut,
+                                          USB_DATAEP_SIZE_64B,
+                                          (TransferCallback) UsbCmdDataReceived,
+                                          0);        
         } 
        else 
        { 
@@ -246,10 +253,10 @@ void UsbCmdDataTransmit(  uint32_t unused,
         {         
             kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_DATAEP_SIZE_64B); 
         
-            CDCDSerialDriver_Write( usbCmdCacheBulkIn,
-                                    USB_DATAEP_SIZE_64B,
-                                    (TransferCallback) UsbCmdDataTransmit,
-                                    0);       
+            CDCDSerialDriver_Write_CmdEp( usbCmdCacheBulkIn,
+                                          USB_DATAEP_SIZE_64B,
+                                          (TransferCallback) UsbCmdDataTransmit,
+                                          0);       
         } 
         else 
         {                    
@@ -260,10 +267,10 @@ void UsbCmdDataTransmit(  uint32_t unused,
     }  
     else 
     {
-        CDCDSerialDriver_Write( usbCmdCacheBulkIn,
-                                USB_DATAEP_SIZE_64B,
-                                (TransferCallback) UsbCmdDataTransmit,
-                                0);  
+        CDCDSerialDriver_Write_CmdEp( usbCmdCacheBulkIn,
+                                      USB_DATAEP_SIZE_64B,
+                                      (TransferCallback) UsbCmdDataTransmit,
+                                      0);  
         TRACE_WARNING( "\r\nERROR : UsbCmdDataTransmit: Rr-transfer hit\r\n" );  
         
     }        

@@ -523,7 +523,7 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
                     || ( uint8_t )RUNNING == pSource->status[ OUT ] )
             {
                     
-//                    printf( "SSC1-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
+                    printf( "SSC1-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
                     return;
             }
             else

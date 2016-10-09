@@ -1972,6 +1972,9 @@
       <name>$PROJ_DIR$\..\uif_usb.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\usb_init_default.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\USBDDriverDescriptors.c</name>
     </file>
   </group>
