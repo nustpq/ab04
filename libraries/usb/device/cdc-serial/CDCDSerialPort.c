@@ -112,27 +112,6 @@ static uint32_t _Interfaces_Parse(USBGenericDescriptor *pDesc,
     if (pArg->pIfDesc == 0)
         return 0;
 
-/*
-#define CDCDSerialDriverDescriptors_AUDIODATAOUT        1
-/// Audio Data IN endpoint number.
-#define CDCDSerialDriverDescriptors_AUDIODATAIN         2
-
-/// Cmd Data OUT endpoint number.
-#define CDCDSerialDriverDescriptors_CMDDATAOUT          3
-/// Cmd Data IN endpoint number.
-#define CDCDSerialDriverDescriptors_CMDDATAIN           4
-
-/// Audio Data OUT endpoint number.
-#define CDCDSerialDriverDescriptors_AUDIODATAOUT1        5
-/// Audio Data IN endpoint number.
-#define CDCDSerialDriverDescriptors_AUDIODATAIN1         6
-
-/// Notification endpoint number.
-#define CDCDSerialDriverDescriptors_NOTIFICATION        7
-
-
-*/
-
     /* Find endpoint descriptors */
     if (pDesc->bDescriptorType == USBGenericDescriptor_ENDPOINT) {
         USBEndpointDescriptor *pEp = (USBEndpointDescriptor*)pDesc;
@@ -182,8 +161,7 @@ static uint32_t _Interfaces_Parse(USBGenericDescriptor *pDesc,
                           else if( epAddress == 5 )
                           {
                             pCdcd->bBulkOutPIPE1 = pEp->bEndpointAddress;
-//                          TRACE_INFO("pCdcd->bBulkOutPIPE1 = (%d)\n\r",pCdcd->bBulkOutPIPE1);
-                            printf("pCdcd->bBulkOutPIPE1 = (%d)\n\r",pCdcd->bBulkOutPIPE1);                            
+                            TRACE_INFO("pCdcd->bBulkOutPIPE1 = (%d)\n\r",pCdcd->bBulkOutPIPE1);                            
                           }
                           else
                           {

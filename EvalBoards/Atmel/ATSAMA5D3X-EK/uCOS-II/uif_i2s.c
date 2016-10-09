@@ -24,6 +24,8 @@
 #include  <ucos_ii.h>
 #endif
 
+#define DATA_TRANSMIT_TRACE 0
+
 extern DataSource soruce_ssc0;
 extern DataSource source_ssc1;
 
@@ -252,7 +254,9 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
             }
             else
             {
+#if DATA_TRANSMIT_TRACE
                printf( "SSC0-Rx:There is No Space in Fifo,space size = (%d) \r\n",temp);
+#endif               
                return;
             }
      }
@@ -334,7 +338,9 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
             }
             else
             {
+#if DATA_TRANSMIT_TRACE              
                printf( "SSC1-Rx:There is No Space in Fifo,space size = (%d) \r\n",temp);
+#endif               
                return;
             }
      }      
@@ -412,20 +418,26 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
                     || ( uint8_t )BUFFERED == pSource->status[ OUT ] )               
             {
                     pSource->status[ OUT ] = ( uint8_t )BUFFERED;
-                    //Todo : error proccess--here do nothing 
+                    //Todo : error proccess--here do nothing
+#if DATA_TRANSMIT_TRACE
                      printf( "SSC0-Tx:Data buffering,data size = (%d) \r\n",temp);
+#endif                     
                     return;
             }
             else if( ( uint8_t )RUNNING == pSource->status[ OUT ] )
-            {                    
+            {         
+#if DATA_TRANSMIT_TRACE
                     printf( "SSC0-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
+#endif                    
                     ///Todo: error proccess
                     // filled invalid data to ringbuffer and send it to pc that is a tip;
                     return;
             }
             else
             {       //
+#if DATA_TRANSMIT_TRACE
                     printf( "SSC0-Tx:Port not ready!\n");
+#endif                    
                     //port machine state is wrong, firmware has bug;
                     assert( 0 );
                     return;
@@ -522,13 +534,16 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
             else if( ( uint8_t )BUFFERED == pSource->status[ OUT ] 
                     || ( uint8_t )RUNNING == pSource->status[ OUT ] )
             {
-                    
+#if DATA_TRANSMIT_TRACE                    
                     printf( "SSC1-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
+#endif                    
                     return;
             }
             else
             {
+#if DATA_TRANSMIT_TRACE              
                     printf( "SSC1-Tx:Port not ready!\r\n");
+#endif                    
                     return;
             }
      }
@@ -560,17 +575,23 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
             {
                     pSource->status[ OUT ] = ( uint8_t )BUFFERED;
                     //error proccess;
+#if DATA_TRANSMIT_TRACE                    
                      printf( "SSC1-Tx:Data buffering,data size = (%d) \r\n",temp);
+#endif                     
                     return;
             }
             else if( ( uint8_t )RUNNING == pSource->status[ OUT ] )
-            {                    
+            { 
+#if DATA_TRANSMIT_TRACE              
                     printf( "SSC1-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
+#endif                    
                     return;
             }
             else
             {
+#if DATA_TRANSMIT_TRACE              
                     printf( "SSC1-Tx:Port not ready!\n");
+#endif                    
                     assert( 0 );
                     return;
             }
