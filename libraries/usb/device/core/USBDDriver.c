@@ -375,6 +375,41 @@ static void GetDescriptor(
     }
 }
 
+static void GetMSDescriptor(
+    const USBDDriver *pDriver,
+    unsigned char type,
+    unsigned char index,
+    unsigned int length)
+{
+    const USBDeviceDescriptor *pDevice;
+    const unsigned char *pDescriptor;
+    // Use different set of descriptors depending on device speed
+    
+    if( index == Extended_Compat_ID ) {    
+        pDescriptor = pDriver->pDescriptors->pStrings[5]; //OSExCompIDDescriptor     
+        //printf("\r\n-Extended_Compat_ID");
+    } else if( index == Extended_Property ) {
+        pDescriptor = pDriver->pDescriptors->pStrings[6]; //Extended Properties Descriptor        
+        //printf("\r\n-Extended_Propertity");
+    }
+    TRACE_DEBUG("HS ");
+
+   //printf("\r\n-length= %d",length);
+   // Adjust length and send descriptor
+    if (length > USBGenericDescriptor_GetLength((USBGenericDescriptor *) pDescriptor)) {
+
+        length = USBGenericDescriptor_GetLength((USBGenericDescriptor *) pDescriptor);
+    }
+   //printf("\r\n-length= %d",length);
+    USBD_Write(0, 
+              pDescriptor, 
+              length,  
+              ((length % pDevice->bMaxPacketSize0) == 0) ? TerminateCtrlInWithNull : 0,
+              0);
+  
+
+}
+
 /**
  * Sets the active setting of the given interface if the configuration supports
  * it; otherwise, the control pipe is STALLed. If the setting of an interface
@@ -608,7 +643,27 @@ void USBDDriver_RequestHandler(
 
     /* Check request code */
     switch (USBGenericRequest_GetRequest(pRequest)) {
+            
+            case USBGenericRequest_GET_MS_DESCRIPTOR:
+            TRACE_INFO_WP("gMSDesc ");
 
+            // Send the requested descriptor
+            type = USBGetDescriptorRequest_GetDescriptorType(pRequest);
+            if( type != 0 ) { //wValue high bytemust 
+                USBD_Stall(0);
+            }
+            type = USBGenericRequest_GetRecipient(pRequest);
+            if( type != 0 ) {
+                //USBD_Stall(0);
+                //printf("\r\nInterFace");
+            }
+            
+            type  = USBGetDescriptorRequest_GetDescriptorIndex(pRequest); //Interface number
+            indexDesc = USBGenericRequest_GetIndex(pRequest);
+            length = USBGenericRequest_GetLength(pRequest);
+            GetMSDescriptor(pDriver, type, indexDesc, length);
+            break;
+            
         case USBGenericRequest_GETDESCRIPTOR:
             TRACE_INFO_WP("gDesc ");
 

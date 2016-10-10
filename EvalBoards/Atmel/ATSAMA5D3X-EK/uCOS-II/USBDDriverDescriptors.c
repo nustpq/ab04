@@ -93,6 +93,21 @@ const USBDeviceDescriptor deviceDescriptor = {
     1 // Device has 1 possible configuration  
 };
 
+
+/// USB device qualifier descriptor.
+const USBDeviceQualifierDescriptor qualifierDescriptor = {
+
+    sizeof(USBDeviceQualifierDescriptor),
+    USBGenericDescriptor_DEVICEQUALIFIER,
+    USBDeviceDescriptor_USB2_00,
+    CDCDeviceDescriptor_CLASS,
+    CDCDeviceDescriptor_SUBCLASS,
+    CDCDeviceDescriptor_PROTOCOL,
+    CHIP_USB_ENDPOINTS_MAXPACKETSIZE(0),
+    1, // Device has one possible configuration
+    0 // Reserved
+};
+
 //* Standard USB configuration descriptor for the CDC serial driver  
 const CDCDSerialDriverConfigurationDescriptors configurationDescriptorsFS = {
 
@@ -890,11 +905,19 @@ const USBDDriverDescriptors cdcdSerialDriverDescriptors = {
 
     &deviceDescriptor,
     (USBConfigurationDescriptor *) &(configurationDescriptorsFS),
+	/*
     0, // No full-speed device qualifier descriptor  
     (USBConfigurationDescriptor *) &(otherSpeedDescriptorsFS),
     0, // No high-speed device descriptor (uses FS one)  
     (USBConfigurationDescriptor *) &(configurationDescriptorsHS),
     0, // No high-speed device qualifier descriptor  
+    (USBConfigurationDescriptor *) &(otherSpeedDescriptorsHS),
+	*/
+	  &qualifierDescriptor,
+    (USBConfigurationDescriptor *) &(otherSpeedDescriptorsFS),
+    &deviceDescriptor,
+    (USBConfigurationDescriptor *) &(configurationDescriptorsHS),
+    &qualifierDescriptor,
     (USBConfigurationDescriptor *) &(otherSpeedDescriptorsHS),
     stringDescriptors,
     6 // 6 string descriptors in list  

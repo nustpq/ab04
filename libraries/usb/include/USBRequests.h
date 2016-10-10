@@ -180,6 +180,9 @@
 /**         @}*/
 /**     @}*/
 
+ 
+#define Extended_Compat_ID      4
+#define Extended_Property       5  
 
 /*----------- Feature Request ------------*/
 
