@@ -2105,6 +2105,7 @@ void USBD_HAL_Suspend(void)
     UDPHS_DisableBIAS();
     UDPHS_DisableUsbClock();
     UDPHS_DisablePeripheralClock();
+	TRACE_INFO( "USB.HAL:Suspend\n\r" );    
 }
 
 /**
@@ -2118,6 +2119,7 @@ void USBD_HAL_Activate(void)
     UDPHS_EnablePeripheralClock();
     UDPHS_EnableUsbClock();
     UDPHS_EnableBIAS();
+	TRACE_INFO( "USB.HAL:Resumed\n\r" ); 
 }
 
 /**

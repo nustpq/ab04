@@ -7,6 +7,7 @@
 #include "uif_twi.h"
 #include "uif_usart.h"
 #include "uif_gpio.h"
+#include "bsp.h"
 #include "codec.h"
 
 int usb_init_default( void );
@@ -19,6 +20,7 @@ void twi1_init_default( void );
 void twi2_init_default( void );
 void usart1_init_default( void );
 void gpio_init_default( void );
+void uif_miscPin_init_default( void );
 void uif_ports_init_default( void );
 
 void aic3204_init_default( void );

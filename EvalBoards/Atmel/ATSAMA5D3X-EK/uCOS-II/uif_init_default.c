@@ -6,7 +6,7 @@
 *
 * Description :  initialize usb device to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -41,7 +41,7 @@ int usb_init_default( void )
 *
 * Description :  initialize ssc0 port to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -88,7 +88,7 @@ void ssc0_init_default( void )
 *
 * Description :  initialize ssc1 port to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -135,7 +135,7 @@ void ssc1_init_default( void )
 *
 * Description :  initialize spi0 port to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -185,7 +185,7 @@ void spi0_init_default( void )
 *
 * Description :  initialize spi1 port to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -237,7 +237,7 @@ void spi1_init_default( void )
 *
 * Description :  initialize twi0 port to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -282,7 +282,7 @@ void twi0_init_default( void )
 *
 * Description :  initialize twi1 port to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -332,7 +332,7 @@ void twi1_init_default( void )
 *
 * Description :  initialize twi2 port to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -382,7 +382,7 @@ void twi2_init_default( void )
 *
 * Description :  initialize usart1 port to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -420,7 +420,7 @@ void usart1_init_default( void )
 *
 * Description :  initialize gpio device to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -482,7 +482,7 @@ void gpio_init_default( void )
 *
 * Description :  initialize aic3204 codec to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -522,7 +522,7 @@ void aic3204_init_default( void )
 *
 * Description :  initialize uif ports to default state;
 *
-* Argument(s) :  nonr
+* Argument(s) :  none
 *		 
 *                
 *
@@ -543,4 +543,40 @@ void uif_ports_init_default( void )
     twi2_init_default( );
     usart1_init_default( );
     gpio_init_default( );
+}
+
+/*
+*********************************************************************************************************
+*                                    uif_miscPin_init_default()
+*
+* Description :  initialize uif control pin to default state;
+*
+* Argument(s) :  none
+*		 
+*                
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void uif_miscPin_init_default( void )
+{
+      //Led/Buzzer initialize;
+    BSP_LED_Init();
+    UIF_LED_Init();
+    BSP_LED_Off( 3 ); 
+    BSP_BUZZER_Toggle( BUZZER_OFF );
+    UIF_LED_On( LED_D3 );
+    UIF_LED_Off( LED_D3 );
+    UIF_LED_On( LED_D4 );
+    UIF_LED_Off( LED_D4 );  
+    
+    //Misc switch initialize
+    UIF_Misc_Init( );
+//    UIF_Misc_On( HDMI_UIF_PWR_EN );
+    UIF_Misc_On ( CODEC0_RST );
+    UIF_Misc_On ( CODEC1_RST );
+    UIF_Misc_On ( FAST_PLUS_RST );  
+  
 }
