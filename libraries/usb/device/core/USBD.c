@@ -426,7 +426,8 @@ uint8_t USBD_IsHighSpeed(void)
  */
 uint8_t USBD_Stall(uint8_t bEndpoint)
 
-{
+{   
+    TRACE_INFO_WP("Stall%d ", bEndpoint);
     return USBD_HAL_Stall(bEndpoint);
 }
 

@@ -244,7 +244,7 @@ static void GetDescriptor(
     /* HS, we try HS values */
     if (USBD_HAL_IsHighSpeed()) {
 
-        TRACE_DEBUG_WP("HS ");
+        TRACE_INFO_WP("HS ");
         if (pDriver->pDescriptors->pHsDevice)
             pDevice = pDriver->pDescriptors->pHsDevice;
         if (pDriver->pDescriptors->pHsConfiguration)
@@ -254,7 +254,7 @@ static void GetDescriptor(
     }
     else {
 
-        TRACE_DEBUG_WP("FS ");
+        TRACE_INFO_WP("FS ");
         pQualifier = pDriver->pDescriptors->pFsQualifier;
         pOtherSpeed = pDriver->pDescriptors->pFsOtherSpeed;
     }
@@ -344,14 +344,14 @@ static void GetDescriptor(
 
             /* Check if descriptor exists */
 
-            if (indexRDesc >= numStrings) {
-
+            if ( (indexRDesc > numStrings) && (indexRDesc != OS_STR_DESC_INDEX) ) {
+                 TRACE_INFO_WP("^^ ");
                 USBD_Stall(0);
             }
             else {
 
-                pString = pStrings[indexRDesc];
-
+                //pString = pStrings[indexRDesc];
+                pString =  indexRDesc == OS_STR_DESC_INDEX ? pStrings[4] : pStrings[indexRDesc];   //PQ
                 /* Adjust length and send descriptor */
 
                 if (length > USBGenericDescriptor_GetLength(pString)) {
@@ -375,6 +375,7 @@ static void GetDescriptor(
     }
 }
 
+//PQ
 static void GetMSDescriptor(
     const USBDDriver *pDriver,
     unsigned char type,
@@ -394,13 +395,13 @@ static void GetMSDescriptor(
     }
     TRACE_DEBUG("HS ");
 
-   //printf("\r\n-length= %d",length);
-   // Adjust length and send descriptor
+    //printf("\r\n-length= %d",length);
+    // Adjust length and send descriptor
     if (length > USBGenericDescriptor_GetLength((USBGenericDescriptor *) pDescriptor)) {
 
         length = USBGenericDescriptor_GetLength((USBGenericDescriptor *) pDescriptor);
     }
-   //printf("\r\n-length= %d",length);
+    //printf("\r\n-length= %d",length);
     USBD_Write(0, 
               pDescriptor, 
               length,  
@@ -644,18 +645,16 @@ void USBDDriver_RequestHandler(
     /* Check request code */
     switch (USBGenericRequest_GetRequest(pRequest)) {
             
-            case USBGenericRequest_GET_MS_DESCRIPTOR:
-            TRACE_INFO_WP("gMSDesc ");
-
+            case USBGenericRequest_GET_MS_DESCRIPTOR:  //PQ
+            TRACE_INFO_WP("gMSDesc ");             
             // Send the requested descriptor
             type = USBGetDescriptorRequest_GetDescriptorType(pRequest);
             if( type != 0 ) { //wValue high bytemust 
-                USBD_Stall(0);
+                USBD_Stall(0);                  
             }
             type = USBGenericRequest_GetRecipient(pRequest);
             if( type != 0 ) {
-                //USBD_Stall(0);
-                //printf("\r\nInterFace");
+                //USBD_Stall(0);                
             }
             
             type  = USBGetDescriptorRequest_GetDescriptorIndex(pRequest); //Interface number
@@ -836,7 +835,8 @@ void USBDDriver_RequestHandler(
         break;
 
     default:
-        TRACE_WARNING(
+        //TRACE_WARNING(
+      TRACE_INFO_WP(
                   "USBDDriver_RequestHandler: Unknown request code (%d)\n\r",
                   USBGenericRequest_GetRequest(pRequest));
         USBD_Stall(0);

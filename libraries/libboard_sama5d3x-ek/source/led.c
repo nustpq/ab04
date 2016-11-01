@@ -42,7 +42,7 @@
  *------------------------------------------------------------------------------*/
 
 #ifdef PINS_LEDS
-static const Pin pinsLeds[] = { PINS_LEDS } ;
+static const Pin pinsLeds[]   = { PINS_LEDS } ;
 static const uint32_t numLeds = PIO_LISTSIZE( pinsLeds ) ;
 #endif
 

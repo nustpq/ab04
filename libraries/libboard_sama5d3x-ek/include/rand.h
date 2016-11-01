@@ -42,7 +42,7 @@
  *         Global Functions
  *------------------------------------------------------------------------------*/
 
-extern void srand( uint32_t dwSeed ) ;
-extern uint32_t rand( void ) ;
+extern void srand1( uint32_t dwSeed ) ;
+extern uint32_t rand1( void ) ;
 
 #endif /* #ifndef _RAND_ */

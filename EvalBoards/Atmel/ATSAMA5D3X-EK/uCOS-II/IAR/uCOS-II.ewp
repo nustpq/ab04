@@ -304,6 +304,9 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
+          <state>$PROJ_DIR$\..\..\..\..\..\App</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\Driver</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\Noah</state>
           <state>$PROJ_DIR$\..\</state>
           <state>$PROJ_DIR$\..\..\BSP</state>
           <state>$PROJ_DIR$\..\..\BSP\uCOS-II</state>
@@ -346,7 +349,7 @@
         </option>
         <option>
           <name>CCOptLevel</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>CCOptStrategy</name>
@@ -355,7 +358,7 @@
         </option>
         <option>
           <name>CCOptLevelSlave</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>CompilerMisraRules98</name>
@@ -618,7 +621,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>uCOS-II.bin</state>
+          <state>AB04_FW_V.bin</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -1910,72 +1913,48 @@
     </settings>
   </configuration>
   <group>
-    <name>Application</name>
+    <name>App</name>
     <file>
-      <name>$PROJ_DIR$\..\alert_table.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\app.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\app.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\app_cfg.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\app_cfg.h</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\cpu_cfg.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\codec.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\defined.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\cpu_cfg.h</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\includes.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\emb.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\lib_cfg.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\kfifo.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\os_cfg.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\lib_cfg.h</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\sine_table.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\mem_basic.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_cmd_parse.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\noah_cmd.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_uart_rx.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\os_cfg.h</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_uart_tx.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\uif_cmdParse.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_user_if.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\uif_dsp.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\taskcomm.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\uif_gpio.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\uif_i2s.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\uif_init_default.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\uif_nandflash.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\uif_spi.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\uif_twi.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\uif_usart.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\uif_usb.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\USBDDriverDescriptors.c</name>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\USBDDriverDescriptors.c</name>
     </file>
   </group>
   <group>
@@ -2018,6 +1997,78 @@
     </file>
   </group>
   <group>
+    <name>Driver</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\codec.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\codec.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_cmdParse.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_cmdparse.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_dsp.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_dsp.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_gpio.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_gpio.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_hardware_init.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_i2s.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_i2s.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_init_default.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_nandflash.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_nandflash.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_object.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_spi.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_spi.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_twi.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_twi.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_usart.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_usart.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.h</name>
+    </file>
+  </group>
+  <group>
     <name>LIB</name>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\libraries\libboard_sama5d3x-ek\lib\libboard_sama5d3x_ek_ewarm_dbg.a</name>
@@ -2042,6 +2093,63 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\libraries\usb\lib\libusb_ewarm_rel.a</name>
+    </file>
+  </group>
+  <group>
+    <name>Noah</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\alert_table.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\alert_table.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\emb.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\emb.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\kfifo.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\kfifo.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\mem_basic.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\mem_basic.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\noah_cmd.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\noah_cmd.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\ruler.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\ruler.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\sine_table.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\sine_table.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\uif.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\uif.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\Xmodem.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\Xmodem.h</name>
     </file>
   </group>
   <group>

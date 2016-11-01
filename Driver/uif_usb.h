@@ -28,6 +28,10 @@ void UsbAudio1DataReceived(  uint32_t unused,
                              uint8_t status,
                              uint32_t received,
                              uint32_t remaining );
+void UsbCmdDataReceived(  uint32_t unused,
+                          uint8_t status,
+                          uint32_t received,
+                          uint32_t remaining );
 
 void UsbAudio0DataTransmit(  uint32_t unused,
                              uint8_t status,
@@ -36,8 +40,11 @@ void UsbAudio0DataTransmit(  uint32_t unused,
 void UsbAudio1DataTransmit(  uint32_t unused,
                              uint8_t status,
                              uint32_t transmit,
-                             uint32_t remaining );
-
+                             uint32_t remaining );   
+void UsbCmdDataTransmit(  uint32_t unused,
+                              uint8_t status,
+                              uint32_t transmit,
+                              uint32_t remaining );
 
 static void ISR_Vbus( const Pin *pPin );
 static void VBus_Configure( void );
@@ -47,5 +54,17 @@ void USBDDriverCallbacks_ConfigurationChanged( uint8_t cfgnum );
 void USBDCallbacks_RequestReceived( const USBGenericRequest *request );
 
 void init_usb( void *pParameter,void *dParameter ); 
+
+
+
+extern bool restart_audio_0_bulk_out   ; 
+extern bool restart_audio_0_bulk_in    ; 
+extern bool restart_audio_1_bulk_out   ; 
+extern bool restart_audio_1_bulk_in    ; 
+extern bool restart_cmd_bulk_out       ; 
+extern bool restart_cmd_bulk_in        ;
+extern bool audio_run_control          ;
+extern bool audio_start_flag           ;
+extern uint8_t audio_0_padding         ;
 
 #endif

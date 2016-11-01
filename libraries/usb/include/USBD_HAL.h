@@ -60,6 +60,8 @@
  *        Macros
  *----------------------------------------------------------------------------*/
 
+#define LED_USB   2
+
 /** Get bitmap for an endpoint */
 #define bmEP(bEP)   (1 << (bEP))
 
@@ -106,6 +108,11 @@ extern uint8_t USBD_HAL_Read(uint8_t bEndpoint,
 extern uint8_t USBD_HAL_Stall(uint8_t bEP);
 extern uint8_t USBD_HAL_Halt(uint8_t bEndpoint,uint8_t ctl);
 extern void USBD_HAL_Test(uint8_t bIndex);
+
+
+extern uint32_t LED_Set( uint32_t dwLed ) ; 
+extern uint32_t LED_Clear( uint32_t dwLed ) ;
+
 /**@}*/
 
 #endif // #define USBD_HAL_H

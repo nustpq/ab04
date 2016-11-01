@@ -80,7 +80,7 @@
 #define SOFTPACK_VERSION       "1.4"
 
 #define TRACE_LEVEL_DEBUG      5
-//#define TRACE_LEVEL_INFO       4
+#define TRACE_LEVEL_INFO       4
 #define TRACE_LEVEL_WARNING    3
 #define TRACE_LEVEL_ERROR      2
 #define TRACE_LEVEL_FATAL      1

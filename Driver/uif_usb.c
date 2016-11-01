@@ -38,6 +38,16 @@ extern kfifo_t  ep1BulkIn_fifo;
 extern kfifo_t  cmdEpBulkOut_fifo;
 extern kfifo_t  cmdEpBulkIn_fifo;
 
+bool restart_audio_0_bulk_out  = false ; 
+bool restart_audio_0_bulk_in   = false ; 
+bool restart_audio_1_bulk_out  = false ; 
+bool restart_audio_1_bulk_in   = false ; 
+bool restart_cmd_bulk_out      = false ; 
+bool restart_cmd_bulk_in       = false ; 
+bool audio_run_control         = false ; 
+bool audio_start_flag          = false ;
+uint8_t audio_0_padding = 0;
+
 void UsbAudio0DataReceived(  uint32_t unused,
                               uint8_t status,
                               uint32_t received,
@@ -65,9 +75,10 @@ void UsbAudio0DataReceived(  uint32_t unused,
        else 
        { 
             //usb out too fast                     
-            printf( "\r\nERROR : UsbAudio0DataReceived: Usb Transfer fast\r\n" );
+            //printf( "\r\nERROR : UsbAudio0DataReceived: Usb Transfer fast\r\n" );
             ///Todo:maybe send a feedback to pc and let it wait a moment?
-            return;           
+           restart_audio_0_bulk_out  = true ;  
+           return;           
        }     
 //       total_received += received ; 
      
@@ -81,7 +92,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
     
 }
 
-
+           
 void UsbAudio1DataReceived(  uint32_t unused,
                               uint8_t status,
                               uint32_t received,
@@ -109,7 +120,8 @@ void UsbAudio1DataReceived(  uint32_t unused,
         else 
         { 
           ///Todo:usb out too fast 
-          printf( "\r\nERROR : UsbAudio1DataReceived: Usb Transfer fast\r\n" );
+          //printf( "\r\nERROR : UsbAudio1DataReceived: Usb Transfer fast\r\n" );
+          restart_audio_1_bulk_out  = true ; 
           return;
             
         }     
@@ -144,6 +156,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
         else 
         {  
            //has no enough data,exit;
+           restart_audio_0_bulk_in  = true ; 
            return; 
         }              
 //        total_transmit += transmit ; 
@@ -183,7 +196,7 @@ void UsbAudio1DataTransmit(  uint32_t unused,
         } 
         else 
         {                    
-//            bulkin_start  = true ;  
+            restart_audio_1_bulk_in  = true ;   
             
         }              
 //        total_transmit += transmit ; 
@@ -209,8 +222,8 @@ void UsbCmdDataReceived(  uint32_t unused,
     
     if ( status == USBD_STATUS_SUCCESS ) 
     {     
-         // Check every data package:        
-          // LED_CLEAR_DATA;
+        // Check every data package:        
+        // LED_CLEAR_DATA;
 
         kfifo_put(&cmdEpBulkOut_fifo, usbCmdCacheBulkOut, received);         
         
@@ -224,9 +237,8 @@ void UsbCmdDataReceived(  uint32_t unused,
         } 
        else 
        { 
-         ///Todo:usb out too fast                     
-
-            
+           ///Todo:usb out too fast 
+           restart_cmd_bulk_out  = true ;              
        }     
 //       total_received += received ; 
      
@@ -260,7 +272,7 @@ void UsbCmdDataTransmit(  uint32_t unused,
         } 
         else 
         {                    
-            
+            restart_cmd_bulk_in  = true ;   
         }              
 //        total_transmit += transmit ; 
      
@@ -279,8 +291,7 @@ void UsbCmdDataTransmit(  uint32_t unused,
 
 static void ISR_Vbus(const Pin *pPin)
 {
-      OSIntEnter(); 
-
+    OSIntEnter(); 
     /* Check current level on VBus */
     if (PIO_Get(pPin))
     {
@@ -292,7 +303,7 @@ static void ISR_Vbus(const Pin *pPin)
         TRACE_INFO("VBUS discon\n\r");
         USBD_Disconnect();
     }
-        OSIntExit();
+    OSIntExit();
 }
 
 static void VBus_Configure( void )

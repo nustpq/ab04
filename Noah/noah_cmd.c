@@ -137,8 +137,7 @@ void  Noah_CMD_Read (CMDREAD    *pCMD_Read,
             }
         break ;        
         
-        case STAT_FLAG :
-#if 0         //avoid compile error
+        case STAT_FLAG :  
             if( 1 <= data_byte && data_byte <= 31 ) 
             {
                 while(1) {
@@ -146,6 +145,7 @@ void  Noah_CMD_Read (CMDREAD    *pCMD_Read,
                     if( NULL != pRecvPtr && OS_ERR_NONE == err )  {
                         break;
                     }
+                    APP_TRACE_INFO(("\r\nOSMemGet Timeout"));
                     OSTimeDly(5); //wait for free MemoryPart
                 }            
                 pRecvPtr->head_sync_1 = CMD_DATA_SYNC1;
@@ -160,8 +160,7 @@ void  Noah_CMD_Read (CMDREAD    *pCMD_Read,
             else
             {
                 state_mac = STAT_SYNC1; 
-            } 
-#endif            
+            }            
         break ;
         
         case STAT_CMD :                 
@@ -185,10 +184,8 @@ void  Noah_CMD_Read (CMDREAD    *pCMD_Read,
                    pRecvPtr  = NULL;                 
                } 
                else 
-               {  
-                 #if 0         //avoid compile error
-                   OSMemPut( pMEM_Part_MsgUART, pRecvPtr ); 
-                 #endif
+               {                    
+                   OSMemPut( pMEM_Part_MsgUART, pRecvPtr );                
                }           
             }
         break ;        
@@ -295,8 +292,7 @@ uint8_t  pcSendDateToBuf( OS_EVENT    *pOS_EVENT,
         
     } 
     else 
-    {  
-#if 0         //avoid compile error        
+    {         
         for( i = 0 ; i < 100 ; i++ ) 
         { //delay 500ms waitting for free Mem 
             pMemPtr = (void *)OSMemGet(pMEM_Part_MsgUART,&err);
@@ -345,7 +341,7 @@ uint8_t  pcSendDateToBuf( OS_EVENT    *pOS_EVENT,
         {   
             OSMemPut( pMEM_Part_MsgUART, pMemPtr );             
         }
-#endif        
+      
     }
     
     return  err;
@@ -372,9 +368,7 @@ uint8_t  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,
         
     while(1) 
     {
-#if 0         //avoid compile error      
-        pMemPtr = (void *)OSMemGet(pMEM_Part_MsgUART,&err);
-#endif        
+        pMemPtr = (void *)OSMemGet(pMEM_Part_MsgUART,&err);      
         if( (NULL != pMemPtr) && (OS_ERR_NONE == err) )  
         {
             break;
@@ -402,13 +396,11 @@ uint8_t  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,
         pSendPtr->cmd[0]      = (cmd_id>>8)&0xFF;
         pSendPtr->cmd[1]      = (cmd_id)&0xFF;  
            
-        err = OSQPost( pOS_EVENT, pMemPtr ); 
-#if 0         //avoid compile error        
+        err = OSQPost( pOS_EVENT, pMemPtr );       
         if( OS_ERR_NONE != err )  
         {   
             OSMemPut( pMEM_Part_MsgUART, pMemPtr ); 
-        }
-#endif        
+        }        
     }
           
     return  err;
@@ -542,8 +534,7 @@ uint8_t  Noah_CMD_Parse_Ruler (NOAH_CMD    *pNoahCmd,
                 *pSessionDone = 1 ; //session done , not data back
             }
         break ;        
-
-#if 0         //avoid compile error        
+     
         case RULER_CMD_READ_MIC_CALI_DATA :
             index += 1;        
         case RULER_CMD_RAED_RULER_INFO :  
@@ -587,8 +578,7 @@ uint8_t  Noah_CMD_Parse_Ruler (NOAH_CMD    *pNoahCmd,
         
         default :
             err = CMD_NOT_SUPPORT ;
-        break ;
-#endif        
+        break ;       
     }
        
     return( err ) ;
@@ -661,11 +651,10 @@ void  Send_GACK (uint8_t  error_id)
 void  Send_Report (uint8_t pkt_sn, uint8_t error_id)
 {
     
-    APP_TRACE_DBG(("Error: %2x ",error_id));
-#if 0         //avoid compile error
+    if ( error_id != 0 ) {
+        APP_TRACE_DBG(("Error: %2x ",error_id)); 
+    }
     pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, (pPCCMDDAT)&error_id, pkt_sn, 0 ) ;
-#endif
-
     
 }
 
@@ -698,7 +687,7 @@ uint8_t  EMB_Data_Build (  uint16_t   cmd_type,
         
     err      =  NO_ERR ; 
     pos      =  0;
-#if 0         //avoid compile error           
+          
     switch( cmd_type ){      
         case DATA_AB_STATUS :       	
             pos = emb_init_builder(pChar, EMB_BUF_SIZE, cmd_type, &builder);
@@ -748,7 +737,7 @@ uint8_t  EMB_Data_Build (  uint16_t   cmd_type,
     if( pos > NEW_CMD_DATA_MLEN ) { 
         err = EMB_LEN_OERFLOW_ERR;              
     }
-#endif    
+   
     return err;
   
 }
@@ -769,19 +758,20 @@ uint8_t  EMB_Data_Build (  uint16_t   cmd_type,
 uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd ) 
 {
     
-    uint8_t    err; 
-    uint8_t    cmd_index, cmd_type; 
-    CPU_INT32S    temp, temp2;      
-    emb_t         root;
-    PCCMDDAT      PCCmd;
-    EMB_BUF      *pEBuf_Data;
+    uint8_t     err; 
+    uint8_t     cmd_index, cmd_type; 
+    CPU_INT32S  temp, temp2;      
+    emb_t       root;
+    PCCMDDAT    PCCmd;
+    EMB_BUF    *pEBuf_Data;
     
-    uint8_t    buf[3];
-    uint8_t   *pdata;
+    uint8_t     buf[3];
+    uint8_t    *pdata;
     uint32_t    data_length;
-    const void   *pBin;
-    uint8_t    pkt_sn;
-       
+    const void *pBin;
+    uint8_t     pkt_sn;
+    uint8_t     taskMsg;
+    
     err          =  NO_ERR; 
     
     cmd_index    = ( pNewCmd->cmd[ 0 ] << 8 ) + pNewCmd->cmd[ 1 ];
@@ -797,8 +787,46 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     
 //    Time_Stamp();
 //    APP_TRACE_INFO(("\r\n::::: EMB_Data_Parse: cmd type=%d ",cmd_type));
-#if 0         //avoid compile error   
-    switch( cmd_type )  {
+
+    
+    switch( cmd_type )  {       
+              
+        case 0:
+            taskMsg = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );
+            OSMboxPost( g_pPortManagerMbox, (void *)taskMsg ); 
+        break;
+        
+        case PC_CMD_START_AUDIO : 
+             temp = emb_get_attr_int(&root, 2, -1);
+             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
+             audio_0_padding = (uint8_t)temp; 
+             Init_Bulk_FIFO();
+             audio_start_flag         = true ;
+             audio_run_control        = true ;
+             restart_audio_0_bulk_out = true  ; 
+             restart_audio_0_bulk_in  = true  ;
+             restart_audio_1_bulk_out = true  ;
+             restart_audio_1_bulk_in  = true  ; 
+             restart_cmd_bulk_out     = true  ;
+             restart_cmd_bulk_in      = true  ;            
+        break;
+        
+        case PC_CMD_STOP_AUDIO : 
+             audio_run_control        = false  ;
+             restart_audio_0_bulk_out = false  ; 
+             restart_audio_0_bulk_in  = false  ;
+             restart_audio_1_bulk_out = false  ;
+             restart_audio_1_bulk_in  = false  ; 
+             restart_cmd_bulk_out     = false  ;
+             restart_cmd_bulk_in      = false  ;            
+        break;
+    
+    }
+    
+    
+    
+#if 0
+    switch( cmd_type )  {  
         
         case PC_CMD_SET_AUDIO_CFG : 
            
@@ -1074,7 +1102,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break;
         
         case PC_CMD_SPI_REC:  //for FM1388 test                        
-            SPI_REC_CFG spi_rec_cfg;    
+            SPI_PLAY_REC_CFG spi_rec_cfg;    
             spi_rec_cfg.spi_mode  = Global_UIF_Setting[1].attribute;
             spi_rec_cfg.spi_speed = Global_UIF_Setting[1].speed;
             spi_rec_cfg.gpio_irq = 2;//useless for FM1388 //im501_irq_gpio;              
@@ -1321,8 +1349,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break ;
        
     }
-#endif     
-    //Send_Report( pkt_sn, err ); //moved to : App_TaskCMDParse()
+#endif
     
     return err;
 

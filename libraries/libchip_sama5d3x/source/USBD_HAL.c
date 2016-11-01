@@ -46,11 +46,18 @@
 #include "chip.h"
 #include "USBD_HAL.h"
 
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
+#define  DEF_BIT_22                         0x00400000u
+#define  SAMA5_REG_PIOA_SODR (*((uint32_t *)0xFFFFF230))
+#define  SAMA5_REG_PIOA_CODR (*((uint32_t *)0xFFFFF234))
+
+#define  LED_SET_USB_DATA      {SAMA5_REG_PIOA_CODR = DEF_BIT_22; }
+#define  LED_CLEAR_USB_DATA    {SAMA5_REG_PIOA_SODR = DEF_BIT_22; }
 /*---------------------------------------------------------------------------
  *      Definitions
  *---------------------------------------------------------------------------*/
@@ -323,7 +330,7 @@ static void UDPHS_EndOfTransfer(uint8_t bEndpoint, uint8_t bStatus)
         uint32_t transferred = pXfr->transferred;
         uint32_t remaining   = pXfr->remaining + pXfr->buffered;
         
-        TRACE_DEBUG_WP("EoT ");
+        TRACE_DEBUG_WP("EoT(%d) ",bEndpoint);
         if (pEp->state == UDPHS_ENDPOINT_SENDING)
             pEp->sendZLP = 0;
         pEp->state = UDPHS_ENDPOINT_IDLE;
@@ -1118,6 +1125,7 @@ extern void USBD_IrqHandler(void);
  * Manages device resume, suspend, end of bus reset.
  * Forwards endpoint events to the appropriate handler.
  */
+
 void USBD_IrqHandler(void)
 {
     Udphs *pUdp = UDPHS;
@@ -1130,12 +1138,15 @@ void USBD_IrqHandler(void)
 
     /* Handle all UDPHS interrupts */
     TRACE_DEBUG_WP("\n\r%c ", USBD_HAL_IsHighSpeed() ? 'H' : 'F');
+
+    LED_SET_USB_DATA;
+    
     while( status )
     {
         /* SOF */
         if (status & UDPHS_INTSTA_INT_SOF)
         {
-            TRACE_DEBUG_WP("SOF ");
+            TRACE_DEBUG_WP("\r\nSOF ");
             /* SOF handler */
             //USBD_SofHandler();
 
@@ -1146,7 +1157,8 @@ void USBD_IrqHandler(void)
         /* Suspend, treated last */
         else if (status == UDPHS_INTSTA_DET_SUSPD)
         {
-            TRACE_WARNING_WP("Susp ");
+            TRACE_WARNING_WP("\r\nSusp ");
+            LED_CLEAR_USB_DATA ;
             /* Enable wakeup */
             pUdp->UDPHS_IEN |= (UDPHS_IEN_WAKE_UP | UDPHS_IEN_ENDOFRSM);
             pUdp->UDPHS_IEN &= ~(uint32_t)UDPHS_IEN_DET_SUSPD;
@@ -1162,7 +1174,7 @@ void USBD_IrqHandler(void)
         {
             USBD_ResumeHandler();
 
-            TRACE_INFO_WP("Rsm ");
+            TRACE_INFO_WP("\r\nRsm ");
 
             /* Acknowledge interrupt */
             pUdp->UDPHS_CLRINT = UDPHS_CLRINT_WAKE_UP
@@ -1176,7 +1188,7 @@ void USBD_IrqHandler(void)
         /* Bus reset */
         else if (status & UDPHS_INTSTA_ENDRESET)
         {
-            TRACE_DEBUG_WP("EoB ");
+            TRACE_DEBUG_WP("\r\nEoB ");
             /* Flush and enable the suspend interrupt */
             pUdp->UDPHS_CLRINT = UDPHS_CLRINT_WAKE_UP | UDPHS_CLRINT_DET_SUSPD;
             pUdp->UDPHS_IEN |= UDPHS_IEN_DET_SUSPD;
@@ -1223,7 +1235,10 @@ void USBD_IrqHandler(void)
         /* Update interrupt status */
         status  = pUdp->UDPHS_INTSTA;
         status &= pUdp->UDPHS_IEN;
-
+                                       
+       
+        LED_CLEAR_USB_DATA ;
+        
         TRACE_DEBUG_WP("\n\r");
         if (status)
         {

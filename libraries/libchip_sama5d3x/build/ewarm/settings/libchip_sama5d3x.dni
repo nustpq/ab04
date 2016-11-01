@@ -25,7 +25,8 @@ ShowTimeSum=1
 mode=0
 [Breakpoints2]
 Bp0=_ 1 "STD_CODE2" "{$PROJ_DIR$\..\..\..\..\EvalBoards\Atmel\ATSAMA5D3X-EK\uCOS-II\app.c}.681.1" 0 0 1 "" 0 ""
-Count=1
+Bp1=_ 1 "STD_CODE2" "{$PROJ_DIR$\..\..\source\USBD_HAL.c}.1217.1" 0 0 1 "" 0 ""
+Count=2
 [Interrupts]
 Enabled=1
 [MemConfig]

@@ -288,21 +288,22 @@ void OS_CPU_ExceptHndlr(CPU_INT32U except_id) {
 
     case OS_CPU_ARM_EXCEPT_RESET:
         /* $$$$ Insert code to handle a Reset exception               */
-
+         while(1);
     case OS_CPU_ARM_EXCEPT_UNDEF_INSTR:
         /* $$$$ Insert code to handle a Undefine Instruction exception */
-
+          while(1);
     case OS_CPU_ARM_EXCEPT_SWI:
         /* $$$$ Insert code to handle a Software exception             */
-
+          while(1);
     case OS_CPU_ARM_EXCEPT_PREFETCH_ABORT:
         /* $$$$ Insert code to handle a Prefetch Abort exception       */
-
+          while(1);
     case OS_CPU_ARM_EXCEPT_DATA_ABORT:
         /* $$$$ Insert code to handle a Data Abort exception           */
-
+          while(1);
     case OS_CPU_ARM_EXCEPT_ADDR_ABORT:
         /* $$$$ Insert code to handle a Address Abort exception        */
+          while(1);
     default:
 
         while (DEF_TRUE) { /* Infinite loop on other exceptions. (see note #1)          */

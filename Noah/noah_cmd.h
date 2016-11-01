@@ -14,8 +14,7 @@
 #ifndef     __NOAH_CMD_H__
 #define     __NOAH_CMD_H__
 
-#include <stdint.h>
-#include "defined.h"
+#include   <includes.h>
 /*
 *********************************************************************************************************
 *                                             ERROR CODES
@@ -43,7 +42,7 @@
 #define REPEAD_CMD_ERR           166u
 #define TIME_OUT                 167u
 #define CODEC_ERR                168u 
-#define CMD_NOT_SURRPORT         169u
+#define CMD_NOT_SUPPORT          169u
 #define GPIO_HIGHT_WTG           170u
 #define CHIP_BUFF_ERR            171u
 #define MMX_ERR                  172u
@@ -82,8 +81,6 @@
 #define UIF_TYPE_NOT_SUPPORT           204u
 #define AUD_CFG_SPI_REC_CONFLICT       205u
 
-//#define UIF_TYPE_NOT_SUPPORT           203u   //------conflict
-
 #define FW_BIN_STATE_ERR         211u
 #define FW_BIN_STATE_0_ERR       212u
 #define FW_BIN_STATE_1_ERR       213u
@@ -102,17 +99,16 @@
 #define FM36_CHECK_FLAG_ERR      227u
 #define FM36_DMIC_PGA_GAIN_ERR   228u
 
-#define CODEC_WR_REG_ERR         230u
-#define CODEC_SETVOL_RANGE_ERR   231u
-#define CODEC_SETFCLK_RANGE_ERR  232u
-#define CODEC_SETMODE_RANGE_ERR  233u
-#define CODEC_SR_NOT_SUPPORT_ERR 234u
-#define CODEC_SR_LEN_NOT_SUPPORT_ERR 235u
-#define CODEC_FUNC_NOT_SUPPORT   236u
+#define CODEC_WR_REG_ERR              230u
+#define CODEC_SETVOL_RANGE_ERR        231u
+#define CODEC_SETFCLK_RANGE_ERR       232u
+#define CODEC_SETMODE_RANGE_ERR       233u
+#define CODEC_SR_NOT_SUPPORT_ERR      234u
+#define CODEC_SR_LEN_NOT_SUPPORT_ERR  235u
+#define CODEC_FUNC_NOT_SUPPORT        236u
 #define CODEC_BIT_LEN_NOT_SUPPORT_ERR 237u
 #define CODEC_FORMAT_NOT_SUPPORT_ERR  238u
 #define CODEC_CH_NUM_NOT_SUPPORT_ERR  239u
-
 
 
 //ERROR CODE from 245~ 255 reserved for Audio MCU
@@ -227,6 +223,9 @@
 #define  PC_CMD_RESET_MIC            13
 #define  PC_CMD_SET_VOLUME           14
 #define  PC_CMD_RESET_AUDIO          15
+#define  PC_CMD_UPDATE_AUDIO         16
+
+#define  PC_CMD_AB_POST              20
 
 #define  PC_CMD_SET_IF_CFG           30
 #define  PC_CMD_RAW_WRITE            31
@@ -237,13 +236,15 @@
 #define  PC_CMD_DELAY                36
 #define  PC_CMD_MCU_FLASH_WRITE      40
 #define  PC_CMD_SET_VEC_CFG          41
-#define  PC_CMD_REC_VOICE_BUFFER     42
-#define  PC_CMD_FETCH_VOICE_BUFFER   43
+
+#define  PC_CMD_REC_VOICE_BUFFER     42 //trigger SPI voice buf rec 
+//#define  PC_CMD_FETCH_VOICE_BUFFER   43
 #define  PC_CMD_TO_IM501_CMD         44
 #define  PC_CMD_ENTER_PSM            45
 #define  PC_CMD_GPIO_SESSION         46
-#define  PC_CMD_SPI_REC              47
+#define  PC_CMD_SPI_REC              47 //start SPI record
 #define  PC_CMD_IF_ONOFF             48
+#define  PC_CMD_SPI_PLAY             49 //start SPI play
 
 #define  PC_CMD_DOWNLOAD_RULER_FW    100
 #define  PC_CMD_UPDATE_RULER_FW      101
@@ -284,27 +285,27 @@
 *********************************************************************************************************
 */
 typedef struct {
-    uint8_t head ;
-    uint8_t DataLen ;
-    uint8_t Data[256];
-    uint8_t checkSum ;
+    unsigned char head ;
+    unsigned char DataLen ;
+    unsigned char Data[256];
+    unsigned char checkSum ;
 }NOAH_CMD ;
 
 typedef struct {
-    uint8_t  head_sync_1 ;   //EB                             
-    uint8_t  data_len[3] ;   //MSB first
-    uint8_t  head_sync_2 ;   //90
-    uint8_t  pkt_sn ;        //1 ~31
-    uint8_t  cmd[2] ;        //MSB first
-    uint8_t  data[ NEW_CMD_DATA_MLEN ] ; 
+    unsigned char  head_sync_1 ;   //EB                             
+    unsigned char  data_len[3] ;   //MSB first
+    unsigned char  head_sync_2 ;   //90
+    unsigned char  pkt_sn ;        //1 ~31
+    unsigned char  cmd[2] ;        //MSB first
+    unsigned char  data[NEW_CMD_DATA_MLEN] ; 
 }*pNEW_CMD ;
 
 typedef struct {
-    uint32_t   index;    
-    uint32_t   length ;
-    uint8_t *pdata; 
-    uint8_t  data[EMB_BUF_SIZE] ;
-    uint8_t  pkt_sn;
+    unsigned int   index;    
+    unsigned int   length ;
+    unsigned char *pdata; 
+    unsigned char  data[EMB_BUF_SIZE] ;
+    unsigned char  pkt_sn;
     bool           state;
 }EMB_BUF ;
 
@@ -331,7 +332,7 @@ typedef union  {
     MCU_FLASH             mcu_flash;
     SET_VEC_CFG           set_vec_cfg;
     VOICE_BUF             voice_buf_data;
-    SPI_CFG         voice_buf_cfg;
+    SPI_PLAY_REC_CFG       spi_rec_cfg;
     GPIO_SESSION          gpio_session;
 }PCCMDDAT, *pPCCMDDAT ;
 
@@ -352,39 +353,39 @@ typedef struct {
 */
 extern void Init_EMB_BUF( EMB_BUF* pEBuf ) ;
 extern void Init_CMD_Read( CMDREAD* pCMD_Read, OS_EVENT  *pOS_EVENT ) ;
-extern void Noah_CMD_Read( CMDREAD* pCMD_Read, uint8_t data_byte ) ;
-//extern uint8_t Noah_CMD_Parse(   uint8_t  *pCmdDat, 
+extern void Noah_CMD_Read( CMDREAD* pCMD_Read, CPU_INT08U data_byte ) ;
+//extern CPU_INT08U Noah_CMD_Parse(   CPU_INT08U  *pCmdDat, 
 //                                    CPU_INT32U datalen
 //                                );
-extern uint8_t pcSendDateToBuf(  OS_EVENT   *pOS_EVENT, 
-                                    uint8_t  frame_head, 
-                                    uint8_t *pdat, 
-                                    uint8_t  data_length, 
-                                    uint8_t  msg_post_mode,
-                                    uint8_t  *pex_dat,
-                                    uint8_t   ex_data_length 
+extern CPU_INT08U pcSendDateToBuf(  OS_EVENT   *pOS_EVENT, 
+                                    CPU_INT08U  frame_head, 
+                                    CPU_INT08U *pdat, 
+                                    CPU_INT08U  data_length, 
+                                    CPU_INT08U  msg_post_mode,
+                                    CPU_INT08U  *pex_dat,
+                                    CPU_INT08U   ex_data_length 
                                  ) ;
-extern uint8_t  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,                               
-                                        PCCMDDAT    *pPcCmdData,
-                                        uint8_t   pkt_index,
-                                        uint16_t   cmd_id                                 
+extern CPU_INT08U  pcSendDateToBuffer ( OS_EVENT    *pOS_EVENT,                               
+                                 PCCMDDAT    *pPcCmdData,
+                                 CPU_INT08U   pkt_index,
+                                 CPU_INT16U   cmd_id                                 
                                );
-extern uint8_t  EMB_Data_Build (  uint16_t   cmd_type, 
-                                     uint8_t  *pChar, 
-                                     PCCMDDAT    *pPcCmdData,
-                                     CPU_INT32U  *p_emb_length);
+extern CPU_INT08U  EMB_Data_Build (  CPU_INT16U   cmd_type, 
+                              CPU_INT08U  *pChar, 
+                              PCCMDDAT    *pPcCmdData,
+                              CPU_INT32U  *p_emb_length);
 
-extern uint8_t CheckSum( uint8_t init_data, 
-                            uint8_t *pdata, 
-                            uint16_t length
+extern CPU_INT08U CheckSum(     CPU_INT08U init_data, 
+                                CPU_INT08U *pdata, 
+                                CPU_INT16U length
                           );
-extern uint8_t  Noah_CMD_Parse_Ruler ( NOAH_CMD    *pNoahCmd,                                 
-                                          uint8_t  *pSessionDone); 
-extern uint8_t EMB_Data_Check( pNEW_CMD pNoahCmd, EMB_BUF *pEBuf, uint8_t delay);
-extern uint8_t EMB_Data_Parse ( pNEW_CMD  pNewCmd )  ;
-extern uint8_t  AB_Status_Change_Report (void);
-extern void  Send_DACK (uint8_t  error_id);
-extern void  Send_GACK (uint8_t  error_id);
-extern void  Send_Report (uint8_t pkt_sn, uint8_t error_id);
+extern CPU_INT08U  Noah_CMD_Parse_Ruler ( NOAH_CMD    *pNoahCmd,                                 
+                                          CPU_INT08U  *pSessionDone); 
+extern CPU_INT08U EMB_Data_Check( pNEW_CMD pNoahCmd, EMB_BUF *pEBuf, CPU_INT08U delay);
+extern CPU_INT08U EMB_Data_Parse ( pNEW_CMD  pNewCmd )  ;
+extern CPU_INT08U  AB_Status_Change_Report (void);
+extern void  Send_DACK (CPU_INT08U  error_id);
+extern void  Send_GACK (CPU_INT08U  error_id);
+extern void  Send_Report (CPU_INT08U pkt_sn, CPU_INT08U error_id);
 
 #endif 

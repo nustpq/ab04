@@ -65,8 +65,8 @@ static uint8_t init_Play_Setting( void *pInstance )
     DataSource *pSource = ( DataSource * )pInstance;
     AUDIO_CFG  *reg = ( AUDIO_CFG * )pSource->peripheralParameter;    
     
-    if( ( reg[ PLAY ].channels == 0 ) 
-      || ( reg[ PLAY ].channels > 8 ) ) 
+    if( ( reg[ PLAY ].channel_num == 0 ) 
+      || ( reg[ PLAY ].channel_num > 8 ) ) 
     {        
         err = ERR_TDM_FORMAT ; 
     }
@@ -84,11 +84,11 @@ static uint8_t init_Play_Setting( void *pInstance )
     
     if( reg[ PLAY ].bit_length == 16 ) 
     {
-        pSource->warmWaterLevel = reg[ PLAY ].sr / 1000 * reg[ PLAY ].channels * 2 * 2;
+        pSource->warmWaterLevel = reg[ PLAY ].sample_rate / 1000 * reg[ PLAY ].channel_num * 2 * 2;
     } 
     else 
     { //32
-        pSource->warmWaterLevel = reg[ PLAY ].sr / 1000 * reg[ PLAY ].channels * 2 * 4;        
+        pSource->warmWaterLevel = reg[ PLAY ].sample_rate / 1000 * reg[ PLAY ].channel_num * 2 * 4;        
     }
     
      pSource->set_peripheral = ssc_txRegister_set;
@@ -134,8 +134,8 @@ static uint8_t init_Rec_Setting( void *pInstance )
              ( start == 4 )?"Low":"High" );   
 #endif
     
-    if( ( reg[ REC ].channels == 0 ) 
-      || ( reg[ REC ].channels > 8 ) ) 
+    if( ( reg[ REC ].channel_num == 0 ) 
+      || ( reg[ REC ].channel_num > 8 ) ) 
     {        
         err = ERR_TDM_FORMAT ; 
     }
@@ -154,11 +154,11 @@ static uint8_t init_Rec_Setting( void *pInstance )
     
     if( reg[ REC ].bit_length == 16 ) 
     { 
-        pSource->warmWaterLevel  = reg[ REC ].sr / 1000 * reg[ REC ].channels  * 2 * 2; // 2ms * 16bit
+        pSource->warmWaterLevel  = reg[ REC ].sample_rate / 1000 * reg[ REC ].channel_num  * 2 * 2; // 2ms * 16bit
     } 
     else 
     { //32bit case
-        pSource->warmWaterLevel  = reg[ REC ].sr / 1000 * reg[ REC ].channels  * 2 * 4; // 2ms * 32bit       
+        pSource->warmWaterLevel  = reg[ REC ].sample_rate / 1000 * reg[ REC ].channel_num  * 2 * 4; // 2ms * 32bit       
     }
     
      pSource->set_peripheral = ssc_rxRegister_set;
@@ -271,7 +271,8 @@ static void Audio_Stop( void )
 */
 void Audio_State_Control( uint8_t *msg )
 {    
-    uint8_t err = 0;
+ /*
+  uint8_t err = 0;
     uint32_t  temp ;    
 
     static uint16_t audio_cmd_index;      //just defined it avoid compile error by leo
@@ -376,7 +377,8 @@ void Audio_State_Control( uint8_t *msg )
                 err = ERR_CMD_TYPE;
             break;
         
-        }           
+        }   
+  */
 }
 
 /*

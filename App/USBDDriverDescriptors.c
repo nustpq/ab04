@@ -58,7 +58,7 @@
 /** Device product ID. */
 #define CDCDSerialDriverDescriptors_PRODUCTID       0x9700
 /** Device vendor ID (Atmel). */
-#define CDCDSerialDriverDescriptors_VENDORID        0x03EB
+#define CDCDSerialDriverDescriptors_VENDORID        0xAB04//0x03EB
 /** Device release number. */
 #define CDCDSerialDriverDescriptors_RELEASE         0x0100
 /**      @}*/
@@ -757,7 +757,7 @@ const unsigned char productStringDescriptor[] = {
     USBStringDescriptor_UNICODE('d'),
 };
 
-// Product serial number.
+//Product serial number.
 const unsigned char serialNumberDescriptor[] = {
 
     USBStringDescriptor_LENGTH(16),
@@ -841,7 +841,7 @@ const unsigned char OSExPropertyDescriptor[] = {
     0x72 ,0x00 ,0x66 ,0x00 ,0x61 ,0x00 ,0x63 ,0x00 ,0x65 ,0x00 ,
     0x47 ,0x00 ,0x55 ,0x00 ,0x49 ,0x00 ,0x44 ,0x00 ,0x00 ,0x00 , 
         
-    0x4E ,0x00,0x00,0x00, //Length of the property value string is 78 bytes.
+    0x4E ,0x00,0x00,0x00,//Length of the property value string is 78 bytes.
     //"{cc22e4b4-7985-426a-87ea-6ee58f202136}"
     USBStringDescriptor_UNICODE('{'),
     USBStringDescriptor_UNICODE('c'),

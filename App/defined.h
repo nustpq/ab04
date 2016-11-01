@@ -21,7 +21,7 @@
 #include <ucos_ii.h>
 
 #include "uif_object.h"
-
+#include "ruler.h"
 
 #define SUCCESS                          0u
 #define NO_ERR                           0u
@@ -95,7 +95,6 @@
 #define MEM_TYPE_PM  0x01
 #define MEM_TYPE_CM  0x02
 
-#define EMB_BUF_SIZE (4200-8)
 
 #define DEF_VERSION_STR_LEN             ( 11 + 1 )
 #define DEF_MODEL_STR_LEN               ( 7 + 1 )
@@ -244,6 +243,7 @@ typedef struct _sys_info
 typedef  uint8_t VERSION_DATA[ DEF_VERSION_STR_LEN ] ;  
 typedef  uint8_t MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
 
+/*
 typedef struct {    
     VERSION_DATA    mic_vendor ; //string    
     VERSION_DATA    mic_part_no ;//string 
@@ -259,7 +259,7 @@ typedef struct {
     uint32_t        data_len ; //add
     uint8_t         *p_data ; 
 }MIC_CALIB_INFO ;
-
+ */
 typedef struct {
     uint32_t   length;
     uint32_t   index;
@@ -267,14 +267,15 @@ typedef struct {
     uint8_t    done;
 }VOICE_BUF ;
 
-typedef struct _spi_parameter
-{
-    uint32_t   spi_speed;
-    uint8_t    spi_mode;  
-    uint8_t    gpio_irq;
-    uint8_t    slave;
-    uint8_t    chip_id;
-}SPI_CFG;
+//
+//typedef struct _spi_parameter
+//{
+//    uint32_t   spi_speed;
+//    uint8_t    spi_mode;  
+//    uint8_t    gpio_irq;
+//    uint8_t    slave;
+//    uint8_t    chip_id;
+//}SPI_CFG;
 
 typedef struct _usart_parameter
 {
@@ -290,6 +291,7 @@ typedef struct twi_parameter
   uint8_t  revers;
 }TWI_CFG;
 
+/*
 typedef struct { 
     uint8_t     channels ; //mic num 1~6 
     uint8_t     bit_length;//16, 24, 32    
@@ -448,6 +450,7 @@ typedef struct {
     uint32_t   delay_us[7];
 }GPIO_SESSION ; 
 
+*/
 
 extern SET_VEC_CFG  Global_VEC_Cfg;
 

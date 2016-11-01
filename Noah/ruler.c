@@ -28,58 +28,31 @@
 *********************************************************************************************************
 */
 
-#include <ucos_ii.h>
-#include "defined.h"
-#include "emb.h"
+//#include <includes.h>
 #include "noah_cmd.h"
 #include "codec.h"
 
-/*----------------------------------------------------------------------------*/
-//just define these to avoid compile error,they will be redefined according new hardware or abandant
 
-#define AUDIO_UART                  0
-#define PC_UART                     1 
-#define RULER_UART                  2
-
-#define I2C_MIX_UIF_M        1
-#define I2C_MIX_UIF_S        2
-#define I2C_MIX_FM36_CODEC   3
-
-#define  APP_CFG_TASK_USER_IF_PRIO  10
-
-//#define LED_P0  PIN_LED_0
-#define LED_P0  0
-
-OS_EVENT  *UART_MUX_Sem_lock ;
-OS_EVENT  *ACK_Sem_RulerUART ;
-OS_EVENT  *Done_Sem_RulerUART ;
-OS_EVENT  *EVENT_MsgQ_RulerUART2Noah;
-OS_EVENT  *EVENT_MsgQ_Noah2RulerUART;
-OS_EVENT  *Load_Vec_Sem_lock;
-/*----------------------------------------------------------------------------*/
-volatile uint32_t   Global_Mic_Mask[4] ;      //MIC sellection status
-volatile uint8_t  Global_Ruler_Index = 0 ;  //the ruler index for UART comm NOW
-volatile uint8_t  Global_Bridge_POST = 0 ;  //audio bridge POST status
-volatile uint8_t  Global_Ruler_State[4];    //ruler status
-volatile uint8_t  Global_Ruler_Type[4];     //ruler type
-volatile uint8_t  Global_Mic_State[4];      //MIC (8*4=32) status(calib info error or not)
-uint8_t           Audio_Version[20];        //fixed size
-uint8_t           Ruler_CMD_Result;
-volatile uint8_t  Ruler_Setup_Sync_Data;
+volatile unsigned int   Global_Mic_Mask[4] ;      //MIC sellection status
+volatile unsigned char  Global_Ruler_Index = 0 ;  //the ruler index for UART comm NOW
+volatile unsigned char  Global_Bridge_POST = 0 ;  //audio bridge POST status
+volatile unsigned char  Global_Ruler_State[4];    //ruler status
+volatile unsigned char  Global_Ruler_Type[4];     //ruler type
+volatile unsigned char  Global_Mic_State[4];      //MIC (8*4=32) status(calib info error or not)
+unsigned char           Audio_Version[20];        //fixed size
+unsigned char           Ruler_CMD_Result;
+volatile unsigned char  Ruler_Setup_Sync_Data;
 
 extern EMB_BUF   Emb_Buf_Data;
 extern EMB_BUF   Emb_Buf_Cmd;
 
-//SET_VEC_CFG  Global_VEC_Cfg; 
-//CODEC_SETS    codec_set[2];
+SET_VEC_CFG  Global_VEC_Cfg; 
+CODEC_SETS    codec_set[2];
 
-uint8_t flag_bypass_fm36;
+unsigned char flag_bypass_fm36;
 
-volatile uint8_t  Global_SPI_Rec_Start = 0;
-volatile uint8_t  Global_SPI_Rec_En = 0;
-
-//import global variable
-extern uint8_t g_pmeccStatus;             //indicate nfc controller initialized or not
+volatile unsigned char  Global_SPI_Rec_Start = 0;
+volatile unsigned char  Global_SPI_Rec_En = 0;
 /*
 *********************************************************************************************************
 *                                           Init_Global_Var()
@@ -93,7 +66,7 @@ extern uint8_t g_pmeccStatus;             //indicate nfc controller initialized 
 */
 void Init_Global_Var( void )
 {
-    uint8_t ruler_id;    
+    unsigned char ruler_id;    
     
     for( ruler_id = 0; ruler_id < 4; ruler_id++ ) {        
         Global_Ruler_State[ruler_id] = RULER_STATE_DETACHED;
@@ -116,10 +89,10 @@ void Init_Global_Var( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-static uint8_t Check_Actived_Mic_Number( void )
+static unsigned char Check_Actived_Mic_Number( void )
 {
-    uint8_t mic_counter = 0;
-    uint8_t i, j;    
+    unsigned char mic_counter = 0;
+    unsigned char i, j;    
 
     for( i = 0; i < 4 ; i++ ) { //scan 4 slots
         for( j = 0; j < 32; j++ ) { //scan max 32mics per slot
@@ -144,10 +117,10 @@ static uint8_t Check_Actived_Mic_Number( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Get_Mask_Num( uint32_t mask )
+unsigned char Get_Mask_Num( unsigned int mask )
 {
-   uint8_t i;
-   uint8_t num = 0;
+   unsigned char i;
+   unsigned char num = 0;
    
    for ( i = 0 ; i<32; i++ ) {
        if( mask & (1<<i) ) {
@@ -172,11 +145,11 @@ uint8_t Get_Mask_Num( uint32_t mask )
 * Note(s)     : If HW switch fast enough, no need this routine.
 *********************************************************************************************************
 */
-#if OLD_CODE
 void Check_UART_Mixer_Ready( void )
 {
-    uint8_t err; 
-    uint32_t  counter;
+ /*  
+  unsigned char err; 
+    unsigned int  counter;
     
     counter = 0;
     while( OSQGet( EVENT_MsgQ_Noah2RulerUART, &err ) ) {
@@ -196,13 +169,10 @@ void Check_UART_Mixer_Ready( void )
         APP_TRACE_INFO(("Check_UART_Mixer_Ready, stage 2 : wait %d ms\r\n",counter));  
     }
     OSTimeDly(5);   
-    
+ */
+  
 }
-#else
-void Check_UART_Mixer_Ready( void )
-{
-}
-#endif
+
 
 /*
 *********************************************************************************************************
@@ -216,37 +186,53 @@ void Check_UART_Mixer_Ready( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-//We assume :
-//1. there must be a REC setup and a PLAY setup for each audio configuration
-//2. REC setup comes first and then PLAY setup 
-
-#if OLD_CODE
-uint8_t Setup_Audio( AUDIO_CFG *pAudioCfg )
-{
-    uint8_t err; 
-    uint8_t mic_num; 
-    uint8_t data  = 0xFF;
-    uint8_t format;
-    uint8_t polarity;
+unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
+{  
+/*  
+    unsigned char err; 
+    unsigned char mic_num; 
+    unsigned char data  = 0xFF;      
+    unsigned char lin_ch = 0;
     
-    uint8_t buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG  };
-        
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG };
+          
     //APP_TRACE_INFO(("Setup_Audio [%s]:[%d SR]:[%d CH]: %s\r\n",(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
     if( pAudioCfg->type == 0 ) {
-        APP_TRACE_INFO(("\r\nSetup_Audio [REC ]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sr, pAudioCfg->channels, pAudioCfg->bit_length));
+        if ( pAudioCfg->lin_ch_mask != 0 ) { 
+            lin_ch = 2;// 2 channel LINE IN
+            pAudioCfg->channel_num += lin_ch; 
+            //APP_TRACE_INFO(("LIN 2CH added up to %d CH\r\n",pAudioCfg->channel_num)); 
+        }
+        APP_TRACE_INFO(("\r\nSetup_Audio [REC ]:[%d SR]:[%d CH]:[%d-Bit]:[LIN %d]", pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length, lin_ch));
     } else if( pAudioCfg->type == 1 ){
-        APP_TRACE_INFO(("\r\nSetup_Audio [PLAY]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sr, pAudioCfg->channels, pAudioCfg->bit_length ));
+        APP_TRACE_INFO(("\r\nSetup_Audio [PLAY]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length ));
     } else {
         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: Unsupported pAudioCfg->type, %d\r\n",pAudioCfg->type));
         return AUD_CFG_ERR;
     }
     
-    err = Check_SR_Support( pAudioCfg->sr );
+    err = Check_SR_Support( pAudioCfg->sample_rate );
     if( err != NO_ERR ) { 
         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: Unsupported sample rate!\r\n")); 
         return err;
     }        
+        
+//    mic_num = Check_Actived_Mic_Number();
+//    if( mic_num > 6 ) {
+//        APP_TRACE_INFO(("\r\nERROR: Check_Actived_Mic_Number = %d > 6\r\n",mic_num));
+//        return AUD_CFG_MIC_NUM_MAX_ERR;//if report err, need UI support!  
+//    } 
+//    //check rec mic num    
+//    if( (pAudioCfg->type == 0) && ( mic_num != pAudioCfg->channels) ) {
+//        APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channels(%d) !=  Active MICs Num(%d)\r\n",pAudioCfg->channels,mic_num));
+//        buf[4] = mic_num;
+//        return AUD_CFG_MIC_NUM_DISMATCH_ERR;
+//    } 
 
+//    if( (pAudioCfg->type == 0) && (pAudioCfg->channels == 0) && (pAudioCfg->lin_ch_mask == 0) ) {
+//        APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channels + ch_lin =  0\r\n" ));        
+//        //return AUD_CFG_PLAY_CH_ZERO_ERR; UI not support
+//    }
     //check sample rate
     //No add here!
     
@@ -265,51 +251,79 @@ uint8_t Setup_Audio( AUDIO_CFG *pAudioCfg )
     } else {
         mic_num = Global_Mic_Mask[0]; //save mic num to ruler0
     } 
-#endif   
-    if ( (pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask != 0) ) {         
-        pAudioCfg->channels += 2; //add 2 channel for LINE IN
-        APP_TRACE_INFO(("Lin 2 channels added...%d\r\n",pAudioCfg->channels)); 
-    }
 
-#ifdef BOARD_TYPE_UIF    
+#endif   
+
+
+#ifdef BOARD_TYPE_UIF  
     if ( pAudioCfg->type == 0 ) {
         
         pAudioCfg->gpio_rec_num  = Get_Mask_Num( pAudioCfg->gpio_rec_bit_mask ); //gpio num
         pAudioCfg->gpio_rec_start_index = pAudioCfg->channel_num;  //gpio start index
-        pAudioCfg->channel_num += pAudioCfg->gpio_rec_num; //add gpio num to channel 
+        pAudioCfg->channel_num += pAudioCfg->gpio_rec_num; //add gpio num to channel         
+        if(  pAudioCfg->channel_num > 10 ) {
+            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO+SPI Rec channel num(=%d) > 10 NOT allowed for UIF\r\n", pAudioCfg->channel_num));
+            return AUD_CFG_MIC_NUM_MAX_ERR ;
+        }  
         
-        pAudioCfg->spi_rec_num   = Get_Mask_Num( pAudioCfg->spi_rec_bit_mask );  //spi num    
-        
+        pAudioCfg->spi_rec_num   = Get_Mask_Num( pAudioCfg->spi_rec_bit_mask );  //spi num           
         Global_SPI_Rec_En = 0; //clear flag as No SPI rec
         if( pAudioCfg->spi_rec_num  != 0 ){
             if( pAudioCfg->channel_num != 0 ) {
                 APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO Rec conflict with SPI Rec\r\n"));
-                return AUD_CFG_SPI_REC_CONFLICT ;
+                //return AUD_CFG_SPI_REC_CONFLICT ;
             }
             pAudioCfg->channel_num = pAudioCfg->spi_rec_num;  //use spi num for rec channel  
             Global_SPI_Rec_En = 1; //set flag for SPI rec            
-        }      
-        if(  pAudioCfg->channel_num > 8 ) {
-            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO+SPI Rec channel num(=%d) > 8 NOT allowed for AB03\r\n", pAudioCfg->channel_num));
-            return AUD_CFG_MIC_NUM_MAX_ERR ;
-        }  
-        
+        } 
     }
 #endif
+    if( (pAudioCfg->spi_rec_num != 0) && (pAudioCfg->channel_num > pAudioCfg->slot_num) )   {
+         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: channel_num > slot_num\r\n"));  
+         return AUD_CFG_ERR ;               
+    }
     //check channel num    
-    if( (pAudioCfg->type == 1) && (pAudioCfg->channels == 0) ) {
-        APP_TRACE_INFO(("WARN:(Setup_Audio Play)pAudioCfg->channels =  0\r\n" ));        
+    if( (pAudioCfg->type == 1) && (pAudioCfg->channel_num == 0) ) {
+        APP_TRACE_INFO(("WARN:(Setup_Audio Play)pAudioCfg->channel_num =  0\r\n" ));        
         //return AUD_CFG_PLAY_CH_ZERO_ERR;  UI not support
     }  
-    if( (pAudioCfg->type == 0) && (pAudioCfg->channels == 0) ) {
-        APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channels  =  0\r\n" ));        
+    if( (pAudioCfg->type == 0) && (pAudioCfg->channel_num == 0) ) {
+        APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channel_num  =  0\r\n" ));        
         //return AUD_CFG_PLAY_CH_ZERO_ERR; UI not support
     }
-    
+                 
+
+    //ssc_cki =  0: falling egde send for sending, 1: rising edge lock for receiving
+    if ( pAudioCfg->type == 0 ) { //rec
+        pAudioCfg->ssc_cki  =   pAudioCfg->bclk_polarity == 0 ? 1 : 0 ;
+    } else { //play
+        pAudioCfg->ssc_cki  =   pAudioCfg->bclk_polarity == 0 ? 0 : 1 ;
+    }
+    switch(  pAudioCfg->format ) {
+        case 1 :  //PDM
+            flag_bypass_fm36 = 0;       //Not bypass FM36 for PDM mode
+            pAudioCfg->ssc_start = 4;  //falling edge trigger for low left
+            pAudioCfg->slot_num  = 8; //make sure 8 slots enabled when used FM36 to record PDM     
+        break;         
+        case 2 : //I2S or I2S-TDM
+            flag_bypass_fm36 = 1;      //bypass FM36
+            pAudioCfg->ssc_start = 4;  //falling edge trigger for low left   
+            if( pAudioCfg->ssc_delay != 1 ) {  //one clock delay is needed in I2S 
+                return CODEC_FORMAT_NOT_SUPPORT_ERR;
+            }              
+        break;           
+        case 3 : //PCM or PCM-TDM
+            flag_bypass_fm36 = 1;      //bypass FM36   
+            pAudioCfg->ssc_start = 5;  //rising edge trigger for high left          
+        break;         
+        default:
+            return CODEC_FORMAT_NOT_SUPPORT_ERR;
+        break;
+    }    
     //Dump_Data(buf, sizeof(buf)); 
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf, sizeof(buf)) ; 
-    USART_SendBuf( AUDIO_UART, (uint8_t *)pAudioCfg, sizeof(AUDIO_CFG)) ; 
+    USART_SendBuf( AUDIO_UART, (unsigned char *)pAudioCfg, sizeof(AUDIO_CFG)) ; 
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM);
     if( err != NO_ERR ) { 
         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: timeout\r\n")); 
@@ -318,47 +332,20 @@ uint8_t Setup_Audio( AUDIO_CFG *pAudioCfg )
     if( data != NO_ERR ) {
         APP_TRACE_INFO(("\r\nSetup_Audio ERROR: %d\r\n ",data)); 
         return data; 
-    }
-    
-    flag_bypass_fm36 = 1;  //bypass FM36
-    if( pAudioCfg->format == 1 && pAudioCfg->channels == 2 ){ //I2S
-        format = 0 ;//I2S
-    } else if( pAudioCfg->format == 2 ){ //PDM       
-        format = 1; //I2S-TDM
-        pAudioCfg->channels = 8; //make sure 8 slots enabled when used FM36 to record PDM
-        flag_bypass_fm36 = 0; //not bypass FM36 for PDM mode
-    } else if( pAudioCfg->format == 3 ) { //PCM/TDM
-        format = 2; //PCM/TDM
-    } else {
-        return CODEC_FORMAT_NOT_SUPPORT_ERR;
-    }
+    }                      
         
-    if( (pAudioCfg->type + pAudioCfg->cki) != 1 ) {
-        return CODEC_FORMAT_NOT_SUPPORT_ERR;
-    }
-    if( pAudioCfg->start==4 ) {    
-        polarity = 0;
-    } else if( pAudioCfg->start==5 ){
-        polarity = 1;    
-    } else {
-        return CODEC_FORMAT_NOT_SUPPORT_ERR;
-    }    
-  
-    codec_set[pAudioCfg->type].flag       = 1;  //cfg received
-    codec_set[pAudioCfg->type].sr         = pAudioCfg->sr;
-    codec_set[pAudioCfg->type].sample_len = pAudioCfg->bit_length;
-    codec_set[pAudioCfg->type].format     = format;
-    codec_set[pAudioCfg->type].slot_num   = pAudioCfg->channels;
-    codec_set[pAudioCfg->type].m_s_sel    = pAudioCfg->master_or_slave;
-    codec_set[pAudioCfg->type].delay      = pAudioCfg->delay;
-    codec_set[pAudioCfg->type].bclk_polarity = polarity;
-    return err ; 
+    codec_set[pAudioCfg->type].flag          = 1;  //cfg received
+    codec_set[pAudioCfg->type].sr            = pAudioCfg->sample_rate;
+    codec_set[pAudioCfg->type].sample_len    = pAudioCfg->bit_length;
+    codec_set[pAudioCfg->type].format        = pAudioCfg->format;
+    codec_set[pAudioCfg->type].slot_num      = pAudioCfg->slot_num;
+    codec_set[pAudioCfg->type].m_s_sel       = pAudioCfg->master_slave;
+    codec_set[pAudioCfg->type].delay         = pAudioCfg->ssc_delay;
+    codec_set[pAudioCfg->type].bclk_polarity = pAudioCfg->bclk_polarity;
+  */   
+    return 0 ; 
 }
-#else
-uint8_t Setup_Audio( AUDIO_CFG *pAudioCfg )
-{
-}
-#endif
+
 
 
 /*
@@ -374,27 +361,24 @@ uint8_t Setup_Audio( AUDIO_CFG *pAudioCfg )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Update_Audio( void )
-{
-  /*
-    uint8_t err;
-    uint8_t index ;  
-      
+unsigned char Update_Audio( void )
+{   
+    unsigned char err;
+    unsigned char index ;  
+ /*     
     APP_TRACE_INFO(("\r\nUpdate_Audio : [REC] = %d [PLAY] = %d\r\n", codec_set[0].flag, codec_set[1].flag));
     err = 0;     
     if( (codec_set[0].flag == 1)  && (codec_set[1].flag == 1) ) {
         if( (codec_set[0].sr !=  codec_set[1].sr) ||
-            (codec_set[0].sample_len !=  codec_set[1].sample_len) ||
+            (codec_set[0].slot_num != codec_set[1].slot_num) ||
             (codec_set[0].format !=  codec_set[1].format)  ||
-            (codec_set[0].m_s_sel !=  codec_set[1].m_s_sel)  ) {
+            (codec_set[0].m_s_sel !=  codec_set[1].m_s_sel) ||
+            (codec_set[0].sample_len !=  codec_set[1].sample_len) ||
+            (codec_set[0].bclk_polarity !=  codec_set[1].bclk_polarity) ) {
             err = AUD_CFG_ERR;
-            APP_TRACE_INFO(("\r\nERROR: [REC] conflict [PLAY] audio settings!\r\n"));
+            APP_TRACE_INFO(("\r\nERROR: [REC] and [PLAY] audio settings conflicts!\r\n"));
         }
-        if( codec_set[0].slot_num >= codec_set[1].slot_num ) {
-           index = 0; 
-        } else {
-           index = 1;
-        }
+        index = 0;   
     } else if( codec_set[0].flag == 1 ) {
         index = 0;
     } else if( codec_set[1].flag == 1 ) {
@@ -404,25 +388,25 @@ uint8_t Update_Audio( void )
     }    
     codec_set[0].flag = 0; //reset Cfg flag
     codec_set[1].flag = 0;
+    
     if( err != NO_ERR ) {
         return err;
     }
-    
-    //codec_set[index].
+    APP_TRACE_INFO(("\r\n\r\n############## BCLK POLARITY = %d\r\n\r\n", codec_set[index].bclk_polarity));
     I2C_Mixer(I2C_MIX_FM36_CODEC);    
-    err = Init_CODEC( &source_twi2,codec_set[index] );     //-------------temp by leo 
-    //err = Init_CODEC( pAudioCfg->sr,  pAudioCfg->bit_length, i2s_tdm_sel, buf[4], buf[15]);
+    err = Init_CODEC( codec_set[index] );    
     I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         APP_TRACE_INFO(("\r\nUpdate_Audio Init_CODEC ERROR: %d\r\n",err)); 
         return err;
     } 
+    
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
 #ifdef BOARD_TYPE_AB03  
     err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, 1, 0 ); //Lin from SP1_RX, slot0~1
-#elif defined BOARD_TYPE_UIF
-    I2C_Mixer(I2C_MIX_FM36_CODEC);
+#elif defined BOARD_TYPE_UIF     
     if( flag_bypass_fm36 == 0 ) {
-        err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, codec_set[index].sample_len, codec_set[index].format, 0 ); //Lin from SP1_RX, slot0~1
+      err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, codec_set[index].sample_len, codec_set[index].slot_num==2 ? 0:1, 0 ); //Lin from SP1_RX, slot0~1
     } else{
         err = FM36_PWD_Bypass(); 
     }
@@ -432,20 +416,9 @@ uint8_t Update_Audio( void )
         APP_TRACE_INFO(("\r\nUpdate_Audio ReInit_FM36 ERROR: %d\r\n",err)); 
         return err;
     }
-        
-//    if ( pAudioCfg->lin_ch_mask != 0 ) {
-//        err = Set_AIC3204_DSP_Offset( mic_num );
-//        if( err != NO_ERR ) {
-//            APP_TRACE_INFO(("\r\nSetup_Audio Init AIC3204 ERROR: %d\r\n",err)); 
-//        }
-//    }
-//    if( buf[16] != 0) {
-//        Global_SPI_Record = 1; //set flag for SPI rec
-//    }
-    ////////////////////////////////////////////////////////////////////////////
-    
+  */          
     return 0 ; 
- */   
+    
 }
 
 
@@ -463,16 +436,15 @@ uint8_t Update_Audio( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-#if OLD_CODE
-uint8_t Start_Audio( START_AUDIO start_audio )
+unsigned char Start_Audio( START_AUDIO start_audio )
 {   
-    uint8_t err;  
-    uint8_t data  = 0xFF; 
-    uint8_t ruler_id;    
-    uint8_t buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_START_AUDIO, start_audio.type&0x03, start_audio.padding }; 
-    
+    unsigned char err;  
+    unsigned char data  = 0xFF; 
+    unsigned char ruler_id;    
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_START_AUDIO, start_audio.type&0x03, start_audio.padding }; 
+  /*  
 #if OS_CRITICAL_METHOD == 3u
-    OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    OS_CPU_SR  cpu_sr = 0u;                                 
 #endif 
 
     APP_TRACE_INFO(("\r\nStart_Audio : type = [%d], padding = [0x%X]\r\n", start_audio.type, start_audio.padding));    
@@ -495,14 +467,9 @@ uint8_t Start_Audio( START_AUDIO start_audio )
         OS_EXIT_CRITICAL();  
         
     }
-    
+     */
     return 0 ;   
 }
-#else
-uint8_t Start_Audio( START_AUDIO start_audio )
-{
-}
-#endif
 
 
 /*
@@ -517,17 +484,16 @@ uint8_t Start_Audio( START_AUDIO start_audio )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Stop_Audio( void )
+unsigned char Stop_Audio( void )
 {  
-    uint8_t err   = 0xFF;  
-    uint8_t data  = 0xFF;
-    uint8_t ruler_id;     
-    uint8_t buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_STOP_AUDIO };
-    
+    unsigned char err   = 0xFF;  
+    unsigned char data  = 0xFF;
+    unsigned char ruler_id;     
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_STOP_AUDIO };
+     /*
 #if OS_CRITICAL_METHOD == 3u
-    OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    OS_CPU_SR  cpu_sr = 0u;                                 // Storage for CPU status register         
 #endif 
-#if OLD_CODE
     APP_TRACE_INFO(("\r\nStop_Audio\r\n"));
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf)) ;    
@@ -568,10 +534,7 @@ uint8_t Stop_Audio( void )
         Global_Mic_Mask[ruler_id] = 0 ;
     }
 #endif
-#else
-    //here don't need stop audio via usart
-#endif
-    
+     */
     return 0 ;    
 }
 
@@ -588,13 +551,12 @@ uint8_t Stop_Audio( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-#if OLD_CODE
-uint8_t Reset_Audio( void )
+unsigned char Reset_Audio( void )
 {  
-    uint8_t err   = 0xFF;  
-    uint8_t data  = 0xFF;    
-    uint8_t buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_RESET_AUDIO };
-    
+    unsigned char err   = 0xFF;  
+    unsigned char data  = 0xFF;    
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_RESET_AUDIO };
+    /*
     APP_TRACE_INFO(("Reset_Audio\r\n"));
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf)) ;    
@@ -607,17 +569,10 @@ uint8_t Reset_Audio( void )
         APP_TRACE_INFO(("\r\nReset_Audio ERROR: %d\r\n ",data)); 
         return data; 
     } 
-     
+    */ 
     return 0 ;    
 }
-#else
-uint8_t Reset_Audio( void )
-{
-  uint8_t err = 0;
-  
-  return err;
-}
-#endif
+
 
 /*
 *********************************************************************************************************
@@ -631,12 +586,11 @@ uint8_t Reset_Audio( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Get_Audio_Version( void )
+unsigned char Get_Audio_Version( void )
 {  
-#if OLD_CODE
-    uint8_t err;      
-    uint8_t buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_GET_AUDIO_VERSION };
-   
+    unsigned char err;      
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_GET_AUDIO_VERSION };
+     /*
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf)) ;    
     err = USART_Read_Timeout( AUDIO_UART, &Audio_Version, sizeof(Audio_Version), TIMEOUT_AUDIO_COM); 
@@ -646,24 +600,18 @@ uint8_t Get_Audio_Version( void )
     } else {        
         APP_TRACE_INFO(("\r\nUSB Audio FW Version: %s\r\n ",Audio_Version));
     } 
-#else
-    //here read version info from flash directly
-    if( g_pmeccStatus )
-      return -1;
-    
-    //here read info from flash directly and don't need via usart;
-#endif    
+*/    
     return 0 ;   
 }
 
 
     
-uint8_t SPI_Rec_Start( VOICE_BUF_CFG *pSpi_rec_cfg )      // SPI_REC_CFG
+unsigned char SPI_Rec_Start( SPI_PLAY_REC_CFG *pSpi_rec_cfg )
 {   
-    uint8_t err   = 0xFF;  
-    uint8_t data  = 0xFF;
-    
-    uint8_t buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_START_RD_VOICE_BUF };
+    unsigned char err   = 0xFF;  
+    unsigned char data  = 0xFF;
+  /*  
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_START_RD_VOICE_BUF };
            
     if( pSpi_rec_cfg->gpio_irq < 2 ) {
         APP_TRACE_INFO(("\r\nIRQ gpio support: UIF_GPIO_2 ~ UIF_GPIO_9 only!\r\n ",data)); 
@@ -675,14 +623,14 @@ uint8_t SPI_Rec_Start( VOICE_BUF_CFG *pSpi_rec_cfg )      // SPI_REC_CFG
     }
     pSpi_rec_cfg->gpio_irq -= 2 ;//'cause UIF_GPIO connecting to Host is differnt from Audio
     
-    APP_TRACE_INFO(("\r\nSPI_Rec_Start : Chip ID = %d, IRQ = GPIO[%d], spi.mode = %d, spi.speed = %d MHz\r\n",\
-                         pSpi_rec_cfg->chip_id, pSpi_rec_cfg->gpio_irq, pSpi_rec_cfg->spi_mode, pSpi_rec_cfg->spi_speed / 1000000 ));
+    APP_TRACE_INFO(("\r\nSPI_Rec_Start : Chip ID = %d, IRQ = GPIO[%d], spi.mode = %d, spi.speed = %d kHz\r\n",\
+                         pSpi_rec_cfg->chip_id, pSpi_rec_cfg->gpio_irq, pSpi_rec_cfg->spi_mode, pSpi_rec_cfg->spi_speed / 1000 ));
     
     Disable_SPI_Port(); //disabled host mcu SPI;
     
     UART2_Mixer(3); 
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) ); 
-    USART_SendBuf( AUDIO_UART, ( uint8_t *)pSpi_rec_cfg, sizeof( VOICE_BUF_CFG ) ) ; 
+    USART_SendBuf( AUDIO_UART, (unsigned char *)pSpi_rec_cfg, sizeof(SPI_PLAY_REC_CFG)) ; 
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );  
     if( err != NO_ERR  || data != 0  ) {         
         APP_TRACE_INFO(("\r\nSPI_Rec_Start ERROR: timeout = %d, ack data = %d\r\n",err, data));  
@@ -691,7 +639,7 @@ uint8_t SPI_Rec_Start( VOICE_BUF_CFG *pSpi_rec_cfg )      // SPI_REC_CFG
     }
     
     Global_SPI_Rec_Start = 1; //set flag for SPI rec
-    
+   */ 
     return 0 ;
 }
      
@@ -708,12 +656,12 @@ uint8_t SPI_Rec_Start( VOICE_BUF_CFG *pSpi_rec_cfg )      // SPI_REC_CFG
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Init_Ruler( uint8_t ruler_slot_id ) //0 ~ 3
+unsigned char Init_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 {
-    uint8_t err ;
-
+    unsigned char err ;
+   /*
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                 
 #endif 
       
     //check ruler connection state 
@@ -744,7 +692,8 @@ uint8_t Init_Ruler( uint8_t ruler_slot_id ) //0 ~ 3
     } else {
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));        
     }    
-    OSSemPost( UART_MUX_Sem_lock );    
+    OSSemPost( UART_MUX_Sem_lock ); 
+    */
     return err ;    
 }
                 
@@ -762,14 +711,14 @@ uint8_t Init_Ruler( uint8_t ruler_slot_id ) //0 ~ 3
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Setup_Ruler( uint8_t ruler_slot_id ) //0 ~ 3
+unsigned char Setup_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 {    
-    uint8_t err ;
+    unsigned char err ;
     EMB_BUF        *pEBuf_Data; 
-    uint8_t buf[] = { RULER_CMD_SET_RULER, ruler_slot_id };
-    
+    unsigned char buf[] = { RULER_CMD_SET_RULER, ruler_slot_id };
+   /* 
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                 
 #endif 
     
     pEBuf_Data  = &Emb_Buf_Data; //Golbal var
@@ -804,7 +753,8 @@ uint8_t Setup_Ruler( uint8_t ruler_slot_id ) //0 ~ 3
     } else {
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
     }    
-    OSSemPost( UART_MUX_Sem_lock );    
+    OSSemPost( UART_MUX_Sem_lock ); 
+    */
     return err ;    
 }
 
@@ -822,14 +772,14 @@ uint8_t Setup_Ruler( uint8_t ruler_slot_id ) //0 ~ 3
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Get_Ruler_Type(  uint8_t ruler_slot_id )
+unsigned char Get_Ruler_Type(  unsigned char ruler_slot_id )
 {  
-    uint8_t err ;
+    unsigned char err ;
     EMB_BUF        *pEBuf_Data; 
-    uint8_t buf[] = { RULER_CMD_GET_RULER_TYPE };
-    
+    unsigned char buf[] = { RULER_CMD_GET_RULER_TYPE };
+    /*
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                  
 #endif 
     
     pEBuf_Data  = &Emb_Buf_Data; //Golbal var
@@ -863,6 +813,7 @@ uint8_t Get_Ruler_Type(  uint8_t ruler_slot_id )
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));        
     }       
     OSSemPost( UART_MUX_Sem_lock );    
+    */
     return err ;    
 }
 
@@ -881,14 +832,14 @@ uint8_t Get_Ruler_Type(  uint8_t ruler_slot_id )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Read_Ruler_Status( uint8_t ruler_slot_id, unsigned short *status_data )
+unsigned char Read_Ruler_Status( unsigned char ruler_slot_id, unsigned short *status_data )
 {    
-    uint8_t err ;
+    unsigned char err ;
     EMB_BUF        *pEBuf_Data; 
-    uint8_t buf[] = { RULER_CMD_RAED_RULER_STATUS };
-    
+    unsigned char buf[] = { RULER_CMD_RAED_RULER_STATUS };
+    /*
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                
 #endif 
     
     pEBuf_Data  = &Emb_Buf_Data; //Golbal var
@@ -922,6 +873,7 @@ uint8_t Read_Ruler_Status( uint8_t ruler_slot_id, unsigned short *status_data )
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
     }        
     OSSemPost( UART_MUX_Sem_lock );    
+    */
     return err ;    
 }
 
@@ -939,13 +891,13 @@ uint8_t Read_Ruler_Status( uint8_t ruler_slot_id, unsigned short *status_data )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Read_Ruler_Info( uint8_t ruler_slot_id )
+unsigned char Read_Ruler_Info( unsigned char ruler_slot_id )
 {    
-    uint8_t  err ; 
-    uint8_t  buf[] = { RULER_CMD_RAED_RULER_INFO }; 
-    
+    unsigned char  err ; 
+    unsigned char  buf[] = { RULER_CMD_RAED_RULER_INFO }; 
+     /*
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                  
 #endif 
  
     //check ruler connection state 
@@ -976,7 +928,8 @@ uint8_t Read_Ruler_Info( uint8_t ruler_slot_id )
     } else {
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
     }    
-    OSSemPost( UART_MUX_Sem_lock );    
+    OSSemPost( UART_MUX_Sem_lock ); 
+    */
     return err ;    
 }
 
@@ -994,17 +947,17 @@ uint8_t Read_Ruler_Info( uint8_t ruler_slot_id )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Write_Ruler_Info( uint8_t ruler_slot_id )
+unsigned char Write_Ruler_Info( unsigned char ruler_slot_id )
 {
-    uint8_t   err;
+    unsigned char   err;
     unsigned short  data_length;
-    uint8_t   temp;
-    uint8_t  *pdata;
-    uint8_t   buf[4];  
+    unsigned char   temp;
+    unsigned char  *pdata;
+    unsigned char   buf[4];  
     EMB_BUF        *pEBuf_Cmd;        
-  
+     /*
  #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                  
 #endif 
     
     pEBuf_Cmd  = &Emb_Buf_Cmd; //Golbal var
@@ -1053,7 +1006,7 @@ uint8_t Write_Ruler_Info( uint8_t ruler_slot_id )
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
-    
+    */
     return err ;
     
 }
@@ -1073,13 +1026,13 @@ uint8_t Write_Ruler_Info( uint8_t ruler_slot_id )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Read_Mic_Cali_Data(uint8_t ruler_slot_id, uint8_t mic_id)
+unsigned char Read_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_id)
 {    
-    uint8_t  err ; 
-    uint8_t  buf[] = { RULER_CMD_READ_MIC_CALI_DATA, mic_id }; 
-    
+    unsigned char  err ; 
+    unsigned char  buf[] = { RULER_CMD_READ_MIC_CALI_DATA, mic_id }; 
+     /*
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                 
 #endif 
  
     //check ruler connection state 
@@ -1111,7 +1064,8 @@ uint8_t Read_Mic_Cali_Data(uint8_t ruler_slot_id, uint8_t mic_id)
     } else {
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
     }      
-    OSSemPost( UART_MUX_Sem_lock );    
+    OSSemPost( UART_MUX_Sem_lock ); 
+    */
     return err ;    
 }
 
@@ -1130,17 +1084,17 @@ uint8_t Read_Mic_Cali_Data(uint8_t ruler_slot_id, uint8_t mic_id)
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Write_Mic_Cali_Data(uint8_t ruler_slot_id, uint8_t mic_id)
+unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_id)
 {    
-    uint8_t   err;
+    unsigned char   err;
     unsigned short  data_length;
-    uint8_t   temp;
-    uint8_t  *pdata;
-    uint8_t   buf[5];  
+    unsigned char   temp;
+    unsigned char  *pdata;
+    unsigned char   buf[5];  
     EMB_BUF        *pEBuf_Cmd;        
-  
+    /*
  #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                
 #endif 
     
     pEBuf_Cmd  = &Emb_Buf_Cmd; //Golbal var
@@ -1189,7 +1143,7 @@ uint8_t Write_Mic_Cali_Data(uint8_t ruler_slot_id, uint8_t mic_id)
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
-    
+    **/
     return err ;
     
 }
@@ -1210,15 +1164,15 @@ uint8_t Write_Mic_Cali_Data(uint8_t ruler_slot_id, uint8_t mic_id)
 *                        Handset(18Mic) for H03
 *********************************************************************************************************
 */
-uint8_t Update_Mic_Mask( uint8_t ruler_slot_id, uint32_t mic_mask )
+unsigned char Update_Mic_Mask( unsigned char ruler_slot_id, unsigned int mic_mask )
 {    
-    uint8_t err ;
-    uint8_t buf_size_send ;
-    uint8_t buf[] = { RULER_CMD_TOGGLE_MIC, mic_mask&0xFF, (mic_mask>>8)&0xFF,
+    unsigned char err ;
+    unsigned char buf_size_send ;
+    unsigned char buf[] = { RULER_CMD_TOGGLE_MIC, mic_mask&0xFF, (mic_mask>>8)&0xFF,
                             (mic_mask>>16)&0xFF,  (mic_mask>>24)&0xFF };
-    
+     /*
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                 
 #endif 
     //check ruler connection state 
     if( Global_Ruler_State[ruler_slot_id] < RULER_STATE_CONFIGURED ) {      
@@ -1249,6 +1203,7 @@ uint8_t Update_Mic_Mask( uint8_t ruler_slot_id, uint32_t mic_mask )
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );    
+    */
     return err ;    
 }
 
@@ -1265,14 +1220,14 @@ uint8_t Update_Mic_Mask( uint8_t ruler_slot_id, uint32_t mic_mask )
 * Note(s)     : Support Ruler(8Mic) and Handset(16Mic)
 *********************************************************************************************************
 */
-uint8_t Ruler_Active_Control( uint8_t active_state )  
+unsigned char Ruler_Active_Control( unsigned char active_state )  
 {    
-    uint8_t err ;
-    uint8_t ruler_id;
-    uint8_t buf[] = { RULER_CMD_ACTIVE_CTR, active_state };
-
+    unsigned char err ;
+    unsigned char ruler_id;
+    unsigned char buf[] = { RULER_CMD_ACTIVE_CTR, active_state };
+     /*
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                  
 #endif 
     
     err = 0;        
@@ -1312,7 +1267,8 @@ uint8_t Ruler_Active_Control( uint8_t active_state )
         if( err != NO_ERR ) {
             break;
         }
-    }        
+    } 
+    */
     return err ;    
 }
 
@@ -1330,16 +1286,16 @@ uint8_t Ruler_Active_Control( uint8_t active_state )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Get_Ruler_Version( uint8_t ruler_slot_id )
+unsigned char Get_Ruler_Version( unsigned char ruler_slot_id )
 {  
-    uint8_t err ;
-    uint8_t buf[] = { RULER_CMD_GET_RULER_VERSION };
+    unsigned char err ;
+    unsigned char buf[] = { RULER_CMD_GET_RULER_VERSION };
     EMB_BUF      *pEBuf_Data;         
-      
+    /* 
     pEBuf_Data  = &Emb_Buf_Data;  //Global var   
     
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                    
 #endif 
     //check ruler connection state 
     if( Global_Ruler_State[ruler_slot_id] < RULER_STATE_ATTACHED ) {      
@@ -1373,7 +1329,8 @@ uint8_t Get_Ruler_Version( uint8_t ruler_slot_id )
     } else {
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
     }    
-    OSSemPost( UART_MUX_Sem_lock );    
+    OSSemPost( UART_MUX_Sem_lock );  
+    */
     return err ;        
 }
   
@@ -1395,10 +1352,10 @@ uint8_t Get_Ruler_Version( uint8_t ruler_slot_id )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-#if OLD_CODE
-uint8_t FLASHD_Write_Safe( uint32_t address, const void *pBuffer,  uint32_t size)
+unsigned char FLASHD_Write_Safe( unsigned int address, const void *pBuffer,  unsigned int size)
 {
-    uint8_t err;
+    unsigned char err;
+    /*
     if( size == 0 ) {
         return 0;
     }
@@ -1407,17 +1364,11 @@ uint8_t FLASHD_Write_Safe( uint32_t address, const void *pBuffer,  uint32_t size
         return FW_BIN_SAVE_ADDR_ERR;
     }
     err = FLASHD_Write(  address, pBuffer, size );
+    */
     return err;  
     
 }
-#else
-uint8_t FLASHD_Write_Safe( uint32_t address, const void *pBuffer,  uint32_t size)
-{
-  uint8_t err = 0;
-  
-  return err;
-}
-#endif
+
 
 /*
 *********************************************************************************************************
@@ -1432,7 +1383,7 @@ uint8_t FLASHD_Write_Safe( uint32_t address, const void *pBuffer,  uint32_t size
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void Read_Flash_State( FLASH_INFO  *pFlash_Info, uint32_t flash_address )
+void Read_Flash_State( FLASH_INFO  *pFlash_Info, unsigned int flash_address )
 {
     
     *pFlash_Info = *(FLASH_INFO *)flash_address;    
@@ -1454,11 +1405,10 @@ void Read_Flash_State( FLASH_INFO  *pFlash_Info, uint32_t flash_address )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-#if OLD_CODE
-uint8_t Write_Flash_State( FLASH_INFO   *pFlash_Info, uint32_t flash_address )
+unsigned char Write_Flash_State( FLASH_INFO   *pFlash_Info, unsigned int flash_address )
 {
     
-    uint8_t err;   
+    unsigned char err;   
     //save state to flash
     pFlash_Info->s_w_counter++ ;
     err = FLASHD_Write_Safe( flash_address, pFlash_Info, AT91C_IFLASH_PAGE_SIZE); 
@@ -1469,14 +1419,6 @@ uint8_t Write_Flash_State( FLASH_INFO   *pFlash_Info, uint32_t flash_address )
     return err;
     
 }
-#else
-uint8_t Write_Flash_State( FLASH_INFO   *pFlash_Info, uint32_t flash_address )  //this fun need reimplement
-{
-  uint8_t err = 0;
-  
-  return err;
-}
-#endif
 
 
 /*
@@ -1496,12 +1438,11 @@ uint8_t Write_Flash_State( FLASH_INFO   *pFlash_Info, uint32_t flash_address )  
 * Note(s)     : None.
 *********************************************************************************************************
 */
-#if OLD_CODE
-uint8_t Save_Ruler_FW( uint32_t cmd, uint8_t *pBin, uint8_t *pStr, uint32_t size )
+unsigned char Save_Ruler_FW( unsigned int cmd, unsigned char *pBin, unsigned char *pStr, unsigned int size )
 {  
-    uint8_t err; 
-    static uint32_t flash_addr = FLASH_ADDR_FW_BIN;
- 
+    unsigned char err; 
+    static unsigned int flash_addr = FLASH_ADDR_FW_BIN;
+      /*
     FLASH_INFO    flash_info;
     
     err = NO_ERR;
@@ -1544,8 +1485,7 @@ uint8_t Save_Ruler_FW( uint32_t cmd, uint8_t *pBin, uint8_t *pStr, uint32_t size
     Buzzer_OnOff(1);               
     LED_Toggle(LED_DS2);    
     err = FLASHD_Write_Safe( flash_addr, pBin, size ); 
-//    Buzzer_OnOff(0);
-    BSP_BUZZER_Toggle( 0 );
+    Buzzer_OnOff(0); 
     if(err != NO_ERR ) {                     
         APP_TRACE_INFO(("ERROR: Write MCU flash failed!\r\n"));
         return err;
@@ -1559,17 +1499,10 @@ uint8_t Save_Ruler_FW( uint32_t cmd, uint8_t *pBin, uint8_t *pStr, uint32_t size
               APP_TRACE_INFO(("Bin file[%d Btyes] saved successfully!\r\n",flash_info.bin_size));     
         }   
     } 
-    return err;      
+    */
+    return err;  
+    
 }
-#else
-uint8_t Save_Ruler_FW( uint32_t cmd, uint8_t *pBin, uint8_t *pStr, uint32_t size )
-{
-  uint8_t err = 0;
-
-  
-  return err;  
-}
-#endif
 
 /*
 *********************************************************************************************************
@@ -1588,14 +1521,13 @@ uint8_t Save_Ruler_FW( uint32_t cmd, uint8_t *pBin, uint8_t *pStr, uint32_t size
 * Note(s)     : Vec size usually not exceed 2kB, so one emb package should be ok.
 *********************************************************************************************************
 */
-#if OLD_CODE
-uint8_t Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
+unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
 {  
-    uint8_t err; 
-    uint32_t flash_addr;
-    uint32_t index;
+    unsigned char err; 
+    unsigned int flash_addr;
+    unsigned int index;
     FLASH_INFO   flash_info;
-    
+     /*
     
     if( (p_dsp_vec->addr_index == 0 ) || (p_dsp_vec->addr_index > FLASH_ADDR_FW_VEC_NUM) || (p_dsp_vec->data_len > FLASH_ADDR_FW_VEC_SIZE )  ) {
         return MCU_FLASH_OP_ERR;
@@ -1630,18 +1562,16 @@ uint8_t Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
     if( err == NO_ERR  ) { 
         APP_TRACE_INFO(("Vec file[%d][%s][%d Btyes] saved successfully!\r\n", index, flash_info.bin_name, flash_info.bin_size));     
     }   
-     
+       */
     return err;  
     
 }
-#else
-uint8_t Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
-{
-  uint8_t err = 0;
-  
-  return err;
-}
-#endif
+
+
+
+
+
+
 /*
 *********************************************************************************************************
 *                                       Set_DSP_VEC()
@@ -1658,11 +1588,11 @@ uint8_t Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
 *********************************************************************************************************
 */
  
-uint8_t Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
+unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
 {  
-    uint8_t err; 
+    unsigned char err; 
     OS_SEM_DATA  sem_data;
-    
+    /*
     err = NO_ERR;
     
     if( (p_dsp_vec_cfg->vec_index_a > 7) || (p_dsp_vec_cfg->vec_index_b > 7) || (p_dsp_vec_cfg->delay > 65535 ) ) {
@@ -1685,14 +1615,15 @@ uint8_t Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
         //check if it's in MCU_Load_Vec() now
         OSSemQuery(Load_Vec_Sem_lock, &sem_data);
         if( sem_data.OSCnt == 0 ) {
-            OSTimeDlyResume( APP_CFG_TASK_USER_IF_PRIO );
+            OSTimeDlyResume(APP_CFG_TASK_USER_IF_PRIO);
             OSSemPend( Load_Vec_Sem_lock, 0, &err );
             OSSemPost( Load_Vec_Sem_lock );
         }
         I2C_Mixer(I2C_MIX_FM36_CODEC);
         err = FM36_PDMADC_CLK_OnOff(1,0); //enable PDM clock
-        I2C_Mixer( I2C_MIX_UIF_S ); 
+        I2C_Mixer(I2C_MIX_UIF_S); 
     }
+    */
     return err;  
     
 }
@@ -1712,14 +1643,14 @@ uint8_t Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
 * Note(s)     : Do not care if ruler is attached or not.Because host can not detect ruler if FW was crashed.
 *********************************************************************************************************
 */
-uint8_t Update_Ruler_FW( uint8_t ruler_slot_id )
+unsigned char Update_Ruler_FW( unsigned char ruler_slot_id )
 {
-    uint8_t err;
-    uint32_t  flash_addr; 
+    unsigned char err;
+    unsigned int  flash_addr; 
     FLASH_INFO   *pFlash_Info;
-    uint8_t Buf[9];
-    uint8_t i;
-    
+    unsigned char Buf[9];
+    unsigned char i;
+     /*
     err = NO_ERR;
     flash_addr  = FLASH_ADDR_FW_BIN;
     pFlash_Info = (FLASH_INFO *)FLASH_ADDR_FW_STATE ;
@@ -1756,7 +1687,7 @@ uint8_t Update_Ruler_FW( uint8_t ruler_slot_id )
         err = USART_Read_Timeout( RULER_UART, Buf, 3, 5000 );
         if( OS_ERR_NONE == err && ( Buf[0] == 'c' || Buf[0] == 'C' )) {
             Global_Ruler_State[ruler_slot_id] = RULER_STATE_RUN ;
-            err = Xmodem_Transmit( (uint8_t *)flash_addr, pFlash_Info->bin_size );
+            err = Xmodem_Transmit( (unsigned char *)flash_addr, pFlash_Info->bin_size );
             Global_Ruler_State[ruler_slot_id] = RULER_STATE_DETACHED ;            
         }         
     }
@@ -1766,48 +1697,16 @@ uint8_t Update_Ruler_FW( uint8_t ruler_slot_id )
         APP_TRACE_INFO(("\r\nUpdate ruler[%d] firmware successfully!\r\n", ruler_slot_id));   
     }
     Port_Detect_Enable(1); //enable ruler detect
-#if OLD_CODE
-    UART_Init( RULER_UART,  ISR_Ruler_UART,  115200 );  //Init Ruler back to interuption mode
-#endif
+    UART_Init(RULER_UART,  ISR_Ruler_UART,  115200 );  //Init Ruler back to interuption mode
     Ruler_Power_Switch(0);   //power off ruler  
     OSTimeDly(500);    
     Ruler_Power_Switch(1);   //power on ruler
     OSSemPost( UART_MUX_Sem_lock ); 
+    */
     return err ;    
     
 }
-//uint8_t Update_Ruler_FW( uint8_t ruler_slot_id )
-//{
-//    uint8_t err;
-//    uint32_t  flash_addr; 
-//    FLASH_INFO   *pFlash_Info;
-//    
-//    err = NO_ERR;
-//    flash_addr  = FLASH_ADDR_FW_BIN;
-//    pFlash_Info = (FLASH_INFO *)FLASH_ADDR_FW_STATE ;
-//        
-//    if( pFlash_Info->f_w_state != FW_DOWNLAD_STATE_FINISHED ) {
-//        APP_TRACE_INFO(("ERROR: FW bin file missed!\r\n"));        
-//        return FW_BIN_STATE_ERR;
-//    }
-//    
-//    APP_TRACE_INFO(("Start updating MCU FW to [%s] on ruler[%d]...\r\n",pFlash_Info->bin_name,ruler_slot_id)); 
-//    
-//    UART_Init(RULER_UART,  NULL,  115200 );    //Init Ruler as no ISR  
-//    
-//    UART1_Mixer( ruler_slot_id );
-//    Check_UART_Mixer_Ready();
-//    if( USART_Start_Ruler_Bootloader() ) {  
-//        APP_TRACE_INFO(("Failed to init ruler bootloader!\r\n"));     
-//    }
-//    
-//    err = Xmodem_Transmit( (uint8_t *)flash_addr, pFlash_Info->bin_size);      
-//         
-//    UART_Init(RULER_UART,  ISR_Ruler_UART,  115200 );    //Init Ruler back to ISR 
-//    
-//    return err ;    
-//    
-//}
+ 
 
 
 /*
@@ -1824,16 +1723,16 @@ uint8_t Update_Ruler_FW( uint8_t ruler_slot_id )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Toggle_Mic(  TOGGLE_MIC *pdata )
+unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
 {  
 #ifdef BOARD_TYPE_UIF 
     return 0;
 #else
     
-    uint8_t  err ;
-    uint8_t  id;
-    uint32_t   mic_mask;  
-    uint32_t   fpga_mask;
+    unsigned char  err ;
+    unsigned char  id;
+    unsigned int   mic_mask;  
+    unsigned int   fpga_mask;
     
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
@@ -1889,11 +1788,10 @@ uint8_t Toggle_Mic(  TOGGLE_MIC *pdata )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Set_Volume(  const DataSource *pSource,SET_VOLUME *pdata )
+unsigned char Set_Volume(  SET_VOLUME *pdata )
 {  
-  /*
-    uint8_t  err ;
-    
+    unsigned char  err ;
+    /*
     APP_TRACE_INFO(( "Set Volume :: " ));
     if( pdata->mic == SET_VOLUME_MUTE ) {
         APP_TRACE_INFO(( "Mute MIC :  " ));
@@ -1926,7 +1824,7 @@ uint8_t Set_Volume(  const DataSource *pSource,SET_VOLUME *pdata )
         I2C_Mixer(I2C_MIX_UIF_S); 
         return err;    
     }
-    err = CODEC_Set_Volume( pSource,pdata->spk, pdata->lout, pdata->lin );
+    err = CODEC_Set_Volume( pdata->spk, pdata->lout, pdata->lin );
     if( OS_ERR_NONE != err ) {    
         APP_TRACE_INFO(( "FAIL [0x%X]\r\n", err )); 
         I2C_Mixer(I2C_MIX_UIF_S); 
@@ -1935,9 +1833,8 @@ uint8_t Set_Volume(  const DataSource *pSource,SET_VOLUME *pdata )
     APP_TRACE_INFO(( "OK\r\n" )); 
     
     I2C_Mixer(I2C_MIX_UIF_S); 
-    
-    return err; 
-  */
+    */
+    return err;  
 }
 
 
@@ -1957,15 +1854,15 @@ uint8_t Set_Volume(  const DataSource *pSource,SET_VOLUME *pdata )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Reset_Mic_Mask(  uint32_t *pInt )
+unsigned char Reset_Mic_Mask(  unsigned int *pInt )
 {  
-    uint8_t  err ;
-    uint8_t  id;
-    uint8_t  *pChar;  
-    uint32_t   fpga_mask;
+    unsigned char  err ;
+    unsigned char  id;
+    unsigned char  *pChar;  
+    unsigned int   fpga_mask;
     
     fpga_mask = 0;    
-    pChar     = (uint8_t *)pInt;
+    pChar     = (unsigned char *)pInt;
     err       = 0;
 
     for( id = 0; id < 4; id++ ) {        
@@ -2007,13 +1904,13 @@ uint8_t Reset_Mic_Mask(  uint32_t *pInt )
 */
 void Ruler_Port_LED_Service( void )
 {    
-    static uint32_t counter; 
-    static uint32_t counter_buz;    
-    uint8_t ruler_id;
-    uint8_t ruler_state;    
-    uint8_t LED_Freq;
-    uint8_t post_err_flag;
-
+    static unsigned int counter; 
+    static unsigned int counter_buz;    
+    unsigned char ruler_id;
+    unsigned char ruler_state;    
+    unsigned char LED_Freq;
+    unsigned char post_err_flag;
+    /*
     LED_Freq      = 0x3F; 
     post_err_flag = 0;
     
@@ -2048,7 +1945,8 @@ void Ruler_Port_LED_Service( void )
         }
   
     }    
-    counter++;    
+    counter++; 
+    */
 }
 
 
@@ -2064,24 +1962,23 @@ void Ruler_Port_LED_Service( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t AB_POST( const DataSource *pSource )
+unsigned char AB_POST( void )
 {
-  /*
-    uint8_t  err;  
+    unsigned char  err;  
     APP_TRACE_INFO(("\r\nStart Audio Bridge POST :\r\n"));    
     //Enable_FPGA();
-    
+     /*
     ///////////////////////////
     APP_TRACE_INFO(("\r\n1. CODEC... \r\n"));
     I2C_Mixer(I2C_MIX_FM36_CODEC);
     codec_set[0].sr = SAMPLE_RATE_DEF;
     codec_set[0].sample_len = SAMPLE_LENGTH;
-    codec_set[0].format = 0; //I2S
-    codec_set[0].slot_num = 8; //8 channels
+    codec_set[0].format = 2; //I2S-TDM
+    codec_set[0].slot_num = 8; //8 channels : BUG 如果设置为2ch，则FM36 counter不动？？？
     codec_set[0].m_s_sel = 0; //master
     codec_set[0].flag = 0; //reset Cfg flag
     codec_set[1].flag = 0;
-    err = Init_CODEC( pSource,codec_set[0] );  
+    err = Init_CODEC( codec_set[0] );  
     I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_CODEC;
@@ -2146,9 +2043,9 @@ uint8_t AB_POST( const DataSource *pSource )
 //        Global_Bridge_POST = POST_ERR_CODEC ;
 //        APP_TRACE_INFO(("\r\nPower Down CODEC ERROR: %d\r\n",err)); 
 //    }
-    
+     */
     return err;
-*/    
+    
 }
 
 
@@ -2165,9 +2062,9 @@ uint8_t AB_POST( const DataSource *pSource )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t Ruler_POST( uint8_t ruler_id )
+unsigned char Ruler_POST( unsigned char ruler_id )
 {
-    uint8_t  err;
+    unsigned char  err;
     unsigned short result;   
     
     APP_TRACE_INFO(("\r\nRuler[%d] POST status check... \r\n",ruler_id)); 
@@ -2216,7 +2113,7 @@ void simple_test_use( void )
                                     {0, 12, 1 }, {0, 13, 1 }, {0, 14, 1 }  
                                 }; 
   
-    for (uint8_t i = 0; i< 6 ; i++ ) {
+    for (unsigned char i = 0; i< 6 ; i++ ) {
         Toggle_Mic(&toggle_mic[i]); 
     } 
     
@@ -2238,13 +2135,13 @@ void simple_test_use( void )
 }
 
 
-uint8_t Ruler_Setup_Sync( uint8_t ruler_slot_id )
+unsigned char Ruler_Setup_Sync( unsigned char ruler_slot_id )
 {
-    uint8_t err ;
-    uint8_t buf[] = { RULER_CMD_SETUP_SYNC, Ruler_Setup_Sync_Data, ruler_slot_id };
-
+    unsigned char err ;
+    unsigned char buf[] = { RULER_CMD_SETUP_SYNC, Ruler_Setup_Sync_Data, ruler_slot_id };
+    /*
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+    //OS_CPU_SR  cpu_sr = 0u;                                
 #endif 
     
     //check ruler connection state 
@@ -2276,7 +2173,8 @@ uint8_t Ruler_Setup_Sync( uint8_t ruler_slot_id )
     } else {
         APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
     }    
-    OSSemPost( UART_MUX_Sem_lock );    
+    OSSemPost( UART_MUX_Sem_lock );
+*/    
     return err ;    
         
 }
@@ -2288,9 +2186,9 @@ void Debug_Audio( void )
    AUDIO_CFG    AudioCfg;
    START_AUDIO  start_audio;
    
-   AudioCfg.channels = 8;
+   AudioCfg.channel_num = 8;
    AudioCfg.bit_length = 32;
-   AudioCfg.sr = 16000;
+   AudioCfg.sample_rate = 16000;
    AudioCfg.type = 1; //play
    
    start_audio.type = 2; //play

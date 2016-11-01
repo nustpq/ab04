@@ -664,8 +664,13 @@
 /** LED #1 pin definition (LED_RED). */
 #define PIN_LED_1   {(PIO_PE24), PIOE, ID_PIOE, PIO_OUTPUT_0, PIO_DEFAULT}
 
+#define PIN_LED_RUN    {(PIO_PA21), PIOA, ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT}
+#define PIN_LED_USB    {(PIO_PA22), PIOA, ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT}
+#define PIN_LED_HDMI   {(PIO_PA24), PIOA, ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT}
+
 /** List of all LEDs definitions. */
-#define PINS_LEDS   PIN_LED_0, PIN_LED_1
+#define PINS_LEDS   PIN_LED_RUN, PIN_LED_USB, PIN_LED_HDMI
+
 #endif
 
 #if defined(BOARD_UIF2)

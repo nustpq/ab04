@@ -554,7 +554,7 @@ void init_spi( void *pInstance,void *parameter )
     
     parameter = parameter;
     DataSource *pSource = ( DataSource * )pInstance;
-    SPI_CFG *pSpi_Cfg = ( SPI_CFG * )parameter;
+    SPI_PLAY_REC_CFG *pSpi_Cfg = ( SPI_PLAY_REC_CFG * )parameter;
     
     if( ID_SPI0 == pSource->dev.identify )
       PIO_Configure( spi0_pins, PIO_LISTSIZE( spi0_pins ) ) ;                                              //fill code initialize spi0 pins
@@ -888,7 +888,7 @@ void spi_register_set( void *instance,void *parameter )
    DataSource *pSource = ( DataSource * )instance;
    Spi *pSpi = _get_spi_instance( pSource->dev.identify );
    
-   SPI_CFG *cfg = ( SPI_CFG * )parameter;
+   SPI_PLAY_REC_CFG *cfg = ( SPI_PLAY_REC_CFG * )parameter;
       
    uint32_t mode = cfg->spi_mode ;
    

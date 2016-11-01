@@ -32,9 +32,6 @@
 *********************************************************************************************************
 */
 
-#include <cpu.h>
-#include <lib_def.h>
-
 
 /*
 *********************************************************************************************************
@@ -45,6 +42,100 @@
 #ifndef  BSP_PRESENT
 #define  BSP_PRESENT
 
+
+#include  <stdarg.h>
+#include  <stdio.h>
+#include  <assert.h>
+
+#include  <cpu.h>
+
+#include  <lib_def.h>
+#include  <lib_ascii.h>
+#include  <lib_mem.h>
+
+#include  <app_cfg.h>
+
+#include  <bsp_int.h>
+//#include  <bsp_gpio.h>
+//#include  <bsp_pmc.h>
+//#include  <bsp_ser.h>
+//#include  <bsp_os.h>
+
+#include  <lib_def.h>
+#include  <lib_ascii.h>
+
+//#include  <at91sam3u4.h>
+#include  <app_cfg.h>
+#include  <ucos_ii.h>
+#include  <stdarg.h>
+#include  <stdio.h>
+#include  <stdbool.h>
+#include  <string.h>
+//#include  <probe_com_cfg.h>
+
+#include  <taskcomm.h>
+#include  <kfifo.h>
+
+//#include  <nvic.h>
+//#include  <board.h>
+//#include  <uart.h>
+//#include  <pio.h>
+#include  <pio_it.h>
+//#include  <gpio.h>
+#include  <led.h>
+//#include  <timer.h>
+//#include  <eefc.h>
+//#include  <flashd.h>
+#include  <twid.h>
+#include  <spi.h>
+//#include  <i2c_gpio.h>
+//#include  <im501_comm.h>
+#include  <ruler.h>
+#include  <emb.h>
+#include  <mem_basic.h>
+//#include  <uif.h>
+#include  <uif_dsp.h>
+#include  <noah_cmd.h>
+//#include  <shell_commands.h>
+#include  <codec.h>
+#include  <xmodem.h>
+//#include  <dma.h>
+//#include  <dmad.h>
+
+
+#include "board.h"
+#include "defined.h"
+#include "uif_object.h"
+
+
+#include "codec.h"
+//#include "sine_table.h"
+
+#include "uif_cmdparse.h"
+#include "uif_i2s.h"
+#include "uif_usb.h"
+#include "uif_spi.h"
+#include "uif_twi.h"
+#include "uif_usart.h"
+#include "uif_nandflash.h"
+#include "uif_gpio.h"
+#include "uif_led.h"
+#include "uif_act8865.h"
+//#include "uif_dsp.h"    
+#include "uif_hardware_init.h"
+
+/*
+*********************************************************************************************************
+*                                               MODULE
+*********************************************************************************************************
+*/
+
+
+
+//#define  BOARD_TYPE_AB01  
+//#define  BOARD_TYPE_AB02  
+//#define  BOARD_TYPE_AB03  
+#define  BOARD_TYPE_UIF
 
 /*
 *********************************************************************************************************
@@ -125,9 +216,13 @@ typedef  struct  atsama5_reg_pio {
 *********************************************************************************************************
 */
 
-#define LED_D3   1
-#define LED_D4   2
-#define LED_D5   3
+#define LED_D3    1
+#define LED_D4    2
+#define LED_D5    3
+
+#define LED_RUN   1
+#define LED_USB   2
+#define LED_HDMI  3
 
 #define BUZZER_OFF 1
 #define BUZZER_ON 0
@@ -172,5 +267,27 @@ void UIF_Misc_On ( CPU_INT32U id );
 void UIF_Misc_Off ( CPU_INT32U id );
 
 void UIF_DelayUs( CPU_INT32U us );
+
+void UIF_Beep_On ( ) ;
+
+void UIF_Beep_Off ( ) ;
+
+void dump_buf_debug( unsigned char *pChar, unsigned int size) ;
+
+
+
+void Head_Info( void );
+void Beep( INT32U beep_cycles);
+void Head_Info( void );
+void Beep( INT32U beep_cycles);
+//void PDM_Pattern_Gen( INT8U type );
+void Time_Stamp( void );
+void Get_Flash_Info (void);
+void BSP_Init (void);
+
+extern const CPU_CHAR fw_version[];
+extern const CPU_CHAR hw_version[];
+extern const CPU_CHAR hw_model[];
+
 
 #endif  /* BSP_PRESENT */

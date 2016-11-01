@@ -84,7 +84,6 @@
 #define DEF_MODEL_STR_LEN               ( 7 + 1 )
 
 
-
 /////////////////  Flash store Vec file related defines  ///////////////////////
 
 #define FW_DOWNLAD_CMD_START           1
@@ -167,8 +166,8 @@ typedef struct {
 
 typedef struct { 
   unsigned char  type;//Rec =0, Play =1
-  unsigned char  channel_num; //1~8  
-  unsigned short sample_rate; //16000, 48000 
+  unsigned char  channel_num; //valid data cahnnel num 1~8  
+  unsigned short sample_rate; //8000, 16000, 24000, 32000, 48000 
 
   unsigned char  bit_length; // 16, 24, 32
   unsigned char  lin_ch_mask;
@@ -182,21 +181,32 @@ typedef struct {
   unsigned char  spi_rec_bit_mask;
   
   unsigned char  format;  //1:I2S  2:PDM  3:PCM/TDM  
+  unsigned char  slot_num;  //bus BCLK slot num
   unsigned char  ssc_cki;
   unsigned char  ssc_delay;
+  
   unsigned char  ssc_start;
   unsigned char  master_slave;
+  unsigned char  bclk_polarity;  //0 or 1
   
-  unsigned char  reserved[3];
+  unsigned char  reserved[1];
 }AUDIO_CFG;
 
 typedef struct {
-  unsigned int   spi_speed;
-  unsigned char  spi_mode;  
-  unsigned char  gpio_irq;
-  unsigned char  chip_id;
-  unsigned char  reserved[1];
-}SPI_REC_CFG;
+  unsigned int    spi_speed; 
+  
+  unsigned short  rec_ch_mask;
+  unsigned short  play_ch_mask;
+  
+  unsigned short  chip_id;
+  unsigned char   spi_mode;  
+  unsigned char   gpio_irq; 
+  
+  unsigned char   time_dly; 
+  unsigned char   slave;
+  unsigned char   reserved[2];
+
+}SPI_PLAY_REC_CFG;
 
 typedef struct {
     unsigned char    type;    //rec = 1,  play = 2, rec&play = 3   
@@ -384,6 +394,6 @@ extern void Read_Flash_State( FLASH_INFO  *pFlash_Info, unsigned int flash_addre
 extern void Debug_Audio( void ) ;
 extern unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg );
 
-extern unsigned char SPI_Rec_Start( SPI_REC_CFG *pSpi_rec_cfg );
+extern unsigned char SPI_Rec_Start( SPI_PLAY_REC_CFG *pSpi_rec_cfg );
 
 #endif

@@ -147,9 +147,9 @@ void ssc1_init_default( void )
 void spi0_init_default( void )
 {
       //initialize spi0 object and it's operation
-    SPI_CFG spi0_cfg;
+    SPI_PLAY_REC_CFG spi0_cfg;
     memset( ( void * )&source_spi0, 0 , sizeof( DataSource ) );
-    memset( ( void * )&spi0_cfg, 0 , sizeof( SPI_CFG ) );
+    memset( ( void * )&spi0_cfg, 0 , sizeof( SPI_PLAY_REC_CFG ) );
     source_spi0.dev.direct = ( uint8_t )BI;
     source_spi0.dev.identify = ID_SPI0;
     source_spi0.dev.instanceHandle = (uint32_t)SPI0;    
@@ -197,9 +197,9 @@ void spi0_init_default( void )
 void spi1_init_default( void )
 {
       //initialize spi1 object and it's operation
-    SPI_CFG spi1_cfg;
+    SPI_PLAY_REC_CFG spi1_cfg;
     memset( ( void * )&source_spi1, 0 , sizeof( DataSource ) );
-    memset( ( void * )&spi1_cfg, 0 , sizeof( SPI_CFG ) );
+    memset( ( void * )&spi1_cfg, 0 , sizeof( SPI_PLAY_REC_CFG ) );
     source_spi1.dev.direct = ( uint8_t )BI;
     source_spi1.dev.identify = ID_SPI1;
     source_spi1.dev.instanceHandle = (uint32_t)SPI1;    
@@ -533,7 +533,7 @@ void aic3204_init_default( void )
 */
 void uif_ports_init_default( void )
 {  
-    usb_init_default( );
+    usb_init_default( ); //init USB 
     ssc0_init_default( );
     ssc1_init_default( );
     spi0_init_default( );
@@ -561,11 +561,10 @@ void uif_ports_init_default( void )
 *********************************************************************************************************
 */
 void uif_miscPin_init_default( void )
-{
-      //Led/Buzzer initialize;
-    BSP_LED_Init();
+{  
+    //BSP_LED_Init();
     UIF_LED_Init();
-    BSP_LED_Off( 3 ); 
+    //BSP_LED_Off( 3 ); 
     BSP_BUZZER_Toggle( BUZZER_OFF );
     UIF_LED_On( LED_D3 );
     UIF_LED_Off( LED_D3 );
@@ -574,7 +573,7 @@ void uif_miscPin_init_default( void )
     
     //Misc switch initialize
     UIF_Misc_Init( );
-//    UIF_Misc_On( HDMI_UIF_PWR_EN );
+    //UIF_Misc_On( HDMI_UIF_PWR_EN );
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
     UIF_Misc_On ( FAST_PLUS_RST );  

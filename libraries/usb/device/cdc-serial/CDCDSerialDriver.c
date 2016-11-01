@@ -107,8 +107,9 @@ void CDCDSerialDriver_ConfigurationChangedHandler(uint8_t cfgnum)
 void CDCDSerialDriver_RequestHandler(const USBGenericRequest *request)
 {
     USBDDriver *pUsbd = USBD_GetDriver();
-    TRACE_INFO_WP("NewReq ");
-    if (CDCDSerial_RequestHandler(request))
+    TRACE_INFO_WP("\r\nNewReq: ");
+    //if (CDCDSerial_RequestHandler(request))
+      //CDCDSerial_RequestHandler(request);
         USBDDriver_RequestHandler(pUsbd, request);
 }
 

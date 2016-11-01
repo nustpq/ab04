@@ -131,7 +131,7 @@
 /**  SYNCH_FRAME request code. */
 #define USBGenericRequest_SYNCHFRAME            12
 /**  UIF board custom request code. */
-#define USBGenericRequest_GET_MS_DESCRIPTOR     13
+#define USBGenericRequest_GET_MS_DESCRIPTOR     13     //PQ
 /**         @}*/
 
 /** \addtogroup usb_request_recipient USB Request Recipients

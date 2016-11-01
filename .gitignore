@@ -1,6 +1,0 @@
-/SI
-/EvalBoards/Atmel/ATSAMA5D3X-EK/uCOS-II/IAR/Debug
-/EvalBoards/Atmel/ATSAMA5D3X-EK/uCOS-II/*.TMP
-/libraries/libchip_sama5d3x/build/ewarm/Debug
-/libraries/usb/build/ewarm/Debug
-/libraries/usb/build/ewarm/Release

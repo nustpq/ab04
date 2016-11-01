@@ -38,7 +38,7 @@
 #include "bsp.h"
 
 //Note: This routine do NOT support reentrance
-INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];
+//INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];
 
 static bool flag_power_lose  = true;
 static bool flag_state_pwd   = false;

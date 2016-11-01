@@ -1142,13 +1142,13 @@ void ssc_txRegister_set( void *instance,void *parameter )
     AUDIO_CFG *reg = ( AUDIO_CFG * )parameter;
     Ssc *pSSC = ( Ssc * )pSource->dev.instanceHandle;
     
-    if( reg->channels > 0 ) 
+    if( reg->channel_num > 0 ) 
     {        
-        tfmr.datnb  = reg->channels - 1 ; 
+        tfmr.datnb  = reg->channel_num - 1 ; 
         tfmr.datlen = reg->bit_length-1;  
-        tcmr.cki = reg->cki;
-        tcmr.sttdly = reg->delay;
-        tcmr.start = reg->start;
+        tcmr.cki = reg->ssc_cki;
+        tcmr.sttdly = reg->ssc_delay;
+        tcmr.start = reg->ssc_start;
         
         SSC_ConfigureTransmitter( pSSC,  tcmr.value,  tfmr.value );
         SSC_DisableTransmitter( pSSC );
@@ -1181,13 +1181,13 @@ void ssc_rxRegister_set( void *instance,void *parameter )
     AUDIO_CFG *reg = ( AUDIO_CFG * )parameter;
     Ssc *pSSC = ( Ssc * )pSource->dev.instanceHandle;
     
-    if( reg->channels > 0 ) 
+    if( reg->channel_num > 0 ) 
     {        
-        rfmr.datnb  = reg->channels - 1 ; 
+        rfmr.datnb  = reg->channel_num - 1 ; 
         rfmr.datlen = reg->bit_length-1;  
-        rcmr.cki = reg->cki;
-        rcmr.sttdly = reg->delay;
-        rcmr.start = reg->start;
+        rcmr.cki = reg->ssc_cki;
+        rcmr.sttdly = reg->ssc_delay;
+        rcmr.start = reg->ssc_start;
 
         SSC_ConfigureReceiver(  pSSC,  rcmr.value , rfmr.value );
         SSC_DisableReceiver( pSSC ); 

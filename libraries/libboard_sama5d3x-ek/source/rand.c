@@ -50,7 +50,7 @@ static uint32_t _dwRandNext=1 ;
  *
  *  \param seed rand initiation seed
  */
-extern void srand( uint32_t dwSeed )
+extern void srand1( uint32_t dwSeed )
 {
     _dwRandNext = dwSeed ;
 }
@@ -58,7 +58,7 @@ extern void srand( uint32_t dwSeed )
 /**
  *  Return a random number, maxinum assumed to be 65536
  */
-extern uint32_t rand( void )
+extern uint32_t rand1( void )
 {
     _dwRandNext = _dwRandNext * 1103515245 + 12345 ;
 
