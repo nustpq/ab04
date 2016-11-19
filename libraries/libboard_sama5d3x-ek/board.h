@@ -137,7 +137,7 @@
 
 /** Frequency of the board main oscillator */
 #define BOARD_MAINOSC           12000000
-
+#define BOARD_SLOW_XTAL         32768 
 /** Master clock frequency (when using board_lowlevel.c) */
 #define BOARD_MCK                ((unsigned long)((BOARD_MAINOSC / 3 / 2) * 66 ))
 
@@ -232,7 +232,9 @@
 #define PIN_USART0_CTS  {PIO_PD15A_CTS0, PIOD, ID_PIOD, PIO_PERIPH_A, PIO_DEFAULT}
 /** USART0 SCK pin definition. */
 #define PIN_USART0_SCK  {PIO_PD14A_SCK0, PIOD, ID_PIOD, PIO_PERIPH_A, PIO_DEFAULT}
-
+#define PINS_USART0      PIN_USART0_TXD,\
+                         PIN_USART0_RXD
+                           
 /** USART1 TXD pin definition. */
 #define PIN_USART1_TXD  {PIO_PB29A_TXD1, PIOB, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT}
 /** USART1 RXD pin definition. */

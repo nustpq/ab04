@@ -124,9 +124,9 @@
 /**      @}*/
 #else
 /// Audio Data OUT endpoint number.
-#define CDCDSerialDriverDescriptors_AUDIODATAOUT        1
+#define CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT     1
 /// Audio Data IN endpoint number.
-#define CDCDSerialDriverDescriptors_AUDIODATAIN         2
+#define CDCDSerialDriverDescriptors_AUDIO_0_DATAIN      2
 
 /// Cmd Data OUT endpoint number.
 #define CDCDSerialDriverDescriptors_CMDDATAOUT          3
@@ -134,12 +134,17 @@
 #define CDCDSerialDriverDescriptors_CMDDATAIN           4
 
 /// Audio Data OUT endpoint number.
-#define CDCDSerialDriverDescriptors_AUDIODATAOUT1        5
+#define CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT     5
 /// Audio Data IN endpoint number.
-#define CDCDSerialDriverDescriptors_AUDIODATAIN1         6
+#define CDCDSerialDriverDescriptors_AUDIO_1_DATAIN      6
 
+/// SPI Audio Data OUT endpoint number.
+#define CDCDSerialDriverDescriptors_SPI_DATAOUT         7
+/// SPI Audio Data IN endpoint number.
+#define CDCDSerialDriverDescriptors_SPI_DATAIN          8
+   
 /// Notification endpoint number.
-#define CDCDSerialDriverDescriptors_NOTIFICATION        7
+#define CDCDSerialDriverDescriptors_MCU_LOG             9
 
 #endif
 

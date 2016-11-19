@@ -41,6 +41,9 @@
 #include <board.h>
 #include <string.h>
 
+
+#ifdef LCD
+
 /*----------------------------------------------------------------------------
  *        Local definitions
  *----------------------------------------------------------------------------*/
@@ -382,3 +385,4 @@ void TSDCom_RestoreCalibrateData(void *pBuffer, uint32_t size)
 
 /**@}*/
 
+#endif

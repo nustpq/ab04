@@ -30,9 +30,6 @@
 #define  INCLUDES_PRESENT
 
 
-//#include  <math.h>
-
-
 /*
 *********************************************************************************************************
 *                                              LIBRARIES
@@ -42,8 +39,7 @@
 #include    <string.h>
 #include    <ctype.h>
 #include    <stdlib.h>
-#include    <stdarg.h>
-                      
+#include    <stdarg.h>                  
 
 #include    <ucos_ii.h>
 #include    <cpu.h>
@@ -55,17 +51,13 @@
 #include    <lib_str.h>
 #include    <libnandflash.h>
 #include    <libpmecc.h>
-                          
-#include   "taskcomm.h"
-  
-#include  <bsp.h>
-#include  <bsp_int.h>
-#include  <bsp_os.h>
-#include  <bsp_cache.h>
 
+#include    <taskcomm.h>
 
- 
-
+#include    <bsp.h>
+#include    <bsp_int.h>
+#include    <bsp_os.h>
+#include    <bsp_cache.h>
 
 
 
@@ -85,14 +77,7 @@
 #endif
 
 
-/*
-*********************************************************************************************************
-*                                                 OS
-*********************************************************************************************************
-*/
 
-#include    <ucos_ii.h>
-#include    <taskcomm.h>
 
 /*
 *********************************************************************************************************

@@ -114,10 +114,16 @@ typedef struct _CDCDSerialPort {
     uint8_t bBulkInPIPE1;
     /** USB bulk OUT endpoint address ,i want to used by ssc1*/
     uint8_t bBulkOutPIPE1;
+    /** USB bulk IN endpoint address ,i want to used by spi*/
+    uint8_t bBulkInPIPE2;
+    /** USB bulk OUT endpoint address ,i want to used by spi*/
+    uint8_t bBulkOutPIPE2;
 	/** USB bulk IN endpoint address ,used by cmd link*/
     uint8_t bBulkInPIPECmd;
     /** USB bulk OUT endpoint address ,usd by cmd link*/
     uint8_t bBulkOutPIPECmd;
+    /** USB bulk IN endpoint address ,used by cmd link*/
+    uint8_t bBulkInPIPELog;
 #endif
 	
 
@@ -160,6 +166,16 @@ extern uint32_t CDCDSerialPort_Write_SecondEp(
     void *pData, uint32_t dwSize,
     TransferCallback fCallback, void* pArg);
 
+extern uint32_t CDCDSerialPort_Write_ThirdEp(
+    const CDCDSerialPort *pCdcd,
+    void *pData, uint32_t dwSize,
+    TransferCallback fCallback, void* pArg);
+
+extern uint32_t CDCDSerialPort_Write_LogEp(
+    const CDCDSerialPort *pCdcd,
+    void *pData, uint32_t dwSize,
+    TransferCallback fCallback, void* pArg);
+
 extern uint32_t CDCDSerialPort_Write_CmdEp(
     const CDCDSerialPort *pCdcd,
     void *pData, uint32_t dwSize,
@@ -173,6 +189,11 @@ extern uint32_t CDCDSerialPort_Read(
 
 
 extern uint32_t CDCDSerialPort_Read_SecondEp(
+    const CDCDSerialPort *pCdcd,
+    void *pData, uint32_t dwSize,
+    TransferCallback fCallback, void* pArg);
+
+extern uint32_t CDCDSerialPort_Read_ThirdEp(
     const CDCDSerialPort *pCdcd,
     void *pData, uint32_t dwSize,
     TransferCallback fCallback, void* pArg);

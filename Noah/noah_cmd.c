@@ -807,6 +807,9 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
              restart_audio_0_bulk_in  = true  ;
              restart_audio_1_bulk_out = true  ;
              restart_audio_1_bulk_in  = true  ; 
+             restart_audio_2_bulk_out = true  ;
+             restart_audio_2_bulk_in  = true  ;        
+             restart_log_bulk_in      = true  ; 
              restart_cmd_bulk_out     = true  ;
              restart_cmd_bulk_in      = true  ;            
         break;
@@ -817,6 +820,9 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
              restart_audio_0_bulk_in  = false  ;
              restart_audio_1_bulk_out = false  ;
              restart_audio_1_bulk_in  = false  ; 
+             restart_audio_2_bulk_out = false  ;
+             restart_audio_2_bulk_in  = false  ;                       
+             restart_log_bulk_in      = false  ; 
              restart_cmd_bulk_out     = false  ;
              restart_cmd_bulk_in      = false  ;            
         break;

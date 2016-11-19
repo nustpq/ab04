@@ -23,6 +23,34 @@
 #include "uif_object.h"
 #include "ruler.h"
 
+/*
+*********************************************************************************************************
+*                                        global macro switch
+*********************************************************************************************************
+*/
+#define UIF_COMMAND      1u
+#define UIF_NANDFLASH    1u
+#define UIF_LED          1u
+#define UIF_USB          1u
+#define UIF_SSC0         1u
+#define UIF_SSC1         1u
+#define UIF_SPI0         1u
+#define UIF_SPI1         1u
+#define UIF_TWI0	     1u
+#define UIF_TWI1	     1u
+#define UIF_TWI2	     1u
+#define UIF_USART1       1u
+#define UIF_GPIO         1u
+
+
+#define UIF_AIC3204      1u
+#define UIF_FM36         1u
+
+/*
+*********************************************************************************************************
+*                                        global macro definition
+*********************************************************************************************************
+*/
 #define SUCCESS                          0u
 #define NO_ERR                           0u
 
@@ -51,7 +79,7 @@
 
 
 #define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*2*4 )               //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
-#define I2S_PINGPONG_OUT_SIZE_3K           I2S_PINGPONG_IN_SIZE_3K    // 
+#define I2S_PINGPONG_OUT_SIZE_3K           ( 48*8*2*4 )    // 
 #define USB_DATAEP_SIZE_64B                   (    64    )            // force use 64Bytes
 #define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
 #define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
@@ -60,6 +88,18 @@
 #define SPI_RINGIN_SIZE_16K                ( 245760UL )               //3072B/s * 10 = 30720B
 #define USB_CMD_RINGOUT_SIZE_1K            ( 1024  )                  //USB cmd data, size MUST be 2^n .
 #define USB_CMD_RINGIN_SIZE_1k             ( 1024  )                  //USB cmd data, size MUST be 2^n .
+
+#define I2S_PINGPONG_IN_SIZE_3K            ( 24*2*2*2 )               //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
+#define I2S_PINGPONG_OUT_SIZE_3K           I2S_PINGPONG_IN_SIZE_3K    // 
+#define USB_DATAEP_SIZE_64B                (    64UL    )             // force use 64Bytes
+#define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
+#define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
+#define USB_RINGIN_SIZE_16K                ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
+#define SPI_RINGOUT_SIZE_50K               ( 3072 * 16 )              //3072B/2ms * 16 > ( 3072B * 5 )
+#define SPI_RINGIN_SIZE_50K                ( 3072 * 16 )              //3072B/2ms * 16 > ( 3072B * 5 )
+#define USB_CMD_RINGOUT_SIZE_2K            ( 2048UL  )                //USB cmd data, size MUST be 2^n .
+#define USB_CMD_RINGIN_SIZE_2k             ( 2048UL  )                //USB cmd data, size MUST be 2^n .
+#define USART_BUFFER_SIZE_1K               ( 1024UL  )                //buffer size of usart
 
 #define PLAY_BUF_DLY_CNT                  5
 
@@ -469,7 +509,9 @@ extern uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B] ;
 extern uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B] ; 
 extern uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B] ;
 extern uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B] ; 
-
+extern uint8_t usbCacheBulkOut2[USB_DATAEP_SIZE_64B] ;
+extern uint8_t usbCacheBulkIn2[USB_DATAEP_SIZE_64B] ; 
+extern uint8_t usbCacheBulkIn3[USB_DATAEP_SIZE_64B] ; 
 //Buffer Level 1:  USB Cmd data stream buffer : 64 B
 extern uint8_t usbCmdCacheBulkOut[ USB_CMDEP_SIZE_64B ] ;            
 extern uint8_t usbCmdCacheBulkIn[ USB_CMDEP_SIZE_64B ]  ;             
@@ -479,7 +521,9 @@ extern uint8_t usbRingBufferBulkOut0[ USB_RINGOUT_SIZE_16K ] ;
 extern uint8_t usbRingBufferBulkIn0[ USB_RINGIN_SIZE_16K ] ;          
 extern uint8_t usbRingBufferBulkOut1[ USB_RINGOUT_SIZE_16K ] ;        
 extern uint8_t usbRingBufferBulkIn1[ USB_RINGIN_SIZE_16K ] ;          
-
+extern uint8_t usbRingBufferBulkOut2[ USB_RINGOUT_SIZE_16K ] ;        
+extern uint8_t usbRingBufferBulkIn2[ USB_RINGIN_SIZE_16K ] ;
+extern uint8_t usbRingBufferBulkIn3[ USB_RINGIN_SIZE_16K ] ;
 //Buffer Level 2:  Ring CMD Buffer : 1024 B
 extern uint8_t usbCmdRingBulkOut[ USB_CMD_RINGOUT_SIZE_1K ] ;         
 extern uint8_t usbCmdRingBulkIn[ USB_CMD_RINGIN_SIZE_1k ]  ;          
@@ -511,6 +555,9 @@ extern uint16_t spi1_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
 extern uint16_t gpio_PingPong_bufferOut[2][I2S_PINGPONG_OUT_SIZE_3K];
 extern uint16_t gpio_PingPong_bufferIn[2][I2S_PINGPONG_IN_SIZE_3K];
 
+//buffer for usart0 and usart1;
+extern uint8_t usart0Buffer[ 2 ][ USART_BUFFER_SIZE_1K ];
+extern uint8_t usart1Buffer[ 2 ][ USART_BUFFER_SIZE_1K ];
 
 //------------------------fifo list instance export for other-----------------//
 //Ring for ssc 
@@ -524,6 +571,8 @@ extern kfifo_t  ep0BulkOut_fifo;
 extern kfifo_t  ep0BulkIn_fifo;
 extern kfifo_t  ep1BulkOut_fifo;
 extern kfifo_t  ep1BulkIn_fifo;
+extern kfifo_t  ep2BulkOut_fifo;
+extern kfifo_t  ep2BulkIn_fifo;   
 
 //Ring for USB cmd endpoint
 extern kfifo_t  cmdEpBulkOut_fifo;
@@ -548,10 +597,13 @@ extern DataSource source_twi0;
 extern DataSource source_twi1;
 extern DataSource source_twi2;
 extern DataSource source_gpio;
+extern DataSource source_usart0;
 extern DataSource source_usart1;
 
 //-----------------------task syncoronize P/V---------------------------------//
 extern OS_FLAG_GRP *g_StartUSBTransfer;
 extern OS_EVENT    *pPortManagerMbox;
+
+
 
 #endif

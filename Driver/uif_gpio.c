@@ -323,6 +323,29 @@ void  GPIOPIN_Set_Session( uint32_t pin , uint32_t dat )
 }
 
 
+/*
+*********************************************************************************************************
+*                                    stop_gpio()
+*
+* Description :  stop gpio device
+*
+* Argument(s) :  pin        : data source instance;
+*		 
+*                
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void stop_gpio( void * pInstance )
+{
+   pInstance = pInstance;
+    //just reset buffers about this device,nothing to do with hardware port;
+   memset( gpio_PingPong_bufferOut, 0 , sizeof( gpio_PingPong_bufferOut ) );
+   memset( gpio_PingPong_bufferIn, 0 , sizeof( gpio_PingPong_bufferIn ) );
+   
+}
 
 
 

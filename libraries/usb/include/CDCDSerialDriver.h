@@ -155,8 +155,13 @@ typedef struct _CDCDSerialDriverConfigurationDescriptors {
     /** Data OUT endpoint descriptor. */
     USBEndpointDescriptor dataOut1;
     /** Data IN endpoint descriptor. */
-    USBEndpointDescriptor dataIn1;    
-    
+    USBEndpointDescriptor dataIn1;  
+    /** Data OUT endpoint descriptor. */
+    USBEndpointDescriptor dataOut2;
+    /** Data IN endpoint descriptor. */
+    USBEndpointDescriptor dataIn2; 
+    /** Data IN endpoint descriptor. */
+    USBEndpointDescriptor dataIn3; 
 
 } __attribute__ ((__packed__)) CDCDSerialDriverConfigurationDescriptors;
 #endif
@@ -218,7 +223,7 @@ extern void CDCDSerialDriver_RequestHandler(
  * \return USBD_STATUS_SUCCESS if the read operation has been started normally;
  *         otherwise, the corresponding error code.
  */
-static inline uint32_t CDCDSerialDriver_Write(
+static inline uint32_t CDCDSerialDriver_WriteAudio_0(
     void *data,
     uint32_t size,
     TransferCallback callback,
@@ -227,7 +232,7 @@ static inline uint32_t CDCDSerialDriver_Write(
     return CDCDSerial_Write(data, size, callback, argument);
 }
 
-static inline uint32_t CDCDSerialDriver_Write_SecondEp(
+static inline uint32_t CDCDSerialDriver_WriteAudio_1(
     void *data,
     uint32_t size,
     TransferCallback callback,
@@ -236,7 +241,25 @@ static inline uint32_t CDCDSerialDriver_Write_SecondEp(
     return CDCDSerial_Write_SecondEp(data, size, callback, argument);
 }
 
-static inline uint32_t CDCDSerialDriver_Write_CmdEp(
+static inline uint32_t CDCDSerialDriver_WriteSPI(
+    void *data,
+    uint32_t size,
+    TransferCallback callback,
+    void *argument)
+{
+    return CDCDSerial_Write_ThirdEp(data, size, callback, argument);
+}
+
+static inline uint32_t CDCDSerialDriver_WriteLog(
+    void *data,
+    uint32_t size,
+    TransferCallback callback,
+    void *argument)
+{
+    return CDCDSerial_Write_LogEp(data, size, callback, argument);
+}
+
+static inline uint32_t CDCDSerialDriver_WriteCmd(
     void *data,
     uint32_t size,
     TransferCallback callback,
@@ -256,7 +279,7 @@ static inline uint32_t CDCDSerialDriver_Write_CmdEp(
  * \return USBD_STATUS_SUCCESS if the read operation has been started normally;
  *         otherwise, the corresponding error code.
  */
-static inline uint32_t CDCDSerialDriver_Read(
+static inline uint32_t CDCDSerialDriver_ReadAudio_0(
     void *data,
     uint32_t size,
     TransferCallback callback,
@@ -265,7 +288,7 @@ static inline uint32_t CDCDSerialDriver_Read(
     return CDCDSerial_Read(data, size, callback, argument);
 }
 
-static inline uint32_t CDCDSerialDriver_Read_SecondEp(
+static inline uint32_t CDCDSerialDriver_ReadAudio_1(
     void *data,
     uint32_t size,
     TransferCallback callback,
@@ -274,7 +297,16 @@ static inline uint32_t CDCDSerialDriver_Read_SecondEp(
     return CDCDSerial_Read_SecondEp(data, size, callback, argument);
 }
 
-static inline uint32_t CDCDSerialDriver_Read_CmdEp(
+static inline uint32_t CDCDSerialDriver_ReadSPI(
+    void *data,
+    uint32_t size,
+    TransferCallback callback,
+    void *argument)
+{
+    return CDCDSerial_Read_ThirdEp(data, size, callback, argument);
+}
+
+static inline uint32_t CDCDSerialDriver_ReadCmd(
     void *data,
     uint32_t size,
     TransferCallback callback,

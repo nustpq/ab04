@@ -262,11 +262,11 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
      }
      /*step3:copy data to buffer*/
 #if 0     
-     CDCDSerialDriver_Read(     usbCacheBulkOut0,                              \
+     CDCDSerialDriver_ReadAudio_0(     usbCacheBulkOut0,                              \
                                 USB_DATAEP_SIZE_64B,                           \
                                 (TransferCallback) UsbAudio0DataReceived,      \
                                   0);
-     CDCDSerialDriver_Write(    usbCacheBulkIn0,                               \
+     CDCDSerialDriver_WriteAudio_0(    usbCacheBulkIn0,                               \
                                  USB_DATAEP_SIZE_64B,                          \
                                (TransferCallback) UsbAudio0DataTransmit,       \
                                0);
@@ -511,12 +511,12 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
                       pSource->warmWaterLevel 
                       ); 
 
-                      CDCDSerialDriver_Read(  usbCacheBulkOut0,                \
+                      CDCDSerialDriver_ReadAudio_0(  usbCacheBulkOut0,         \
                                 USB_CMDEP_SIZE_64B ,                           \
                                 (TransferCallback)UsbAudio1DataReceived,       \
                                 0);
                       
-                      CDCDSerialDriver_Write(  usbCacheBulkIn1,                \
+                      CDCDSerialDriver_WriteAudio_0(  usbCacheBulkIn1,         \
                                  USB_DATAEP_SIZE_64B,                          \
                                  (TransferCallback) UsbAudio1DataTransmit,     \
                                  0);

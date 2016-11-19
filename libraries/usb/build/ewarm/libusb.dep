@@ -2,597 +2,413 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>96192118</fileChecksum>
+  <fileChecksum>2736453055</fileChecksum>
   <configuration>
     <name>Debug</name>
     <outputs>
-      <file>$PROJ_DIR$\..\..\common\cdc\CDCLineCoding.c</file>
-      <file>$PROJ_DIR$\..\..\common\core\USBDescriptors.c</file>
-      <file>$PROJ_DIR$\..\..\include\USBLib_Types.h</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver_Callbacks.c</file>
-      <file>$PROJ_DIR$\..\..\include\USBLib_Trace.h</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver_Callbacks.c</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDStream.c</file>
-      <file>$PROJ_DIR$\..\..\common\audio\AUDFeatureUnitRequest.c</file>
-      <file>$PROJ_DIR$\..\..\common\audio\AUDGenericRequest.c</file>
-      <file>$PROJ_DIR$\..\..\common\cdc\CDCSetControlLineStateRequest.c</file>
-      <file>$PROJ_DIR$\..\..\include\USBRequests.h</file>
-      <file>$PROJ_DIR$\..\..\device\composite\AUDDFunction.c</file>
-      <file>$PROJ_DIR$\..\..\common\hid\HIDReportRequest.c</file>
-      <file>$PROJ_DIR$\..\..\include\USBDescriptors.h</file>
-      <file>$PROJ_DIR$\..\..\common\hid\HIDKeypad.c</file>
-      <file>$PROJ_DIR$\..\..\device\composite\CDCAUDDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\common\core\USBRequests.c</file>
-      <file>$PROJ_DIR$\..\..\common\hid\HIDIdleRequest.c</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver.c</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\board_lowlevel.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\rand.h</file>
       <file>$PROJ_DIR$\..\..\include\AUDRequests.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDescriptors.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDSpeakerPhone.h</file>
       <file>$PROJ_DIR$\..\..\include\AUDDSpeakerPhoneDriver.h</file>
       <file>$PROJ_DIR$\..\..\include\AUDDFunction.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDSpeakerDriver.h</file>
+      <file>$PROJ_DIR$\..\..\include\AUDDStream.h</file>
       <file>$PROJ_DIR$\..\..\include\CDCDescriptors.h</file>
       <file>$PROJ_DIR$\..\..\include\CDCAUDDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDStream.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCDSerial.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCHIDDDriver.h</file>
+      <file>$PROJ_DIR$\..\..\include\AUDDSpeakerPhone.h</file>
+      <file>$PROJ_DIR$\..\..\include\AUDDescriptors.h</file>
+      <file>$PROJ_DIR$\..\..\include\AUDDSpeakerDriver.h</file>
       <file>$PROJ_DIR$\..\..\include\HIDDFunction.h</file>
+      <file>$PROJ_DIR$\..\..\device\core\USBD.c</file>
       <file>$PROJ_DIR$\..\..\include\DUALCDCDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCNotifications.h</file>
       <file>$PROJ_DIR$\..\..\include\HIDDKeyboardDriver.h</file>
       <file>$PROJ_DIR$\..\..\include\HIDDMouseDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDDTransferDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDDKeyboard.h</file>
-      <file>$PROJ_DIR$\..\..\device\composite\DUALCDCDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\include\CDCMSDDriver.h</file>
+      <file>$PROJ_DIR$\..\..\include\CDCDSerialDriver.h</file>
       <file>$PROJ_DIR$\..\..\include\CDCDSerialPort.h</file>
+      <file>$PROJ_DIR$\..\..\include\HIDDKeyboard.h</file>
+      <file>$PROJ_DIR$\..\..\include\CDCMSDDriver.h</file>
+      <file>$PROJ_DIR$\..\..\include\CDCDSerial.h</file>
       <file>$PROJ_DIR$\..\..\include\HIDAUDDDriver.h</file>
       <file>$PROJ_DIR$\..\..\include\HIDDescriptors.h</file>
+      <file>$PROJ_DIR$\..\..\include\CDCNotifications.h</file>
       <file>$PROJ_DIR$\..\..\include\CDCRequests.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCDSerialDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDMSDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDIOFifo.h</file>
-      <file>$PROJ_DIR$\..\..\include\USBD_HAL.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDDStateMachine.h</file>
+      <file>$PROJ_DIR$\..\..\include\CDCHIDDDriver.h</file>
       <file>$PROJ_DIR$\..\..\include\MSDFunction.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDRequests.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDescriptors.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDLun.h</file>
-      <file>$PROJ_DIR$\..\..\include\SBCMethods.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDUsages.h</file>
       <file>$PROJ_DIR$\..\..\include\HIDReports.h</file>
+      <file>$PROJ_DIR$\..\..\include\USBD_HAL.h</file>
+      <file>$PROJ_DIR$\..\..\include\USBLib_Types.h</file>
+      <file>$PROJ_DIR$\..\..\include\MSDescriptors.h</file>
+      <file>$PROJ_DIR$\..\..\include\MSDIOFifo.h</file>
+      <file>$PROJ_DIR$\..\..\include\USBDescriptors.h</file>
       <file>$PROJ_DIR$\..\..\include\MSD.h</file>
-      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial.c</file>
+      <file>$PROJ_DIR$\..\..\include\HIDDTransferDriver.h</file>
       <file>$PROJ_DIR$\..\..\include\USBD.h</file>
       <file>$PROJ_DIR$\..\..\include\USBDDriver.h</file>
+      <file>$PROJ_DIR$\..\..\include\USBRequests.h</file>
       <file>$PROJ_DIR$\..\..\include\MSDDriver.h</file>
+      <file>$PROJ_DIR$\..\..\include\MSDLun.h</file>
+      <file>$PROJ_DIR$\..\..\include\HIDRequests.h</file>
       <file>$PROJ_DIR$\..\..\include\SBC.h</file>
+      <file>$PROJ_DIR$\..\..\include\USBLib_Trace.h</file>
+      <file>$PROJ_DIR$\..\..\include\HIDMSDDriver.h</file>
+      <file>$PROJ_DIR$\..\..\include\HIDUsages.h</file>
+      <file>$PROJ_DIR$\..\..\include\MSDDStateMachine.h</file>
+      <file>$PROJ_DIR$\..\..\include\SBCMethods.h</file>
+      <file>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDStream.c</file>
+      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial.c</file>
+      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialPort.c</file>
+      <file>$PROJ_DIR$\..\..\common\cdc\CDCLineCoding.c</file>
+      <file>$PROJ_DIR$\..\..\common\core\USBRequests.c</file>
+      <file>$PROJ_DIR$\..\..\common\audio\AUDGenericRequest.c</file>
+      <file>$PROJ_DIR$\..\..\device\composite\AUDDFunction.c</file>
+      <file>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver_Callbacks.c</file>
+      <file>$PROJ_DIR$\..\..\common\hid\HIDKeypad.c</file>
+      <file>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver_Callbacks.c</file>
+      <file>$PROJ_DIR$\..\..\common\hid\HIDReportRequest.c</file>
+      <file>$PROJ_DIR$\..\..\device\composite\CDCAUDDDriver.c</file>
+      <file>$PROJ_DIR$\..\..\common\cdc\CDCSetControlLineStateRequest.c</file>
+      <file>$PROJ_DIR$\..\..\common\audio\AUDFeatureUnitRequest.c</file>
+      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial_Callbacks.c</file>
+      <file>$PROJ_DIR$\..\..\common\core\USBDescriptors.c</file>
+      <file>$PROJ_DIR$\..\..\common\hid\HIDIdleRequest.c</file>
+      <file>$PROJ_DIR$\..\..\device\massstorage\MSDIOFifo.c</file>
+      <file>$PROJ_DIR$\..\..\device\hid-transfer\HIDDFunction.c</file>
+      <file>$PROJ_DIR$\..\..\device\composite\CDCMSDDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\hid-transfer\HIDDTransferDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\massstorage\MSDDStateMachine.c</file>
       <file>$PROJ_DIR$\..\..\device\composite\HIDMSDDriver.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBRequests.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerDriver.o</file>
+      <file>$PROJ_DIR$\..\..\device\composite\DUALCDCDDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\composite\CDCHIDDDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\composite\HIDAUDDDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardInputReport.c</file>
+      <file>$PROJ_DIR$\..\..\device\hid-mouse\HIDDMouseDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\massstorage\SBCMethods.c</file>
       <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardDriver.c</file>
+      <file>$PROJ_DIR$\..\..\device\massstorage\MSDLun.c</file>
       <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboard.c</file>
       <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardCallbacks_LedsChanged.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-transfer\HIDDFunction.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardInputReport.c</file>
+      <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardOutputReport.c</file>
       <file>$PROJ_DIR$\..\..\device\massstorage\MSDDriver.c</file>
       <file>$PROJ_DIR$\..\..\device\massstorage\MSDFunction.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\SBCMethods.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardOutputReport.c</file>
-      <file>$PROJ_DIR$\..\..\device\core\USBD.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-mouse\HIDDMouseDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\MSDDStateMachine.c</file>
-      <file>$PROJ_DIR$\..\..\device\core\USBDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\MSDIOFifo.c</file>
-      <file>$PROJ_DIR$\..\..\device\composite\HIDAUDDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\core\USBDCallbacks.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-transfer\HIDDTransferDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\core\USBDDriverCallbacks.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\MSDLun.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDFunction.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDKeypad.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardOutputReport.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCHIDDDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDMSDDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCDSerial_Callbacks.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardOutputReport.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDIOFifo.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDMSDDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDFeatureUnitRequest.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDFunction.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCSetControlLineStateRequest.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDKeypad.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDAUDDDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDTransferDriver.o</file>
       <file>$PROJ_DIR$\Debug\Obj\HIDIdleRequest.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\DUALCDCDDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerPhoneDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDStream.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardInputReport.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCAUDDDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDLun.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCAUDDDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerDriver_Callbacks.o</file>
-      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
-      <file>$PROJ_DIR$\..\..\lib\libusb_ewarm_dbg.a</file>
-      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDFeatureUnitRequest.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDGenericRequest.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBDescriptors.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\DUALCDCDDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBD.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDFunction.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDFunction.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBDCallbacks.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDTransferDriver.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDStream.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDMouseDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBRequests.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCDSerialDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCSetControlLineStateRequest.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerDriver.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboard.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCDSerialDriver.o</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerDriver_Callbacks.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\SBCMethods.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCDSerialPort.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardInputReport.o</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBDDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDGenericRequest.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCMSDDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerPhoneDriver_Callbacks.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardCallbacks_LedsChanged.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDFunction.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDAUDDDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCHIDDDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCDSerial.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBD.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboard.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBDCallbacks.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDDStateMachine.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCLineCoding.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCDSerial.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerPhoneDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDIOFifo.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardCallbacks_LedsChanged.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCDSerialPort.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBDDriverCallbacks.o</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDDStateMachine.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCDSerial_Callbacks.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDReportRequest.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\c\assert.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCLineCoding.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBDDriverCallbacks.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDLun.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\SBCMethods.o</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\USBDDriver.pbi</file>
       <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerPhoneDriver_Callbacks.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCSetControlLineStateRequest.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDFunction.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCAUDDDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBDDriverCallbacks.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDKeypad.pbi</file>
       <file>$PROJ_DIR$\Debug\Obj\HIDReportRequest.o</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\AUDDFunction.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\MSDDriver.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDDMouseDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\CDCMSDDriver.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\HIDIdleRequest.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDKeypad.o</file>
+      <file>$PROJ_DIR$\..\..\device\core\USBDCallbacks.c</file>
       <file>$PROJ_DIR$\Debug\Obj\USBDescriptors.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardOutputReport.pbi</file>
+      <file>$PROJ_DIR$\..\..\device\core\USBDDriver.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDFunction.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBDDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDStream.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\DUALCDCDDriver.pbi</file>
+      <file>$PROJ_DIR$\..\..\device\core\USBDDriverCallbacks.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDAUDDDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerDriver_Callbacks.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBDCallbacks.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDStream.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardCallbacks_LedsChanged.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBDescriptors.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboard.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardInputReport.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDTransferDriver.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCDSerialPort.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDDStateMachine.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCAUDDDriver.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDIdleRequest.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCHIDDDriver.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDMSDDriver.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDTransferDriver.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDMouseDriver.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCLineCoding.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerDriver_Callbacks.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardOutputReport.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDDStateMachine.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCMSDDriver.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCDSerial_Callbacks.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDFunction.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBRequests.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCLineCoding.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\SBCMethods.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerPhoneDriver.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerDriver.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerPhoneDriver_Callbacks.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDAUDDDriver.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDFunction.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCDSerialPort.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCHIDDDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardCallbacks_LedsChanged.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBD.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDGenericRequest.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
       <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
-      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial_Callbacks.c</file>
-      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\composite\CDCHIDDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialPort.c</file>
-      <file>$PROJ_DIR$\..\..\device\composite\CDCMSDDriver.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCDSerialDriver.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCDSerial.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCMSDDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDMouseDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\DUALCDCDDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDFeatureUnitRequest.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDIOFifo.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBD.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBRequests.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDFeatureUnitRequest.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\assert.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardInputReport.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDDSpeakerPhoneDriver.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDReportRequest.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDLun.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboard.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCDSerial_Callbacks.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\SBCMethods.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDDriver.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBDDriverCallbacks.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDKeyboardDriver.pbi</file>
+      <file>$PROJ_DIR$\..\..\lib\libusb_ewarm_dbg.a</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDLun.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBDCallbacks.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDDFunction.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCDSerialDriver.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCDSerial.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\USBDDriver.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\HIDMSDDriver.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\libusb.pbd</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDIOFifo.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\AUDGenericRequest.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\CDCSetControlLineStateRequest.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\MSDFunction.pbi</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\pmc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\irq.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\gmac.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\pwmc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\smcNfc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\pio_it.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\pio.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\rtc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\fuse.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\hsmci.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\usart.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\pit.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\twid.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\twi.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\tc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\dmac.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\spi.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\ssc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_pit.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_dbgu.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_uart1.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_smc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_udphs.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_trng.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_fuse.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_usart2.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_dmac1.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_pioa.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_sfr.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_mpddrc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_usart3.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_gmac.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_spi1.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_matrix.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_emac.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_aic.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_piob.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_piod.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_pioe.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_pmc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_pioc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_hsmci2.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_adc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_twi2.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_hsmci1.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_dmac0.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_shdwc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_ssc1.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_rstc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\async.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\udphs.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\adc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_sha.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\mmu.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_tdes.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_gpbr.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_wdt.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_bsc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\emac.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\cp15\cp15.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_sckc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_rtc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\rstc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_aes.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_isi.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\USBD_Config.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_uart0.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\ov.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\tsd.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\wav.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\lcd_draw.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\tsd_com.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\lcd_color.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\lcdd.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\cand.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\omnivision.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\lcd_font10x14.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\ovyuv.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\lcd_gimp_image.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\lcd_font.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\qt1070.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\macb.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\dbgu_console.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\math.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\bmp.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\clock.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\dbg_util.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\iso7816_4.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\gmii.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\dma_hardware_interface.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\timetick.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\wm8904.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\led.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\mii.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\mcid.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\gmacb.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\dmad.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\board_memories.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\gmacd.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\hamming.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\emacd.h</file>
+      <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\board.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_usart0.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_lcdc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_usart1.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_hsmci0.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_udphs.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_twi0.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_pwm.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_rstc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_rtc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_shdwc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_sckc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_spi.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_wdt.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_smd.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_pit.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_tc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_aes.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_aximx.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_ssc0.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_uart.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_spi0.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_tc0.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_pwm.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_twi.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_pmc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_tc1.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_sfr.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_trng.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_usart.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_can1.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_smc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_ssc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_sha.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_can0.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_tdes.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\SAMA5D3X.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_aic.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_bsc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_dbgu.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_gmac.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_fuse.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_gpbr.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_isi.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_dmac.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_emac.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_hsmci.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_lcdc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_matrix.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_pio.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_can.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_twi1.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_adc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_mpddrc.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_aximx.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\chip.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\App\USBDDriverDescriptors.c</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\video.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\aes.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\trng.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\can.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\wdt.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\isi.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\tdes.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\trace.h</file>
+      <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\sha.h</file>
     </outputs>
     <file>
-      <name>[ROOT_NODE]</name>
+      <name>$PROJ_DIR$\..\..\device\core\USBD.c</name>
       <outputs>
         <tool>
-          <name>IARCHIVE</name>
-          <file> 112</file>
-        </tool>
-      </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\cdc\CDCLineCoding.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 168</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 156</file>
+          <file> 146</file>
         </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 43 163 122 113 142 172 137 126 133 11</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 43 163 122 113 142 172 137 126 133 11</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\core\USBDescriptors.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 116</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 182</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 14 163 122 113 142 172 137 126 133</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 14 163 122 113 142 172 137 126 133</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver_Callbacks.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 138</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 110</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 163 122 113 142 172 137 126 133 25 2 11 14 21 58 106 183 111 59 176 22 28</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 163 122 113 142 172 137 126 133 25 2 11 14 21 58 106 183 111 59 176 22 28</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver.c</name>
-      <outputs>
         <tool>
           <name>BICOMP</name>
           <file> 158</file>
         </tool>
+      </outputs>
+      <inputs>
         <tool>
           <name>ICCARM</name>
+          <file> 35 32 181 162 187 184 170 190 123 131 37 29 125 149 121 28 183 42</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 35 32 181 162 187 184 170 190 123 131 37 29 125 149 121 28 183 42</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDStream.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 109</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
           <file> 102</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 23 11 163 122 113 142 172 137 126 133 14 21 58 2 106 183 111 47 176 59 20 4</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 23 11 163 122 113 142 172 137 126 133 14 21 58 2 106 183 111 47 176 59 20 4</file>
+          <file> 8 181 162 187 184 170 190 123 131 5 35 32 37 29 125 149 121 36 183 9 2 28 42</file>
         </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver_Callbacks.c</name>
-      <outputs>
         <tool>
           <name>BICOMP</name>
-          <file> 146</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 174</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 163 122 113 142 172 137 126 133 23 11 14 21 58 2 106 183 111 47 176 59</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 163 122 113 142 172 137 126 133 23 11 14 21 58 2 106 183 111 47 176 59</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDStream.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 104</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 127</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 22 163 122 113 142 172 137 126 133 28 58 14 11 2 106 183 111 59 176 21 20 47 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 22 163 122 113 142 172 137 126 133 28 58 14 11 2 106 183 111 59 176 21 20 47 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\audio\AUDFeatureUnitRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 114</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 94</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 20 11 163 122 113 142 172 137 126 133</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 20 11 163 122 113 142 172 137 126 133</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\audio\AUDGenericRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 115</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 144</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 20 11 163 122 113 142 172 137 126 133</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 20 11 163 122 113 142 172 137 126 133</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\cdc\CDCSetControlLineStateRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 96</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 131</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 43 163 122 113 142 172 137 126 133 11</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 43 163 122 113 142 172 137 126 133 11</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\AUDDFunction.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 95</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 177</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 24 11 163 22 28 58 14 2 59 176 20 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 24 11 163 22 28 58 14 2 59 176 20 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\hid\HIDReportRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 166</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 175</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 50 163 122 113 142 172 137 126 133 11</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 50 163 122 113 142 172 137 126 133 11</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\hid\HIDKeypad.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 97</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 85</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 54 163 122 113 142 172 137 126 133</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 54 163 122 113 142 172 137 126 133</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\CDCAUDDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 107</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 109</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 27 11 163 26 21 58 14 2 59 176 29 40 43 33 24 22 28</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 27 11 163 26 21 58 14 2 59 176 29 40 43 33 24 22 28</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\core\USBRequests.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 129</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 63</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 11 163 122 113 142 172 137 126 133</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 11 163 122 113 142 172 137 126 133</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\hid\HIDIdleRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 100</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 181</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 50 163 122 113 142 172 137 126 133 11</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 50 163 122 113 142 172 137 126 133 11</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 132</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 64</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 25 2 163 122 113 142 172 137 126 133 11 14 21 58 106 183 111 59 176 22 28 4 20 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 25 2 163 122 113 142 172 137 126 133 11 14 21 58 106 183 111 59 176 22 28 4 20 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\DUALCDCDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 101</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 117</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 58 14 163 11 2 47 176 59 32 26 40 43 33</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 58 14 163 11 2 47 176 59 32 26 40 43 33</file>
+          <file> 8 181 162 187 184 170 190 123 131 5 35 32 37 29 125 149 121 36 183 9 2 28 42</file>
         </tool>
       </inputs>
     </file>
@@ -600,505 +416,22 @@
       <name>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 157</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 151</file>
+          <file> 179</file>
         </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 29 163 122 113 142 172 137 126 133 11 59 176 106 183 111 14 2 40 43 33 58 4 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 29 163 122 113 142 172 137 126 133 11 59 176 106 183 111 14 2 40 43 33 58 4 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\HIDMSDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 88</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 93</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 45 11 163 42 55 54 51 52 61 46 58 14 2 59 176 37 49 56 48</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 45 11 163 42 55 54 51 52 61 46 58 14 2 59 176 37 49 56 48</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 123</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 103</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 34 14 163 122 113 142 172 137 126 133 11 42 55 54 37 59 176 106 183 111 2 31 50 58 4 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 34 14 163 122 113 142 172 137 126 133 11 42 55 54 37 59 176 106 183 111 2 31 50 58 4 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboard.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 135</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 153</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 37 14 163 122 113 142 172 137 126 133 11 42 55 54 59 176 106 183 111 2 31 50 58 4 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 37 14 163 122 113 142 172 137 126 133 11 42 55 54 59 176 106 183 111 2 31 50 58 4 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardCallbacks_LedsChanged.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 160</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 147</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 34 14 163 122 113 142 172 137 126 133 11 42 55 54 37 59 176 106 183 111 2 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 34 14 163 122 113 142 172 137 126 133 11 42 55 54 37 59 176 106 183 111 2 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-transfer\HIDDFunction.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 148</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 120</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 31 163 122 113 142 172 137 126 133 50 11 42 55 54 58 14 2 106 183 111 59 176 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 31 163 122 113 142 172 137 126 133 50 11 42 55 54 58 14 2 106 183 111 59 176 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardInputReport.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 105</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 141</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 37 14 163 122 113 142 172 137 126 133 11 42 55 54 59 176 106 183 111 2 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 37 14 163 122 113 142 172 137 126 133 11 42 55 54 59 176 106 183 111 2 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 178</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 91</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 60 163 122 113 142 172 137 126 133 52 61 46 58 14 11 2 106 183 111 56 48 59 176 4 49 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 60 163 122 113 142 172 137 126 133 52 61 46 58 14 11 2 106 183 111 56 48 59 176 4 49 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDFunction.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 84</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 119</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 51 60 163 122 113 142 172 137 126 133 52 61 46 58 14 11 2 106 183 111 56 48 59 176 4 49 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 51 60 163 122 113 142 172 137 126 133 52 61 46 58 14 11 2 106 183 111 56 48 59 176 4 49 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\SBCMethods.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 139</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 171</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 53 61 52 163 122 113 142 172 137 126 133 46 58 14 11 2 106 183 111 48 56 59 176 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 53 61 52 163 122 113 142 172 137 126 133 46 58 14 11 2 106 183 111 48 56 59 176 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardOutputReport.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 90</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 86</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 37 14 163 122 113 142 172 137 126 133 11 42 55 54 59 176 106 183 111 2</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 37 14 163 122 113 142 172 137 126 133 11 42 55 54 59 176 106 183 111 2</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\core\USBD.c</name>
-      <outputs>
         <tool>
           <name>BICOMP</name>
           <file> 152</file>
         </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 118</file>
-        </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 58 14 163 122 113 142 172 137 126 133 11 2 106 183 111 47 176 4</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 58 14 163 122 113 142 172 137 126 133 11 2 106 183 111 47 176 4</file>
+          <file> 20 181 162 187 184 170 190 123 131 37 36 183 125 149 121 32 29 17 24 23 35 42 28</file>
         </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-mouse\HIDDMouseDriver.c</name>
-      <outputs>
         <tool>
           <name>BICOMP</name>
-          <file> 128</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 179</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 31 163 122 113 142 172 137 126 133 50 11 42 55 54 58 14 2 106 183 111 59 176 35 47 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 31 163 122 113 142 172 137 126 133 50 11 42 55 54 58 14 2 106 183 111 59 176 35 47 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDDStateMachine.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 164</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 155</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 53 61 52 163 122 113 142 172 137 126 133 46 58 14 11 2 106 183 111 48 56 59 176 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 53 61 52 163 122 113 142 172 137 126 133 46 58 14 11 2 106 183 111 48 56 59 176 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\core\USBDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 173</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 143</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 59 176 163 11 14 2 58 47 125 134</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 59 176 163 11 14 2 58 47 125 134</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDIOFifo.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 92</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 159</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 46</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 46</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\HIDAUDDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 149</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 98</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 41 11 163 42 55 54 21 58 14 2 59 176 37 24 22 28</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 41 11 163 42 55 54 21 58 14 2 59 176 37 24 22 28</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\core\USBDCallbacks.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 121</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 154</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 58 14 163 122 113 142 172 137 126 133 11 2 106 183 111 59 176</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 58 14 163 122 113 142 172 137 126 133 11 2 106 183 111 59 176</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-transfer\HIDDTransferDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 124</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 99</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 163 122 113 142 172 137 126 133 36 14 42 55 54 11 58 2 106 183 111 59 176 4 31 50 47 125 134</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 163 122 113 142 172 137 126 133 36 14 42 55 54 11 58 2 106 183 111 59 176 4 31 50 47 125 134</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\core\USBDDriverCallbacks.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 169</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 162</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 59 176 163 122 113 142 172 137 126 133 106 183 111 11 14 2 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 59 176 163 122 113 142 172 137 126 133 106 183 111 11 14 2 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDLun.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 108</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 170</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 52 163 122 113 142 172 137 126 133 61 46 58 14 11 2 106 183 111 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 52 163 122 113 142 172 137 126 133 61 46 58 14 11 2 106 183 111 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial_Callbacks.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 165</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 89</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 163 122 113 142 172 137 126 133 29 11 59 176 106 183 111 14 2 40 43 33 58</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 163 122 113 142 172 137 126 133 29 11 59 176 106 183 111 14 2 40 43 33 58</file>
+          <file> 20 181 162 187 184 170 190 123 131 37 36 183 125 149 121 32 29 17 24 23 35 42 28</file>
         </tool>
       </inputs>
     </file>
@@ -1106,45 +439,22 @@
       <name>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialDriver.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 130</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 136</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 44 163 122 113 142 172 137 126 133 11 43 26 33 29 59 176 106 183 111 14 2 40 58 4 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 44 163 122 113 142 172 137 126 133 11 43 26 33 29 59 176 106 183 111 14 2 40 58 4 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\CDCHIDDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
           <file> 150</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 87</file>
+          <name>BICOMP</name>
+          <file> 178</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 30 11 163 26 42 55 54 58 14 2 59 176 29 40 43 33 37</file>
+          <name>ICCARM</name>
+          <file> 16 181 162 187 184 170 190 123 131 37 24 6 23 20 36 183 125 149 121 32 29 17 35 42 28</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 30 11 163 26 42 55 54 58 14 2 59 176 29 40 43 33 37</file>
+          <name>BICOMP</name>
+          <file> 16 181 162 187 184 170 190 123 131 37 24 6 23 20 36 183 125 149 121 32 29 17 35 42 28</file>
         </tool>
       </inputs>
     </file>
@@ -1152,294 +462,114 @@
       <name>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialPort.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 161</file>
+          <name>ICCARM</name>
+          <file> 143</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 140</file>
+          <name>BICOMP</name>
+          <file> 115</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 167 122 113 142 172 137 126 133 40 163 11 43 33 58 14 2 106 183 111 59 176 26 4</file>
+          <name>ICCARM</name>
+          <file> 161 162 187 184 170 190 123 131 17 181 37 24 23 35 32 29 125 149 121 36 183 6 42 257 293 348 329 345 330 347 331 343 332 337 338 333 334 335 339 336 340 341 346 342 308 318 316 301 302 304 320 303 324 305 325 309 321 317 313 298 322 306 310 326 328 307 311 327 323 297 314 312 315 319 299 344 294 296 258 300 295 256 220 236 233 224 239 234 235 217 222 212 226 223 214 215 213 216 237 218 221 225 211 227 219 228 232 229 230 231 240 238 210 248 252 249 247 253 255 244 246 245 251 254 243 241 250 194 201 193 200 198 197 192 195 199 196 208 209 206 205 204 202 203 207 242 353 357 354 350 355 351 358 356 352 1 0 289 276 285 280 292 273 290 287 277 274 278 279 288 281 291 284 275 286 282 261 283 272 265 262 270 268 271 264 260 263 266 259 267 269</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 167 122 113 142 172 137 126 133 40 163 11 43 33 58 14 2 106 183 111 59 176 26 4</file>
+          <name>BICOMP</name>
+          <file> 161 162 187 184 170 190 123 131 17 181 37 24 23 35 32 29 125 149 121 36 183 6 42 257 293 348 329 345 330 347 331 343 332 337 338 333 334 335 339 336 340 341 346 342 308 318 316 301 302 304 320 303 324 305 325 309 321 317 313 298 322 306 310 326 328 307 311 327 323 297 314 312 315 319 299 344 294 296 258 300 295 256 220 236 233 224 239 234 235 217 222 212 226 223 214 215 213 216 237 218 221 225 211 227 219 228 232 229 230 231 240 238 210 248 252 249 247 253 255 244 246 245 251 254 243 241 250 194 201 193 200 198 197 192 195 199 196 208 209 206 205 204 202 203 207 242 353 357 354 350 355 351 358 356 352 1 0 289 276 285 280 292 273 290 287 277 274 278 279 288 281 291 284 275 286 282 261 283 272 265 262 270 268 271 264 260 263 266 259 267 269</file>
         </tool>
       </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\CDCMSDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 145</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 180</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 39 11 163 26 51 52 61 46 58 14 2 59 176 29 40 43 33 49 56 48</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 106 122 113 142 172 137 126 133 183 111 39 11 163 26 51 52 61 46 58 14 2 59 176 29 40 43 33 49 56 48</file>
-        </tool>
-      </inputs>
-    </file>
-  </configuration>
-  <configuration>
-    <name>Release</name>
-    <outputs>
-      <file>$PROJ_DIR$\..\..\common\cdc\CDCLineCoding.c</file>
-      <file>$PROJ_DIR$\..\..\common\core\USBDescriptors.c</file>
-      <file>$PROJ_DIR$\..\..\include\USBLib_Types.h</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver_Callbacks.c</file>
-      <file>$PROJ_DIR$\..\..\include\USBLib_Trace.h</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver_Callbacks.c</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDStream.c</file>
-      <file>$PROJ_DIR$\..\..\common\audio\AUDFeatureUnitRequest.c</file>
-      <file>$PROJ_DIR$\..\..\common\audio\AUDGenericRequest.c</file>
-      <file>$PROJ_DIR$\..\..\common\cdc\CDCSetControlLineStateRequest.c</file>
-      <file>$PROJ_DIR$\..\..\include\USBRequests.h</file>
-      <file>$PROJ_DIR$\..\..\device\composite\AUDDFunction.c</file>
-      <file>$PROJ_DIR$\..\..\common\hid\HIDReportRequest.c</file>
-      <file>$PROJ_DIR$\..\..\include\USBDescriptors.h</file>
-      <file>$PROJ_DIR$\..\..\common\hid\HIDKeypad.c</file>
-      <file>$PROJ_DIR$\..\..\device\composite\CDCAUDDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\common\core\USBRequests.c</file>
-      <file>$PROJ_DIR$\..\..\common\hid\HIDIdleRequest.c</file>
-      <file>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver.c</file>
-      <file>$PROJ_DIR$\..\..\include\AUDRequests.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDescriptors.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDSpeakerPhone.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDSpeakerPhoneDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDFunction.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDSpeakerDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCDescriptors.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCAUDDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\AUDDStream.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCDSerial.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCHIDDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDDFunction.h</file>
-      <file>$PROJ_DIR$\..\..\include\DUALCDCDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCNotifications.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDDKeyboardDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDDMouseDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDDTransferDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDDKeyboard.h</file>
-      <file>$PROJ_DIR$\..\..\device\composite\DUALCDCDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\include\CDCMSDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCDSerialPort.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDAUDDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDDescriptors.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCRequests.h</file>
-      <file>$PROJ_DIR$\..\..\include\CDCDSerialDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDMSDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDIOFifo.h</file>
-      <file>$PROJ_DIR$\..\..\include\USBD_HAL.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDDStateMachine.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDFunction.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDRequests.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDescriptors.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDLun.h</file>
-      <file>$PROJ_DIR$\..\..\include\SBCMethods.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDUsages.h</file>
-      <file>$PROJ_DIR$\..\..\include\HIDReports.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSD.h</file>
-      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial.c</file>
-      <file>$PROJ_DIR$\..\..\include\USBD.h</file>
-      <file>$PROJ_DIR$\..\..\include\USBDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\MSDDriver.h</file>
-      <file>$PROJ_DIR$\..\..\include\SBC.h</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboardCallbacks_LedsChanged.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDMouseDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDLun.pbi</file>
-      <file>$PROJ_DIR$\..\..\lib\libusb_ewarm_rel.a</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCDSerialDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDDStateMachine.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDFeatureUnitRequest.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDFunction.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDFeatureUnitRequest.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDStream.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDFunction.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDIdleRequest.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\USBDCallbacks.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDFunction.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDKeypad.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboard.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCHIDDDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDMSDDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\USBDDriverCallbacks.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDMouseDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDSpeakerPhoneDriver.o</file>
-      <file>$PROJ_DIR$\..\..\device\composite\HIDMSDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboard.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardCallbacks_LedsChanged.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-transfer\HIDDFunction.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardInputReport.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\MSDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\MSDFunction.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\SBCMethods.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardOutputReport.c</file>
-      <file>$PROJ_DIR$\..\..\device\core\USBD.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-mouse\HIDDMouseDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\MSDDStateMachine.c</file>
-      <file>$PROJ_DIR$\..\..\device\core\USBDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\MSDIOFifo.c</file>
-      <file>$PROJ_DIR$\..\..\device\composite\HIDAUDDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\core\USBDCallbacks.c</file>
-      <file>$PROJ_DIR$\..\..\device\hid-transfer\HIDDTransferDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\core\USBDDriverCallbacks.c</file>
-      <file>$PROJ_DIR$\..\..\device\massstorage\MSDLun.c</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\assert.h</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCMSDDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCSetControlLineStateRequest.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDIOFifo.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDIdleRequest.o</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDAUDDDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDFunction.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDIOFifo.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\USBRequests.o</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCAUDDDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDSpeakerPhoneDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\USBDescriptors.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboardDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDDStateMachine.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDSpeakerPhoneDriver_Callbacks.o</file>
-      <file>$PROJ_DIR$\Release\Obj\SBCMethods.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
-      <file>$PROJ_DIR$\Release\Obj\USBDCallbacks.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDSpeakerDriver.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
-      <file>$PROJ_DIR$\Release\Obj\USBD.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCLineCoding.o</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCMSDDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCSetControlLineStateRequest.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDStream.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCDSerial_Callbacks.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCDSerialDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCHIDDDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDFunction.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDAUDDDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDReportRequest.o</file>
-      <file>$PROJ_DIR$\Release\Obj\USBDDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboardInputReport.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\DUALCDCDDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDSpeakerDriver_Callbacks.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\USBDescriptors.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDFunction.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCAUDDDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboard.o</file>
-      <file>$PROJ_DIR$\Release\Obj\DUALCDCDDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboardDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCDSerial_Callbacks.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDSpeakerDriver_Callbacks.o</file>
-      <file>$PROJ_DIR$\Release\Obj\USBD.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDSpeakerPhoneDriver_Callbacks.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDGenericRequest.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboardInputReport.o</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDDSpeakerDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\USBDDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCDSerial.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDMSDDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\SBCMethods.o</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCLineCoding.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboardOutputReport.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDTransferDriver.o</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCDSerial.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\USBDDriverCallbacks.o</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCDSerialPort.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboardOutputReport.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDTransferDriver.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\MSDLun.o</file>
-      <file>$PROJ_DIR$\Release\Obj\USBRequests.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\CDCDSerialPort.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDKeypad.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\AUDGenericRequest.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDDKeyboardCallbacks_LedsChanged.o</file>
-      <file>$PROJ_DIR$\Release\Obj\HIDReportRequest.pbi</file>
-      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial_Callbacks.c</file>
-      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\composite\CDCHIDDDriver.c</file>
-      <file>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialPort.c</file>
-      <file>$PROJ_DIR$\..\..\device\composite\CDCMSDDriver.c</file>
-    </outputs>
-    <file>
-      <name>[ROOT_NODE]</name>
-      <outputs>
-        <tool>
-          <name>IARCHIVE</name>
-          <file> 65</file>
-        </tool>
-      </outputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\common\cdc\CDCLineCoding.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 169</file>
+          <name>ICCARM</name>
+          <file> 136</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 138</file>
+          <name>BICOMP</name>
+          <file> 126</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 43 114 107 106 113 121 112 109 110 11</file>
+          <name>ICCARM</name>
+          <file> 24 181 162 187 184 170 190 123 131 37</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 43 114 107 106 113 121 112 109 110 11</file>
+          <name>BICOMP</name>
+          <file> 24 181 162 187 184 170 190 123 131 37</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\common\core\USBDescriptors.c</name>
+      <name>$PROJ_DIR$\..\..\common\core\USBRequests.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 128</file>
+          <name>ICCARM</name>
+          <file> 159</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 152</file>
+          <name>BICOMP</name>
+          <file> 135</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 14 114 107 106 113 121 112 109 110</file>
+          <name>ICCARM</name>
+          <file> 37 181 162 187 184 170 190 123 131</file>
         </tool>
         <tool>
+          <name>BICOMP</name>
+          <file> 37 181 162 187 184 170 190 123 131</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\common\audio\AUDGenericRequest.c</name>
+      <outputs>
+        <tool>
           <name>ICCARM</name>
-          <file> 14 114 107 106 113 121 112 109 110</file>
+          <file> 188</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 147</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 2 37 181 162 187 184 170 190 123 131</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 2 37 181 162 187 184 170 190 123 131</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\composite\AUDDFunction.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 100</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 133</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 4 37 181 8 5 35 32 29 36 183 2 28</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 4 37 181 8 5 35 32 29 36 183 2 28</file>
         </tool>
       </inputs>
     </file>
@@ -1447,206 +577,22 @@
       <name>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver_Callbacks.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 151</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 159</file>
+          <file> 106</file>
         </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 114 107 106 113 121 112 109 110 25 2 11 14 21 58 104 136 105 59 133 22 28</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 114 107 106 113 121 112 109 110 25 2 11 14 21 58 104 136 105 59 133 22 28</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver.c</name>
-      <outputs>
         <tool>
           <name>BICOMP</name>
           <file> 127</file>
         </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 83</file>
-        </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 23 11 114 107 106 113 121 112 109 110 14 21 58 2 104 136 105 47 133 59 20 4</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 23 11 114 107 106 113 121 112 109 110 14 21 58 2 104 136 105 47 133 59 20 4</file>
+          <file> 181 162 187 184 170 190 123 131 10 29 37 32 9 35 125 149 121 36 183 8 5</file>
         </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver_Callbacks.c</name>
-      <outputs>
         <tool>
           <name>BICOMP</name>
-          <file> 161</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 131</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 114 107 106 113 121 112 109 110 23 11 14 21 58 2 104 136 105 47 133 59</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 114 107 106 113 121 112 109 110 23 11 14 21 58 2 104 136 105 47 133 59</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDStream.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 141</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 72</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 22 114 107 106 113 121 112 109 110 28 58 14 11 2 104 136 105 59 133 21 20 47 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 22 114 107 106 113 121 112 109 110 28 58 14 11 2 104 136 105 59 133 21 20 47 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\audio\AUDFeatureUnitRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 69</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 71</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 20 11 114 107 106 113 121 112 109 110</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 20 11 114 107 106 113 121 112 109 110</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\audio\AUDGenericRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 181</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 162</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 20 11 114 107 106 113 121 112 109 110</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 20 11 114 107 106 113 121 112 109 110</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\cdc\CDCSetControlLineStateRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 118</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 140</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 43 114 107 106 113 121 112 109 110 11</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 43 114 107 106 113 121 112 109 110 11</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\AUDDFunction.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 76</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 70</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 24 11 114 22 28 58 14 2 59 133 20 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 24 11 114 22 28 58 14 2 59 133 20 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\hid\HIDReportRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 183</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 147</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 50 114 107 106 113 121 112 109 110 11</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 50 114 107 106 113 121 112 109 110 11</file>
+          <file> 181 162 187 184 170 190 123 131 10 29 37 32 9 35 125 149 121 36 183 8 5</file>
         </tool>
       </inputs>
     </file>
@@ -1654,91 +600,22 @@
       <name>$PROJ_DIR$\..\..\common\hid\HIDKeypad.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 180</file>
+          <name>ICCARM</name>
+          <file> 95</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 77</file>
+          <name>BICOMP</name>
+          <file> 92</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 54 114 107 106 113 121 112 109 110</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 54 114 107 106 113 121 112 109 110</file>
+          <file> 44 181 162 187 184 170 190 123 131</file>
         </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\CDCAUDDDriver.c</name>
-      <outputs>
         <tool>
           <name>BICOMP</name>
-          <file> 154</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 126</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 27 11 114 26 21 58 14 2 59 133 29 40 43 33 24 22 28</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 27 11 114 26 21 58 14 2 59 133 29 40 43 33 24 22 28</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\core\USBRequests.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 178</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 125</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 11 114 107 106 113 121 112 109 110</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 11 114 107 106 113 121 112 109 110</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\common\hid\HIDIdleRequest.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 74</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 120</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 50 114 107 106 113 121 112 109 110 11</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 50 114 107 106 113 121 112 109 110 11</file>
+          <file> 44 181 162 187 184 170 190 123 131</file>
         </tool>
       </inputs>
     </file>
@@ -1746,528 +623,160 @@
       <name>$PROJ_DIR$\..\..\device\audio-speaker\AUDDSpeakerDriver.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 135</file>
+          <name>ICCARM</name>
+          <file> 134</file>
         </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 139</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 10 29 181 162 187 184 170 190 123 131 37 32 9 35 125 149 121 36 183 8 5 42 2 28</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 10 29 181 162 187 184 170 190 123 131 37 32 9 35 125 149 121 36 183 8 5 42 2 28</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver.c</name>
+      <outputs>
         <tool>
           <name>ICCARM</name>
           <file> 164</file>
         </tool>
-      </outputs>
-      <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 25 2 114 107 106 113 121 112 109 110 11 14 21 58 104 136 105 59 133 22 28 4 20 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 25 2 114 107 106 113 121 112 109 110 11 14 21 58 104 136 105 59 133 22 28 4 20 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\DUALCDCDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 156</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 150</file>
+          <file> 138</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 58 14 114 11 2 47 133 59 32 26 40 43 33</file>
+          <name>ICCARM</name>
+          <file> 3 37 181 162 187 184 170 190 123 131 32 9 35 29 125 149 121 28 183 36 2 42</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 58 14 114 11 2 47 133 59 32 26 40 43 33</file>
+          <name>BICOMP</name>
+          <file> 3 37 181 162 187 184 170 190 123 131 32 9 35 29 125 149 121 28 183 36 2 42</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial.c</name>
+      <name>$PROJ_DIR$\..\..\device\audio-speakerphone\AUDDSpeakerPhoneDriver_Callbacks.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 172</file>
+          <name>ICCARM</name>
+          <file> 87</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 166</file>
+          <name>BICOMP</name>
+          <file> 140</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 29 114 107 106 113 121 112 109 110 11 59 133 104 136 105 14 2 40 43 33 58 4 47</file>
+          <name>ICCARM</name>
+          <file> 181 162 187 184 170 190 123 131 3 37 32 9 35 29 125 149 121 28 183 36</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 29 114 107 106 113 121 112 109 110 11 59 133 104 136 105 14 2 40 43 33 58 4 47</file>
+          <name>BICOMP</name>
+          <file> 181 162 187 184 170 190 123 131 3 37 32 9 35 29 125 149 121 28 183 36</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\device\composite\HIDMSDDriver.c</name>
+      <name>$PROJ_DIR$\..\..\common\hid\HIDReportRequest.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 80</file>
+          <name>ICCARM</name>
+          <file> 93</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 167</file>
+          <name>BICOMP</name>
+          <file> 165</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 45 11 114 42 55 54 51 52 61 46 58 14 2 59 133 37 49 56 48</file>
+          <name>ICCARM</name>
+          <file> 40 181 162 187 184 170 190 123 131 37</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 45 11 114 42 55 54 51 52 61 46 58 14 2 59 133 37 49 56 48</file>
+          <name>BICOMP</name>
+          <file> 40 181 162 187 184 170 190 123 131 37</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardDriver.c</name>
+      <name>$PROJ_DIR$\..\..\device\composite\CDCAUDDDriver.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 129</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 157</file>
+          <file> 90</file>
         </tool>
-      </outputs>
-      <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 34 14 114 107 106 113 121 112 109 110 11 42 55 54 37 59 133 104 136 105 2 31 50 58 4 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 34 14 114 107 106 113 121 112 109 110 11 42 55 54 37 59 133 104 136 105 2 31 50 58 4 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboard.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 78</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 155</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 37 14 114 107 106 113 121 112 109 110 11 42 55 54 59 133 104 136 105 2 31 50 58 4 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 37 14 114 107 106 113 121 112 109 110 11 42 55 54 59 133 104 136 105 2 31 50 58 4 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardCallbacks_LedsChanged.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 62</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 182</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 34 14 114 107 106 113 121 112 109 110 11 42 55 54 37 59 133 104 136 105 2 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 34 14 114 107 106 113 121 112 109 110 11 42 55 54 37 59 133 104 136 105 2 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-transfer\HIDDFunction.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 153</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 73</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 31 114 107 106 113 121 112 109 110 50 11 42 55 54 58 14 2 104 136 105 59 133 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 31 114 107 106 113 121 112 109 110 50 11 42 55 54 58 14 2 104 136 105 59 133 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardInputReport.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 149</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 163</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 37 14 114 107 106 113 121 112 109 110 11 42 55 54 59 133 104 136 105 2 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 37 14 114 107 106 113 121 112 109 110 11 42 55 54 59 133 104 136 105 2 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 67</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
           <file> 117</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 60 114 107 106 113 121 112 109 110 52 61 46 58 14 11 2 104 136 105 56 48 59 133 4 49 47</file>
+          <name>ICCARM</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 7 37 181 6 9 35 32 29 36 183 20 17 24 23 4 8 5</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 60 114 107 106 113 121 112 109 110 52 61 46 58 14 11 2 104 136 105 56 48 59 133 4 49 47</file>
+          <name>BICOMP</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 7 37 181 6 9 35 32 29 36 183 20 17 24 23 4 8 5</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDFunction.c</name>
+      <name>$PROJ_DIR$\..\..\common\cdc\CDCSetControlLineStateRequest.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 123</file>
+          <name>ICCARM</name>
+          <file> 88</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 145</file>
+          <name>BICOMP</name>
+          <file> 189</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 51 60 114 107 106 113 121 112 109 110 52 61 46 58 14 11 2 104 136 105 56 48 59 133 4 49 47</file>
+          <name>ICCARM</name>
+          <file> 24 181 162 187 184 170 190 123 131 37</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 51 60 114 107 106 113 121 112 109 110 52 61 46 58 14 11 2 104 136 105 56 48 59 133 4 49 47</file>
+          <name>BICOMP</name>
+          <file> 24 181 162 187 184 170 190 123 131 37</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\SBCMethods.c</name>
+      <name>$PROJ_DIR$\..\..\common\audio\AUDFeatureUnitRequest.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 132</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 168</file>
+          <file> 156</file>
         </tool>
-      </outputs>
-      <inputs>
         <tool>
           <name>BICOMP</name>
-          <file> 53 61 52 114 107 106 113 121 112 109 110 46 58 14 11 2 104 136 105 48 56 59 133 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 53 61 52 114 107 106 113 121 112 109 110 46 58 14 11 2 104 136 105 48 56 59 133 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardOutputReport.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 170</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 175</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 37 14 114 107 106 113 121 112 109 110 11 42 55 54 59 133 104 136 105 2</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 37 14 114 107 106 113 121 112 109 110 11 42 55 54 59 133 104 136 105 2</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\core\USBD.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 137</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
           <file> 160</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 58 14 114 107 106 113 121 112 109 110 11 2 104 136 105 47 133 4</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 58 14 114 107 106 113 121 112 109 110 11 2 104 136 105 47 133 4</file>
+          <file> 2 37 181 162 187 184 170 190 123 131</file>
         </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-mouse\HIDDMouseDriver.c</name>
-      <outputs>
         <tool>
           <name>BICOMP</name>
-          <file> 82</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 63</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 31 114 107 106 113 121 112 109 110 50 11 42 55 54 58 14 2 104 136 105 59 133 35 47 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 31 114 107 106 113 121 112 109 110 50 11 42 55 54 58 14 2 104 136 105 59 133 35 47 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDDStateMachine.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 130</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 68</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 53 61 52 114 107 106 113 121 112 109 110 46 58 14 11 2 104 136 105 48 56 59 133 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 53 61 52 114 107 106 113 121 112 109 110 46 58 14 11 2 104 136 105 48 56 59 133 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\core\USBDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 165</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 148</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 59 133 114 11 14 2 58 47 108 111</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 59 133 114 11 14 2 58 47 108 111</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDIOFifo.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 124</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 119</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 46</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 46</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\composite\HIDAUDDDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 146</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 122</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 41 11 114 42 55 54 21 58 14 2 59 133 37 24 22 28</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 41 11 114 42 55 54 21 58 14 2 59 133 37 24 22 28</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\core\USBDCallbacks.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 134</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 75</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 58 14 114 107 106 113 121 112 109 110 11 2 104 136 105 59 133</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 58 14 114 107 106 113 121 112 109 110 11 2 104 136 105 59 133</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\hid-transfer\HIDDTransferDriver.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 176</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 171</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 114 107 106 113 121 112 109 110 36 14 42 55 54 11 58 2 104 136 105 59 133 4 31 50 47 108 111</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 114 107 106 113 121 112 109 110 36 14 42 55 54 11 58 2 104 136 105 59 133 4 31 50 47 108 111</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\core\USBDDriverCallbacks.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 81</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 173</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 59 133 114 107 106 113 121 112 109 110 104 136 105 11 14 2 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 59 133 114 107 106 113 121 112 109 110 104 136 105 11 14 2 4</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\device\massstorage\MSDLun.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 64</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 177</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 52 114 107 106 113 121 112 109 110 61 46 58 14 11 2 104 136 105 4</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 52 114 107 106 113 121 112 109 110 61 46 58 14 11 2 104 136 105 4</file>
+          <file> 2 37 181 162 187 184 170 190 123 131</file>
         </tool>
       </inputs>
     </file>
@@ -2275,91 +784,114 @@
       <name>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerial_Callbacks.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 142</file>
+          <name>ICCARM</name>
+          <file> 168</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 158</file>
+          <name>BICOMP</name>
+          <file> 132</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 114 107 106 113 121 112 109 110 29 11 59 133 104 136 105 14 2 40 43 33 58</file>
+          <name>ICCARM</name>
+          <file> 181 162 187 184 170 190 123 131 20 37 36 183 125 149 121 32 29 17 24 23 35</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 114 107 106 113 121 112 109 110 29 11 59 133 104 136 105 14 2 40 43 33 58</file>
+          <name>BICOMP</name>
+          <file> 181 162 187 184 170 190 123 131 20 37 36 183 125 149 121 32 29 17 24 23 35</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialDriver.c</name>
+      <name>$PROJ_DIR$\..\..\common\core\USBDescriptors.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 66</file>
+          <name>ICCARM</name>
+          <file> 97</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 143</file>
+          <name>BICOMP</name>
+          <file> 111</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 44 114 107 106 113 121 112 109 110 11 43 26 33 29 59 133 104 136 105 14 2 40 58 4 47</file>
+          <name>ICCARM</name>
+          <file> 32 181 162 187 184 170 190 123 131</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 44 114 107 106 113 121 112 109 110 11 43 26 33 29 59 133 104 136 105 14 2 40 58 4 47</file>
+          <name>BICOMP</name>
+          <file> 32 181 162 187 184 170 190 123 131</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\device\composite\CDCHIDDDriver.c</name>
+      <name>$PROJ_DIR$\..\..\common\hid\HIDIdleRequest.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 79</file>
+          <name>ICCARM</name>
+          <file> 118</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 144</file>
+          <name>BICOMP</name>
+          <file> 86</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 30 11 114 26 42 55 54 58 14 2 59 133 29 40 43 33 37</file>
+          <name>ICCARM</name>
+          <file> 40 181 162 187 184 170 190 123 131 37</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 30 11 114 26 42 55 54 58 14 2 59 133 29 40 43 33 37</file>
+          <name>BICOMP</name>
+          <file> 40 181 162 187 184 170 190 123 131 37</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\device\cdc-serial\CDCDSerialPort.c</name>
+      <name>$PROJ_DIR$\..\..\device\massstorage\MSDIOFifo.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 179</file>
+          <name>ICCARM</name>
+          <file> 157</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 174</file>
+          <name>BICOMP</name>
+          <file> 186</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 115 107 106 113 121 112 109 110 40 114 11 43 33 58 14 2 104 136 105 59 133 26 4</file>
+          <name>ICCARM</name>
+          <file> 31</file>
         </tool>
         <tool>
+          <name>BICOMP</name>
+          <file> 31</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\hid-transfer\HIDDFunction.c</name>
+      <outputs>
+        <tool>
           <name>ICCARM</name>
-          <file> 115 107 106 113 121 112 109 110 40 114 11 43 33 58 14 2 104 136 105 59 133 26 4</file>
+          <file> 89</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 177</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 11 181 162 187 184 170 190 123 131 40 37 22 27 44 35 32 29 125 149 121 36 183 42</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 11 181 162 187 184 170 190 123 131 40 37 22 27 44 35 32 29 125 149 121 36 183 42</file>
         </tool>
       </inputs>
     </file>
@@ -2367,25 +899,479 @@
       <name>$PROJ_DIR$\..\..\device\composite\CDCMSDDriver.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 139</file>
+          <name>ICCARM</name>
+          <file> 153</file>
         </tool>
         <tool>
+          <name>BICOMP</name>
+          <file> 130</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
           <name>ICCARM</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 19 37 181 6 30 39 41 31 35 32 29 36 183 20 17 24 23 26 33 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 19 37 181 6 30 39 41 31 35 32 29 36 183 20 17 24 23 26 33 45</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\hid-transfer\HIDDTransferDriver.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 122</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 114</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 181 162 187 184 170 190 123 131 34 32 22 27 44 37 35 29 125 149 121 36 183 42 11 40 28 151 148</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 181 162 187 184 170 190 123 131 34 32 22 27 44 37 35 29 125 149 121 36 183 42 11 40 28 151 148</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\massstorage\MSDDStateMachine.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 129</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
           <file> 116</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 39 11 114 26 51 52 61 46 58 14 2 59 133 29 40 43 33 49 56 48</file>
+          <name>ICCARM</name>
+          <file> 46 41 39 181 162 187 184 170 190 123 131 31 35 32 37 29 125 149 121 45 33 36 183 42</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 4 104 107 106 113 121 112 109 110 136 105 39 11 114 26 51 52 61 46 58 14 2 59 133 29 40 43 33 49 56 48</file>
+          <name>BICOMP</name>
+          <file> 46 41 39 181 162 187 184 170 190 123 131 31 35 32 37 29 125 149 121 45 33 36 183 42</file>
         </tool>
       </inputs>
     </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\composite\HIDMSDDriver.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 120</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 182</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 43 37 181 22 27 44 30 39 41 31 35 32 29 36 183 18 26 33 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 43 37 181 22 27 44 30 39 41 31 35 32 29 36 183 18 26 33 45</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\composite\DUALCDCDDriver.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 155</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 103</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 35 32 181 37 29 28 183 36 13 6 17 24 23</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 35 32 181 37 29 28 183 36 13 6 17 24 23</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\composite\CDCHIDDDriver.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 144</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 119</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 25 37 181 6 22 27 44 35 32 29 36 183 20 17 24 23 18</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 25 37 181 6 22 27 44 35 32 29 36 183 20 17 24 23 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\composite\HIDAUDDDriver.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 105</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 141</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 21 37 181 22 27 44 9 35 32 29 36 183 18 4 8 5</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 21 37 181 22 27 44 9 35 32 29 36 183 18 4 8 5</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardInputReport.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 163</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 113</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 32 181 162 187 184 170 190 123 131 37 22 27 44 36 183 125 149 121 29 42</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 32 181 162 187 184 170 190 123 131 37 22 27 44 36 183 125 149 121 29 42</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\hid-mouse\HIDDMouseDriver.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 154</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 124</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 11 181 162 187 184 170 190 123 131 40 37 22 27 44 35 32 29 125 149 121 36 183 15 28 42</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 11 181 162 187 184 170 190 123 131 40 37 22 27 44 35 32 29 125 149 121 36 183 15 28 42</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\massstorage\SBCMethods.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 137</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 169</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 46 41 39 181 162 187 184 170 190 123 131 31 35 32 37 29 125 149 121 45 33 36 183 42</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 46 41 39 181 162 187 184 170 190 123 131 31 35 32 37 29 125 149 121 45 33 36 183 42</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardDriver.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 108</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 173</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 14 32 181 162 187 184 170 190 123 131 37 22 27 44 18 36 183 125 149 121 29 11 40 35 42 28</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 14 32 181 162 187 184 170 190 123 131 37 22 27 44 18 36 183 125 149 121 29 11 40 35 42 28</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\massstorage\MSDLun.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 166</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 175</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 39 181 162 187 184 170 190 123 131 41 31 35 32 37 29 125 149 121 42</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 39 181 162 187 184 170 190 123 131 41 31 35 32 37 29 125 149 121 42</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboard.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 167</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 112</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 32 181 162 187 184 170 190 123 131 37 22 27 44 36 183 125 149 121 29 11 40 35 42 28</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 32 181 162 187 184 170 190 123 131 37 22 27 44 36 183 125 149 121 29 11 40 35 42 28</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardCallbacks_LedsChanged.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 110</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 145</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 14 32 181 162 187 184 170 190 123 131 37 22 27 44 18 36 183 125 149 121 29 42</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 14 32 181 162 187 184 170 190 123 131 37 22 27 44 18 36 183 125 149 121 29 42</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\hid-keyboard\HIDDKeyboardOutputReport.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 128</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 98</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 18 32 181 162 187 184 170 190 123 131 37 22 27 44 36 183 125 149 121 29</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 18 32 181 162 187 184 170 190 123 131 37 22 27 44 36 183 125 149 121 29</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\massstorage\MSDDriver.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 94</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 171</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 38 181 162 187 184 170 190 123 131 39 41 31 35 32 37 29 125 149 121 33 45 36 183 42 26 28</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38 181 162 187 184 170 190 123 131 39 41 31 35 32 37 29 125 149 121 33 45 36 183 42 26 28</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\massstorage\MSDFunction.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 142</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 191</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 30 38 181 162 187 184 170 190 123 131 39 41 31 35 32 37 29 125 149 121 33 45 36 183 42 26 28</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30 38 181 162 187 184 170 190 123 131 39 41 31 35 32 37 29 125 149 121 33 45 36 183 42 26 28</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\core\USBDCallbacks.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 107</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 176</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 35 32 181 162 187 184 170 190 123 131 37 29 125 149 121 36 183</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 35 32 181 162 187 184 170 190 123 131 37 29 125 149 121 36 183</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\core\USBDDriver.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 101</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 180</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 36 183 181 37 32 29 35 28 151 148</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 42 125 162 187 184 170 190 123 131 149 121 36 183 181 37 32 29 35 28 151 148</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\device\core\USBDDriverCallbacks.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 91</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 172</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 36 183 181 162 187 184 170 190 123 131 125 149 121 37 32 29 42</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 36 183 181 162 187 184 170 190 123 131 125 149 121 37 32 29 42</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>IARCHIVE</name>
+          <file> 174</file>
+        </tool>
+      </outputs>
+    </file>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs/>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>IARCHIVE</tool>
+    </forcedrebuild>
   </configuration>
 </project>
 

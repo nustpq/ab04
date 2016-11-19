@@ -44,7 +44,7 @@ extern void DBGU_Configure( uint32_t dwBaudrate, uint32_t dwMasterClock ) ;
 extern void DBGU_PutChar( uint8_t uc ) ;
 extern uint32_t DBGU_GetChar( void ) ;
 extern uint32_t DBGU_IsRxReady( void ) ;
-
+extern uint32_t DBGU_ReadChar( void );
 
 extern void DBGU_DumpFrame( uint8_t* pucFrame, uint32_t dwSize ) ;
 extern void DBGU_DumpMemory( uint8_t* pucBuffer, uint32_t dwSize, uint32_t dwAddress ) ;

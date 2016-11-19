@@ -269,7 +269,7 @@
 #define SET_FRAME_HEAD( frame_id, frame_type )    ((frame_type & 0x3F)|(frame_id & 0xC0))
 
 #define NOAH_CMD_DATA_MLEN     255  // max 255 cmd data per package
-#define NEW_CMD_DATA_MLEN      (EMB_BUF_SIZE) //(2048-8) //KFIFO size is 1024, EMB = 1024 - Header
+#define NEW_CMD_DATA_MLEN     (EMB_BUF_SIZE) //(2048-8) //KFIFO size is 1024, EMB = 1024 - Header
 
 /*
 *********************************************************************************************************

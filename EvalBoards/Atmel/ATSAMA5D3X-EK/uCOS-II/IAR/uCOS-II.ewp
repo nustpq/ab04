@@ -711,7 +711,7 @@
         </option>
         <option>
           <name>IlinkMapFile</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkLogFile</name>
@@ -1942,10 +1942,19 @@
       <name>$PROJ_DIR$\..\..\..\..\..\App\task_cmd_parse.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_debug_info.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_shell.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\App\task_uart_rx.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\App\task_uart_tx.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_usb_service.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\App\task_user_if.c</name>
@@ -2005,6 +2014,12 @@
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\codec.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_audio_path.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_audio_path.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_cmdParse.c</name>
     </file>
     <file>
@@ -2033,6 +2048,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_init_default.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_list.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_list.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_nandflash.c</name>
@@ -2102,6 +2123,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Noah\alert_table.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\commands.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\commands.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Noah\emb.c</name>

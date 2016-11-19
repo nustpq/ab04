@@ -79,7 +79,7 @@
         </option>
         <option>
           <name>RTDescription</name>
-          <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+          <state>To be used with the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
         </option>
         <option>
           <name>OGProductVersion</name>
@@ -304,6 +304,9 @@
           <name>CCIncludePath2</name>
           <state>$PROJ_DIR$/../../../memories</state>
           <state>$PROJ_DIR$/../../../usb/include</state>
+          <state>$PROJ_DIR$/../../../libchip_sama5d3x</state>
+          <state>$PROJ_DIR$/../../../libchip_sama5d3x/include</state>
+          <state>$PROJ_DIR$/../../../libboard_sama5d3x-ek</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>

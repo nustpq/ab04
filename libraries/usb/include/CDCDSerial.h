@@ -86,6 +86,18 @@ extern uint32_t CDCDSerial_Write_SecondEp(
     TransferCallback callback,
     void *argument);
 
+extern uint32_t CDCDSerial_Write_ThirdEp(
+    void *data,
+    uint32_t size,
+    TransferCallback callback,
+    void *argument);
+
+extern uint32_t CDCDSerial_Write_LogEp(
+    void *data,
+    uint32_t size,
+    TransferCallback callback,
+    void *argument);
+
 extern uint32_t CDCDSerial_Write_CmdEp(
     void *data,
     uint32_t size,
@@ -101,6 +113,12 @@ extern uint32_t CDCDSerial_Read(
     void *argument);
 
 extern uint32_t CDCDSerial_Read_SecondEp(
+    void *data,
+    uint32_t size,
+    TransferCallback callback,
+    void *argument);
+
+extern uint32_t CDCDSerial_Read_ThirdEp(
     void *data,
     uint32_t size,
     TransferCallback callback,

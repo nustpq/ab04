@@ -73,7 +73,6 @@
 #include  <string.h>
 //#include  <probe_com_cfg.h>
 
-#include  <taskcomm.h>
 #include  <kfifo.h>
 
 //#include  <nvic.h>
@@ -96,7 +95,7 @@
 //#include  <uif.h>
 #include  <uif_dsp.h>
 #include  <noah_cmd.h>
-//#include  <shell_commands.h>
+#include  <commands.h>
 #include  <codec.h>
 #include  <xmodem.h>
 //#include  <dma.h>
@@ -106,7 +105,7 @@
 #include "board.h"
 #include "defined.h"
 #include "uif_object.h"
-
+#include "USBD_Config.h"
 
 #include "codec.h"
 //#include "sine_table.h"
@@ -121,8 +120,10 @@
 #include "uif_gpio.h"
 #include "uif_led.h"
 #include "uif_act8865.h"
-//#include "uif_dsp.h"    
+#include "uif_list.h"
+#include "uif_audio_path.h"
 #include "uif_hardware_init.h"
+
 
 /*
 *********************************************************************************************************
@@ -132,9 +133,9 @@
 
 
 
-//#define  BOARD_TYPE_AB01  
-//#define  BOARD_TYPE_AB02  
-//#define  BOARD_TYPE_AB03  
+//#define  BOARD_TYPE_AB01
+//#define  BOARD_TYPE_AB02
+//#define  BOARD_TYPE_AB03
 #define  BOARD_TYPE_UIF
 
 /*
@@ -272,8 +273,13 @@ void UIF_Beep_On ( ) ;
 
 void UIF_Beep_Off ( ) ;
 
+void Buzzer_OnOff( unsigned char onoff );
+
 void dump_buf_debug( unsigned char *pChar, unsigned int size) ;
 
+CPU_INT08U  BSP_Ser_RdByte (void);
+void BSP_Ser_WrByte(CPU_CHAR tx_byte);
+void BSP_Ser_Printf (CPU_CHAR *format, ...);
 
 
 void Head_Info( void );
@@ -285,9 +291,14 @@ void Time_Stamp( void );
 void Get_Flash_Info (void);
 void BSP_Init (void);
 
+extern CPU_INT08U Debug_COM_Sel;
+extern OS_EVENT *Bsp_Ser_Tx_Sem_lock;  
+extern OS_EVENT *Bsp_Ser_Rx_Sem_lock;
+
 extern const CPU_CHAR fw_version[];
 extern const CPU_CHAR hw_version[];
 extern const CPU_CHAR hw_model[];
 
+extern volatile unsigned char BUZZER_MUTE;
 
 #endif  /* BSP_PRESENT */

@@ -50,7 +50,7 @@
 //
 #define MAX_RESEND_TIMES        3
 #define DBG_UART_Send_Buf_Size  4096 //kFIFO
-
+#define DBG_USB_Send_Buf_Size   4096 //kFIFO
 
 
 extern OS_MEM       *pMEM_Part_MsgUART;
@@ -74,7 +74,7 @@ extern OS_EVENT * EVENT_MsgQ_Noah2RulerUART;
 extern void     * MsgQ_Noah2CMDParse[MsgUARTQueue_SIZE];
 extern OS_EVENT * EVENT_MsgQ_Noah2CMDParse;
 
-extern OS_EVENT *App_UserIF_Mbox; 
+extern OS_EVENT *App_UserIF_Mbox;
 extern OS_EVENT *ACK_Sem_PCUART;
 extern OS_EVENT *ACK_Sem_RulerUART;
 extern OS_EVENT *Done_Sem_RulerUART;
@@ -95,9 +95,9 @@ extern volatile CPU_INT08U  Global_Conn_Ready;
 extern volatile CPU_INT08U  Global_Idle_Ready;
 extern unsigned int         test_counter1, test_counter2,test_counter3, test_counter4, test_counter5 ;
 extern CPU_INT16U debug_uart_fifo_data_max ;
+extern CPU_INT16U debug_usb_fifo_data_max ;
 extern CPU_INT16U debug_uart_fifo_oveflow_counter ;
-
-
+extern CPU_INT16U debug_usb_fifo_oveflow_counter ;
 
 void App_TaskUART_Tx      ( void *pdata ) ;
 void App_TaskUART_Tx_Ruler( void *pdata ) ;
@@ -109,10 +109,17 @@ void App_TaskUserIF       ( void *p_arg ) ;
 void App_TaskJoy          ( void *p_arg ) ;
 void App_TaskCMDParse     ( void *p_arg ) ;
 void App_TaskDebugInfo    ( void *p_arg ) ;
+void App_TaskUSB          ( void *p_arg ) ;
+void App_TaskGenieShell   ( void *p_arg ) ;
+
 
 void Task_ReCreate_Shell( void );
 void Port_Detect_Enable( unsigned char on_off );
 void BSP_Ser_WrStr_To_Buffer( char *p_str );
+void BSP_Ser_WrStr_To_Buffer_USB( char *p_str );
+
+void Init_Debug_FIFO( void );
+
 void Buzzer_Error( void );
 
 

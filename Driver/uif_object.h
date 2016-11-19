@@ -94,7 +94,7 @@ typedef struct _DataSource
 {
 //public interface to reveal ucosII task,that I want to hide peripheral info in this struct;
 	uint32_t ( *register_source )( void *type );
-        void ( *init_source )( void *pParameter,void *dParameter );    //initialize the hardware according result that parse protocol
+    void ( *init_source )( void *pParameter,void *dParameter );    //initialize the hardware according result that parse protocol
 	void ( *set_peripheral )( void *instance,void *parameter );    //set register;
 	void ( *peripheral_start )( void *instance );                  //starting peripheral
 	void ( *peripheral_stop )( void *instance );		       //stoping peripheral
@@ -118,7 +118,7 @@ typedef struct _DataSource
 	void *peripheralParameter;  //peripheral register parameter;
 	void *dmaParameter;         //dma parameter for this; 
 	void *privateData;          //user config parameter;
-        void *mutex;                //lock port mutex;
+    void *mutex;                //lock port mutex;
 	void *buffer;               //maybe should define a private buf for this?
         uint32_t warmWaterLevel;    //corresponding to i2s_play_buffer_size,maybe
                                     //should move it to another struct?
@@ -127,7 +127,7 @@ typedef struct _DataSource
         kfifo_t *pRingBulkIn;       //the in  ring buffer that this port relevant
         uint16_t *pBufferIn;        //the pointer pointed PingPong buffer in
         uint16_t *pBufferOut;       //the pointer pointed PingPong buffer out
-	uint8_t status[BI];         //state machine of port
+	    uint8_t status[BI];         //state machine of port
         uint16_t unused;            //keep alive
         
 #ifdef PINGPONG

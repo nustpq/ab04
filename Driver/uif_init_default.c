@@ -1,5 +1,22 @@
+/*
+*********************************************************************************************************
+*
+*                                          APP PACKAGE
+*
+*                                         Atmel  AT91SAMA5D3
+*                                             on the
+*                                      Unified EVM Interface Board 2.0
+*
+* Filename      : uif_init_default.c
+* Version       : V0.0.1
+* Programmer(s) : Leo
+*********************************************************************************************************
+* Note(s)       :
+*********************************************************************************************************
+*/
 #include "uif_hardware_init.h"
 
+extern CODEC_SETS codec_set;
 /*
 *********************************************************************************************************
 *                                    usb_init_default()
@@ -64,9 +81,10 @@ void ssc0_init_default( void )
     source_ssc0.tx_index = 0;
     source_ssc0.rx_index = 0;
     source_ssc0.peripheralParameter = ( void * )Audio_Configure_Instance0;
-    source_ssc0.warmWaterLevel = 3072;
-    source_ssc0.txSize = 3072;
-    source_ssc0.rxSize = 3072;     
+    source_ssc0.warmWaterLevel = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 ) * codec_set.slot_num * 2 ) * 2; 
+    source_ssc0.txSize = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 ) * codec_set.slot_num * 2 );                           
+    source_ssc0.rxSize = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 )* codec_set.slot_num * 2 ); 
+    
     
     source_ssc0.init_source = init_I2S;
     source_ssc0.buffer_write = ssc0_buffer_write;
@@ -111,14 +129,15 @@ void ssc1_init_default( void )
     source_ssc1.tx_index = 0;
     source_ssc1.rx_index = 0;
     source_ssc1.peripheralParameter = ( void * )Audio_Configure_Instance1;
-    source_ssc1.warmWaterLevel = 3072; 
-    source_ssc1.txSize = 3072;
-    source_ssc1.rxSize = 3072;    
+    source_ssc1.warmWaterLevel = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 ) * codec_set.slot_num * 2 ) * 4; 
+    source_ssc1.txSize = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 ) * codec_set.slot_num * 2 );                           
+    source_ssc1.rxSize = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 )* codec_set.slot_num * 2 ); 
+ 
     
     source_ssc1.init_source = init_I2S;
     source_ssc1.buffer_write = ssc1_buffer_write;
     source_ssc1.buffer_read  = ssc1_buffer_read;
-    source_ssc0.peripheral_stop = stop_ssc;    
+    source_ssc1.peripheral_stop = stop_ssc;    
     
     source_ssc1.pRingBulkOut = &ssc1_bulkout_fifo;
     source_ssc1.pRingBulkIn = &ssc1_bulkin_fifo;
@@ -157,12 +176,14 @@ void spi0_init_default( void )
     source_spi0.status[ OUT ] = ( uint8_t )FREE; 
     source_spi0.tx_index = 0;
     source_spi0.rx_index = 0;
+    
+	source_spi0.peripheralParameter = ( void * )&spi0_cfg;
     source_spi0.privateData = spi0_RingBulkIn;
     spi0_cfg.spi_speed = 10 * 1000 * 1000;
     spi0_cfg.spi_mode = 1;
-    source_spi0.warmWaterLevel = 3072; 
-    source_spi0.txSize = 3072;
-    source_spi0.rxSize = 3072;     
+    source_spi0.warmWaterLevel = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 ) * codec_set.slot_num * 2 ); 
+    source_spi0.txSize = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 ) * codec_set.slot_num * 2 );                           
+    source_spi0.rxSize = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 )* codec_set.slot_num * 2 );     
     
     source_spi0.init_source = init_spi;
     source_spi0.peripheral_stop = stop_spi;
@@ -207,13 +228,16 @@ void spi1_init_default( void )
     source_spi1.status[ OUT ] = ( uint8_t )FREE; 
     source_spi1.tx_index = 0;
     source_spi1.rx_index = 0;
+	
+    source_spi1.peripheralParameter = ( void * )&spi1_cfg;
     source_spi1.privateData = spi1_RingBulkIn;
     source_spi1.buffer = ( uint8_t * )spi1_2MSOut;
     spi1_cfg.spi_speed = 10 * 1000 * 1000;
     spi1_cfg.spi_mode  = 1;
-    source_spi1.warmWaterLevel = 3072;
-    source_spi1.txSize = 3072;
-    source_spi1.rxSize = 3072;     
+    source_spi1.warmWaterLevel = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 ) * codec_set.slot_num * 2 ) * 2; 
+    source_spi1.txSize = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 ) * codec_set.slot_num * 2 ) * 2;                           
+    source_spi1.rxSize = (( codec_set.sr / 1000 ) * ( codec_set.sample_len / 8 )* codec_set.slot_num * 2 ) * 2;  
+     
     
     source_spi1.init_source = init_spi;
     source_spi1.peripheral_stop = stop_spi;
@@ -378,6 +402,40 @@ void twi2_init_default( void )
 
 /*
 *********************************************************************************************************
+*                                    usart0_init_default()
+*
+* Description :  initialize usart0 port to default state;
+*
+* Argument(s) :  none
+*		 
+*                
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void usart0_init_default( void )
+{
+    //initialize usart1 object and it's operation 
+    memset( ( void * )&source_usart0, 0 , sizeof( DataSource ) );
+    source_usart0.dev.direct = ( uint8_t )BI;
+    source_usart0.dev.identify = ID_USART0;
+    source_usart0.dev.instanceHandle = (uint32_t)USART0;
+    source_usart0.status[ IN ] = ( uint8_t )FREE;
+    source_usart0.status[ OUT ] = ( uint8_t )FREE; 
+    source_usart0.tx_index = 0;
+    source_usart0.rx_index = 0;
+    
+    source_usart0.init_source = usart_init;
+    source_usart0.buffer_write = usart0_DmaTx;
+    source_usart0.buffer_read = usart0_DmaRx;
+    
+    if( NULL != source_usart0.init_source )
+       source_usart0.init_source( &source_usart0,NULL );
+}
+/*
+*********************************************************************************************************
 *                                    usart1_init_default()
 *
 * Description :  initialize usart1 port to default state;
@@ -460,12 +518,13 @@ void gpio_init_default( void )
     source_gpio.peripheralParameter = ( void * )&gpio_cfg;
     source_gpio.tx_index = 0;
     source_gpio.rx_index = 0;
-    source_gpio.txSize = 3072;
-    source_gpio.rxSize = 3072;
+    source_gpio.txSize = 192;//3072;
+    source_gpio.rxSize = 192;//3072;
     
     source_gpio.init_source = gpio_Init;
     source_gpio.buffer_write = gpio_Pin_Set;
     source_gpio.buffer_read = gpio_Pin_Get;
+    source_gpio.peripheral_stop = stop_gpio;
     
     source_gpio.pRingBulkOut = &ep0BulkOut_fifo;
     source_gpio.pRingBulkIn = &ep0BulkIn_fifo;
@@ -491,11 +550,11 @@ void gpio_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
+extern CODEC_SETS codec_set;
 void aic3204_init_default( void )
 {
-    CODEC_SETS codec_set;
-    
-    codec_set.sr = 48000;
+     
+    codec_set.sr = 24000;
     codec_set.sample_len = 16;
     codec_set.format = 1;
     codec_set.slot_num = 2;
@@ -504,7 +563,8 @@ void aic3204_init_default( void )
     codec_set.flag = 1;
     codec_set.delay = 0;
     Init_CODEC( &source_twi1,codec_set );
-    codec_set.sr = 48000;
+    
+    codec_set.sr = 24000;
     codec_set.sample_len = 16;
     codec_set.format = 1;
     codec_set.slot_num = 2;
@@ -513,6 +573,7 @@ void aic3204_init_default( void )
     codec_set.flag = 1;
     codec_set.delay = 0;
     Init_CODEC( &source_twi2,codec_set );
+    
 }
 
 
@@ -534,8 +595,8 @@ void aic3204_init_default( void )
 void uif_ports_init_default( void )
 {  
     usb_init_default( ); //init USB 
-    ssc0_init_default( );
-    ssc1_init_default( );
+    //ssc0_init_default( );
+    //ssc1_init_default( );
     spi0_init_default( );
     spi1_init_default( );
     twi0_init_default( );
@@ -577,5 +638,5 @@ void uif_miscPin_init_default( void )
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
     UIF_Misc_On ( FAST_PLUS_RST );  
-  
+    UIF_Misc_On ( LEVEL_SHIFT_OE );
 }

@@ -37,6 +37,9 @@
 
 #include <string.h>
 
+
+#ifdef TOUCESCREEN
+
 #ifdef REG_ADC_TSMR
 /** \addtogroup tsd_module
  *@{
@@ -376,3 +379,4 @@ void TSD_DeInitialize(void)
 /**@}*/
 #endif /* #ifdef REG_ADC_TSMR */
 
+#endif

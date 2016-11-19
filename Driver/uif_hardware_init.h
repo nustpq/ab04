@@ -18,6 +18,7 @@ void spi1_init_default( void );
 void twi0_init_default( void );
 void twi1_init_default( void );
 void twi2_init_default( void );
+void usart0_init_default( void );
 void usart1_init_default( void );
 void gpio_init_default( void );
 void uif_miscPin_init_default( void );

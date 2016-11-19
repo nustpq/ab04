@@ -42,7 +42,7 @@
 #include <CDCDSerialPort.h>
 #include <CDCDescriptors.h>
 #include <USBLib_Trace.h>
-
+#include <USBD_Config.h>
 /*------------------------------------------------------------------------------
  *         Types
  *------------------------------------------------------------------------------*/
@@ -53,7 +53,7 @@ typedef struct _CDCDParseData {
     CDCDSerialPort * pCdcd;
     /** Pointer to found interface descriptor */
     USBInterfaceDescriptor * pIfDesc;
-    
+
 } CDCDParseData;
 
 /*------------------------------------------------------------------------------
@@ -122,23 +122,33 @@ static uint32_t _Interfaces_Parse(USBGenericDescriptor *pDesc,
                 break;
             case USBEndpointDescriptor_BULK:
                 if (pEp->bEndpointAddress & 0x80)
-                	{ 
+                	{
                           epAddress = pEp->bEndpointAddress & 0x7F;
-						  
-                          if( epAddress == 2 )
+
+                          if( epAddress == CDCDSerialDriverDescriptors_AUDIO_0_DATAIN )
                           {
                             pCdcd->bBulkInPIPE = pEp->bEndpointAddress & 0x7F;
                             TRACE_INFO("pCdcd->bBulkInPIPE = (%d)\n\r",pCdcd->bBulkInPIPE);
                           }
-                          else if( epAddress == 4 )
+                          else if( epAddress == CDCDSerialDriverDescriptors_CMDDATAIN )
                           {
                             pCdcd->bBulkInPIPECmd = pEp->bEndpointAddress & 0x7F;
                             TRACE_INFO("pCdcd->bBulkInPIPECmd = (%d)\n\r",pCdcd->bBulkInPIPECmd);
                           }
-                          else if( epAddress == 6 )
+                          else if( epAddress == CDCDSerialDriverDescriptors_AUDIO_1_DATAIN )
                           {
                               pCdcd->bBulkInPIPE1 = pEp->bEndpointAddress & 0x7F;
                               TRACE_INFO("pCdcd->bBulkInPIPE1 = (%d)\n\r",pCdcd->bBulkInPIPE1);
+                          }
+                          else if( epAddress == CDCDSerialDriverDescriptors_SPI_DATAIN )
+                          {
+                              pCdcd->bBulkInPIPE2 = pEp->bEndpointAddress & 0x7F;
+                              TRACE_INFO("pCdcd->bBulkInPIPE2 = (%d)\n\r",pCdcd->bBulkInPIPE2);
+                          }
+                          else if( epAddress == CDCDSerialDriverDescriptors_MCU_LOG )
+                          {
+                              pCdcd->bBulkInPIPELog = pEp->bEndpointAddress & 0x7F;
+                              TRACE_INFO("pCdcd->bBulkInPIPELog = (%d)\n\r",pCdcd->bBulkInPIPELog);
                           }
                           else
                           {
@@ -148,26 +158,31 @@ static uint32_t _Interfaces_Parse(USBGenericDescriptor *pDesc,
                 else
                 	{
                           epAddress = pEp->bEndpointAddress;
-                          if( epAddress == 1 )
+                          if( epAddress == CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT )
                           {
                             pCdcd->bBulkOutPIPE = pEp->bEndpointAddress;
                             TRACE_INFO("pCdcd->bBulkOutPIPE = (%d)\n\r",pCdcd->bBulkOutPIPE);
                           }
-                          else if( epAddress == 3 )
+                          else if( epAddress == CDCDSerialDriverDescriptors_CMDDATAOUT )
                           {
                             pCdcd->bBulkOutPIPECmd = pEp->bEndpointAddress;
                             TRACE_INFO("pCdcd->bBulkOutPIPECmd = (%d)\n\r",pCdcd->bBulkOutPIPECmd);
                           }
-                          else if( epAddress == 5 )
+                          else if( epAddress == CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT )
                           {
                             pCdcd->bBulkOutPIPE1 = pEp->bEndpointAddress;
-                            TRACE_INFO("pCdcd->bBulkOutPIPE1 = (%d)\n\r",pCdcd->bBulkOutPIPE1);                            
+                            TRACE_INFO("pCdcd->bBulkOutPIPE1 = (%d)\n\r",pCdcd->bBulkOutPIPE1);
+                          }
+                          else if( epAddress == CDCDSerialDriverDescriptors_SPI_DATAOUT )
+                          {
+                            pCdcd->bBulkOutPIPE2 = pEp->bEndpointAddress;
+                            TRACE_INFO("pCdcd->bBulkOutPIPE2 = (%d)\n\r",pCdcd->bBulkOutPIPE2);
                           }
                           else
                           {
                              assert( 0 );
                           }
-                          
+
                 	}
         }
     }
@@ -176,7 +191,10 @@ static uint32_t _Interfaces_Parse(USBGenericDescriptor *pDesc,
         &&  pCdcd->bBulkInPIPE != 0
         &&  pCdcd->bBulkOutPIPE != 0
         &&  pCdcd->bBulkInPIPE1 != 0
-        &&  pCdcd->bBulkOutPIPE1 != 0  )
+        &&  pCdcd->bBulkOutPIPE1 != 0
+        &&  pCdcd->bBulkInPIPE2 != 0
+        &&  pCdcd->bBulkOutPIPE2 != 0
+        &&  pCdcd-> bBulkInPIPELog != 0)
         return USBRC_FINISHED;
 
     return 0;
@@ -424,6 +442,18 @@ uint32_t CDCDSerialPort_Read_SecondEp(const CDCDSerialPort * pCdcd,
                      fCallback, pArg);
 }
 
+uint32_t CDCDSerialPort_Read_ThirdEp(const CDCDSerialPort * pCdcd,
+                          void * pData,uint32_t dwSize,
+                          TransferCallback fCallback,void * pArg)
+{
+    if (pCdcd->bBulkOutPIPE1 == 0)
+        return USBRC_PARAM_ERR;
+
+    return USBD_Read(pCdcd->bBulkOutPIPE2,
+                     pData, dwSize,
+                     fCallback, pArg);
+}
+
 uint32_t CDCDSerialPort_Read_CmdEp(const CDCDSerialPort * pCdcd,
                           void * pData,uint32_t dwSize,
                           TransferCallback fCallback,void * pArg)
@@ -471,6 +501,31 @@ uint32_t CDCDSerialPort_Write_SecondEp(const CDCDSerialPort * pCdcd,
         return USBRC_PARAM_ERR;
 
     return USBD_Write(pCdcd->bBulkInPIPE1,
+                      pData, dwSize,
+                      fCallback, pArg);
+}
+
+uint32_t CDCDSerialPort_Write_ThirdEp(const CDCDSerialPort * pCdcd,
+                                   void * pData, uint32_t dwSize,
+                                   TransferCallback fCallback, void * pArg)
+{
+    if (pCdcd->bBulkInPIPE2 == 0)
+        return USBRC_PARAM_ERR;
+
+    return USBD_Write(pCdcd->bBulkInPIPE2,
+                      pData, dwSize,
+                      fCallback, pArg);
+}
+
+
+uint32_t CDCDSerialPort_Write_LogEp(const CDCDSerialPort * pCdcd,
+                                   void * pData, uint32_t dwSize,
+                                   TransferCallback fCallback, void * pArg)
+{
+    if (pCdcd->bBulkInPIPE2 == 0)
+        return USBRC_PARAM_ERR;
+
+    return USBD_Write(pCdcd->bBulkInPIPELog,
                       pData, dwSize,
                       fCallback, pArg);
 }

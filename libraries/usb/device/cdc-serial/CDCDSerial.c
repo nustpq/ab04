@@ -176,6 +176,15 @@ uint32_t CDCDSerial_Read_SecondEp(void *data,
     return CDCDSerialPort_Read_SecondEp(pCdcd, data, size, callback, argument);
 }
 
+uint32_t CDCDSerial_Read_ThirdEp(void *data,
+                         uint32_t size,
+                         TransferCallback callback,
+                         void *argument)
+{
+    CDCDSerialPort * pCdcd = &cdcdSerial;
+    return CDCDSerialPort_Read_ThirdEp(pCdcd, data, size, callback, argument);
+}
+
 uint32_t CDCDSerial_Read_CmdEp(void *data,
                          uint32_t size,
                          TransferCallback callback,
@@ -214,6 +223,24 @@ uint32_t CDCDSerial_Write_SecondEp(void *data,
 {
     CDCDSerialPort * pCdcd = &cdcdSerial;
     return CDCDSerialPort_Write_SecondEp(pCdcd, data, size, callback, argument);
+}
+    
+uint32_t CDCDSerial_Write_ThirdEp(void *data,
+                          uint32_t size,
+                          TransferCallback callback,
+                          void *argument)
+{
+    CDCDSerialPort * pCdcd = &cdcdSerial;
+    return CDCDSerialPort_Write_ThirdEp(pCdcd, data, size, callback, argument);
+}
+
+uint32_t CDCDSerial_Write_LogEp(void *data,
+                          uint32_t size,
+                          TransferCallback callback,
+                          void *argument)
+{
+    CDCDSerialPort * pCdcd = &cdcdSerial;
+    return CDCDSerialPort_Write_LogEp(pCdcd, data, size, callback, argument);
 }
 
 uint32_t CDCDSerial_Write_CmdEp(void *data,

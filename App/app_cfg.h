@@ -47,43 +47,37 @@
 
 
 #define  DBG_UART_METHOD_TASK_EN  //this define enable the DBG UART in task for speed up, PQ
-
+//#define  DBG_USB_LOG_EN     //enable usb log info
 /*
 *********************************************************************************************************
 *                                        TASK PRIORITIES
 *********************************************************************************************************
 */
 
-#define TASKLEDPRIORITY    ( 8u ) 
-#define TASKUSBPRIORITY    ( 12u )
-#define TASKSSC0PRIORITY   ( 6u )
-//#define CMDPARASEPRIORITY  ( 14u )
-#define FIRMWAREVECUPDATE  ( 26u )
+#define TASKLEDPRIORITY                                    8
 
+#define TASKSSC0PRIORITY                                   6
+#define FIRMWAREVECUPDATE                                  26
 
+#define  APP_CFG_TASK_USB_PRIO                             1
+#define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
 #define  APP_CFG_TASK_UART_TX_PRIO                         3
-#define  APP_CFG_TASK_UART_TX_RULER_PRIO                   13
-#define  APP_CFG_TASK_UART_RX_PRIO                         5
 #define  APP_CFG_TASK_NOAH_PRIO                            4
-#define  APP_CFG_TASK_NOAH_RULER_PRIO                      16
-#define  APP_CFG_TASK_CMD_PARSE_PRIO                       2  
+#define  APP_CFG_TASK_UART_RX_PRIO                         5
+
 #define  APP_CFG_TASK_USER_IF_PRIO                         10
 #define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+1)
 
+#define  APP_CFG_TASK_UART_TX_RULER_PRIO                   13
+#define  APP_CFG_TASK_NOAH_RULER_PRIO                      16
 
-
-#define  APP_CFG_TASK_SHELL_PRIO                           20
-#define  APP_CFG_TASK_START_PRIO                           30
-
-#define  APP_CFG_TASK_DBG_INFO_PRIO                        21
-
+#define  APP_CFG_TASK_SHELL_PRIO                           30
+#define  APP_CFG_TASK_DBG_INFO_PRIO                        31
+#define  APP_CFG_TASK_START_PRIO                           35
 #define  APP_CFG_TASK_PROBE_STR_PRIO                       37
 #define  PROBE_DEMO_INTRO_CFG_TASK_LED_PRIO                38
-
-#define  OS_PROBE_TASK_PRIO                                40
-
-#define  OS_PROBE_TASK_ID                                  40
-
+#define  OS_PROBE_TASK_PRIO                                40  
+#define  OS_PROBE_TASK_ID                                  40 
 #define  OS_TASK_TMR_PRIO                         (OS_LOWEST_PRIO - 2)
 
 
@@ -129,13 +123,17 @@
 
 void  BSP_Ser_Printf (CPU_CHAR  *format, ...);
 
-#define  APP_CFG_TRACE                              printf
-
+//#define  APP_CFG_TRACE                              printf
+#define  APP_CFG_TRACE                              BSP_Ser_Printf
 
 #define  APP_TRACE_INFO(x)               ((APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_INFO)  ? (void)(APP_CFG_TRACE x) : (void)0)
 #define  APP_TRACE_DBG(x)                ((APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_DBG)   ? (void)(APP_CFG_TRACE x) : (void)0)
 
 
+// for shell uart
+#define  UART_SHELL_SEND_STR(x)                (void)( BSP_Ser_Printf x )      
+#define  UART_SHELL_GET_BYTE(x)                      ( BSP_Ser_RdByte x )
+#define  UART_SHELL_SEND_BYTE(x)               (void)( BSP_Ser_WrByte x )  
 
 
 #endif /* __APP_CFG_H__ */

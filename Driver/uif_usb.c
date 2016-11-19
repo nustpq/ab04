@@ -14,19 +14,13 @@
 * Note(s)       :
 *********************************************************************************************************
 */
-
+     
 #include  <ucos_ii.h>
 
 #include "uif_usb.h"
 #include "defined.h"
 
-extern uint8_t usbCacheBulkOut0[ USB_DATAEP_SIZE_64B ];
-extern uint8_t usbCacheBulkOut1[ USB_DATAEP_SIZE_64B ];
-extern uint8_t usbCacheBulkIn0[ USB_DATAEP_SIZE_64B ];
-extern uint8_t usbCacheBulkIn1[ USB_DATAEP_SIZE_64B ];
 
-//extern uint8_t usbCmdCacheBulkOut[ USB_CMDEP_SIZE_64B ] ;
-//extern uint8_t usbCmdCacheBulkIn[ USB_CMDEP_SIZE_64B ]  ;
 
 //Ring for USB data endpoint
 extern kfifo_t  ep0BulkOut_fifo;
@@ -38,14 +32,20 @@ extern kfifo_t  ep1BulkIn_fifo;
 extern kfifo_t  cmdEpBulkOut_fifo;
 extern kfifo_t  cmdEpBulkIn_fifo;
 
+extern kfifo_t DBG_USB_Send_kFIFO;
+
 bool restart_audio_0_bulk_out  = false ; 
 bool restart_audio_0_bulk_in   = false ; 
 bool restart_audio_1_bulk_out  = false ; 
 bool restart_audio_1_bulk_in   = false ; 
+bool restart_audio_2_bulk_out  = false ; 
+bool restart_audio_2_bulk_in   = false ; 
+bool restart_log_bulk_in       = false ;
 bool restart_cmd_bulk_out      = false ; 
 bool restart_cmd_bulk_in       = false ; 
 bool audio_run_control         = false ; 
 bool audio_start_flag          = false ;
+
 uint8_t audio_0_padding = 0;
 
 void UsbAudio0DataReceived(  uint32_t unused,
@@ -67,7 +67,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
         if ( USB_DATAEP_SIZE_64B <=  size ) 
         { 
             //enough free buffer                      
-            CDCDSerialDriver_Read(    usbCacheBulkOut0,
+            CDCDSerialDriver_ReadAudio_0(    usbCacheBulkOut0,
                                       USB_DATAEP_SIZE_64B,
                                       (TransferCallback) UsbAudio0DataReceived,
                                       0);        
@@ -112,7 +112,7 @@ void UsbAudio1DataReceived(  uint32_t unused,
         if ( USB_DATAEP_SIZE_64B <= size ) 
         { 
             //enouth free buffer                      
-            CDCDSerialDriver_Read_SecondEp(    usbCacheBulkOut1,
+            CDCDSerialDriver_ReadAudio_1(    usbCacheBulkOut1,
                                                USB_DATAEP_SIZE_64B,
                                               (TransferCallback) UsbAudio1DataReceived,
                                               0);        
@@ -148,7 +148,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
             //enough data to send to PC           
             kfifo_get( &ep0BulkIn_fifo, usbCacheBulkIn0, USB_DATAEP_SIZE_64B ); 
         
-            CDCDSerialDriver_Write( usbCacheBulkIn0,
+            CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
                                     USB_DATAEP_SIZE_64B,
                                     (TransferCallback) UsbAudio0DataTransmit,
                                     0);       
@@ -164,7 +164,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
     }  
     else 
     {
-        CDCDSerialDriver_Write( usbCacheBulkIn0,
+        CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
                                 USB_DATAEP_SIZE_64B,
                                 (TransferCallback) UsbAudio0DataTransmit,
                                 0);  
@@ -189,7 +189,7 @@ void UsbAudio1DataTransmit(  uint32_t unused,
           //enough data to send to PC          
             kfifo_get(&ep1BulkIn_fifo, usbCacheBulkIn1, USB_DATAEP_SIZE_64B); 
         
-            CDCDSerialDriver_Write_SecondEp( usbCacheBulkIn1,
+            CDCDSerialDriver_WriteAudio_1( usbCacheBulkIn1,
                                              USB_DATAEP_SIZE_64B,
                                              (TransferCallback) UsbAudio1DataTransmit,
                                              0);       
@@ -204,7 +204,7 @@ void UsbAudio1DataTransmit(  uint32_t unused,
     }  
     else 
     {
-        CDCDSerialDriver_Write_SecondEp( usbCacheBulkIn1,
+        CDCDSerialDriver_WriteAudio_1( usbCacheBulkIn1,
                                          USB_DATAEP_SIZE_64B,
                                          (TransferCallback) UsbAudio1DataTransmit,
                                          0);  
@@ -212,6 +212,130 @@ void UsbAudio1DataTransmit(  uint32_t unused,
         
     }        
 }
+
+void UsbSPIDataReceived(  uint32_t unused,
+                              uint8_t status,
+                              uint32_t received,
+                              uint32_t remaining )
+{
+    remaining = remaining;
+    uint32_t size;
+    
+    if ( status == USBD_STATUS_SUCCESS ) 
+    {     
+         // Check every data package:        
+          // LED_CLEAR_DATA;
+
+        kfifo_put( &ep2BulkOut_fifo, usbCacheBulkOut2, received ); 
+        
+        size = kfifo_get_free_space( &ep2BulkOut_fifo );
+        if ( USB_DATAEP_SIZE_64B <= size ) 
+        { 
+            //enouth free buffer                      
+            CDCDSerialDriver_ReadSPI(    usbCacheBulkOut2,
+                                               USB_DATAEP_SIZE_64B,
+                                              (TransferCallback) UsbSPIDataReceived,
+                                              0);        
+        } 
+        else 
+        { 
+          ///Todo:usb out too fast 
+          //printf( "\r\nERROR : UsbAudio1DataReceived: Usb Transfer fast\r\n" );
+          restart_audio_2_bulk_out  = true ; 
+          return;
+            
+        }     
+ //       total_received += received ; 
+     
+    }  
+    else 
+    {      
+        printf( "\r\nERROR : UsbSPIDataReceived: Transfer error\r\n" ); 
+        
+    }      
+}
+
+
+
+void UsbSPIDataTransmit(      uint32_t unused,
+                              uint8_t status,
+                              uint32_t transmit,
+                              uint32_t remaining )
+{          
+    //Record    
+    
+    if ( status == USBD_STATUS_SUCCESS  ) 
+    {       
+       
+        if ( USB_DATAEP_SIZE_64B <= kfifo_get_data_size(  &ep2BulkIn_fifo )  ) 
+        { 
+          //enough data to send to PC          
+            kfifo_get(&ep2BulkIn_fifo, usbCacheBulkIn2, USB_DATAEP_SIZE_64B); 
+        
+            CDCDSerialDriver_WriteSPI( usbCacheBulkIn2,
+                                             USB_DATAEP_SIZE_64B,
+                                             (TransferCallback) UsbSPIDataTransmit,
+                                             0);       
+        } 
+        else 
+        {                    
+            restart_audio_2_bulk_in  = true ;   
+            
+        }              
+//        total_transmit += transmit ; 
+     
+    }  
+    else 
+    {
+        CDCDSerialDriver_WriteSPI( usbCacheBulkIn2,
+                                         USB_DATAEP_SIZE_64B,
+                                         (TransferCallback) UsbSPIDataTransmit,
+                                         0);  
+        TRACE_WARNING( "\r\nERROR : UsbSPIDataTransmit: Rr-transfer hit\r\n" );  
+        
+    }        
+}
+   
+
+void UsbLogDataTransmit(      uint32_t unused,
+                              uint8_t status,
+                              uint32_t transmit,
+                              uint32_t remaining )
+{          
+    //Record    
+    
+    if ( status == USBD_STATUS_SUCCESS  ) 
+    {       
+       
+        if ( USB_DATAEP_SIZE_64B <= kfifo_get_data_size(  &DBG_USB_Send_kFIFO )  ) 
+        { 
+          //enough data to send to PC          
+            kfifo_get(&DBG_USB_Send_kFIFO, usbCacheBulkIn3, USB_DATAEP_SIZE_64B); 
+        
+            CDCDSerialDriver_WriteLog( usbCacheBulkIn3,
+                                             USB_DATAEP_SIZE_64B,
+                                             (TransferCallback) UsbLogDataTransmit,
+                                             0);       
+        } 
+        else 
+        {                    
+            restart_log_bulk_in  = true ;   
+            
+        }              
+//        total_transmit += transmit ; 
+     
+    }  
+    else 
+    {
+        CDCDSerialDriver_WriteLog( usbCacheBulkIn3,
+                                         USB_DATAEP_SIZE_64B,
+                                         (TransferCallback) UsbLogDataTransmit,
+                                         0);  
+        TRACE_WARNING( "\r\nERROR : UsbLogDataTransmit: Rr-transfer hit\r\n" );  
+        
+    }        
+}
+   
 
 void UsbCmdDataReceived(  uint32_t unused,
                           uint8_t status,
@@ -230,7 +354,7 @@ void UsbCmdDataReceived(  uint32_t unused,
         if ( USB_DATAEP_SIZE_64B <= kfifo_get_free_space( &cmdEpBulkOut_fifo ) ) 
         { 
             //enough free buffer                      
-            CDCDSerialDriver_Read_CmdEp(  usbCmdCacheBulkOut,
+            CDCDSerialDriver_ReadCmd(  usbCmdCacheBulkOut,
                                           USB_DATAEP_SIZE_64B,
                                           (TransferCallback) UsbCmdDataReceived,
                                           0);        
@@ -265,7 +389,7 @@ void UsbCmdDataTransmit(  uint32_t unused,
         {         
             kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_DATAEP_SIZE_64B); 
         
-            CDCDSerialDriver_Write_CmdEp( usbCmdCacheBulkIn,
+            CDCDSerialDriver_WriteCmd( usbCmdCacheBulkIn,
                                           USB_DATAEP_SIZE_64B,
                                           (TransferCallback) UsbCmdDataTransmit,
                                           0);       
@@ -279,7 +403,7 @@ void UsbCmdDataTransmit(  uint32_t unused,
     }  
     else 
     {
-        CDCDSerialDriver_Write_CmdEp( usbCmdCacheBulkIn,
+        CDCDSerialDriver_WriteCmd( usbCmdCacheBulkIn,
                                       USB_DATAEP_SIZE_64B,
                                       (TransferCallback) UsbCmdDataTransmit,
                                       0);  

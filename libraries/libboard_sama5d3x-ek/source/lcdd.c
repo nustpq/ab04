@@ -39,6 +39,8 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef LCD
+
 #ifdef LCDC
 /** \addtogroup lcdd_base
  * Implementation of LCD driver, Include LCD initialization,
@@ -1637,4 +1639,4 @@ void *LCDD_CreateCanvas(uint8_t bLayer,
 
 /**@}*/
 #endif /* ifdef LCDC */
-
+#endif

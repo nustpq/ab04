@@ -23,8 +23,11 @@
 
 extern uint8_t usartBuffer[ 2 ][ 1024 ];
 
+uint8_t usart0_DmaRx( void *pInstance, const uint8_t *buf, uint32_t len );
+uint8_t usart0_DmaTx( void *pInstance, const uint8_t *buf, uint32_t len );
 uint8_t usart1_DmaRx( void *pInstance, const uint8_t *buf, uint32_t len );
 uint8_t usart1_DmaTx( void *pInstance, const uint8_t *buf, uint32_t len );
+
 void usart_init( void *pInstance, void *parameter );
 
 static void _ConfigureDma( void* pInstance );

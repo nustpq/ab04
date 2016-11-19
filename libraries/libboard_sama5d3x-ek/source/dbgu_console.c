@@ -193,7 +193,7 @@ extern void DBGU_PutChar( uint8_t c )
     while ( (CONSOLE_DBGU->DBGU_SR & DBGU_SR_TXEMPTY) == 0 ) ;
 
     /* Send character */
-    CONSOLE_DBGU->DBGU_THR=c ;
+    CONSOLE_DBGU->DBGU_THR = c ;
 }
 
 /**
@@ -210,6 +210,16 @@ extern uint32_t DBGU_GetChar( void )
     }
 
     while ( (CONSOLE_DBGU->DBGU_SR & DBGU_SR_RXRDY) == 0 ) ;
+    return CONSOLE_DBGU->DBGU_RHR ;
+}
+
+extern uint32_t DBGU_ReadChar( void )
+{
+    if ( !_bConsoleIsInitialized )
+    {
+        DBGU_Configure(CONSOLE_BAUDRATE, BOARD_MCK);
+    }
+
     return CONSOLE_DBGU->DBGU_RHR ;
 }
 

@@ -115,7 +115,7 @@ void App_TaskUART_Tx( void *p_arg )
                         OSTimeDly(1);
                     }                       
                     size = kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_DATAEP_SIZE_64B);  
-                    CDCDSerialDriver_Write_CmdEp( usbCmdCacheBulkIn,
+                    CDCDSerialDriver_WriteCmd( usbCmdCacheBulkIn,
                                                   size,
                                                   (TransferCallback) UsbCmdDataTransmit,
                                                   0);  
@@ -134,7 +134,7 @@ void App_TaskUART_Tx( void *p_arg )
                     OSTimeDly(1);
                 }
                 size = kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_DATAEP_SIZE_64B);  
-                CDCDSerialDriver_Write_CmdEp( usbCmdCacheBulkIn,
+                CDCDSerialDriver_WriteCmd( usbCmdCacheBulkIn,
                                               size,
                                               (TransferCallback) UsbCmdDataTransmit,
                                               0);  

@@ -39,7 +39,7 @@
 #define OS_LOWEST_PRIO           63u   /* Defines the lowest priority that can be assigned ...         */
                                        /* ... MUST NEVER be higher than 254!                           */
 
-#define OS_MAX_EVENTS            10u   /* Max. number of event control blocks in your application      */
+#define OS_MAX_EVENTS            20u   /* Max. number of event control blocks in your application      */
 #define OS_MAX_FLAGS              5u   /* Max. number of Event Flag Groups    in your application      */
 #define OS_MAX_MEM_PART           5u   /* Max. number of memory partitions                             */
 #define OS_MAX_QS                 4u   /* Max. number of queue control blocks in your application      */
@@ -48,7 +48,7 @@
 #define OS_SCHED_LOCK_EN          1u   /* Include code for OSSchedLock() and OSSchedUnlock()           */
 
 #define OS_TICK_STEP_EN           1u   /* Enable tick stepping feature for uC/OS-View                  */
-#define OS_TICKS_PER_SEC       500u   /* Set the number of ticks in one second                        */
+#define OS_TICKS_PER_SEC       1000u   /* Set the number of ticks in one second                        */
 
 #define OS_TLS_TBL_SIZE           0u   /* Size of Thread-Local Storage Table                           */
 
