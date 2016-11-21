@@ -32,7 +32,6 @@
 #include <includes.h>
 
 
-
 /*
 *********************************************************************************************************
 *                                    App_TaskGenieShell()
@@ -52,25 +51,28 @@ void App_TaskGenieShell( void *p_arg )
 
     (void)p_arg;
 
-    CPU_INT08U  index ;		/*index is the pointer of commandbuf */
+    CPU_INT08U  index ;		/*index is the pointer of data in commandbuf */
+    CPU_INT08U  cmd_loop ;
     CPU_INT08U  num ;
     CPU_CHAR    ch ;
     CPU_CHAR    CommandBuf[ MaxLenComBuf + 1 ];	/*store '\0'*/
     CPU_INT08U  (*Func)(CPU_INT08U argc, CPU_CHAR **argv);
     CPU_CHAR    *argv[10];
     CPU_INT08U  argc;
-    CPU_INT08U  error_code;
-
-    index  =  0 ;
-    CommandBuf[0] = '\0';
-
-    InitCommands();
+    CPU_INT08U  error_code;     
+  
+    index    =  0 ;
+    cmd_loop = 0;
+    CommandBuf[0] = '\0'; 
+    InitCommands();  
+    Init_CommandLoop();
     OSTimeDly(1000);
 
     /*To be done: Login & Password*/
     UART_SHELL_SEND_STR(( "\n\rLaunching Genieshell, press any to continue..."));
     UART_SHELL_GET_BYTE(());
-    UART_SHELL_SEND_STR(("\n\r>"));
+    Time_Stamp();
+    UART_SHELL_SEND_STR((">"));
 
     while (DEF_TRUE) {
 
@@ -85,7 +87,8 @@ void App_TaskGenieShell( void *p_arg )
 
             case '\r':				//enter
                 if ( index == 0 ){     //commandbuf is null,begin a new line
-                    UART_SHELL_SEND_STR(("\n\r>"));
+                    Time_Stamp();
+                    UART_SHELL_SEND_STR((">"));
 
                 } else {
 
@@ -94,13 +97,16 @@ void App_TaskGenieShell( void *p_arg )
                     }
                     CommandBuf[index] = '\0';
                     //UART_SHELL_SEND_STR("\n\rThe command is %s",CommandBuf);
+                    memcpy(CommandBufLoop[cmd_loop++], CommandBuf, strlen(CommandBuf));                    
+                    cmd_loop = cmd_loop % MaxLenComBufLoop ;
                     num = CommandParse( CommandBuf,&argc,argv );	//analys the argv in the commandbuf
                     if( num == ERRORCOMMAND ){             	//error or none exist command
                         index = 0;
                         CommandBuf[index] = '\0';
                         //UART_SHELL_SEND_STR("\n\rError command is %s",CommandBuf);
                         UART_SHELL_SEND_STR(("Error: bad command or filename."));
-                        UART_SHELL_SEND_STR(("\n\r>"));
+                        Time_Stamp();
+                        UART_SHELL_SEND_STR((">"));
 
                     } else {
                         Func = ShellComms[num].CommandFunc;	//call corresponding CommandFunc
@@ -121,7 +127,8 @@ void App_TaskGenieShell( void *p_arg )
                         index = 0;
                         CommandBuf[index] = '\0';
                         UIF_LED_Toggle(LED_RUN);
-                        UART_SHELL_SEND_STR(("\n\r>"));
+                        Time_Stamp();
+                        UART_SHELL_SEND_STR((">"));
 
                     }
                 }

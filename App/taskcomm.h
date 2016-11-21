@@ -38,7 +38,7 @@
 #define  MSG_TYPE_RESET         0xA0000000
 #define  MSG_TYPE_SWITCH        0xB0000000
 #define  MSG_TYPE_PORT_DET      0xC0000000
-#define  MCU_SW_RESET_PATTERN   0xA5000005
+#define  MCU_SW_RESET_PATTERN   0xA500000D
 
 
 /////////  UART Message Storage Area  //////////////////

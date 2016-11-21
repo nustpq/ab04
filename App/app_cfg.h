@@ -77,7 +77,7 @@
 #define  APP_CFG_TASK_PROBE_STR_PRIO                       37
 #define  PROBE_DEMO_INTRO_CFG_TASK_LED_PRIO                38
 #define  OS_PROBE_TASK_PRIO                                40  
-#define  OS_PROBE_TASK_ID                                  40 
+#define  OS_PROBE_TASK_ID                                  40 //ID
 #define  OS_TASK_TMR_PRIO                         (OS_LOWEST_PRIO - 2)
 
 

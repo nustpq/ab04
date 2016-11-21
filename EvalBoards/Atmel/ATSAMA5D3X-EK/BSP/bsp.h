@@ -140,6 +140,37 @@
 
 /*
 *********************************************************************************************************
+*                                             LOCAL DEFINES
+*********************************************************************************************************
+*/
+
+#define  SAMA5_REG_PIOE_PER (*((CPU_REG32 *)0xFFFFFA00))
+#define  SAMA5_REG_PIOE_OER (*((CPU_REG32 *)0xFFFFFA10))
+
+#define  SAMA5_REG_PIOE_SODR (*((CPU_REG32 *)0xFFFFFA30))
+#define  SAMA5_REG_PIOE_CODR (*((CPU_REG32 *)0xFFFFFA34))
+#define  SAMA5_REG_PIOE_ODSR (*((CPU_REG32 *)0xFFFFFA38))
+
+
+#define  SAMA5_REG_PIOA_PER (*((CPU_REG32 *)0xFFFFF200))
+#define  SAMA5_REG_PIOA_OER (*((CPU_REG32 *)0xFFFFF210))
+
+#define  SAMA5_REG_PIOA_SODR (*((CPU_REG32 *)0xFFFFF230))
+#define  SAMA5_REG_PIOA_CODR (*((CPU_REG32 *)0xFFFFF234))
+#define  SAMA5_REG_PIOA_ODSR (*((CPU_REG32 *)0xFFFFF238))
+
+#define  SAMA5_REG_PMC_PLLAR (*((CPU_REG32 *)0xFFFFFC28))
+#define  SAMA5_REG_PMC_MCKR  (*((CPU_REG32 *)0xFFFFFC30))
+
+#define  SAMA5_REG_RSTC_CR   (*((CPU_REG32 *)0xFFFFFE00))
+                                                                /* ------------------- CLK SOURCES ------------------ */
+#define  BSP_CLK_SRC_SLOW                            0          /* Slow  clock                                        */
+#define  BSP_CLK_SRC_MAIN                            1          /* Main  clock                                        */
+#define  BSP_CLK_SRC_PLLA                            2          /* PLLA   clock                                        */
+#define  BSP_CLK_SRC_UPLL                            3          /* 1/2 UPLL   clock                                        */
+
+/*
+*********************************************************************************************************
 *                                               DEFINES
 *********************************************************************************************************
 */

@@ -849,16 +849,14 @@ static  void  App_TaskStart (void *p_arg)
     for (;;) {
 
         counter++;
-
         if(counter&0xFF) {
             UIF_LED_On( LED_RUN );
-        }
-
+        }     
         if(counter&0x3F) {
             UIF_LED_Off( LED_RUN );
-        }
-
+        }   
         OSTimeDly(10);
+        
     }
 
 }

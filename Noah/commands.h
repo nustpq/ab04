@@ -5,10 +5,12 @@
 
 
 
-#define MAX_COMMAND_NUM            20
+#define MAX_COMMAND_NUM            21
 #define MAX_COMMAND_NAME_LENGTH    20
 #define ERRORCOMMAND              255
+
 #define MaxLenComBuf	          100
+#define MaxLenComBufLoop	      10
 
 typedef struct{
   
@@ -19,11 +21,15 @@ typedef struct{
     
 }SHELL_CMD;
 
+	 
 
+//typedef CPU_CHAR  (*pCommandBuf_t)[ MaxLenComBuf + 1 ];   
+extern CPU_CHAR CommandBufLoop[][MaxLenComBuf + 1 ];
+extern SHELL_CMD ShellComms[];
 
-extern void          InitCommands(void);
-extern CPU_INT08U    CommandParse( CPU_CHAR *Buf, CPU_INT08U *p_argc, CPU_CHAR *argv[] );
-extern SHELL_CMD     ShellComms[];
+void InitCommands(void);
+void Init_CommandLoop( void );
+CPU_INT08U  CommandParse( CPU_CHAR *Buf, CPU_INT08U *p_argc, CPU_CHAR *argv[] );
 
 CPU_INT08U HelpFunc(CPU_INT08U argc,CPU_CHAR **argv);
 CPU_INT08U HostNameFunc(CPU_INT08U argc,CPU_CHAR **argv);
@@ -45,4 +51,5 @@ CPU_INT08U ReadCMFunc( CPU_INT08U argc,CPU_CHAR **argv );
 CPU_INT08U Get_Ver_Info( CPU_INT08U argc,CPU_CHAR **argv );
 CPU_INT08U Write_Ruler_FW( CPU_INT08U argc,CPU_CHAR **argv );
 CPU_INT08U Flash_Info( CPU_INT08U argc,CPU_CHAR **argv );
+CPU_INT08U Cmd_History( CPU_INT08U argc,CPU_CHAR **argv );
 #endif 

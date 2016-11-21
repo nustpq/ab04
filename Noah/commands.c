@@ -3,7 +3,7 @@
 
 
 SHELL_CMD ShellComms[ MAX_COMMAND_NUM ];
-
+CPU_CHAR CommandBufLoop[MaxLenComBufLoop][ MaxLenComBuf + 1 ];	/*store '\0'*/
 
 void InitCommands( void )
 {
@@ -125,11 +125,17 @@ void InitCommands( void )
 	pShell->CommandFunc = Write_Ruler_FW;
     pShell->help = "Update ruler firmware. {cmd ruler_id}\n\reg: rulerfw 0";
     pShell++;
-    
+        
     pShell->num  = cmd_index++;
 	pShell->name = "flash";
 	pShell->CommandFunc = Flash_Info;
     pShell->help = "List flash saved data info.";
+    pShell++;
+    
+    pShell->num  = cmd_index++;
+	pShell->name = "history";
+	pShell->CommandFunc = Cmd_History;
+    pShell->help = "List user command history.";
     pShell++;
 }
 
@@ -283,11 +289,10 @@ CPU_INT08U RebootFunc(CPU_INT08U argc,CPU_CHAR **argv)
      
     UART_SHELL_SEND_STR((">>User cmd reset triggered... \r\n"));     
     UART_SHELL_SEND_STR((">>That's all folks !\r\n\r\n>> Rebooting...\r\n"));      
-    OSTimeDly(1000);
+    OSTimeDly(500);
     Beep(3); 
-    //AT91C_BASE_RSTC->RSTC_RCR = MCU_SW_RESET_PATTERN ; // do reset processor and peripherals
-    //while(1);
-    
+    SAMA5_REG_RSTC_CR = MCU_SW_RESET_PATTERN ; // do reset processor and peripherals
+    while(1);     
     return 0;
  
 }         
@@ -667,8 +672,7 @@ CPU_INT08U Write_Ruler_FW( CPU_INT08U argc,CPU_CHAR **argv )
 CPU_INT08U Get_Ver_Info( CPU_INT08U argc,CPU_CHAR **argv )	
 {
     
-    UART_SHELL_SEND_STR(("\n\rHost  MCU Version : %s",fw_version));
-    UART_SHELL_SEND_STR(("\n\rAudio MCU Version : %s",Audio_Version));	 
+    UART_SHELL_SEND_STR(("\n\rHost  MCU Version : %s",fw_version));    
     
     return 0;
 }
@@ -690,6 +694,26 @@ CPU_INT08U Flash_Info( CPU_INT08U argc,CPU_CHAR **argv )
     return 0;    
 }
 
+void Init_CommandLoop( void )
+{
+    for( CPU_INT08U i= 0; i<MaxLenComBufLoop; i++ ) {
+         CommandBufLoop[i][0] = '\0' ;          
+    }  
+}
+
+
+CPU_INT08U Cmd_History( CPU_INT08U argc,CPU_CHAR **argv )
+{       
+    for( CPU_INT08U i= 0; i<MaxLenComBufLoop; i++ ) {
+        if( CommandBufLoop[i][0] != '\0' ) {         
+            UART_SHELL_SEND_STR(("\n\r%d  %s",i,(CPU_CHAR *)&CommandBufLoop[i]));
+        }
+    }     
+    return 0;    
+}
+ 
+
+
 
 CPU_INT08U CommandParse( CPU_CHAR *Buf, CPU_INT08U *p_argc, CPU_CHAR *argv[] )
 {
@@ -697,7 +721,7 @@ CPU_INT08U CommandParse( CPU_CHAR *Buf, CPU_INT08U *p_argc, CPU_CHAR *argv[] )
 	CPU_INT08U i;
 	CPU_INT08U pointer;
 	CPU_INT08U num;
-        CPU_INT08U argc;
+    CPU_INT08U argc;
 	CPU_CHAR   name[MAX_COMMAND_NAME_LENGTH+1];		//SHELL_CMD name length <20
 
 	argc    = 0;            

@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.2]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.3]"; //fixed size string
 
 #ifdef  BOARD_TYPE_UIF
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
@@ -59,36 +59,6 @@ OS_EVENT *Bsp_Ser_Rx_Sem_lock;
 
 CPU_INT08U Debug_COM_Sel = 0 ; //debug uart use:    0: DBGUART, 1: UART1, >1: debug muted
 
-/*
-*********************************************************************************************************
-*                                             LOCAL DEFINES
-*********************************************************************************************************
-*/
-
-#define  SAMA5_REG_PIOE_PER (*((CPU_REG32 *)0xFFFFFA00))
-#define  SAMA5_REG_PIOE_OER (*((CPU_REG32 *)0xFFFFFA10))
-
-#define  SAMA5_REG_PIOE_SODR (*((CPU_REG32 *)0xFFFFFA30))
-#define  SAMA5_REG_PIOE_CODR (*((CPU_REG32 *)0xFFFFFA34))
-#define  SAMA5_REG_PIOE_ODSR (*((CPU_REG32 *)0xFFFFFA38))
-
-
-#define  SAMA5_REG_PIOA_PER (*((CPU_REG32 *)0xFFFFF200))
-#define  SAMA5_REG_PIOA_OER (*((CPU_REG32 *)0xFFFFF210))
-
-#define  SAMA5_REG_PIOA_SODR (*((CPU_REG32 *)0xFFFFF230))
-#define  SAMA5_REG_PIOA_CODR (*((CPU_REG32 *)0xFFFFF234))
-#define  SAMA5_REG_PIOA_ODSR (*((CPU_REG32 *)0xFFFFF238))
-
-#define  SAMA5_REG_PMC_PLLAR (*((CPU_REG32 *)0xFFFFFC28))
-#define  SAMA5_REG_PMC_MCKR  (*((CPU_REG32 *)0xFFFFFC30))
-
-
-                                                                /* ------------------- CLK SOURCES ------------------ */
-#define  BSP_CLK_SRC_SLOW                            0          /* Slow  clock                                        */
-#define  BSP_CLK_SRC_MAIN                            1          /* Main  clock                                        */
-#define  BSP_CLK_SRC_PLLA                            2          /* PLLA   clock                                        */
-#define  BSP_CLK_SRC_UPLL                            3          /* 1/2 UPLL   clock                                        */
 
 /*
 *********************************************************************************************************
@@ -497,6 +467,40 @@ void UIF_LED_Init( void )
 }
 
 
+
+void UIF_Beep_On ( )
+{
+    SAMA5_REG_PIOA_CODR = DEF_BIT_08;
+
+}
+
+void UIF_Beep_Off ( )
+{
+    SAMA5_REG_PIOA_SODR = DEF_BIT_08;
+
+}
+
+
+volatile unsigned char BUZZER_MUTE = 0 ;
+
+void Buzzer_OnOff( unsigned char onoff )
+{
+
+    if( BUZZER_MUTE != 0 ) {
+        return;
+    }
+
+    if( onoff == 0 ) {
+        UIF_Beep_Off ( );
+
+    } else {
+        UIF_Beep_On ( );
+
+    }
+
+
+}
+
 /*
 *********************************************************************************************************
 *                                             UIF_LED_On()
@@ -531,40 +535,7 @@ void UIF_LED_On ( CPU_INT32U led )
         break;
     }
 
-}
-
-void UIF_Beep_On ( )
-{
-    SAMA5_REG_PIOA_CODR = DEF_BIT_08;
-
-}
-
-void UIF_Beep_Off ( )
-{
-    SAMA5_REG_PIOA_SODR = DEF_BIT_08;
-
-}
-
-
-volatile unsigned char BUZZER_MUTE = 0 ;
-
-void Buzzer_OnOff( unsigned char onoff )
-{
-
-    if( BUZZER_MUTE != 0 ) {
-        return;
-    }
-
-    if( onoff == 0 ) {
-        UIF_Beep_Off ( );
-
-    } else {
-        UIF_Beep_On ( );
-
-    }
-
-
-}
+} 
 
 /*
 *********************************************************************************************************
@@ -655,6 +626,42 @@ void UIF_LED_Toggle( CPU_INT32U led )
     }
 
 }
+
+/*
+*********************************************************************************************************
+*                                         Beep()
+*
+* Description : Beep Buzzer
+*
+* Argument(s) : beep times.
+*
+* Return(s)   : none.
+*
+* Caller(s)   : App_TaskJoy()
+*
+* Note(s)     : none.
+*********************************************************************************************************
+*/
+void Beep( INT32U beep_cycles)
+{
+       
+   for( INT32U i = 0; i< beep_cycles; i++)  {
+
+        UIF_Beep_On(); //beep on
+        UIF_LED_On(LED_RUN);
+        UIF_LED_On(LED_USB);
+        UIF_LED_On(LED_HDMI);
+        OSTimeDly(250);
+        UIF_Beep_Off(); //beep off
+        UIF_LED_Off(LED_RUN);
+        UIF_LED_Off(LED_USB);
+        UIF_LED_Off(LED_HDMI);
+        OSTimeDly(250); //delay_ms(250);
+
+    }
+
+}
+
 
 /*
 *********************************************************************************************************
@@ -953,40 +960,6 @@ void  BSP_Ser_Printf (CPU_CHAR *format, ...)
 #endif
 }
 
-/*
-*********************************************************************************************************
-*                                         Beep()
-*
-* Description : Beep Buzzer
-*
-* Argument(s) : beep times.
-*
-* Return(s)   : none.
-*
-* Caller(s)   : App_TaskJoy()
-*
-* Note(s)     : none.
-*********************************************************************************************************
-*/
-void Beep( INT32U beep_cycles)
-{
-
-//   INT32U i ;
-//
-//   for(i = 0; i< beep_cycles; i++)  {
-//
-//        PIO_Clear(&PinBuzzer); //beep on
-//        LED_Clear(LED_DS1);
-//        LED_Set(LED_DS2);
-//        OSTimeDly(250);
-//        PIO_Set(&PinBuzzer); //beep off
-//        LED_Clear(LED_DS2);
-//        LED_Set(LED_DS1);
-//        OSTimeDly(250); //delay_ms(250);
-//
-//    }
-
-}
 
 
 /*
@@ -1110,6 +1083,7 @@ void Get_Uptime( void )
 }
 
 
+
 void Time_Stamp( void )
 {
 
@@ -1125,7 +1099,7 @@ void Time_Stamp( void )
     min  = time / 60 %60 ;
     hour = time / 3600 % 24 ;
 
-    APP_TRACE_INFO(("\r\n[%02d:%02d:%02d.%03d] ", hour,min, sec, msec ));
+    APP_TRACE_INFO(("\r\n\r\n[%02d:%02d:%02d.%03d] ", hour,min, sec, msec ));
 
 }
 

@@ -58,9 +58,9 @@
 /** Device product ID. */
 #define CDCDSerialDriverDescriptors_PRODUCTID       0x9700
 /** Device vendor ID (Atmel). */
-#define CDCDSerialDriverDescriptors_VENDORID        0xAB04//0x03EB
+#define CDCDSerialDriverDescriptors_VENDORID        0x03EB
 /** Device release number. */
-#define CDCDSerialDriverDescriptors_RELEASE         0x0100
+#define CDCDSerialDriverDescriptors_RELEASE         0x0104
 /**      @}*/
 
 /*------------------------------------------------------------------------------
@@ -872,18 +872,27 @@ const unsigned char manufacturerDescriptor[] = {
 /// Product string descriptor  
 const unsigned char productStringDescriptor[] = {
 
-    USBStringDescriptor_LENGTH(10),
+    USBStringDescriptor_LENGTH(19),
     USBGenericDescriptor_STRING,
+    USBStringDescriptor_UNICODE('i'),
+    USBStringDescriptor_UNICODE('S'),
+    USBStringDescriptor_UNICODE('A'),
+    USBStringDescriptor_UNICODE('M'),
+    USBStringDescriptor_UNICODE(' '),
+    USBStringDescriptor_UNICODE('T'),
+    USBStringDescriptor_UNICODE('e'),
+    USBStringDescriptor_UNICODE('s'),
+    USBStringDescriptor_UNICODE('t'), 
+    USBStringDescriptor_UNICODE('b'),
+    USBStringDescriptor_UNICODE('e'),
+    USBStringDescriptor_UNICODE('n'),
+    USBStringDescriptor_UNICODE('c'),
+    USBStringDescriptor_UNICODE('h'),
+    USBStringDescriptor_UNICODE(' '),
     USBStringDescriptor_UNICODE('A'),
     USBStringDescriptor_UNICODE('B'),
     USBStringDescriptor_UNICODE('0'),
-    USBStringDescriptor_UNICODE('4'),    
-    USBStringDescriptor_UNICODE(' '),
-    USBStringDescriptor_UNICODE('B'),
-    USBStringDescriptor_UNICODE('o'),
-    USBStringDescriptor_UNICODE('a'),
-    USBStringDescriptor_UNICODE('r'),
-    USBStringDescriptor_UNICODE('d'),
+    USBStringDescriptor_UNICODE('4')
 };
 
 //Product serial number.
