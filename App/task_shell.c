@@ -95,11 +95,12 @@ void App_TaskGenieShell( void *p_arg )
                     if(CommandBuf[index-1]==' ') {
                         index--;			//get rid of the end space
                     }                 
-                    CommandBuf[index] = '\0';
-                    
+                    CommandBuf[index] = '\0';                     
                     idx = atoi(CommandBuf);
-                    if( idx ) {                         
-                        memcpy(CommandBuf, CommandBufLoop[idx-1], strlen(CommandBufLoop[idx-1]));
+                    if( idx > 0 && idx <= MAX_COMMAND_NUM) { 
+                        memcpy(CommandBuf, ShellComms[idx-1].name, strlen(ShellComms[idx-1].name));                     
+                        index = strlen(ShellComms[idx-1].name);
+                        CommandBuf[index] = '\0'; 
                         UART_SHELL_SEND_STR((" : %s",CommandBuf));
                         break;
                     }

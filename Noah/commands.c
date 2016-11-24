@@ -708,7 +708,8 @@ CPU_INT08U Cmd_History( CPU_INT08U argc,CPU_CHAR **argv )
     for( CPU_INT08U i= 0; i<MaxLenComBufLoop; i++ ) {        
         index = ( index + 1 ) % MaxLenComBufLoop ;
         if( CommandBufLoop[index][0] != '\0' ) {         
-            UART_SHELL_SEND_STR(("\n\r%02d  %s",index+1,(CPU_CHAR *)&CommandBufLoop[index]));
+            //UART_SHELL_SEND_STR(("\n\r%02d  %s",i+1,(CPU_CHAR *)&CommandBufLoop[index]));
+            UART_SHELL_SEND_STR(("\n\r  %s",(CPU_CHAR *)&CommandBufLoop[index]));
         }
     }     
     return 0;    
