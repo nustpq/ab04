@@ -9,8 +9,8 @@
 #define MAX_COMMAND_NAME_LENGTH    20
 #define ERRORCOMMAND              255
 
-#define MaxLenComBuf	          100
-#define MaxLenComBufLoop	      10
+#define MaxLenComBuf	          50
+#define MaxLenComBufLoop	      20
 
 typedef struct{
   
@@ -26,6 +26,7 @@ typedef struct{
 //typedef CPU_CHAR  (*pCommandBuf_t)[ MaxLenComBuf + 1 ];   
 extern CPU_CHAR CommandBufLoop[][MaxLenComBuf + 1 ];
 extern SHELL_CMD ShellComms[];
+extern CPU_INT08U cmd_loop_idx;
 
 void InitCommands(void);
 void Init_CommandLoop( void );

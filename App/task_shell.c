@@ -52,19 +52,19 @@ void App_TaskGenieShell( void *p_arg )
     (void)p_arg;
 
     CPU_INT08U  index ;		/*index is the pointer of data in commandbuf */
-    CPU_INT08U  cmd_loop ;
     CPU_INT08U  num ;
     CPU_CHAR    ch ;
     CPU_CHAR    CommandBuf[ MaxLenComBuf + 1 ];	/*store '\0'*/
     CPU_INT08U  (*Func)(CPU_INT08U argc, CPU_CHAR **argv);
     CPU_CHAR    *argv[10];
     CPU_INT08U  argc;
-    CPU_INT08U  error_code;     
-  
-    index    =  0 ;
-    cmd_loop = 0;
-    CommandBuf[0] = '\0'; 
-    InitCommands();  
+    CPU_INT08U  error_code;
+    CPU_INT08U  idx;
+    
+    index  =  0 ;
+    cmd_loop_idx = 0;
+    CommandBuf[0] = '\0';
+    InitCommands();
     Init_CommandLoop();
     OSTimeDly(1000);
 
@@ -94,11 +94,16 @@ void App_TaskGenieShell( void *p_arg )
 
                     if(CommandBuf[index-1]==' ') {
                         index--;			//get rid of the end space
-                    }
+                    }                 
                     CommandBuf[index] = '\0';
+                    
+                    idx = atoi(CommandBuf);
+                    if( idx ) {                         
+                        memcpy(CommandBuf, CommandBufLoop[idx-1], strlen(CommandBufLoop[idx-1]));
+                        UART_SHELL_SEND_STR((" : %s",CommandBuf));
+                        break;
+                    }
                     //UART_SHELL_SEND_STR("\n\rThe command is %s",CommandBuf);
-                    memcpy(CommandBufLoop[cmd_loop++], CommandBuf, strlen(CommandBuf));                    
-                    cmd_loop = cmd_loop % MaxLenComBufLoop ;
                     num = CommandParse( CommandBuf,&argc,argv );	//analys the argv in the commandbuf
                     if( num == ERRORCOMMAND ){             	//error or none exist command
                         index = 0;
@@ -109,6 +114,12 @@ void App_TaskGenieShell( void *p_arg )
                         UART_SHELL_SEND_STR((">"));
 
                     } else {
+                        if( strcmp(CommandBuf,CommandBufLoop[cmd_loop_idx] ) != 0 ) {  //save cmd history
+                            cmd_loop_idx++;
+                            cmd_loop_idx %= MaxLenComBufLoop ;
+                            memcpy(CommandBufLoop[cmd_loop_idx], CommandBuf, strlen(CommandBuf)+1);
+                        }
+                        
                         Func = ShellComms[num].CommandFunc;	//call corresponding CommandFunc
                         error_code = Func(argc,argv) ;
                         if( error_code == 1 ) {
@@ -158,6 +169,11 @@ void App_TaskGenieShell( void *p_arg )
 
             default:				//normal key
                 if ( index> MaxLenComBuf ){	//the buf reached MAX
+                    index = 0;
+                    CommandBuf[index] = '\0';
+                    UART_SHELL_SEND_STR(("Error: command length overflow!"));
+                    Time_Stamp();
+                    UART_SHELL_SEND_STR((">"));
                 //do nothing
                 } else {
                     CommandBuf[index] = ch;

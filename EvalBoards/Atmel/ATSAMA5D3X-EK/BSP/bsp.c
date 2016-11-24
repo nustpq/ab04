@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.3]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.4]"; //fixed size string
 
 #ifdef  BOARD_TYPE_UIF
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
@@ -1111,7 +1111,7 @@ void  Get_Flash_Info (void)
     FLASH_INFO flash_info;
 
     APP_TRACE_INFO(("\r\n"));
-    APP_TRACE_INFO(("------------------------------------------------------   Flash INFORMATION   -------------------------------------------------------\r\n"));
+    APP_TRACE_INFO(("------------------------------------------------------   FLASH INFORMATION   -------------------------------------------------------\r\n"));
     for(i=0; i<FLASH_ADDR_FW_VEC_NUM; i++ ) {
         Read_Flash_State(&flash_info, i==0 ? FLASH_ADDR_FW_STATE : (FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * i) );
         if(flash_info.flag == 0x55 ) {

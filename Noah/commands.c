@@ -1,7 +1,7 @@
 
 #include <includes.h>
 
-
+CPU_INT08U cmd_loop_idx;
 SHELL_CMD ShellComms[ MAX_COMMAND_NUM ];
 CPU_CHAR CommandBufLoop[MaxLenComBufLoop][ MaxLenComBuf + 1 ];	/*store '\0'*/
 
@@ -704,9 +704,11 @@ void Init_CommandLoop( void )
 
 CPU_INT08U Cmd_History( CPU_INT08U argc,CPU_CHAR **argv )
 {       
-    for( CPU_INT08U i= 0; i<MaxLenComBufLoop; i++ ) {
-        if( CommandBufLoop[i][0] != '\0' ) {         
-            UART_SHELL_SEND_STR(("\n\r%d  %s",i,(CPU_CHAR *)&CommandBufLoop[i]));
+    CPU_INT08U index = cmd_loop_idx ;    
+    for( CPU_INT08U i= 0; i<MaxLenComBufLoop; i++ ) {        
+        index = ( index + 1 ) % MaxLenComBufLoop ;
+        if( CommandBufLoop[index][0] != '\0' ) {         
+            UART_SHELL_SEND_STR(("\n\r%02d  %s",index+1,(CPU_CHAR *)&CommandBufLoop[index]));
         }
     }     
     return 0;    
@@ -735,7 +737,7 @@ CPU_INT08U CommandParse( CPU_CHAR *Buf, CPU_INT08U *p_argc, CPU_CHAR *argv[] )
 		pointer++;
 	}    
 	name[pointer] = '\0';	//now got the command name, and pointer is to the first space in the Buf
-        pointer = 0;
+    pointer = 0;
     
 	for( i=0; i<MAX_COMMAND_NUM; i++){
 		//if(!strcmp(name,ShellComms[i].name)){
@@ -762,7 +764,7 @@ CPU_INT08U CommandParse( CPU_CHAR *Buf, CPU_INT08U *p_argc, CPU_CHAR *argv[] )
 		}
 	}//while
     
-        *p_argc = argc ;    
+    *p_argc = argc ;    
 	return ( num );
     
 }
