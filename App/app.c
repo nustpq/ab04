@@ -160,7 +160,7 @@ uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B] ;
 uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B] ;
 uint8_t usbCacheBulkOut2[USB_DATAEP_SIZE_64B] ;
 uint8_t usbCacheBulkIn2[USB_DATAEP_SIZE_64B] ;
-uint8_t usbCacheBulkIn3[USB_DATAEP_SIZE_64B] ;
+uint8_t usbCacheBulkIn3[USB_LOGEP_SIZE_256B] ;
 //Buffer Level 1:  USB Cmd data stream buffer : 64 B
 uint8_t usbCmdCacheBulkOut[ USB_CMDEP_SIZE_64B ] ;             //64B
 uint8_t usbCmdCacheBulkIn[ USB_CMDEP_SIZE_64B ]  ;             //64B

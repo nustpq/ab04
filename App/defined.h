@@ -80,7 +80,8 @@
 
 #define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*2*4 )               //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
 #define I2S_PINGPONG_OUT_SIZE_3K           ( 48*8*2*4 )    // 
-#define USB_DATAEP_SIZE_64B                   (    64    )            // force use 64Bytes
+#define USB_DATAEP_SIZE_64B                (    64    )            // force use 64Bytes
+#define USB_LOGEP_SIZE_256B                (    256   )            // force use 256Bytes
 #define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
 #define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
 #define USB_RINGIN_SIZE_16K                ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
@@ -511,7 +512,7 @@ extern uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B] ;
 extern uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B] ; 
 extern uint8_t usbCacheBulkOut2[USB_DATAEP_SIZE_64B] ;
 extern uint8_t usbCacheBulkIn2[USB_DATAEP_SIZE_64B] ; 
-extern uint8_t usbCacheBulkIn3[USB_DATAEP_SIZE_64B] ; 
+extern uint8_t usbCacheBulkIn3[USB_LOGEP_SIZE_256B] ; 
 //Buffer Level 1:  USB Cmd data stream buffer : 64 B
 extern uint8_t usbCmdCacheBulkOut[ USB_CMDEP_SIZE_64B ] ;            
 extern uint8_t usbCmdCacheBulkIn[ USB_CMDEP_SIZE_64B ]  ;             

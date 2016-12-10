@@ -446,7 +446,7 @@ uint32_t CDCDSerialPort_Read_ThirdEp(const CDCDSerialPort * pCdcd,
                           void * pData,uint32_t dwSize,
                           TransferCallback fCallback,void * pArg)
 {
-    if (pCdcd->bBulkOutPIPE1 == 0)
+    if (pCdcd->bBulkOutPIPE2 == 0)
         return USBRC_PARAM_ERR;
 
     return USBD_Read(pCdcd->bBulkOutPIPE2,
@@ -522,7 +522,7 @@ uint32_t CDCDSerialPort_Write_LogEp(const CDCDSerialPort * pCdcd,
                                    void * pData, uint32_t dwSize,
                                    TransferCallback fCallback, void * pArg)
 {
-    if (pCdcd->bBulkInPIPE2 == 0)
+    if (pCdcd->bBulkInPIPELog == 0)
         return USBRC_PARAM_ERR;
 
     return USBD_Write(pCdcd->bBulkInPIPELog,

@@ -94,23 +94,25 @@ void  App_TaskDebugInfo (void *p_arg)
 
         }
 
-#ifdef DBG_USB_LOG_EN
-        size  = kfifo_get_data_size( &DBG_USB_Send_kFIFO );
-        if( restart_log_bulk_in && size > 0 ) {
-            restart_log_bulk_in = false;
-            if( size > debug_usb_fifo_data_max ) {
-                debug_usb_fifo_data_max = size;
+#ifdef DBG_USB_LOG_EN         
+        if ( USBD_GetState() >= USBD_STATE_CONFIGURED ) { 
+            size  = kfifo_get_data_size( &DBG_USB_Send_kFIFO );
+            if( restart_log_bulk_in && size > 0 ) {
+                restart_log_bulk_in = false;
+                if( size > debug_usb_fifo_data_max ) {
+                    debug_usb_fifo_data_max = size;
+                }
+                size = size < USB_LOGEP_SIZE_256B ?  size  :  USB_LOGEP_SIZE_256B;
+                kfifo_get(&DBG_USB_Send_kFIFO, usbCacheBulkIn3, size);
+                CDCDSerialDriver_WriteLog(       usbCacheBulkIn3,
+                                                 size,
+                                                 (TransferCallback) UsbLogDataTransmit,
+                                                 0); 
+
+            } else {
+                OSTimeDly(1);
+
             }
-            size = size < USB_DATAEP_SIZE_64B ?  size  :  USB_DATAEP_SIZE_64B;
-            kfifo_get(&DBG_USB_Send_kFIFO, usbCacheBulkIn3, USB_DATAEP_SIZE_64B);
-            CDCDSerialDriver_WriteLog( usbCacheBulkIn3,
-                                             USB_DATAEP_SIZE_64B,
-                                             (TransferCallback) UsbLogDataTransmit,
-                                             0);
-
-        } else {
-            OSTimeDly(1);
-
         }
 #endif
 

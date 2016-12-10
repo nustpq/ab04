@@ -96,13 +96,13 @@ void App_TaskUART_Rx( void *p_arg )
         
         if( counter ) {
 //             Time_Stamp();
-              APP_TRACE_INFO(("."));
+//             APP_TRACE_INFO(("."));
 //             APP_TRACE_INFO(("\r\n:App_TaskUART_Rx check: [%d]start",counter));   
             
              counter = counter < RX_DATA_LEN ? counter : RX_DATA_LEN;
              kfifo_get(&cmdEpBulkOut_fifo, (unsigned char *)rx_data, counter) ; 
 
-#if( true )            
+#if( false )            
              APP_TRACE_INFO(("\r\n========== receive data counter: %d =============\r\n",counter));             
              for(i = 0; i< counter; i++ ){  
                 APP_TRACE_INFO(("%0X ", rx_data[i] ));

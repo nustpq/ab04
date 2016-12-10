@@ -2088,6 +2088,12 @@
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.h</name>
     </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_xc3s50an.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_xc3s50an.h</name>
+    </file>
   </group>
   <group>
     <name>LIB</name>

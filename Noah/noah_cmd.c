@@ -785,8 +785,8 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         APP_TRACE_INFO(("\r\nWARN: CMD Index(%d) != EMB Element ID(%d)\r\n",cmd_index,cmd_type));
     }
     
-//    Time_Stamp();
-//    APP_TRACE_INFO(("\r\n::::: EMB_Data_Parse: cmd type=%d ",cmd_type));
+    Time_Stamp();
+    APP_TRACE_INFO(("\r\n::::: EMB_Data_Parse: cmd type=%d ",cmd_type));
 
     
     switch( cmd_type )  {       
@@ -801,6 +801,10 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
              if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
              audio_0_padding = (uint8_t)temp; 
              Init_Bulk_FIFO();
+             
+             taskMsg = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );
+             OSMboxPost( g_pPortManagerMbox, (void *)taskMsg ); 
+             OSTimeDly(1);
              audio_start_flag         = true ;
              audio_run_control        = true ;
              restart_audio_0_bulk_out = true  ; 

@@ -57,7 +57,7 @@ typedef struct {
 } UdphsEpt;
 /** \brief Udphs hardware registers */
 #define UDPHSEPT_NUMBER 16
-#define UDPHSDMA_NUMBER 7
+#define UDPHSDMA_NUMBER 7 //PQ 
 typedef struct {
   RwReg     UDPHS_CTRL;       /**< \brief (Udphs Offset: 0x00) UDPHS Control Register */
   RoReg     UDPHS_FNUM;       /**< \brief (Udphs Offset: 0x04) UDPHS Frame Number Register */

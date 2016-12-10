@@ -42,7 +42,7 @@
 #define CHIP_USB_PULLUP_INTERNAL
 
 /** Number of USB endpoints */
-#define CHIP_USB_NUMENDPOINTS   7
+#define CHIP_USB_NUMENDPOINTS   16//7 PQ
 
 /** Endpoints max paxcket size */
 #ifndef CUSTOM_USB
@@ -50,7 +50,7 @@
    ((i == 0) ? 64 : 1024)
 #else
 #define CHIP_USB_ENDPOINTS_MAXPACKETSIZE(i) \
-     ((i == 0) ? 64 : 64)
+     ((i == 0) ? 64 : ( (i == 9)? 256 : 64 ) )
 #endif
 
 /** Endpoints Number of Bank */
@@ -59,7 +59,7 @@
 
 /** Endpoints DMA support */
 #define CHIP_USB_ENDPOINTS_DMA(i) \
-    ((i == 0) ? 0 : 1)
+    (((i == 0) || (i >= 8) ) ? 0 : 1)         //PQ
 
 /**@}*/
 #endif /* #ifndef UDPHS_H */
