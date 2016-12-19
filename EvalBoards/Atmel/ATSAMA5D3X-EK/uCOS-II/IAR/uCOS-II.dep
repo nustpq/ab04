@@ -484,6 +484,12 @@
           <file> 33</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_dbg_r.c</name>
@@ -497,6 +503,12 @@
           <file> 170</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_flag.c</name>
@@ -510,6 +522,12 @@
           <file> 43</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_mbox.c</name>
@@ -523,6 +541,12 @@
           <file> 220</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_mutex.c</name>
@@ -536,6 +560,12 @@
           <file> 264</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Ports\ARM-Cortex-A\Generic\IAR\os_cpu_c.c</name>
@@ -549,6 +579,12 @@
           <file> 415</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_mem.c</name>
@@ -562,6 +598,12 @@
           <file> 414</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_q.c</name>
@@ -575,6 +617,12 @@
           <file> 217</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_mem.c</name>
@@ -588,6 +636,12 @@
           <file> 440</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 245 364 48 102 363 382 359 371 376</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_sem.c</name>
@@ -601,6 +655,12 @@
           <file> 258</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Ports\ARM-Cortex-A\Generic\IAR\os_cpu_a_vfp-d16.asm</name>
@@ -623,6 +683,12 @@
           <file> 336</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 236 364 48 102 363 382 371 369 376</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_time.c</name>
@@ -636,6 +702,12 @@
           <file> 108</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_task.c</name>
@@ -649,6 +721,12 @@
           <file> 288</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_tmr.c</name>
@@ -662,6 +740,12 @@
           <file> 298</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 257 375 93 102 228 71 151 30 207 50 423 181 364 48 363 382 371 379 251</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_i2s.c</name>
@@ -1017,6 +1101,12 @@
           <file> 410</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 377 93 102 228 71 151 30 207 50 423 181 282 65 37 448 0 299 208 450 435 286 16 257 375 364 48 363 382 371 379 251 359 369 248 245 376 236 1 17 12 20 68 449 408 224 88 90 51 275 8 111 453 426 141 110 307 107 436 263 5 261 227 235 421 155 60 260 25 96 171 100 417 193 73 70 162 293 308 420 121 149 429 2 272 158 64 184 148 4 67 187 313 416 123 86 292 305 163 114 168 214 199 290 302 83 22 13 154 38 190 221 23 138 267 212 165 84 49 137 57 82 409 7 455 244 52 182 47 178 164 87 295 115 169 45 34 179 294 53 442 135 209 15 46 19 259 172 116 411 173 160 368 229 95 150 291 419 431 10 183 131 413 422 301 97 255 72 63 153 9 11 418 128 3 24 94 186 21 213 198 271 142 132 180 303 130 201 152 233 85 192 127 451 200 176 159 281 42 157 140 185 103 167 297 28 441 81 139 54 27 206 61 166 36 145 304 175 300 202 146 296 393 402 392 77 362 352 361 346 378 334 311 353 342 406 355 400 317 315 324 343 143 309 310 55 280 287 156 306 59 134 40 325 328 331 312 452 124 332 323 322 389 394</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Noah\kfifo.c</name>
@@ -1077,6 +1167,12 @@
           <file> 66</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 359 364 48 102 363 382 371</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Noah\noah_cmd.c</name>
@@ -1128,6 +1224,12 @@
           <file> 120</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 369 364 48 102 363 382 371</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_math.c</name>
@@ -1141,6 +1243,12 @@
           <file> 189</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 248 364 48 102 363 382 359 371</file>
+        </tool>
+      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\Ports\ARM\IAR\lib_mem_a.asm</name>
@@ -1277,12 +1385,6 @@
           <file> 105</file>
         </tool>
       </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 377 93 102 228 71 151 30 207 50 423 181 282 65 37 448 0 299 208 450 435 286 16 257 375 364 48 363 382 371 379 251 359 369 248 245 376 236 1 17 12 20 68 449 408 224 88 90 51 275 8 111 453 426 141 110 307 107 436 263 5 261 227 235 421 155 60 260 25 96 171 100 417 193 73 70 162 293 308 420 121 149 429 2 272 158 64 184 148 4 67 187 313 416 123 86 292 305 163 114 168 214 199 290 302 83 22 13 154 38 190 221 23 138 267 212 165 84 49 137 57 82 409 7 455 244 52 182 47 178 164 87 295 115 169 45 34 179 294 53 442 135 209 15 46 19 259 172 116 411 173 160 368 229 95 150 291 419 431 10 183 131 413 422 301 97 255 72 63 153 9 11 418 128 3 24 94 186 21 213 198 271 142 132 180 303 130 201 152 233 85 192 127 451 200 176 159 281 42 157 140 185 103 167 297 28 441 81 139 54 27 206 61 166 36 145 304 175 300 202 146 296 393 402 392 77 362 352 361 346 378 334 311 353 342 406 355 400 317 315 324 343 143 309 310 55 280 287 156 306 59 134 40 325 328 331 312 452 124 332 323 322 389 394</file>
-        </tool>
-      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\BSP\bsp_int.c</name>
