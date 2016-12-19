@@ -31,7 +31,7 @@
  *  T   :bit16~bit22
  *----------------------------------------------------------------------------------*/
 #define MAX_PATH_NAME_LENGTH 16
-#define MAX_I2S_CLK_PATH  8
+#define MAX_I2S_CLK_PATH  14
 #define MAX_DATA_PATH       7
 #define MAX_PDM_CLK_PATH    1
 

@@ -49,6 +49,12 @@ const char fpga_i2s_clk_path[ MAX_I2S_CLK_PATH ][ MAX_PATH_NAME_LENGTH ] = {
   "port0_ssc1_5",
   "port1_codec1_6",
   "port1_ssc1_7",
+  "ssc1_codec1_8",
+  "codec0_fm36_9",
+  "codec0_ssc0_10",
+  "codec0_port1_11",
+  "codec0_codec1_12",
+  "codec0_ssc1_13",  
 };
 //All of data path switch in fpga implemented;
 const char fpga_data_path[ MAX_DATA_PATH ][ 4 ] = {
