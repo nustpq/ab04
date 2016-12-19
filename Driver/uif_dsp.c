@@ -18,7 +18,7 @@
 *
 *                                          Atmel AT91SAM7A3
 *                                               on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename      : uif_dsp.c
 * Version       : V0.0.1

@@ -16,9 +16,9 @@
 *
 *                                           TASK PACKAGE
 *
-*                                          Atmel AT91SAM3U4C
+*                                          Atmel ATSAMA5D3X
 *                                               on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename      : task_usb_service.c
 * Version       : V1.0.0
@@ -36,12 +36,12 @@ uint8_t tmpBuffer[ I2S_PINGPONG_IN_SIZE_3K ];
 void Init_Audio_Path();
 /*
 *********************************************************************************************************
-*                                    App_TaskUSB()
+*                                    App_TaskUSBService()
 *
 * Description : Process UART Receive related process between Audio Bridge and PC, Audio Bridge and Ruler.
 *               Fetch data from PC in UART receive buffer, check data sanity in DL layer 
 *
-* Argument(s) : p_arg   Argument passed to 'App_TaskUSB()' by 'OSTaskCreate()'.
+* Argument(s) : p_arg   Argument passed to 'App_TaskUSBService()' by 'OSTaskCreate()'.
 *
 * Return(s)   : none.
 *
@@ -49,7 +49,7 @@ void Init_Audio_Path();
 *                   used.  The compiler should not generate any code for this statement.
 *********************************************************************************************************
 */
-void  App_TaskUSB ( void *p_arg )
+void  App_TaskUSBService ( void *p_arg )
 {
     
    (void)p_arg; 
@@ -58,6 +58,7 @@ void  App_TaskUSB ( void *p_arg )
     uint8_t  usb_state;
     uint8_t  usb_state_saved ;
     uint32_t counter, counter2;
+    
     ListElmt  *e ;
     AUDIOPATH *pPath;      
     
@@ -107,7 +108,7 @@ void  App_TaskUSB ( void *p_arg )
         {
             pPath = ( AUDIOPATH * )e->data;
             
-            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN == pPath->epIn ) {
+            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN == pPath->epIn ) {  //SSC0 Rec
                 //step1: calculate space of ssc0/spi0/gpio ring buffer.
                 counter  = kfifo_get_data_size( pPath->pfifoIn );             
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
@@ -132,7 +133,7 @@ void  App_TaskUSB ( void *p_arg )
                                             0);  
                 }
                 
-            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->epIn ) {
+            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->epIn ) {  //SSC1 Rec
                 //step1: calculate space of ssc0/spi0/gpio ring buffer.
                 counter  = kfifo_get_data_size( pPath->pfifoIn );             
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
@@ -157,7 +158,7 @@ void  App_TaskUSB ( void *p_arg )
                                             0);  
                 }
                 
-            } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->epIn ) {
+            } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->epIn ) {  //SPI/GPIO Rec
                 //step1: calculate space of ssc0/spi0/gpio ring buffer.
                 counter  = kfifo_get_data_size( pPath->pfifoIn );             
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
@@ -196,7 +197,7 @@ void  App_TaskUSB ( void *p_arg )
         {
             pPath = ( AUDIOPATH * )e->data;
             
-            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT == pPath->epOut ) {
+            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT == pPath->epOut ) { //SSC0 Play
                 counter = kfifo_get_free_space( pPath->pfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out && audio_run_control )  {
                     restart_audio_0_bulk_out = false ;
@@ -221,7 +222,7 @@ void  App_TaskUSB ( void *p_arg )
                 }               
            
                 
-            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->epOut ) {
+            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->epOut ) {   //SSC1 Play
                 counter = kfifo_get_free_space( pPath->pfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_out && audio_run_control )  {
                     restart_audio_1_bulk_out = false ;
@@ -246,7 +247,7 @@ void  App_TaskUSB ( void *p_arg )
                 }               
            
                 
-            } else if( CDCDSerialDriverDescriptors_SPI_DATAOUT == pPath->epOut ) {
+            } else if( CDCDSerialDriverDescriptors_SPI_DATAOUT == pPath->epOut ) { //SPI/GPIO Play
                 counter = kfifo_get_free_space( pPath->pfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_out && audio_run_control )  {
                     restart_audio_2_bulk_out = false ;
@@ -287,7 +288,7 @@ void  App_TaskUSB ( void *p_arg )
 
 
 
-
+/*
 #if 0
 static  void  AppTaskUSB_old (void *p_arg)
 {
@@ -325,7 +326,7 @@ static  void  AppTaskUSB_old (void *p_arg)
         if ( usb_state >= USBD_STATE_CONFIGURED ) {  
           
           
-#if 0 //test
+#if 0 //for test
  //----------------------------------------------------------------------------
             byteCnt = kfifo_get_free_space( &ep0BulkOut_fifo );
             if(  byteCnt >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out && audio_run_control )  {
@@ -405,7 +406,7 @@ static  void  AppTaskUSB_old (void *p_arg)
     } //for loop
 }
 #endif
-
+*/
 
 
 

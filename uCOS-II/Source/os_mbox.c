@@ -259,7 +259,7 @@ OS_EVENT  *OSMboxDel (OS_EVENT  *pevent,
 * Description: This function waits for a message to be sent to a mailbox
 *
 * Arguments  : pevent        is a pointer to the event control block associated with the desired mailbox
-*
+* 
 *              timeout       is an optional timeout period (in clock ticks).  If non-zero, your task will
 *                            wait for a message to arrive at the mailbox up to the amount of time
 *                            specified by this argument.  If you specify 0, however, your task will wait

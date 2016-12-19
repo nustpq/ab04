@@ -5,7 +5,7 @@
 *
 *                                         Atmel  AT91SAMA5D3
 *                                             on the
-*                                      Unified EVM Interface Board 2.0
+*                                      Audio Bridge 04 Board (AB04 V1.0) 2.0
 *
 * Filename      : uif_init_default.c
 * Version       : V0.0.1
@@ -558,7 +558,7 @@ void aic3204_init_default( void )
     codec_set.sample_len = 16;
     codec_set.format = 1;
     codec_set.slot_num = 2;
-    codec_set.m_s_sel = 0;
+    codec_set.m_s_sel = 1;
     codec_set.bclk_polarity = 1;
     codec_set.flag = 1;
     codec_set.delay = 0;

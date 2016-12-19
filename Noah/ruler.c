@@ -16,9 +16,9 @@
 *
 *                                        RULER RELATED OPERATIONS REALIZATION
 *
-*                                          Atmel AT91SAM3U4C
+*                                          Atmel ATSAMA5D3X
 *                                               on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename      : ruler.c
 * Version       : V1.0.0

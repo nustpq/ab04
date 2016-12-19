@@ -16,9 +16,9 @@
 *
 *                                           TASK PACKAGE
 *
-*                                          Atmel AT91SAM3U4C
+*                                          Atmel ATSAMA5D3X
 *                                               on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename      : task_user_if.c
 * Version       : V1.0.0
@@ -64,9 +64,11 @@ void  App_TaskUserIF (void *p_arg)
     //CPU_INT08U   iM401_Ctrl_Enable;
 
     (void)p_arg;
-
-    OSTimeDly(100); //wait for other tasks be ready , and time for power stable for ruler
-    Head_Info(); //Send header     
+    Buzzer_OnOff(1);
+    OSTimeDly(100); //wait for other tasks be ready , and time for power stable for ruler    
+    Head_Info(); //Send header 
+    Buzzer_OnOff(0);  
+    
     //Ruler_Power_Switch(1);
     Init_Global_Var();
     //iM401_Ctrl_Enable = 1;
@@ -74,6 +76,8 @@ void  App_TaskUserIF (void *p_arg)
 //    if( AB_POST() )  {
 //        Buzzer_Error();
 //    }
+    
+    FPGA_Setup();
     Init_FM36_AB03( 24000,
                         1,
                         0,

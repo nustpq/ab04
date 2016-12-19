@@ -5,13 +5,13 @@
 *
 *                                         Atmel  AT91SAMA5D3
 *                                             on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename         : Xc3s50an.h
 * Version           : V0.0.1
 * Programmer(s) : Leo
 *********************************************************************************************************
-* Note(s)       : fpga  driver 
+* Note(s)       : fpga  driver
 *********************************************************************************************************
 */
 #ifndef _UIF_XC3S50AN_H_
@@ -76,14 +76,14 @@ typedef struct _fpga_data_switch
 
 #pragma pack ( 1 )
 typedef struct _fpga_clk_switch
-{	
+{
 	uint8_t oe;
 	uint8_t dir;
 
 	uint8_t reves0;
 	uint8_t reves1;
-        
-        char switch_name[16];
+
+    char switch_name[16];
 }FPGA_CLK_SWITCH;
 #pragma pack ( )
 
@@ -97,15 +97,15 @@ typedef struct _fpga_path
 	FPGA_DATA_SWITCH T1;
 
 	uint16_t rev;
-	
+
 }FPGA_PATH;
 
 //this struct is used to verify the path of i2s clock valid or collide with others;
-//rule 1:Each node must single input signal; 
-//rule 2:Each node must be a single role; 
+//rule 1:Each node must single input signal;
+//rule 2:Each node must be a single role;
 #pragma pack ( 1 )
 typedef struct _node_role
-{	
+{
   char name[8];
   uint8_t position;                 //node name in path name position;
   uint8_t direct;                   //path dir;
@@ -120,16 +120,16 @@ typedef struct _node_role
 typedef struct _fpga_command
 {
   	uint8_t revs;
-        
+
 	uint8_t t0 : 1;    //23
 	uint8_t t1 : 1;
-	uint8_t t2 : 1;    
+	uint8_t t2 : 1;
 	uint8_t t3 : 1;
 	uint8_t t4 : 1;
 	uint8_t t5 : 1;
 	uint8_t t6 : 1;
 	uint8_t t7 : 1;   //16
-  
+
 
 	uint8_t dir_port0_codec0 : 1;  //15
 	uint8_t dir_port0_fm36   : 1;
@@ -139,7 +139,7 @@ typedef struct _fpga_command
 	uint8_t dir_prot0_ssc1   : 1;
 	uint8_t dir_port1_code1  : 1;
 	uint8_t dir_prot1_ssc1   : 1;  //8
-        
+
     uint8_t oe_port0_codec0  : 1;  //7
 	uint8_t oe_port0_fm36    : 1;
 	uint8_t oe_port0_ssc0    : 1;
@@ -160,7 +160,7 @@ typedef struct _fpga_chip
 						  FPGA_COMMAND* pCmd,
 					      List *clkList,
 						  List *dataList);                                          //assemble command word and sent to fpga;
-    FPGA_COMMAND * ( *get_path_cfg )( char *pathName );                             //get current command word 
+    FPGA_COMMAND * ( *get_path_cfg )( char *pathName );                             //get current command word
 
 //private interface of xc3s50an chip
    void ( *add_clk_switch_cfg)( FPGA_CLK_SWITCH * cfg,List * clkList );
@@ -170,10 +170,10 @@ typedef struct _fpga_chip
 //private member of this obj;
 	List fpga_i2s_clk_list;                                                         //i2s clock config list
 	List fpga_i2s_data_list;                                                        //audio data config list
-	List clock_node_role;                                                           //The list records the roles of each clock node in the FPGA 		
+	List clock_node_role;                                                           //The list records the roles of each clock node in the FPGA
 	FPGA_DATA_SWITCH data_cfg;                                                      //audio data config
 	FPGA_CLK_SWITCH clock_cfg;                                                      //clock config list
-	
+
 	FPGA_COMMAND cmdWord;
 	DataSource *controller;                                                         //which port to send fpga command;
 
@@ -194,5 +194,5 @@ extern void add_data_switch_cfg( FPGA_DATA_SWITCH *cfg ,List *dataList );
 extern void resset_fpga( void );
 extern void init_fpga( void );
 extern void init_fpga_instance( void );
-								
+extern void FPGA_Setup( void ) ;
 #endif

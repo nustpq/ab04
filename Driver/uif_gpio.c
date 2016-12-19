@@ -5,7 +5,7 @@
 *
 *                                         Atmel  AT91SAMA5D3
 *                                             on the
-*                                      Unified EVM Interface Board 2.0
+*                                      Audio Bridge 04 Board (AB04 V1.0) 2.0
 *
 * Filename      : uif_gpio.c
 * Version       : V0.0.1

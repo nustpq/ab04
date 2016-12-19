@@ -16,9 +16,9 @@
 *
 *                                        COMMUNICATION COMMANDS REALIZATION
 *
-*                                          Atmel AT91SAM3U4C
+*                                          Atmel ATSAMA5D3X
 *                                               on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename      : noah_cmd.c
 * Version       : V1.0.0
@@ -755,6 +755,8 @@ uint8_t  EMB_Data_Build (  uint16_t   cmd_type,
 * Note(s)     : This routine do NOT support reentrance
 *********************************************************************************************************
 */
+CPU_INT32U    port_control_info;
+
 uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd ) 
 {
     
@@ -770,8 +772,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     uint32_t    data_length;
     const void *pBin;
     uint8_t     pkt_sn;
-    uint8_t     taskMsg;
-    
+  
     err          =  NO_ERR; 
     
     cmd_index    = ( pNewCmd->cmd[ 0 ] << 8 ) + pNewCmd->cmd[ 1 ];
@@ -791,10 +792,10 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     
     switch( cmd_type )  {       
               
-        case 0:
-            taskMsg = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );
-            OSMboxPost( g_pPortManagerMbox, (void *)taskMsg ); 
-        break;
+//        case 0:
+//            taskMsg = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );
+//            OSMboxPost( g_pPortManagerMbox, (void *)&taskMsg ); 
+//        break;
         
         case PC_CMD_START_AUDIO : 
              temp = emb_get_attr_int(&root, 2, -1);
@@ -802,9 +803,11 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
              audio_0_padding = (uint8_t)temp; 
              Init_Bulk_FIFO();
              
-             taskMsg = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );
-             OSMboxPost( g_pPortManagerMbox, (void *)taskMsg ); 
-             OSTimeDly(1);
+             port_control_info = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );             
+             while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
+                 OSTimeDly(5);                      
+             };  
+          
              audio_start_flag         = true ;
              audio_run_control        = true ;
              restart_audio_0_bulk_out = true  ; 
@@ -815,7 +818,8 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
              restart_audio_2_bulk_in  = true  ;        
              restart_log_bulk_in      = true  ; 
              restart_cmd_bulk_out     = true  ;
-             restart_cmd_bulk_in      = true  ;            
+             restart_cmd_bulk_in      = true  ;   
+             
         break;
         
         case PC_CMD_STOP_AUDIO : 

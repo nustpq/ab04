@@ -16,9 +16,9 @@
 *
 *                                           TASK PACKAGE
 *
-*                                          Atmel AT91SAM3U4C
+*                                          Atmel ATSAMA5D3X
 *                                               on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename      : task_user_if.c
 * Version       : V1.0.0
@@ -74,7 +74,7 @@ void  App_TaskDebugInfo (void *p_arg)
 
     kfifo_init_static( &DBG_UART_Send_kFIFO, (unsigned char *)DBG_UART_Send_Buffer, DBG_UART_Send_Buf_Size);
     kfifo_init_static( &DBG_USB_Send_kFIFO, (unsigned char *)DBG_USB_Send_Buffer, DBG_USB_Send_Buf_Size);
-
+    //OSTimeDly(10000);
     while ( DEF_TRUE ) {                   /* Task body, always written as an infinite loop.           */
 
         size  = kfifo_get_data_size( &DBG_UART_Send_kFIFO );

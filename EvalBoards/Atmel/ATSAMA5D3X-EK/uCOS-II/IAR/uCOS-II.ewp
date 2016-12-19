@@ -1939,10 +1939,16 @@
       <name>$PROJ_DIR$\..\..\..\..\..\App\sine_table.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_audio_manager.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\App\task_cmd_parse.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\App\task_debug_info.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_joy.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\App\task_shell.c</name>
@@ -2054,6 +2060,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_list.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_lpc1313fhn33.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_lpc1313fhn33.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_nandflash.c</name>

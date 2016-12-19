@@ -16,9 +16,9 @@
 *
 *                                      TASKS HEADERS CONFIGURATION
 *
-*                                          Atmel AT91SAM3U4C
+*                                          Atmel ATSAMA5D3X
 *                                               on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename      : taskcomm.h
 * Version       : V1.0.0
@@ -82,7 +82,7 @@ extern OS_EVENT *UART_MUX_Sem_lock;
 extern OS_EVENT *UART_MUX_Sem_lock;
 extern OS_EVENT *Load_Vec_Sem_lock;
 
-extern OS_EVENT *g_pPortManagerMbox;
+extern OS_EVENT *App_AudioManager_Mbox;
 
 extern CPU_INT08U DBG_UART_Send_Buffer[];
 
@@ -109,9 +109,10 @@ void App_TaskUserIF       ( void *p_arg ) ;
 void App_TaskJoy          ( void *p_arg ) ;
 void App_TaskCMDParse     ( void *p_arg ) ;
 void App_TaskDebugInfo    ( void *p_arg ) ;
-void App_TaskUSB          ( void *p_arg ) ;
+void App_TaskUSBService   ( void *p_arg ) ;
 void App_TaskGenieShell   ( void *p_arg ) ;
-
+void App_AudioManager     ( void *p_arg ) ;
+ 
 
 void Task_ReCreate_Shell( void );
 void Port_Detect_Enable( unsigned char on_off );

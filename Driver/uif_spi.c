@@ -5,7 +5,7 @@
 *
 *                                         Atmel  AT91SAMA5D3
 *                                                   on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename          :  uif_spi.c
 * Version           :  V0.0.1
@@ -24,9 +24,6 @@
 
 extern sDmad g_dmad;
 
-#ifndef USE_EVENTGROUP
-extern OS_FLAG_GRP *g_pStartUSBTransfer;
-#endif
 
 sDmad spi_dmad;
 
@@ -165,13 +162,7 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
          }
      }
    
-    /*step 3:send semphone */ 
-                   OSFlagPost( 
-                    g_pStartUSBTransfer,
-                    (OS_FLAGS)(SPI0_IN), 
-                    OS_FLAG_SET, 
-                    &error
-                ); 
+
 }
 
 /*
@@ -230,13 +221,7 @@ void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
          }
      }
      
-      /*step 3:send semphone */ 
-      OSFlagPost( 
-                 g_pStartUSBTransfer,
-                 (OS_FLAGS)(SPI0_OUT), 
-                 OS_FLAG_SET, 
-                 &error
-                ); 
+ 
 }
 
 /*
@@ -294,15 +279,7 @@ void _SPI1_DmaRxCallback( uint8_t status, void* pArg )
             }
      }
 
-//spi1 is connected to fpga, so it's not need to sync with others
-#if 0     
-     OSFlagPost(    //send group event
-                    g_pStartUSBTransfer,
-                    (OS_FLAGS)(SPI1_IN), //
-                    OS_FLAG_SET, //
-                    &error
-                );
-#endif 
+ 
 }
 
 
@@ -361,15 +338,6 @@ void  _SPI1_DmaTxCallback( uint8_t status, void* pArg )
          }
      }
      
-//spi1 is connected to fpga, so it's not need to sync with others
-#if 0
-      OSFlagPost( 
-                 g_pStartUSBTransfer,
-                 (OS_FLAGS)(SPI1_OUT), 
-                 OS_FLAG_SET, 
-                 &error
-                );
-#endif
      
 }
 

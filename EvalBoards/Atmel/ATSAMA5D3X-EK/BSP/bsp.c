@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.6]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.61]"; //fixed size string
 
 #ifdef  BOARD_TYPE_UIF
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
@@ -203,9 +203,13 @@ void  BSP_Init (void)
     list_init( &ssc0_data , NULL );
     ssc0_data.match = NULL;
 
-#ifdef UIF_AIC3204
-    aic3204_init_default( );
-#endif
+    //FPGA
+    init_fpga_instance();
+    
+
+    //CODEC
+    aic3204_init_default();
+
 
     //config port dma
     Dma_configure( );
@@ -535,7 +539,7 @@ void UIF_LED_On ( CPU_INT32U led )
         break;
     }
 
-} 
+}
 
 /*
 *********************************************************************************************************
@@ -644,7 +648,7 @@ void UIF_LED_Toggle( CPU_INT32U led )
 */
 void Beep( INT32U beep_cycles)
 {
-       
+
    for( INT32U i = 0; i< beep_cycles; i++)  {
 
         UIF_Beep_On(); //beep on

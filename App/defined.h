@@ -507,36 +507,49 @@ extern AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
 */
 //Buffer Level 1:  USB data stream buffer : 64 B
 extern uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B] ;
-extern uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B] ; 
+extern uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B] ;
+
 extern uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B] ;
-extern uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B] ; 
+extern uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B] ;
+
 extern uint8_t usbCacheBulkOut2[USB_DATAEP_SIZE_64B] ;
 extern uint8_t usbCacheBulkIn2[USB_DATAEP_SIZE_64B] ; 
-extern uint8_t usbCacheBulkIn3[USB_LOGEP_SIZE_256B] ; 
+
+extern uint8_t usbCacheBulkIn3[USB_LOGEP_SIZE_256B] ;
+
+
 //Buffer Level 1:  USB Cmd data stream buffer : 64 B
 extern uint8_t usbCmdCacheBulkOut[ USB_CMDEP_SIZE_64B ] ;            
 extern uint8_t usbCmdCacheBulkIn[ USB_CMDEP_SIZE_64B ]  ;             
 
+
 ////Buffer Level 2:  Ring Data Buffer for usb: 16384 B
 extern uint8_t usbRingBufferBulkOut0[ USB_RINGOUT_SIZE_16K ] ;        
-extern uint8_t usbRingBufferBulkIn0[ USB_RINGIN_SIZE_16K ] ;          
+extern uint8_t usbRingBufferBulkIn0[ USB_RINGIN_SIZE_16K ] ;  
+
 extern uint8_t usbRingBufferBulkOut1[ USB_RINGOUT_SIZE_16K ] ;        
-extern uint8_t usbRingBufferBulkIn1[ USB_RINGIN_SIZE_16K ] ;          
+extern uint8_t usbRingBufferBulkIn1[ USB_RINGIN_SIZE_16K ] ;  
+
 extern uint8_t usbRingBufferBulkOut2[ USB_RINGOUT_SIZE_16K ] ;        
 extern uint8_t usbRingBufferBulkIn2[ USB_RINGIN_SIZE_16K ] ;
+
 extern uint8_t usbRingBufferBulkIn3[ USB_RINGIN_SIZE_16K ] ;
+
 //Buffer Level 2:  Ring CMD Buffer : 1024 B
 extern uint8_t usbCmdRingBulkOut[ USB_CMD_RINGOUT_SIZE_1K ] ;         
 extern uint8_t usbCmdRingBulkIn[ USB_CMD_RINGIN_SIZE_1k ]  ;          
 
-//Buffer Level 3:  Ring  Data Buffer for audio port include ssc and spi: 16384 B
+
+//Buffer Level 3:  Ring Data Buffer for audio port include ssc and spi: 16384 B
 extern uint8_t ssc0_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             
-extern uint8_t ssc0_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               
+extern uint8_t ssc0_RingBulkIn[ USB_RINGIN_SIZE_16K ] ; 
+
 extern uint8_t ssc1_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             
 extern uint8_t ssc1_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               
 
 extern uint16_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_16K ];
 extern uint16_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_16K];
+
 extern uint16_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_16K ];
 extern uint16_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_16K ];
 

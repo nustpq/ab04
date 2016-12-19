@@ -68,11 +68,7 @@ DataSource source_usart0;
 DataSource source_usart1;
 DataSource source_gpio;
 
-//task sync variable
-OS_FLAG_GRP *g_pStartUSBTransfer;      //when one port data ready,notify usb port,
-                                       //if all port needed sync ready,transmmit;
-OS_EVENT *g_pPortManagerMbox;          //The cmd parse task used Mailbox to control
-                                       //other task start or stop;
+
 //port bitmap
 uint8_t g_portMap;
 
@@ -556,12 +552,11 @@ void Dma_configure(void)
 *********************************************************************************************************
 */
 
-static  CPU_STK  AppTaskLEDStk[4096u];
-static  CPU_STK  AppTaskUSBStk[4096u];
-static  CPU_STK  AppTaskSSC0Stk[4096u];
-static  CPU_STK  AppTaskCmdParaseStk[4096u];
-static  CPU_STK  AppTaskFirmwareVecUpdateStk[4096u];
+static  CPU_STK  AppTaskLEDStk[4096u];  
 
+
+static  OS_STK       App_TaskUSBSevStk[APP_CFG_TASK_USB_SEV_STK_SIZE];
+static  OS_STK       App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE];
 static  OS_STK       App_TaskStartStk[APP_CFG_TASK_START_STK_SIZE];
 static  OS_STK       App_TaskUserIF_Stk[APP_CFG_TASK_USER_IF_STK_SIZE];
 static  OS_STK       App_TaskJoyStk[APP_CFG_TASK_JOY_STK_SIZE];
@@ -582,10 +577,8 @@ static  OS_STK       App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE];
 */
 
 static  void  AppTaskLED                (void        *p_arg);
-static  void  AppTaskUSB                (void        *p_arg);
-static  void  AppTaskSSC0               (void        *p_arg);
-static  void  AppTaskCmdParase          (void        *p_arg);
-static  void  AppTaskFirmwareVecUpdate  (void        *p_arg);
+
+
 static  void  App_BufferCreate (void);
 static  void  App_EventCreate (void);
 static  void  App_TaskStart             (void        *p_arg);
@@ -665,7 +658,10 @@ static  void  App_TaskStart (void *p_arg)
 
     App_BufferCreate();
     App_EventCreate();
-
+    
+    
+////////////////////////////////////////////////////////////////////////////////
+    
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskDebugInfo ,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE - 1],
@@ -679,92 +675,35 @@ static  void  App_TaskStart (void *p_arg)
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet(APP_CFG_TASK_DBG_INFO_PRIO, "Debug Info", &os_err);
 #endif
+               
+    os_err = OSTaskCreateExt((void (*)(void *)) App_TaskUSBService,
+                    (void           *) 0,
+                    (OS_STK         *)&App_TaskUSBSevStk[APP_CFG_TASK_USB_SEV_STK_SIZE - 1],
+                    (INT8U           ) APP_CFG_TASK_USB_SEV_PRIO,
+                    (INT16U          ) APP_CFG_TASK_USB_SEV_PRIO,
+                    (OS_STK         *)&App_TaskUSBSevStk[0],
+                    (INT32U          ) APP_CFG_TASK_USB_SEV_STK_SIZE,
+                    (void *)0,
+                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
-#if UIF_LED
-    // create led flash task
-    os_err = OSTaskCreateExt( AppTaskLED,
-                              DEF_NULL,
-                             &AppTaskLEDStk[APP_CFG_TASK_LED_STK_SIZE - 1],
-                              TASKLEDPRIORITY,
-                              TASKLEDPRIORITY,
-                             &AppTaskLEDStk[0],
-                              APP_CFG_TASK_LED_STK_SIZE,
-                              0u,
-                             (OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK));
-
-    if(os_err != OS_ERR_NONE) {
-        APP_TRACE_INFO(("Error creating task. OSTaskCreateExt() returned with error %u\r\n", os_err));
-    }
 #if (OS_TASK_NAME_EN > 0)
-    OSTaskNameSet(TASKLEDPRIORITY, "AppTaskLED", &os_err);
+    OSTaskNameSet(APP_CFG_TASK_USB_SEV_PRIO, "USB Service", &os_err);
 #endif
-#endif
+    
+    os_err = OSTaskCreateExt((void (*)(void *)) App_AudioManager,
+                    (void           *) 0,
+                    (OS_STK         *)&App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE - 1],
+                    (INT8U           ) APP_CFG_TASK_AUDIO_MGR_PRIO,
+                    (INT16U          ) APP_CFG_TASK_AUDIO_MGR_PRIO,
+                    (OS_STK         *)&App_TaskAudioMgrStk[0],
+                    (INT32U          ) APP_CFG_TASK_AUDIO_MGR_STK_SIZE,
+                    (void *)0,
+                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
-
-#if UIF_USB
-    // create usb transfer task
-    os_err = OSTaskCreateExt( App_TaskUSB,
-                              DEF_NULL,
-                             &AppTaskUSBStk[APP_CFG_TASK_USB_STK_SIZE - 1],
-                              APP_CFG_TASK_USB_PRIO,
-                              APP_CFG_TASK_USB_PRIO,
-                             &AppTaskUSBStk[0],
-                              APP_CFG_TASK_USB_STK_SIZE,
-                              0u,
-                             (OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK));
-
-    if(os_err != OS_ERR_NONE) {
-        APP_TRACE_INFO(("Error creating task. OSTaskCreateExt() returned with error %u\r\n", os_err));
-    }
 #if (OS_TASK_NAME_EN > 0)
-    OSTaskNameSet(APP_CFG_TASK_USB_PRIO, "USB Service", &os_err);
+    OSTaskNameSet(APP_CFG_TASK_AUDIO_MGR_PRIO, "Audio Manager", &os_err);
 #endif
-#endif
-
-#if UIF_SSC0
-    // Create the ssc0 data transfer task;
-    os_err = OSTaskCreateExt( AppTaskSSC0,
-                              DEF_NULL,
-                             &AppTaskSSC0Stk[APP_CFG_TASK_SSC0_STK_SIZE - 1],
-                              TASKSSC0PRIORITY,
-                              TASKSSC0PRIORITY,
-                             &AppTaskSSC0Stk[0],
-                              APP_CFG_TASK_SSC0_STK_SIZE,
-                              0u,
-                             (OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK));
-
-    if(os_err != OS_ERR_NONE) {
-        APP_TRACE_INFO(("Error creating task. OSTaskCreateExt() returned with error %u\r\n", os_err));
-    }
-#if (OS_TASK_NAME_EN > 0)
-    OSTaskNameSet(TASKSSC0PRIORITY, "AppTaskSSC0", &os_err);
-#endif
-#endif
-
-
-#if UIF_NANDFLASH
-    // create firmware update task
-    os_err = OSTaskCreateExt( AppTaskFirmwareVecUpdate,
-                              DEF_NULL,
-                             &AppTaskFirmwareVecUpdateStk[4096 - 1],
-                              FIRMWAREVECUPDATE,
-                              FIRMWAREVECUPDATE,
-                             &AppTaskFirmwareVecUpdateStk[0],
-                              4096u,
-                              0u,
-                             (OS_TASK_OPT_STK_CLR | OS_TASK_OPT_STK_CHK));
-
-    if(os_err != OS_ERR_NONE) {
-        APP_TRACE_INFO(("Error creating task. OSTaskCreateExt() returned with error %u\r\n", os_err));
-    }
-#if (OS_TASK_NAME_EN > 0)
-    OSTaskNameSet(FIRMWAREVECUPDATE, "FW_Update", &os_err);
-#endif
-#endif
-
-
-////////////////////////////////////////////////////////////////////////////////
-
+    
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskCMDParse,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskCMDParseStk[APP_CFG_TASK_CMD_PARSE_STK_SIZE - 1],
@@ -837,14 +776,22 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_SHELL_PRIO, "Genie_shell", &os_err);
 #endif
 
+    
+     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskJoy,
+                    (void           *) 0,
+                    (OS_STK         *)&App_TaskJoyStk[APP_CFG_TASK_JOY_STK_SIZE - 1],
+                    (INT8U           ) APP_CFG_TASK_JOY_PRIO,
+                    (INT16U          ) APP_CFG_TASK_JOY_PRIO,
+                    (OS_STK         *)&App_TaskJoyStk[0],
+                    (INT32U          ) APP_CFG_TASK_JOY_STK_SIZE,
+                    (void *)0,
+                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+
+#if (OS_TASK_NAME_EN > 0)
+    OSTaskNameSet(APP_CFG_TASK_JOY_PRIO, "Keyboard", &os_err);
+#endif
+    
 ////////////////////////////////////////////////////////////////////////////////
-
-    g_pStartUSBTransfer = OSFlagCreate( 0,&os_err );
-
-    if(os_err != OS_ERR_NONE) {
-        APP_TRACE_INFO(("Error starting. OSStart() returned with error %u\r\n", os_err));
-    }
-
 
     for (;;) {
 
@@ -930,124 +877,6 @@ static  void  AppTaskLED ( void *p_arg )
 #endif
 
 
-/*
-*********************************************************************************************************
-*                                             AppTaskSSC0()
-*
-* Description : audio port data send/received task.
-*
-* Arguments   : none.
-*
-* Returns     : none.
-*
-* Note(s)     : none.
-*********************************************************************************************************
-*/
-
-#if UIF_SSC0
-extern void Alert_Sound_Gen( uint8_t *pdata, uint32_t size, uint32_t REC_SR_Set );
-extern void Alert_Sound_Gen1( uint8_t *pdata, uint32_t size, uint32_t REC_SR_Set );
-
-static  void  AppTaskSSC0 ( void *p_arg )
-{
-    uint8_t err = 0;
-    uint8_t receiveTaskMsg = 0;
-
-
-    memset( ssc0_PingPongOut, 0x5555, sizeof( ssc0_PingPongOut ) );
-    memset( ssc1_PingPongOut, 0x5555, sizeof( ssc1_PingPongOut ) );
-    memset( ssc0_PingPongIn, 0 , sizeof( ssc0_PingPongIn ) );
-    memset( ssc1_PingPongIn, 0 , sizeof( ssc1_PingPongIn ) );
-
-#if 1
-    Alert_Sound_Gen( ( uint8_t * )ssc0_PingPongOut,
-                      sizeof( ssc0_PingPongOut[ 0 ] ),
-                      8000 );
-
-    Alert_Sound_Gen( ( uint8_t * )ssc0_PingPongOut[1],
-                      sizeof( ssc0_PingPongOut[ 1 ] ),
-                      8000 );
-
-    Alert_Sound_Gen1( ( uint8_t * )ssc1_PingPongOut,
-                       sizeof( ssc1_PingPongOut[ 0 ] ),
-                       8000 );
-    Alert_Sound_Gen1( ( uint8_t * )ssc1_PingPongOut,
-                       sizeof( ssc1_PingPongOut[ 1 ] ),
-                       8000 );
-#endif
-
-#if 0
-    uint16_t *pInt = NULL;
-    uint32_t i ;
-    pInt = ( uint16_t * )ssc0_PingPongOut[0] ;
-    for( i = 0; i< ( sizeof( ssc1_PingPongOut ) );  )
-    {
-       *(pInt+i++) = 0x1122 ;
-       *(pInt+i++) = 0x3344 ;
-       *(pInt+i++) = 0x5566 ;
-       *(pInt+i++) = 0x7788 ;
-       *(pInt+i++) = 0x99aa ;
-       *(pInt+i++) = 0xbbcc ;
-       *(pInt+i++) = 0xddee ;
-       *(pInt+i++) = 0xff00 ;
-    }
-
-    pInt = ( uint16_t * )ssc1_PingPongOut[0] ;
-    for( i = 0; i< ( sizeof( ssc1_PingPongOut ) ); )
-    {
-       *(pInt+i++) = 0x1122 ;
-       *(pInt+i++) = 0x3344 ;
-       *(pInt+i++) = 0x5566 ;
-       *(pInt+i++) = 0x7788 ;
-       *(pInt+i++) = 0x99aa ;
-       *(pInt+i++) = 0xbbcc ;
-       *(pInt+i++) = 0xddee ;
-       *(pInt+i++) = 0xff00 ;
-    }
-#endif
-
-    for(;;)
-    {
-          receiveTaskMsg = ( uint32_t )OSMboxPend( g_pPortManagerMbox,
-                                                0,
-                                                &err);
-          switch( receiveTaskMsg )
-          {
-
-            case ( SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT ):
-                    if( ( ( uint8_t )START != source_ssc0.status[ IN ] )
-                        &&( ( uint8_t )BUFFERED != source_ssc0.status[ IN ] )
-                        &&( ( uint8_t )RUNNING != source_ssc0.status[ IN ] ) )
-                    {
-//                          OSSchedLock( );
-                          source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_PingPongOut,
-                                                   sizeof( ssc0_PingPongOut ) >> 1 );
-                          source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_PingPongIn,
-                                                   sizeof( ssc0_PingPongIn ) >>1 );
-                          source_ssc0.status[ IN ]  = ( uint8_t )START;
-                          source_ssc0.status[ OUT ] = ( uint8_t )START;
-
-                          source_ssc1.buffer_write( &source_ssc1,( uint8_t * )ssc1_PingPongOut,
-                                                   sizeof( ssc1_PingPongOut ) >> 1 );
-                          source_ssc1.buffer_read( &source_ssc1,( uint8_t * )ssc1_PingPongIn,
-                                                   sizeof( ssc1_PingPongIn ) >> 1 );
-                          source_ssc1.status[ IN ]  = ( uint8_t )START;
-                          source_ssc1.status[ OUT ] = ( uint8_t )START;
-//                        OSSchedUnlock( );
-//                        OSTaskSuspend( OS_PRIO_SELF );
-                    }
-            break;
-
-            default:
-            break;
-
-          }
-
-          OSTimeDlyHMSM(0, 0, 0, 10);
-    }
-
-}
-#endif
 
 
 /*
@@ -1243,8 +1072,10 @@ static void  App_EventCreate (void)
     CPU_INT08U  err;
 #endif
 
-    App_UserIF_Mbox     = OSMboxCreate((void *)0);   /* Create MBOX for comm between App_TaskUserIF() and App_TaskJoy()    */
-   // App_Noah_Ruler_Mbox = OSMboxCreate((void *)0);   /* Create MBOX for comm App_TaskUserIF()to App_TaskNoah_Ruler()       */
+    App_UserIF_Mbox        = OSMboxCreate((void *)0);   /* Create MBOX for comm between App_TaskUserIF() and App_TaskJoy()    */
+    App_AudioManager_Mbox  = OSMboxCreate((void *)0);   /* Create MBOX for SSC    */
+      
+//    App_Noah_Ruler_Mbox = OSMboxCreate((void *)0);   /* Create MBOX for comm App_TaskUserIF()to App_TaskNoah_Ruler()       */
 //    ACK_Sem_PCUART      = OSSemCreate(0);            /* Create Sem for the ACK from PC, after UART data sent               */
 //    ACK_Sem_RulerUART   = OSSemCreate(0);            /* Create Sem for the ACK from Ruler, after UART data sent            */
 //    Done_Sem_RulerUART  = OSSemCreate(0);            /* Create Sem for the Ruler operation caller, after operation done    */
@@ -1262,10 +1093,13 @@ static void  App_EventCreate (void)
 //    Load_Vec_Sem_lock   = OSSemCreate(1); //sem for MCU_Load_Vec() in im501_comm.c
 //    //ruler UART MUX //if error then halt MCU
 //    if( NULL == UART_MUX_Sem_lock )  while(1); //last Event creat failure means OS_MAX_EVENTS is not enough
-
+      
+       
 #if (OS_EVENT_NAME_EN > 0)
 
-   OSEventNameSet(App_UserIF_Mbox,      "Joy->UserI/F Mbox",   &err);
+   OSEventNameSet(App_UserIF_Mbox,       "Joy->UserI/F Mbox",   &err);
+   OSEventNameSet(App_AudioManager_Mbox, "Joy->Audio Manager",   &err);
+   
 //  // OSEventNameSet(App_Noah_Ruler_Mbox,  "UserI/F->NoahRulerMbox",     &err);
 //   OSEventNameSet(ACK_Sem_PCUART,       "PCUART_Tx_ACK_Sem",    &err);
 //   OSEventNameSet(ACK_Sem_RulerUART,    "RulerUART_Tx_ACK_Sem", &err);

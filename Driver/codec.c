@@ -16,9 +16,9 @@
 *
 *                                          CODEC TLV320AIC3204 Setup
 *
-*                                          Atmel AT91SAM3U4C
+*                                          Atmel ATSAMA5D3X
 *                                               on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename      : codec.c
 * Version       : V2.0.0

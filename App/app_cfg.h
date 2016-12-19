@@ -1,4 +1,4 @@
-/*
+ /*
 *********************************************************************************************************
 *                                            EXAMPLE CODE
 *
@@ -56,10 +56,8 @@
 
 #define TASKLEDPRIORITY                                    8
 
-#define TASKSSC0PRIORITY                                   6
-#define FIRMWAREVECUPDATE                                  26
-
-#define  APP_CFG_TASK_USB_PRIO                             1
+#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       6
+#define  APP_CFG_TASK_USB_SEV_PRIO                         1
 #define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
 #define  APP_CFG_TASK_UART_TX_PRIO                         3
 #define  APP_CFG_TASK_NOAH_PRIO                            4
@@ -76,7 +74,7 @@
 #define  APP_CFG_TASK_START_PRIO                           35
 #define  APP_CFG_TASK_PROBE_STR_PRIO                       37
 #define  PROBE_DEMO_INTRO_CFG_TASK_LED_PRIO                38
-#define  OS_PROBE_TASK_PRIO                                40  
+#define  OS_PROBE_TASK_PRIO                                40
 #define  OS_PROBE_TASK_ID                                  40 //ID
 #define  OS_TASK_TMR_PRIO                         (OS_LOWEST_PRIO - 2)
 
@@ -105,9 +103,9 @@
 
 #define  OS_PROBE_TASK_STK_SIZE                          512
 
-#define  APP_CFG_TASK_LED_STK_SIZE                      4096
-#define  APP_CFG_TASK_USB_STK_SIZE                      4096
-#define  APP_CFG_TASK_SSC0_STK_SIZE                     4096
+
+#define  APP_CFG_TASK_USB_SEV_STK_SIZE                  4096
+#define  APP_CFG_TASK_AUDIO_MGR_STK_SIZE                4096
 
 
 
@@ -131,9 +129,9 @@ void  BSP_Ser_Printf (CPU_CHAR  *format, ...);
 
 
 // for shell uart
-#define  UART_SHELL_SEND_STR(x)                (void)( BSP_Ser_Printf x )      
+#define  UART_SHELL_SEND_STR(x)                (void)( BSP_Ser_Printf x )
 #define  UART_SHELL_GET_BYTE(x)                      ( BSP_Ser_RdByte x )
-#define  UART_SHELL_SEND_BYTE(x)               (void)( BSP_Ser_WrByte x )  
+#define  UART_SHELL_SEND_BYTE(x)               (void)( BSP_Ser_WrByte x )
 
 
 #endif /* __APP_CFG_H__ */

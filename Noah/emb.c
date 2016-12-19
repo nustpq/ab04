@@ -18,7 +18,7 @@
 *
 *                                          Atmel AT91SAMA5D3
 *                                               on the
-*                                      Unified EVM Interface Board
+*                                      Audio Bridge 04 Board (AB04 V1.0)
 *
 * Filename      : emb.c
 * Version       : V1.0.0

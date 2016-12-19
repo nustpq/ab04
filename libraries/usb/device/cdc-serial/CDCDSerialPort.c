@@ -121,6 +121,7 @@ static uint32_t _Interfaces_Parse(USBGenericDescriptor *pDesc,
                     pCdcd->bIntInPIPE = pEp->bEndpointAddress & 0x7F;
                 break;
             case USBEndpointDescriptor_BULK:
+             
                 if (pEp->bEndpointAddress & 0x80)
                 	{
                           epAddress = pEp->bEndpointAddress & 0x7F;

@@ -5,7 +5,7 @@
 *
 *                                         Atmel  AT91SAMA5D3
 *                                             on the
-*                                      Unified EVM Interface Board 2.0
+*                                      Audio Bridge 04 Board (AB04 V1.0) 2.0
 *
 * Filename      : uif_i2s.c
 * Version       : V0.0.1
@@ -29,7 +29,6 @@
 extern DataSource soruce_ssc0;
 extern DataSource source_ssc1;
 
-extern OS_FLAG_GRP *g_pStartUSBTransfer; 
 
 //static uint8_t mutex = 0;
 
@@ -274,15 +273,6 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 
 
    
-    /*step 5:send semphone */ 
-                   OSFlagPost( 
-                    g_pStartUSBTransfer,
-                    (OS_FLAGS)(SSC0_IN), 
-                    OS_FLAG_SET, 
-                    &error
-                );   
- 
-   
 }
 
 /*
@@ -344,15 +334,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
                return;
             }
      }      
-     
-    /*step 4:send semphone */
-                OSFlagPost( 
-                    g_pStartUSBTransfer,
-                    (OS_FLAGS)(SSC1_IN), 
-                    OS_FLAG_SET, 
-                    &error
-                );
-   
+        
    
 }
 #endif
@@ -373,9 +355,6 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 #ifdef USE_DMA
 #define TEST_BUF 0
 
-#ifndef USE_EVENTGROUP
-extern OS_FLAG_GRP *g_pStartUSBTransfer;
-#endif
 
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
@@ -445,16 +424,6 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
      }
 #endif
 
-     
-//step 4:send semphone     
-#ifndef USE_EVENTGROUP
-     OSFlagPost(    //send group event
-                    g_pStartUSBTransfer,
-                    (OS_FLAGS)(SSC0_OUT), //
-                    OS_FLAG_SET,          //
-                    &error
-                );
-#endif
      
 }
 
@@ -598,16 +567,7 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 
      }
 #endif          
-/*----------------------------------------------------------------------------*/           
-//step 4:send semphone       
-#ifndef USE_EVENTGROUP
-     OSFlagPost(    //send group event
-                    g_pStartUSBTransfer,
-                    (OS_FLAGS)( SSC1_OUT ), //
-                    OS_FLAG_SET,            //
-                    &error
-                );
-#endif  
+  
 }
 #endif
 
