@@ -31,7 +31,7 @@
  *  T   :bit16~bit22
  *----------------------------------------------------------------------------------*/
 #define MAX_PATH_NAME_LENGTH 16
-#define MAX_I2S_CLK_PATH  14
+#define MAX_I2S_CLK_PATH  8
 #define MAX_DATA_PATH       7
 #define MAX_PDM_CLK_PATH    1
 
@@ -53,13 +53,6 @@
 #define SSC1_DIR   ( SSC1_OE + MAX_OE )
 #define MAX_DIR    MAX_OE
 
-//#define T0   ( MAX_OE + MAX_DIR )
-//#define T1   ( T0 + 1 )
-//#define T2   ( T1 + 1 )
-//#define T3   ( T2 + 1 )
-//#define T4   ( T3 + 1 )
-//#define T5   ( T4 + 1 )
-//#define T6   ( T5 + 1 )
 
 extern const char fpga_i2s_clk_path[ MAX_I2S_CLK_PATH ][ MAX_PATH_NAME_LENGTH ];
 extern const char fpga_data_path[ MAX_DATA_PATH ][ 4 ];
@@ -76,14 +69,14 @@ typedef struct _fpga_data_switch
 
 #pragma pack ( 1 )
 typedef struct _fpga_clk_switch
-{
+{	
 	uint8_t oe;
 	uint8_t dir;
 
 	uint8_t reves0;
 	uint8_t reves1;
-
-    char switch_name[16];
+        
+        char switch_name[16];
 }FPGA_CLK_SWITCH;
 #pragma pack ( )
 
@@ -97,15 +90,15 @@ typedef struct _fpga_path
 	FPGA_DATA_SWITCH T1;
 
 	uint16_t rev;
-
+	
 }FPGA_PATH;
 
 //this struct is used to verify the path of i2s clock valid or collide with others;
-//rule 1:Each node must single input signal;
-//rule 2:Each node must be a single role;
+//rule 1:Each node must single input signal; 
+//rule 2:Each node must be a single role; 
 #pragma pack ( 1 )
 typedef struct _node_role
-{
+{	
   char name[8];
   uint8_t position;                 //node name in path name position;
   uint8_t direct;                   //path dir;
@@ -115,41 +108,79 @@ typedef struct _node_role
 }ROLE;
 #pragma pack (  )
 
-
+#if 0
 //fpga command word struct
+#pragma pack ( 1 )
 typedef struct _fpga_command
 {
   	uint8_t revs;
-
+        
 	uint8_t t0 : 1;    //23
 	uint8_t t1 : 1;
-	uint8_t t2 : 1;
+	uint8_t t2 : 1;    
 	uint8_t t3 : 1;
 	uint8_t t4 : 1;
 	uint8_t t5 : 1;
 	uint8_t t6 : 1;
 	uint8_t t7 : 1;   //16
+  
 
-
-	uint8_t dir_port0_codec0 : 1;  //15
+	uint8_t dir_port0_codec0 : 1;  //15-->8
 	uint8_t dir_port0_fm36   : 1;
 	uint8_t dir_port0_ssc0   : 1;
 	uint8_t dir_port0_port1  : 1;
 	uint8_t dir_port0_codec1 : 1;
-	uint8_t dir_prot0_ssc1   : 1;
-	uint8_t dir_port1_code1  : 1;
+	uint8_t dir_port0_ssc1   : 1;
+	uint8_t dir_port1_codec1  : 1;
 	uint8_t dir_prot1_ssc1   : 1;  //8
-
-    uint8_t oe_port0_codec0  : 1;  //7
+        
+    uint8_t oe_port0_codec0  : 1;  //7--->0
 	uint8_t oe_port0_fm36    : 1;
 	uint8_t oe_port0_ssc0    : 1;
 	uint8_t oe_port0_port1   : 1;
 	uint8_t oe_port0_codec1  : 1;
-	uint8_t oe_prot0_ssc1    : 1;
-	uint8_t oe_port1_code1   : 1;
-	uint8_t oe_prot1_ssc1    : 1;  //0
+	uint8_t oe_port0_ssc1    : 1;
+	uint8_t oe_port1_codec1   : 1;
+	uint8_t oe_port1_ssc1    : 1;  //0
 
 }FPGA_COMMAND;
+#pragma pack (  )
+#else
+//fpga command word struct
+typedef struct _fpga_command
+{
+  	uint8_t revs;
+        
+	uint8_t t0 : 1;    //23
+	uint8_t t1 : 1;
+	uint8_t t2 : 1;    
+	uint8_t t3 : 1;
+	uint8_t t4 : 1;
+	uint8_t t5 : 1;
+	uint8_t t6 : 1;
+	uint8_t t7 : 1;   //16
+  
+
+	uint8_t dir_port0_codec0 : 1;  //15-->8
+	uint8_t dir_codec0_fm36   : 1;
+	uint8_t dir_codec0_ssc0   : 1;
+	uint8_t dir_codec0_port1  : 1;
+	uint8_t dir_codec0_codec1 : 1;
+	uint8_t dir_codec0_ssc1   : 1;
+	uint8_t dir_codec1_port1  : 1;
+	uint8_t dir_codec1_ssc1   : 1;  //8
+        
+    uint8_t oe_port0_codec0  : 1;  //7--->0
+	uint8_t oe_codec0_fm36    : 1;
+	uint8_t oe_codec0_ssc0    : 1;
+	uint8_t oe_codec0_port1   : 1;
+	uint8_t oe_codec0_codec1  : 1;
+	uint8_t oe_codec0_ssc1    : 1;
+	uint8_t oe_codec1_port1   : 1;
+	uint8_t oe_codec1_ssc1    : 1;  //0
+
+}FPGA_COMMAND;
+#endif
 
 typedef struct _fpga_chip
 {
@@ -160,7 +191,7 @@ typedef struct _fpga_chip
 						  FPGA_COMMAND* pCmd,
 					      List *clkList,
 						  List *dataList);                                          //assemble command word and sent to fpga;
-    FPGA_COMMAND * ( *get_path_cfg )( char *pathName );                             //get current command word
+    FPGA_COMMAND * ( *get_path_cfg )( char *pathName );                             //get current command word 
 
 //private interface of xc3s50an chip
    void ( *add_clk_switch_cfg)( FPGA_CLK_SWITCH * cfg,List * clkList );
@@ -170,10 +201,10 @@ typedef struct _fpga_chip
 //private member of this obj;
 	List fpga_i2s_clk_list;                                                         //i2s clock config list
 	List fpga_i2s_data_list;                                                        //audio data config list
-	List clock_node_role;                                                           //The list records the roles of each clock node in the FPGA
+	List clock_node_role;                                                           //The list records the roles of each clock node in the FPGA 		
 	FPGA_DATA_SWITCH data_cfg;                                                      //audio data config
 	FPGA_CLK_SWITCH clock_cfg;                                                      //clock config list
-
+	
 	FPGA_COMMAND cmdWord;
 	DataSource *controller;                                                         //which port to send fpga command;
 

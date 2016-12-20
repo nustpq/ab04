@@ -30,6 +30,7 @@
 
 
 #include <includes.h>
+#include "uif_xc3s50an.h"
 
 
 OS_EVENT  *App_UserIF_Mbox;
@@ -78,6 +79,7 @@ void  App_TaskUserIF (void *p_arg)
 //    }
     
     FPGA_Setup();
+    
     Init_FM36_AB03( 24000,
                         1,
                         0,
@@ -92,8 +94,10 @@ void  App_TaskUserIF (void *p_arg)
 //#endif
 
     while ( DEF_TRUE ) {                                          /* Task body, always written as an infinite loop.           */
-
-        msg = (CPU_INT32U *)(OSMboxPend(App_UserIF_Mbox, 0, &err)); //pending, no timeout
+//        FPGA_Setup();
+        OSTimeDly( 10 );
+//        msg = (CPU_INT32U *)(OSMboxPend(App_UserIF_Mbox, 0, &err)); //pending, no timeout
+   
 /*
         if (msg != NULL) {
             key_state = *msg ;

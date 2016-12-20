@@ -30,31 +30,23 @@
 
 
 //global object declare
-FpgaChip xc3s50an;
+FpgaChip xc3s50an;                        
 
 const DataSource *pFpga = &source_spi1;
 List fpga_i2s_clk_list;
 List fpga_i2s_data_list;
 List fpga_i2s_clk_valid_list;
 
-
-
 //All of i2s clock path in fpga that supported;
-const char fpga_i2s_clk_path[ MAX_I2S_CLK_PATH ][ MAX_PATH_NAME_LENGTH ] = {
-  "port0_codec0_0",
-  "port0_fm36_1",
-  "port0_ssc0_2",
-  "port0_port1_3",
-  "port0_codec1_4",
-  "port0_ssc1_5",
-  "port1_codec1_6",
-  "port1_ssc1_7",
-  "ssc1_codec1_8",
-  "codec0_fm36_9",
-  "codec0_ssc0_10",
-  "codec0_port1_11",
-  "codec0_codec1_12",
-  "codec0_ssc1_13",  
+const char fpga_i2s_clk_path[ MAX_I2S_CLK_PATH ][ MAX_PATH_NAME_LENGTH ] = { 
+  "codec0_port0_0",
+  "codec0_fm36_1",	
+  "codec0_ssc0_2",	
+  "codec0_port1_3",
+  "codec0_codec1_4",
+  "codec0_ssc1_5",	
+  "codec1_port1_6",
+  "codec1_ssc1_7",	
 };
 //All of data path switch in fpga implemented;
 const char fpga_data_path[ MAX_DATA_PATH ][ 4 ] = {
@@ -67,8 +59,8 @@ const char fpga_data_path[ MAX_DATA_PATH ][ 4 ] = {
   "T6"
 };
 
-
-const char biNode[ MAXNODE ][ 8 ] = {
+  
+const char biNode[ MAXNODE ][ 8 ] = { 
     "port0",
     "port1",
     "codec0",
@@ -78,7 +70,7 @@ const char biNode[ MAXNODE ][ 8 ] = {
     "ssc1"
   };
 
-const char dataSwitch[ 14 ][ 32 ]= {
+const char dataSwitch[ 14 ][ 32 ]= { 
   "codec0_tx->fm36_i2s_rx",
   "uif_i2s0_rx->fm36_i2s_rx",
   "ssc0_tx->codec0_rx",
@@ -94,8 +86,8 @@ const char dataSwitch[ 14 ][ 32 ]= {
   "fm36_pdmi_clk->hdmi_pdm_clk",
   "uif_pdmo_clk->hdmi_pdm_clk"
 };
-
-
+	                          
+	                          
 /*
 *********************************************************************************************************
 *                                               parase_index()
@@ -112,13 +104,13 @@ const char dataSwitch[ 14 ][ 32 ]= {
 uint8_t parase_index( char *pPath )
 {
   assert( NULL != pPath );
-
+  
   uint8_t len = strlen( pPath );
-
+  
   char *t = &pPath[ len - 1 ];
-
+  
   return ( *t - 48 );
-
+  
 }
 
 
@@ -137,37 +129,37 @@ uint8_t parase_index( char *pPath )
 int8_t get_i2s_clk_index( char *pPath )
 {
   assert( NULL != pPath );
-#if 0
+#if 0  
   int8_t ret = -1;
   uint8_t len = strlen( pPath );
-
+  
   for( uint8_t i = 0; i < MAX_I2S_CLK_PATH; i++ )
   {
     if( 0 == strncmp( pPath, fpga_i2s_clk_path[ i ] ,len ) )
-    {
+    {      
       ret = i;
     }
   }
-
+  
   return ret;
 #else
-  int8_t ret = -1;
+  int8_t ret = -1;  
   char pathName[ 36 ];
-
+  
   for( uint8_t i = 0; i< MAX_I2S_CLK_PATH; i++ )
-  {
+  {   
     uint8_t len = strlen( ( char * )&fpga_i2s_clk_path[ i ] );
     memset( pathName , 0 ,sizeof( pathName ) );
     strncpy( pathName,(char *)fpga_i2s_clk_path[ i ],len-2 );
-
+    
     if( !strcmp( pPath,pathName ) )
     {
       ret = i;
       break;
     }
-
+    
   }
-
+  
   return ret;
 #endif
 }
@@ -187,9 +179,9 @@ int8_t get_i2s_clk_index( char *pPath )
 int8_t get_data_path_index( char *pPath )
 {
   assert( NULL != pPath );
-
+  
   int8_t ret = -1;
-
+  
     for( uint8_t i = 0; i < MAXDATAPATH; i++ )
   	{
 		if( 0 == strcmp( pPath, dataSwitch[ i ] ) )
@@ -217,11 +209,11 @@ int8_t get_data_path_index( char *pPath )
 */
 FPGA_DATA_SWITCH * map_name_to_path( const char *pPath )
 {
-    assert( NULL != pPath );
+  assert( NULL != pPath );
 
-    FPGA_DATA_SWITCH *dNode;
+  FPGA_DATA_SWITCH *dNode;
 
-    dNode = ( FPGA_DATA_SWITCH * )malloc( sizeof( FPGA_DATA_SWITCH ) );
+  dNode = ( FPGA_DATA_SWITCH * )malloc( sizeof( FPGA_DATA_SWITCH ) );
 
     if( NULL == dNode ){
         APP_TRACE_INFO(("ERROR : memory : malloc failed @ map_name_to_path\r\n"));   
@@ -261,11 +253,11 @@ FPGA_DATA_SWITCH * map_name_to_path( const char *pPath )
 */
 void set_i2s_clk_path( uint8_t index,FPGA_COMMAND* cmd,uint8_t dir, uint8_t oe )
 {
-
-  assert( NULL != cmd ) ;
-
+  
+  assert( NULL != cmd ) ;	
+  
   assert( index < MAX_I2S_CLK_PATH );
-
+  
   switch( index )
   {
   case 0:
@@ -273,37 +265,37 @@ void set_i2s_clk_path( uint8_t index,FPGA_COMMAND* cmd,uint8_t dir, uint8_t oe )
     cmd->oe_port0_codec0 = oe;
     break;
   case 1:
-    cmd->dir_port0_fm36 = dir;
-    cmd->oe_port0_fm36 = oe;
+    cmd->dir_codec0_fm36 = dir;
+    cmd->oe_codec0_fm36 = oe;				
     break;
   case 2:
-    cmd->dir_port0_ssc0 = dir;
-    cmd->oe_port0_ssc0 = oe;
+    cmd->dir_codec0_ssc0 = dir;
+    cmd->oe_codec0_ssc0 = oe;				
     break;
   case 3:
-    cmd->dir_port0_port1 = dir;
-    cmd->oe_port0_port1 = oe;
+    cmd->dir_codec0_port1 = dir;
+    cmd->oe_codec0_port1 = oe;				
     break;
   case 4:
-    cmd->dir_port0_codec1 = dir;
-    cmd->oe_port0_codec1 = oe;
+    cmd->dir_codec0_codec1 = dir;
+    cmd->oe_codec0_codec1 = oe;				
     break;
   case 5:
-    cmd->dir_prot0_ssc1 = dir;
-    cmd->oe_prot0_ssc1 = oe;
+    cmd->dir_codec0_ssc1 = dir;
+    cmd->oe_codec0_ssc1 = oe;				
     break;
   case 6:
-    cmd->dir_port1_code1 = dir;
-    cmd->oe_port1_code1 = oe;
+    cmd->dir_codec1_port1 = dir;
+    cmd->oe_codec1_port1 = oe;				
     break;
   case 7:
-    cmd->dir_prot1_ssc1 = dir;
-    cmd->oe_prot1_ssc1 = oe;
+    cmd->dir_codec1_ssc1 = dir;
+    cmd->oe_codec1_ssc1 = oe;				
     break;
   default:
     break;
   }
-
+  
 }
 
 
@@ -325,35 +317,35 @@ void set_i2s_clk_path( uint8_t index,FPGA_COMMAND* cmd,uint8_t dir, uint8_t oe )
 void set_data_path( FPGA_COMMAND* cmd,uint8_t index,uint8_t value )
 {
   assert( NULL != cmd );
-
+  
   assert( index < MAX_DATA_PATH );
-
+  
   switch( index )
   {
   case 0:
     cmd->t0 = value;
     break;
   case 1:
-    cmd->t1 = value;
+    cmd->t1 = value;				
     break;
   case 2:
-    cmd->t2 = value;
+    cmd->t2 = value;				
     break;
   case 3:
-    cmd->t3 = value;
-    break;
+    cmd->t3 = value;				
+    break;				
   case 4:
-    cmd->t4 = value;
+    cmd->t4 = value;				
     break;
   case 5:
-    cmd->t5 = value;
+    cmd->t5 = value;				
     break;
   case 6:
-    cmd->t6 = value;
+    cmd->t6 = value;				
     break;
   default:
     break;
-
+    
   }
 }
 
@@ -383,6 +375,7 @@ int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataLi
 
   FpgaChip *fpga = ( FpgaChip * )handle;
 
+  
   //step1:set i2s clock path to command word;
   ListElmt *e = fpga->fpga_i2s_clk_list.head;
 
@@ -402,7 +395,7 @@ int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataLi
         index = i;
         break;
       }
-
+      
     }
 #else
     index = get_i2s_clk_index( clk->switch_name );
@@ -413,12 +406,12 @@ int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataLi
       APP_TRACE_INFO(("ERROR :  Clock Path is invalid : %s\r\n", clk->switch_name));     
       return index;
     }
-
+    
     set_i2s_clk_path( index,pCmd,clk->dir,clk->oe );
     e = e -> next;
   }
-
-
+  
+  
   //step2: set i2s/pdm data to command word
   ListElmt *e1 = fpga->fpga_i2s_data_list.head;
 
@@ -428,12 +421,12 @@ int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataLi
     set_data_path( pCmd,cfg->ord,cfg->sel );
     e1 = e1 -> next;
   }
-
+  
   //step3: send command word to fpga and valid it via spi1 port;
   fpga->controller->buffer_write( ( void * )fpga->controller,
                                  ( uint8_t * )pCmd,
                                  sizeof( uint32_t ) );
-  APP_TRACE_INFO(("Cfg FPGA Cmd Word :  0x%04X\r\n", *( uint32_t * )pCmd ));
+  
   return 0;
 }
 
@@ -700,17 +693,18 @@ static uint32_t clk_rule_2( const void *key1,const void *key2 )
 
   ROLE *role = ( ROLE * )key2;
 
+  /*
   while( NULL != e )
   {
     ROLE * pRole = ( ROLE * )e->data;
 
     if( ( strcmp( pRole->name , role->name ) == 0 )
 		&&( pRole->direct == RECEIVER ) )
-      cnt++;
+      //      cnt++;          //TODO : RECEIVER==0 correct?
 
       e = e->next;
   }
-
+ */
   return ( cnt >= 1 ) ? 0 : 1;
 
 
@@ -744,8 +738,9 @@ static uint32_t clk_rule_3( const void *key1,const void *key2 )
   if( -1 == index )
     return 1;
 
-  if( ( index > MAX_BI_NODE ) && ( role->direct == SENDER ) )
-    return  0;
+  //TODO: rule is logic error? when index = 4?
+//  if( ( index > MAX_BI_NODE ) && ( role->direct == SENDER ) )
+//    return  0;
 
    return 1;
 
@@ -944,6 +939,9 @@ void add_clk_switch_cfg( FPGA_CLK_SWITCH *cfg , List *clkList )
     return;
   if( i2s_clk_path_check( cfg , &fpga_i2s_clk_valid_list ) )
     list_ins_next( clkList,clkList->tail,cfg );
+  else
+    //TODO:add check result feedback to caller;
+    ;
 }
 /*
 *********************************************************************************************************
@@ -1149,17 +1147,21 @@ void destroy_fpga_instance( void )
 
 
 //Init_fpga_clock_path( 0,0,"port1_codec1" );
-static void Init_fpga_clock_path( unsigned char clock_dir, unsigned char clock_output_en, const char *s_clock_path )
+static int32_t Init_fpga_clock_path( unsigned char clock_dir, unsigned char clock_output_en, const char *s_clock_path )
 {
 
- 	FPGA_CLK_SWITCH  clock_path_cfg;
+    FPGA_CLK_SWITCH  *clock_path_cfg = ( FPGA_CLK_SWITCH * )malloc( sizeof( FPGA_CLK_SWITCH ) );
+    if( NULL == clock_path_cfg )
+      return -1;
+    
     APP_TRACE_INFO(("set clock path: %s \r\n",s_clock_path));
-
-    clock_path_cfg.dir = clock_dir; //0: uif_portx -> others, 1: others -> uif_portx,
-	clock_path_cfg.oe  = clock_output_en; //0: enable port output,  1: high-z port output
-    memset( clock_path_cfg.switch_name , 0 , sizeof( clock_path_cfg.switch_name ) );
-    memcpy( clock_path_cfg.switch_name, s_clock_path , 16 );
-    xc3s50an.add_clk_switch_cfg( &clock_path_cfg, &xc3s50an.fpga_i2s_clk_list );
+    
+//    memset( ( void * )&clock_path_cfg, 0 , sizeof( clock_path_cfg ) );
+    clock_path_cfg->dir = clock_dir; //0: uif_portx -> others, 1: others -> uif_portx,
+    clock_path_cfg->oe  = clock_output_en; //0: enable port output,  1: high-z port output
+    memset( clock_path_cfg->switch_name , 0 , sizeof( clock_path_cfg->switch_name ) );
+    memcpy( clock_path_cfg->switch_name, s_clock_path , 16 );
+    xc3s50an.add_clk_switch_cfg( clock_path_cfg, &xc3s50an.fpga_i2s_clk_list );
 
 }
 
@@ -1216,22 +1218,49 @@ void FPGA_Setup( void )
     FPGA_COMMAND cmd;
 
     init_fpga();
-
+#if 1
     //test codec0 as master
-    Init_fpga_clock_path( 1,0,"port0_codec0_0" );
-    Init_fpga_clock_path( 0,0,"port0_fm36_1" );
-    Init_fpga_clock_path( 0,0,"port0_ssc0_2" );
-    Init_fpga_clock_path( 0,0,"port0_port1_3" );
-    Init_fpga_clock_path( 0,0,"port0_codec1_4" );
-    Init_fpga_clock_path( 0,0,"port0_ssc1_5" );
+    Init_fpga_clock_path( 0,0,"codec0_port0_0" );
+    Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
+//    Init_fpga_clock_path( 1,0,"codec0_ssc0_2" );
+//    Init_fpga_clock_path( 1,0,"codec0_port1_3" );
+//    Init_fpga_clock_path( 1,0,"codec0_codec1_4" );
+//    Init_fpga_clock_path( 1,0,"codec0_ssc1_5" );
+        //test codec0 as master
+//    Init_fpga_clock_path( 0,0,"port0_codec0_0" );
+//    Init_fpga_clock_path( 1,0,"port0_fm36_1" );
+//    Init_fpga_clock_path( 1,0,"port0_ssc0_2" );
+//   Init_fpga_clock_path( 1,0,"port0_port1_3" );
+//    Init_fpga_clock_path( 1,0,"port0_codec1_4" );
+//    Init_fpga_clock_path( 1,0,"port0_ssc1_5" );
+#else
+    FPGA_CLK_SWITCH  clock_path_cfg0;
+    FPGA_CLK_SWITCH  clock_path_cfg1;   
+    
+//    APP_TRACE_INFO(("set clock path: %s \r\n",s_clock_path));   
+    memset( ( void * )&clock_path_cfg0, 0 , sizeof( clock_path_cfg0 ) );
+    clock_path_cfg0.dir = 1; //0: uif_portx -> others, 1: others -> uif_portx,
+    clock_path_cfg0.oe  = 0; //0: enable port output,  1: high-z port output
+    memset( clock_path_cfg0.switch_name , 0 , sizeof( clock_path_cfg0.switch_name ) );
+    memcpy( clock_path_cfg0.switch_name, "port0_fm36_1" , 16 );
+    xc3s50an.add_clk_switch_cfg( &clock_path_cfg0, &xc3s50an.fpga_i2s_clk_list );
+    
+//    APP_TRACE_INFO(("set clock path: %s \r\n",s_clock_path));   
+    memset( ( void * )&clock_path_cfg1, 0 , sizeof( clock_path_cfg0 ) );
+    clock_path_cfg1.dir = 1; //0: uif_portx -> others, 1: others -> uif_portx,
+    clock_path_cfg1.oe  = 0; //0: enable port output,  1: high-z port output
+    memset( clock_path_cfg1.switch_name , 0 , sizeof( clock_path_cfg1.switch_name ) );
+    memcpy( clock_path_cfg1.switch_name, "port0_ssc0_2" , 16 );
+    xc3s50an.add_clk_switch_cfg( &clock_path_cfg1, &xc3s50an.fpga_i2s_clk_list );
+#endif
 
     Init_fpga_data_path( "uif_i2s0_rx->fm36_i2s_rx" );
     Init_fpga_data_path( "ssc0_tx->codec0_rx" );
     Init_fpga_data_path( "ssc1_tx->codec1_rx" );
     Init_fpga_data_path( "fm36_pdmo_data->uif_pdmo_data" );
     Init_fpga_data_path( "fm36_pdmi_clk->hdmi_pdm_clk" );
-
-	xc3s50an.set_path( &xc3s50an, &xc3s50an.cmdWord , &xc3s50an.fpga_i2s_clk_list, &xc3s50an.fpga_i2s_data_list);
+    
+    xc3s50an.set_path( &xc3s50an, &xc3s50an.cmdWord , &xc3s50an.fpga_i2s_clk_list, &xc3s50an.fpga_i2s_data_list);
 
 }
                   
