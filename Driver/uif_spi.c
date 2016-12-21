@@ -500,9 +500,6 @@ static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk 
 
 }
 
-
-
-
 /*
 *********************************************************************************************************
 *                                               init_spi()
@@ -602,7 +599,12 @@ uint8_t _spiDmaRx( void *pInstance ,const uint8_t *buf,uint32_t len  )
     td.dwSrcAddr = (uint32_t)&pSpi->SPI_RDR;
 //    td.dwDstAddr = (uint32_t) pSource->buffer;
     td.dwDstAddr = (uint32_t) buf;
-    td.dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 ) | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;   
+    td.dwCtrlA   = DMAC_CTRLA_BTSIZE( len ) 
+//                   | DMAC_CTRLA_SRC_WIDTH_HALF_WORD 
+//                   | DMAC_CTRLA_DST_WIDTH_HALF_WORD; 
+		   | DMAC_CTRLA_SRC_WIDTH_BYTE 
+		   | DMAC_CTRLA_DST_WIDTH_BYTE;    
+    
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR 
                    | DMAC_CTRLB_DST_DSCR
                    | DMAC_CTRLB_SIF_AHB_IF2 
@@ -642,10 +644,15 @@ uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  )
     
     sDmaTransferDescriptor td;
 
-//    td.dwSrcAddr = (uint32_t) pSource->privateData;
     td.dwSrcAddr = (uint32_t) buf;
     td.dwDstAddr = (uint32_t)&pSpi->SPI_TDR;
-    td.dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 ) | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
+    td.dwCtrlA   = DMAC_CTRLA_BTSIZE( len )            //( len >> 1 ) 
+//                   | DMAC_CTRLA_SRC_WIDTH_HALF_WORD 
+//                   | DMAC_CTRLA_DST_WIDTH_HALF_WORD;
+		     | DMAC_CTRLA_SRC_WIDTH_BYTE 
+		     | DMAC_CTRLA_DST_WIDTH_BYTE;
+
+    
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR 
                    | DMAC_CTRLB_DST_DSCR
                    | DMAC_CTRLB_SIF_AHB_IF0 
@@ -660,8 +667,6 @@ uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  )
     return 0;
   
 }
-
-
 
 
 /*
