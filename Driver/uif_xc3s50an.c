@@ -152,7 +152,7 @@ int8_t get_i2s_clk_index( char *pPath )
     memset( pathName , 0 ,sizeof( pathName ) );
     strncpy( pathName,(char *)fpga_i2s_clk_path[ i ],len-2 );
     
-    if( !strcmp( pPath,pathName ) )
+    if( !strncmp( pPath,pathName,len-2 ) )
     {
       ret = i;
       break;
@@ -1221,7 +1221,7 @@ void FPGA_Setup( void )
 #if 1
     //test codec0 as master
     Init_fpga_clock_path( 0,0,"codec0_port0_0" );
-    Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
+//    Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
 //    Init_fpga_clock_path( 1,0,"codec0_ssc0_2" );
 //    Init_fpga_clock_path( 1,0,"codec0_port1_3" );
 //    Init_fpga_clock_path( 1,0,"codec0_codec1_4" );
