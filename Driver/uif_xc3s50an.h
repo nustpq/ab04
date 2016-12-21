@@ -194,7 +194,7 @@ typedef struct _fpga_chip
     FPGA_COMMAND * ( *get_path_cfg )( char *pathName );                             //get current command word 
 
 //private interface of xc3s50an chip
-   void ( *add_clk_switch_cfg)( FPGA_CLK_SWITCH * cfg,List * clkList );
+   int8_t ( *add_clk_switch_cfg)( FPGA_CLK_SWITCH * cfg,List * clkList );
    void ( *add_data_switch_cfg)( FPGA_DATA_SWITCH *cfg ,List *clkList );
    void ( *set_data_path )( FPGA_COMMAND *pCmd,uint8_t index,uint8_t value );
    void ( *set_clk_path )( uint8_t index,FPGA_COMMAND* cmd,uint8_t dir, uint8_t oe );
@@ -220,7 +220,7 @@ extern void set_i2s_clk_path( uint8_t index,FPGA_COMMAND* cmd,uint8_t dir, uint8
 extern void set_data_path(  FPGA_COMMAND* cmd,uint8_t index,uint8_t value );
 extern int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataList);
 extern bool i2s_clk_path_check( void * pPath , List *validList );
-extern void add_clk_switch_cfg( FPGA_CLK_SWITCH *cfg ,List *clkList );
+extern int8_t add_clk_switch_cfg( FPGA_CLK_SWITCH *cfg ,List *clkList );
 extern void add_data_switch_cfg( FPGA_DATA_SWITCH *cfg ,List *dataList );
 extern void resset_fpga( void );
 extern void init_fpga( void );
