@@ -30,8 +30,8 @@
  *  DIR:bit8~bit14
  *  T   :bit16~bit22
  *----------------------------------------------------------------------------------*/
-#define MAX_PATH_NAME_LENGTH 16
-#define MAX_I2S_CLK_PATH  8
+#define MAX_PATH_NAME_LENGTH 32
+#define MAX_I2S_CLK_PATH  18
 #define MAX_DATA_PATH       7
 #define MAX_PDM_CLK_PATH    1
 
@@ -134,7 +134,7 @@ typedef struct _fpga_command
 	uint8_t dir_port1_codec1  : 1;
 	uint8_t dir_prot1_ssc1   : 1;  //8
         
-    uint8_t oe_port0_codec0  : 1;  //7--->0
+        uint8_t oe_port0_codec0  : 1;  //7--->0
 	uint8_t oe_port0_fm36    : 1;
 	uint8_t oe_port0_ssc0    : 1;
 	uint8_t oe_port0_port1   : 1;
@@ -145,13 +145,13 @@ typedef struct _fpga_command
 
 }FPGA_COMMAND;
 #pragma pack (  )
-#else
+
 //fpga command word struct
 typedef struct _fpga_command
 {
-  	uint8_t revs;
+  	uint8_t revs;      //               ( 4 )
         
-	uint8_t t0 : 1;    //23
+	uint8_t t0 : 1;    //23             ( 3 )
 	uint8_t t1 : 1;
 	uint8_t t2 : 1;    
 	uint8_t t3 : 1;
@@ -161,7 +161,7 @@ typedef struct _fpga_command
 	uint8_t t7 : 1;   //16
   
 
-	uint8_t dir_port0_codec0 : 1;  //15-->8
+	uint8_t dir_codec0_port0 : 1;  //15-->8( 2 )
 	uint8_t dir_codec0_fm36   : 1;
 	uint8_t dir_codec0_ssc0   : 1;
 	uint8_t dir_codec0_port1  : 1;
@@ -170,7 +170,7 @@ typedef struct _fpga_command
 	uint8_t dir_codec1_port1  : 1;
 	uint8_t dir_codec1_ssc1   : 1;  //8
         
-    uint8_t oe_port0_codec0  : 1;  //7--->0
+        uint8_t oe_port0_codec0  : 1;  //7--->0 ( 1 )
 	uint8_t oe_codec0_fm36    : 1;
 	uint8_t oe_codec0_ssc0    : 1;
 	uint8_t oe_codec0_port1   : 1;
@@ -180,6 +180,90 @@ typedef struct _fpga_command
 	uint8_t oe_codec1_ssc1    : 1;  //0
 
 }FPGA_COMMAND;
+#endif
+
+#if 1
+#pragma pack ( 1 )
+typedef struct _fpga_command
+{
+/*------------------------------------------*/
+    uint32_t pdm_revers;                 //(left)
+/*------------------------------------------*/
+  	uint8_t t_revs0;      
+        uint8_t t_revs1; 
+	uint8_t t_revs2; 
+	
+	uint8_t t0 : 1;    
+	uint8_t t1 : 1;
+	uint8_t t2 : 1;    
+	uint8_t t3 : 1;
+	uint8_t t4 : 1;
+	uint8_t t5 : 1;
+	uint8_t t6 : 1;
+	uint8_t t7 : 1;   
+  
+/*------------------------------------------*/
+	uint8_t dir_revers6;
+        uint8_t dir_port1_ssc1     : 1;  
+        uint8_t dir_port1_fm36     : 1;
+	uint8_t dir_revers0        : 1;
+	uint8_t dir_revers1        : 1;
+	uint8_t dir_revers2        : 1;
+	uint8_t dir_revers3        : 1;	
+	uint8_t dir_revers4        : 1;
+	uint8_t dir_revers5	   : 1;
+
+	uint8_t dir_codec1_ssc0    : 1;  
+	uint8_t dir_codec1_ssc1    : 1;
+	uint8_t dir_codec1_fm36    : 1;
+	uint8_t dir_port0_port1    : 1;
+	uint8_t dir_port0_ssc0     : 1;
+	uint8_t dir_port0_ssc1     : 1;
+	uint8_t dir_port0_fm36     : 1;
+	uint8_t dir_port1_ssc0     : 1;  
+        
+        uint8_t dir_codec0_port0   : 1;  
+	uint8_t dir_codec0_fm36    : 1;
+	uint8_t dir_codec0_ssc0    : 1;
+	uint8_t dir_codec0_port1   : 1;
+	uint8_t dir_codec0_codec1  : 1;
+	uint8_t dir_codec0_ssc1    : 1;	
+	uint8_t dir_codec1_port0   : 1;
+	uint8_t dir_codec1_port1   : 1; 
+
+	
+/*--------------------------------------*/
+	uint8_t oe_revers6;
+
+        uint8_t oe_port1_ssc1      : 1;  
+        uint8_t oe_port1_fm36      : 1;
+	uint8_t oe_revers0         : 1;
+	uint8_t oe_revers1         : 1;
+	uint8_t oe_revers2         : 1;
+	uint8_t oe_revers3         : 1;	
+	uint8_t oe_revers4	   : 1;
+	uint8_t oe_revers5	   : 1;
+
+	uint8_t oe_codec1_ssc0     : 1; 
+	uint8_t oe_codec1_ssc1     : 1;
+	uint8_t oe_codec1_fm36     : 1;
+	uint8_t oe_port0_port1     : 1;
+	uint8_t oe_port0_ssc0      : 1;
+	uint8_t oe_port0_ssc1      : 1;
+	uint8_t oe_port0_fm36      : 1;
+	uint8_t oe_port1_ssc0      : 1;  
+        
+        uint8_t oe_codec0_port0    : 1;  // LSB
+	uint8_t oe_codec0_fm36     : 1;
+	uint8_t oe_codec0_ssc0     : 1;
+	uint8_t oe_codec0_port1    : 1;
+	uint8_t oe_codec0_codec1   : 1;
+	uint8_t oe_codec0_ssc1     : 1;	
+	uint8_t oe_codec1_port0    : 1;
+	uint8_t oe_codec1_port1    : 1;  //0
+
+}FPGA_COMMAND;
+#pragma pack (  )
 #endif
 
 typedef struct _fpga_chip

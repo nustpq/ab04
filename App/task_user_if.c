@@ -95,7 +95,7 @@ void  App_TaskUserIF (void *p_arg)
 
     while ( DEF_TRUE ) {                                          /* Task body, always written as an infinite loop.           */
 //        FPGA_Setup();
-        OSTimeDly( 10 );
+//        OSTimeDly( 10 );
 //        msg = (CPU_INT32U *)(OSMboxPend(App_UserIF_Mbox, 0, &err)); //pending, no timeout
    
 /*
@@ -193,8 +193,8 @@ void  App_TaskUserIF (void *p_arg)
 //                                Global_Ruler_State[ruler_id] = RULER_STATE_DETACHED ;
 //                                Global_Mic_Mask[ruler_id]    = 0 ;
                                 //if( (ruler_id == 0) && (iM401_Ctrl_Enable == 1) ) {
-                                if( (ruler_id == Global_VEC_Cfg.gpio) && (Global_VEC_Cfg.trigger_en) ) {
-                                    MCU_Load_Vec( 0 );
+//                                if( (ruler_id == Global_VEC_Cfg.gpio) && (Global_VEC_Cfg.trigger_en) ) {
+//                                    MCU_Load_Vec( 0 );
                                 }
 
                             }
@@ -212,10 +212,10 @@ void  App_TaskUserIF (void *p_arg)
             OSTimeDly(5);
             Buzzer_OnOff(0); //buzzer off
         }
-*/
 
 
-    }
+
+//*/    }
 }
 
 

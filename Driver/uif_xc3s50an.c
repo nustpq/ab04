@@ -45,8 +45,20 @@ const char fpga_i2s_clk_path[ MAX_I2S_CLK_PATH ][ MAX_PATH_NAME_LENGTH ] = {
   "codec0_port1_3",
   "codec0_codec1_4",
   "codec0_ssc1_5",	
-  "codec1_port1_6",
-  "codec1_ssc1_7",	
+  "codec1_port0_6",
+  "codec1_port1_7",
+  
+  "codec1_ssc0_8",
+  "codec1_ssc1_9",
+  "codec1_fm36_10",
+  "port0_port1_11",
+  "port0_ssc0_12",
+  "port0_ssc1_13",  
+  "port0_fm36_14",
+  
+  "port1_ssc0_15",
+  "port1_ssc1_16",  
+  "port1_fm36_17",    
 };
 //All of data path switch in fpga implemented;
 const char fpga_data_path[ MAX_DATA_PATH ][ 4 ] = {
@@ -261,8 +273,8 @@ void set_i2s_clk_path( uint8_t index,FPGA_COMMAND* cmd,uint8_t dir, uint8_t oe )
   switch( index )
   {
   case 0:
-    cmd->dir_port0_codec0 = dir;
-    cmd->oe_port0_codec0 = oe;
+    cmd->dir_codec0_port0 = dir;
+    cmd->oe_codec0_port0 = oe;
     break;
   case 1:
     cmd->dir_codec0_fm36 = dir;
@@ -285,13 +297,53 @@ void set_i2s_clk_path( uint8_t index,FPGA_COMMAND* cmd,uint8_t dir, uint8_t oe )
     cmd->oe_codec0_ssc1 = oe;				
     break;
   case 6:
-    cmd->dir_codec1_port1 = dir;
-    cmd->oe_codec1_port1 = oe;				
+    cmd->dir_codec1_port0 = dir;
+    cmd->oe_codec1_port0 = oe;				
     break;
   case 7:
+    cmd->dir_codec1_port1 = dir;
+    cmd->oe_codec1_port1 = oe;				
+    break;    
+  case 8:
+    cmd->dir_codec1_ssc0 = dir;
+    cmd->oe_codec1_ssc0 = oe;				
+    break;
+  case 9:
     cmd->dir_codec1_ssc1 = dir;
     cmd->oe_codec1_ssc1 = oe;				
-    break;
+    break;  
+  case 10:
+    cmd->dir_codec1_fm36 = dir;
+    cmd->oe_codec1_fm36 = oe;				
+    break; 
+  case 11:
+    cmd->dir_port0_port1 = dir;
+    cmd->oe_port0_port1 = oe;				
+    break; 
+  case 12:
+    cmd->dir_port0_ssc0 = dir;
+    cmd->oe_port0_ssc0 = oe;				
+    break; 
+  case 13:
+    cmd->dir_port0_ssc1 = dir;
+    cmd->oe_port0_ssc1 = oe;				
+    break; 
+  case 14:
+    cmd->dir_port0_fm36 = dir;
+    cmd->oe_port0_fm36 = oe;				
+    break;    
+  case 15:
+    cmd->dir_port1_ssc0 = dir;
+    cmd->oe_port1_ssc0 = oe;				
+    break; 
+  case 16:
+    cmd->dir_port1_ssc1 = dir;
+    cmd->oe_port1_ssc1 = oe;				
+    break; 
+  case 17:
+    cmd->dir_port1_fm36 = dir;
+    cmd->oe_port1_fm36 = oe;				
+    break;     
   default:
     break;
   }
@@ -426,7 +478,8 @@ int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataLi
   fpga->controller->buffer_write( ( void * )fpga->controller,
                                  ( uint8_t * )pCmd,
                                  sizeof( uint32_t ) );
-  
+//  APP_TRACE_INFO(("%s :  fpga cmd send : %ld\r\n",__func__, *(uint64_t *)pCmd++ ));
+//  APP_TRACE_INFO(("%s :  fpga cmd send : %ld\r\n",__func__, *(uint64_t *)pCmd ));  
   return 0;
 }
 
@@ -700,7 +753,7 @@ static uint32_t clk_rule_2( const void *key1,const void *key2 )
 
     if( ( strcmp( pRole->name , role->name ) == 0 )
 		&&( pRole->direct == RECEIVER ) )
-            cnt++;          //TODO : RECEIVER==0 correct?
+            cnt++;          //TODO : 
 
       e = e->next;
   }
@@ -937,13 +990,13 @@ int8_t add_clk_switch_cfg( FPGA_CLK_SWITCH *cfg , List *clkList )
   int8_t ret = -1;
   if( 0 > find_clk_path( ( char * )fpga_i2s_clk_path,cfg ) )
     return ret;
-  while( !match_clk_path( clkList,cfg ) )
-    return ret ;
-  if( i2s_clk_path_check( cfg , &fpga_i2s_clk_valid_list ) )
+//  while( !match_clk_path( clkList,cfg ) )
+//    return ret ;
+//  if( i2s_clk_path_check( cfg , &fpga_i2s_clk_valid_list ) )
     list_ins_next( clkList,clkList->tail,cfg );
-  else
+//  else
     //TODO:add check result feedback to caller;
-    return ret;
+//    return ret;
   return 0;  
 }
 /*
