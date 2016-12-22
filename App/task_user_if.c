@@ -78,7 +78,7 @@ void  App_TaskUserIF (void *p_arg)
 //        Buzzer_Error();
 //    }
     
-    FPGA_Setup();
+//    FPGA_Setup();
     
     Init_FM36_AB03( 24000,
                         1,
@@ -94,8 +94,8 @@ void  App_TaskUserIF (void *p_arg)
 //#endif
 
     while ( DEF_TRUE ) {                                          /* Task body, always written as an infinite loop.           */
-//        FPGA_Setup();
-//        OSTimeDly( 10 );
+        FPGA_Setup();
+        OSTimeDly( 10 );
 //        msg = (CPU_INT32U *)(OSMboxPend(App_UserIF_Mbox, 0, &err)); //pending, no timeout
    
 /*

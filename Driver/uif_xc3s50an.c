@@ -477,7 +477,7 @@ int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataLi
   //step3: send command word to fpga and valid it via spi1 port;
   fpga->controller->buffer_write( ( void * )fpga->controller,
                                  ( uint8_t * )pCmd,
-                                 sizeof( uint32_t ) );
+                                 sizeof( uint32_t ) << 2 );
 //  APP_TRACE_INFO(("%s :  fpga cmd send : %ld\r\n",__func__, *(uint64_t *)pCmd++ ));
 //  APP_TRACE_INFO(("%s :  fpga cmd send : %ld\r\n",__func__, *(uint64_t *)pCmd ));  
   return 0;
@@ -1202,7 +1202,20 @@ void destroy_fpga_instance( void )
 
 
 
-//Init_fpga_clock_path( 0,0,"port1_codec1" );
+/*
+*********************************************************************************************************
+*                                               Init_fpga_clock_path()
+*
+* Description : initialize a new clock path into link ;
+*
+* Arguments   : clock_dir       : signal direct
+*               clock_output_en : enable signal output
+*               s_clock_path    £ºpath name
+* Returns       : success/fail: 0/-1
+*
+* Note(s)       : none.
+*********************************************************************************************************
+*/
 static int8_t Init_fpga_clock_path( unsigned char clock_dir, unsigned char clock_output_en, const char *s_clock_path )
 {
     int32_t ret = -1;
@@ -1229,7 +1242,20 @@ static int8_t Init_fpga_clock_path( unsigned char clock_dir, unsigned char clock
 }
 
 
-//Init_fpga_data_path( "fm36_pdmi_clk->hdmi_pdm_clk" );
+/*
+*********************************************************************************************************
+*                                               Init_fpga_data_path()
+*
+* Description : initialize a new clock path into link ;
+*
+* Arguments   : s_data_path : path name
+*               
+*               
+* Returns       : none
+*
+* Note(s)       : none.
+*********************************************************************************************************
+*/
 static void Init_fpga_data_path( const char *s_data_path )
 {
 
@@ -1240,6 +1266,7 @@ static void Init_fpga_data_path( const char *s_data_path )
     xc3s50an.add_data_switch_cfg( p_data_path_cfg, &xc3s50an.fpga_i2s_data_list );
 
 }
+
 
 /*******************************************************
   CLOCK Path:
@@ -1289,7 +1316,9 @@ void FPGA_Setup( void )
     Init_fpga_clock_path( 0,0,"codec0_port1_3" );
     Init_fpga_clock_path( 0,0,"codec0_codec1_4" );
     Init_fpga_clock_path( 0,0,"codec0_ssc1_5" );
-
+   
+    
+    
     Init_fpga_data_path( "uif_i2s0_rx->fm36_i2s_rx" );
     Init_fpga_data_path( "ssc0_tx->codec0_rx" );
     Init_fpga_data_path( "ssc1_tx->codec1_rx" );

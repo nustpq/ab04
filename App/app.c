@@ -661,7 +661,7 @@ static  void  App_TaskStart (void *p_arg)
     
     
 ////////////////////////////////////////////////////////////////////////////////
-    
+/**/    
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskDebugInfo ,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE - 1],
@@ -675,7 +675,8 @@ static  void  App_TaskStart (void *p_arg)
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet(APP_CFG_TASK_DBG_INFO_PRIO, "Debug Info", &os_err);
 #endif
-               
+
+    /**/
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskUSBService,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskUSBSevStk[APP_CFG_TASK_USB_SEV_STK_SIZE - 1],
@@ -690,6 +691,7 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_USB_SEV_PRIO, "USB Service", &os_err);
 #endif
     
+/**/    
     os_err = OSTaskCreateExt((void (*)(void *)) App_AudioManager,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE - 1],
@@ -703,7 +705,9 @@ static  void  App_TaskStart (void *p_arg)
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet(APP_CFG_TASK_AUDIO_MGR_PRIO, "Audio Manager", &os_err);
 #endif
+
     
+/**/    
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskCMDParse,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskCMDParseStk[APP_CFG_TASK_CMD_PARSE_STK_SIZE - 1],
@@ -718,6 +722,7 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_CMD_PARSE_PRIO, "CMD_Parse", &os_err);
 #endif
 
+    /**/
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskUART_Rx,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskUART_RxStk[APP_CFG_TASK_UART_RX_STK_SIZE - 1],
@@ -731,7 +736,9 @@ static  void  App_TaskStart (void *p_arg)
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet(APP_CFG_TASK_UART_RX_PRIO, "Uart_rx", &os_err);
 #endif
+    
 
+    /**/
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskUART_Tx,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskUART_TxStk[APP_CFG_TASK_UART_TX_STK_SIZE - 1],
@@ -741,11 +748,12 @@ static  void  App_TaskStart (void *p_arg)
                     (INT32U          ) APP_CFG_TASK_UART_TX_STK_SIZE,
                     (void *)0,
                     (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+    
 
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet(APP_CFG_TASK_UART_TX_PRIO, "Uart_tx", &os_err);
 #endif
-
+   
 
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskUserIF,
                     (void           *) 0,
@@ -761,7 +769,7 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_USER_IF_PRIO, "User I/F", &os_err);
 #endif
 
-
+/**/
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskGenieShell,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskGenieShellStk[APP_CFG_TASK_SHELL_STK_SIZE - 1],
@@ -776,7 +784,8 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_SHELL_PRIO, "Genie_shell", &os_err);
 #endif
 
-    
+
+/**/    
      os_err = OSTaskCreateExt((void (*)(void *)) App_TaskJoy,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskJoyStk[APP_CFG_TASK_JOY_STK_SIZE - 1],
