@@ -265,10 +265,13 @@ typedef  struct  atsama5_reg_pio {
 #define CODEC0_RST      3
 #define FM36_RST        4
 #define PA_SHUTDOWN     5
+
 #define FAST_PLUS_RST   7
 #define V5_UIF_EN       9
 #define HDMI_UIF_PWR_EN 10
 #define LEVEL_SHIFT_OE  11
+
+#define HDMI_PORT_DET0  16
 
 void  BSP_LED_Init ( void );
 

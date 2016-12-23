@@ -1,6 +1,7 @@
 #ifndef _UIF_GPIO_H_
 #define _UIF_GPIO_H_
 
+#include "../BSP/bsp.h"
 #include "defined.h"
 
 //gpio rec configure

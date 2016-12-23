@@ -28,7 +28,9 @@ extern sDmad g_dmad;
 sDmad spi_dmad;
 
 const Pin spi0_pins[] = { PINS_SPI0 };					 
-const Pin spi1_pins[] = { PINS_SPI1 };                     
+const Pin spi1_pins[] = { PINS_SPI1,PIN_SPI1_NPCS0 };   
+
+
 
 
 
