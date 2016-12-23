@@ -990,13 +990,13 @@ int8_t add_clk_switch_cfg( FPGA_CLK_SWITCH *cfg , List *clkList )
   int8_t ret = -1;
   if( 0 > find_clk_path( ( char * )fpga_i2s_clk_path,cfg ) )
     return ret;
-//  while( !match_clk_path( clkList,cfg ) )
-//    return ret ;
-//  if( i2s_clk_path_check( cfg , &fpga_i2s_clk_valid_list ) )
+  while( !match_clk_path( clkList,cfg ) )
+    return ret ;
+  if( i2s_clk_path_check( cfg , &fpga_i2s_clk_valid_list ) )
     list_ins_next( clkList,clkList->tail,cfg );
-//  else
+  else
     //TODO:add check result feedback to caller;
-//    return ret;
+    return ret;
   return 0;  
 }
 /*
@@ -1266,7 +1266,6 @@ static void Init_fpga_data_path( const char *s_data_path )
     xc3s50an.add_data_switch_cfg( p_data_path_cfg, &xc3s50an.fpga_i2s_data_list );
 
 }
-
 
 /*******************************************************
   CLOCK Path:
