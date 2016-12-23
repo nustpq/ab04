@@ -108,6 +108,7 @@ typedef struct _node_role
 }ROLE;
 #pragma pack (  )
 
+//note: if need to extend new path,
 #pragma pack ( 1 )
 typedef struct _fpga_command
 {

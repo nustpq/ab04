@@ -1262,7 +1262,7 @@ static void Init_fpga_data_path( const char *s_data_path )
     FPGA_DATA_SWITCH *p_data_path_cfg;
     APP_TRACE_INFO(("set data path: %s \r\n",s_data_path));
 
-	p_data_path_cfg =  map_name_to_path( s_data_path );
+    p_data_path_cfg =  map_name_to_path( s_data_path );
     xc3s50an.add_data_switch_cfg( p_data_path_cfg, &xc3s50an.fpga_i2s_data_list );
 
 }
