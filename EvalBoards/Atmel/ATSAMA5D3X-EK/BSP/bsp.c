@@ -46,9 +46,9 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.61]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.7]"; //fixed size string
 
-#ifdef  BOARD_TYPE_UIF
+#ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
 const CPU_CHAR hw_model[]    = "[AB04]";
 #endif
@@ -201,22 +201,15 @@ void  BSP_Init (void)
     portsList.match = matchPath;
 
     list_init( &ssc0_data , NULL );
-    ssc0_data.match = NULL;
+    ssc0_data.match = NULL;  
 
-    //FPGA
     init_fpga_instance();
-    
-
-    //CODEC
-    aic3204_init_default();
-
 
     //config port dma
     Dma_configure( );
 
     //initialize Tc1 interval = 1ms
-    _ConfigureTc1( 1000u );
-
+    _ConfigureTc1( 1000u );  
 
 
 //    AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;       /* Disable the Watchdog Timer                               */

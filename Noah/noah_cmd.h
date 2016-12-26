@@ -80,6 +80,7 @@
 #define AUD_CFG_ERR                    203u
 #define UIF_TYPE_NOT_SUPPORT           204u
 #define AUD_CFG_SPI_REC_CONFLICT       205u
+#define POST_ERR_FPGA                  206u
 
 #define FW_BIN_STATE_ERR         211u
 #define FW_BIN_STATE_0_ERR       212u

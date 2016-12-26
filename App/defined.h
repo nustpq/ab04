@@ -85,22 +85,12 @@
 #define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
 #define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
 #define USB_RINGIN_SIZE_16K                ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
-#define SPI_RINGOUT_SIZE_16K               ( 245760UL )               //3072B/s * 10 = 30720B
-#define SPI_RINGIN_SIZE_16K                ( 245760UL )               //3072B/s * 10 = 30720B
 #define USB_CMD_RINGOUT_SIZE_1K            ( 1024  )                  //USB cmd data, size MUST be 2^n .
 #define USB_CMD_RINGIN_SIZE_1k             ( 1024  )                  //USB cmd data, size MUST be 2^n .
+#define USART_BUFFER_SIZE_1K               ( 1024UL  )                //buffer size of usart
 
-#define I2S_PINGPONG_IN_SIZE_3K            ( 24*2*2*2 )               //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
-#define I2S_PINGPONG_OUT_SIZE_3K           I2S_PINGPONG_IN_SIZE_3K    // 
-#define USB_DATAEP_SIZE_64B                (    64UL    )             // force use 64Bytes
-#define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
-#define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
-#define USB_RINGIN_SIZE_16K                ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
 #define SPI_RINGOUT_SIZE_50K               ( 3072 * 16 )              //3072B/2ms * 16 > ( 3072B * 5 )
 #define SPI_RINGIN_SIZE_50K                ( 3072 * 16 )              //3072B/2ms * 16 > ( 3072B * 5 )
-#define USB_CMD_RINGOUT_SIZE_2K            ( 2048UL  )                //USB cmd data, size MUST be 2^n .
-#define USB_CMD_RINGIN_SIZE_2k             ( 2048UL  )                //USB cmd data, size MUST be 2^n .
-#define USART_BUFFER_SIZE_1K               ( 1024UL  )                //buffer size of usart
 
 #define PLAY_BUF_DLY_CNT                  5
 
@@ -169,9 +159,9 @@
 
 #define RULER_ID_DEFAULT                  0xFF
 
-#define SAMPLE_LENGTH                     16
-#define SAMPLE_RATE_DEF                   16000
-#define SET_VOLUME_MUTE                   1000
+//#define SAMPLE_LENGTH                     16
+//#define SAMPLE_RATE_DEF                   16000
+//#define SET_VOLUME_MUTE                   1000
 //ruler state defines
 #define  RULER_STATE_DETACHED           0x00
 #define  RULER_STATE_ATTACHED           0x01
@@ -547,11 +537,11 @@ extern uint8_t ssc0_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;
 extern uint8_t ssc1_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             
 extern uint8_t ssc1_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               
 
-extern uint16_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_16K ];
-extern uint16_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_16K];
+extern uint16_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
+extern uint16_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_50K];
 
-extern uint16_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_16K ];
-extern uint16_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_16K ];
+extern uint16_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
+extern uint16_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_50K ];
 
 //Buffer Level 4:  PingPong buffer for audio data : MAX 48*2*8*2*2 = 3072 B
 //these buffer is private 

@@ -136,8 +136,8 @@
 //#define  BOARD_TYPE_AB01
 //#define  BOARD_TYPE_AB02
 //#define  BOARD_TYPE_AB03
-#define  BOARD_TYPE_UIF
-
+//#define  BOARD_TYPE_UIF
+#define  BOARD_TYPE_AB04
 /*
 *********************************************************************************************************
 *                                             LOCAL DEFINES
@@ -326,7 +326,7 @@ void Get_Flash_Info (void);
 void BSP_Init (void);
 
 extern CPU_INT08U Debug_COM_Sel;
-extern OS_EVENT *Bsp_Ser_Tx_Sem_lock;  
+extern OS_EVENT *Bsp_Ser_Tx_Sem_lock;
 extern OS_EVENT *Bsp_Ser_Rx_Sem_lock;
 
 extern const CPU_CHAR fw_version[];

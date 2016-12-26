@@ -24,6 +24,6 @@ void gpio_init_default( void );
 void uif_miscPin_init_default( void );
 void uif_ports_init_default( void );
 
-void aic3204_init_default( void );
+unsigned char aic3204_init_default( void );
 
 #endif

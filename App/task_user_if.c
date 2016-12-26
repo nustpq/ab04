@@ -73,28 +73,18 @@ void  App_TaskUserIF (void *p_arg)
     //Ruler_Power_Switch(1);
     Init_Global_Var();
     //iM401_Ctrl_Enable = 1;
-    //OSTimeDly(100);
-//    if( AB_POST() )  {
-//        Buzzer_Error();
-//    }
-    
-//    FPGA_Setup();
-    
-    Init_FM36_AB03( 24000,
-                        1,
-                        0,
-                        0,
-                       16,
-                        0,
-                       1);
-
+    OSTimeDly(100);
+    if( AB_POST() )  {
+        Buzzer_Error();
+    }
+        
 
 //#ifndef BOARD_TYPE_AB01
 //    APP_TRACE_INFO(( "\r\nWARNING: NOT AB01, NO MCU Ctrl UART SWITCH\r\n"));
 //#endif
 
     while ( DEF_TRUE ) {                                          /* Task body, always written as an infinite loop.           */
-        FPGA_Setup();
+        
         OSTimeDly( 10 );
 //        msg = (CPU_INT32U *)(OSMboxPend(App_UserIF_Mbox, 0, &err)); //pending, no timeout
    

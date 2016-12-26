@@ -101,7 +101,8 @@ void  App_TaskUSBService ( void *p_arg )
             OSTimeDly(5);
             continue;      
         }
-        
+ 
+#if 1
         //////////////////////// proccess up link data /////////////////////////  
         e = portsList.head;         
         while( e != NULL )
@@ -278,7 +279,7 @@ void  App_TaskUSBService ( void *p_arg )
             e = e -> next;
             
         }
-        
+#endif     
         OSTimeDly( 1 );
         
     } //for loop

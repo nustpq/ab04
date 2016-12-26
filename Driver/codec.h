@@ -26,7 +26,7 @@
 #define PCA9540B_ADDRESS  0xE0
 #define PCA9548A_ADDRESS  0xEE
 
-#define CODEC_ADDRESS     0x30 
+#define CODEC_ADDRESS     0x30
 #define AD1938_ADDRESS    0x04
 #define AD1937_ADDRESS    0x08
 
@@ -55,17 +55,18 @@
 #define   TDM_MODE     2
 #define   TDM16_MODE   3
 
- 
+
 typedef struct {
-    unsigned short sr; // 8000 ~ 48000   
-    uint8_t  sample_len ; //16 or 32 only 
+    unsigned short sr; // 8000 ~ 48000
+    uint8_t  sample_len ; //16 or 32 only
     uint8_t  format; // 0 : i2s, 1 : pcm
     uint8_t  slot_num ; //2, 4, 8
     uint8_t  m_s_sel; //0 : master, 1 : slave;
     uint8_t  flag;  // flag if received audio_cfg command
     uint8_t  bclk_polarity; //1: frame start rising edge match bclk,  0: frame start rising edge inverted bclk
     uint8_t  delay;
-    uint8_t  reserved[3];
+    uint8_t  id;//CODEC ID : 0 or 1
+    uint8_t  reserved[2];
 }CODEC_SETS ;
 
 /****************************************/

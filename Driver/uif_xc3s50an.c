@@ -1168,9 +1168,8 @@ void init_fpga_instance( void )
   xc3s50an.set_clk_path = set_i2s_clk_path;
 
 
-  xc3s50an.controller = &source_spi1;
+  xc3s50an.controller = &source_spi1; 
 
-  init_fpga( );
 }
 
 /*
@@ -1301,9 +1300,10 @@ static void Init_fpga_data_path( const char *s_data_path )
   "fm36_pdmi_clk->hdmi_pdm_clk",
   "uif_pdmo_clk->hdmi_pdm_clk"
 ************************************************************/
-void FPGA_Setup( void )
+unsigned char FPGA_Setup( void )   //?????
 {
-
+    unsigned char err;
+  
     FPGA_COMMAND cmd;
 
     init_fpga();
@@ -1324,10 +1324,11 @@ void FPGA_Setup( void )
     Init_fpga_data_path( "fm36_pdmo_data->uif_pdmo_data" );
     Init_fpga_data_path( "fm36_pdmi_clk->hdmi_pdm_clk" );
     
-    xc3s50an.set_path( &xc3s50an, 
+    err = xc3s50an.set_path( &xc3s50an, 
                        &xc3s50an.cmdWord , 
                        &xc3s50an.fpga_i2s_clk_list, 
                        &xc3s50an.fpga_i2s_data_list );
+    return err;
 
 }
                   

@@ -31,7 +31,7 @@
 
 #include <includes.h>
 
-OS_EVENT *App_AudioManager_Mbox;       
+OS_EVENT *App_AudioManager_Mbox;
 
 
 /*
@@ -53,12 +53,12 @@ void  App_AudioManager (void *p_arg)
 
     CPU_INT08U   err ;
     CPU_INT32U   *msg ;
-    
+
     (void)p_arg;
-    
+
     err   = 0 ;
-    msg   = NULL ;    
-    
+    msg   = NULL ;
+
 ////////////////////////////////////////////////////////////////////////////////
     #if 0
     memset( ssc0_PingPongOut, 0x5555, sizeof( ssc0_PingPongOut ) );
@@ -66,7 +66,7 @@ void  App_AudioManager (void *p_arg)
     memset( ssc0_PingPongIn, 0 , sizeof( ssc0_PingPongIn ) );
     memset( ssc1_PingPongIn, 0 , sizeof( ssc1_PingPongIn ) );
 #endif
-    
+
 #if 0
     Alert_Sound_Gen( ( uint8_t * )ssc0_PingPongOut,
                       sizeof( ssc0_PingPongOut[ 0 ] ),
@@ -113,22 +113,22 @@ void  App_AudioManager (void *p_arg)
        *(pInt+i++) = 0xff00 ;
     }
 #endif
-////////////////////////////////////////////////////////////////////////////////    
-    
-    
+////////////////////////////////////////////////////////////////////////////////
+
+
     while ( DEF_TRUE ) {  /* Task body, always written as an infinite loop.   */
-      
-        msg = ( uint32_t *)OSMboxPend( App_AudioManager_Mbox,  0,  &err );             
+
+        msg = ( uint32_t *)OSMboxPend( App_AudioManager_Mbox,  0,  &err );
         APP_TRACE_INFO(( "\r\n[App_AudioManager_Mbox = 0x%0X ]", *msg ));
-                
+        OSTimeDly(50); //test
         switch( *msg )
-        {  
+        {
             case ( SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT ):
                     if( ( ( uint8_t )START != source_ssc0.status[ IN ] )
                         &&( ( uint8_t )BUFFERED != source_ssc0.status[ IN ] )
                         &&( ( uint8_t )RUNNING != source_ssc0.status[ IN ] ) )
                     {
-//                          OSSchedLock( );
+
                           source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_PingPongOut,
                                                    sizeof( ssc0_PingPongOut ) >> 1 );
                           source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_PingPongIn,
@@ -136,22 +136,21 @@ void  App_AudioManager (void *p_arg)
                           source_ssc0.status[ IN ]  = ( uint8_t )START;
                           source_ssc0.status[ OUT ] = ( uint8_t )START;
 
-                          source_ssc1.buffer_write( &source_ssc1,( uint8_t * )ssc1_PingPongOut,
-                                                   sizeof( ssc1_PingPongOut ) >> 1 );
-                          source_ssc1.buffer_read( &source_ssc1,( uint8_t * )ssc1_PingPongIn,
-                                                   sizeof( ssc1_PingPongIn ) >> 1 );
-                          source_ssc1.status[ IN ]  = ( uint8_t )START;
-                          source_ssc1.status[ OUT ] = ( uint8_t )START;
-//                        OSSchedUnlock( );
-//                        OSTaskSuspend( OS_PRIO_SELF );
+//                          source_ssc1.buffer_write( &source_ssc1,( uint8_t * )ssc1_PingPongOut,
+//                                                   sizeof( ssc1_PingPongOut ) >> 1 );
+//                          source_ssc1.buffer_read( &source_ssc1,( uint8_t * )ssc1_PingPongIn,
+//                                                   sizeof( ssc1_PingPongIn ) >> 1 );
+//                          source_ssc1.status[ IN ]  = ( uint8_t )START;
+//                          source_ssc1.status[ OUT ] = ( uint8_t )START;
+
                     }
           break;
 
           default:
           break;
 
-        } 
-        OSTimeDlyHMSM(0, 0, 0, 10);       
+        }
+        OSTimeDlyHMSM(0, 0, 0, 10);
 
     }
 

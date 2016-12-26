@@ -232,7 +232,7 @@ extern uint32_t DBGU_IsRxReady( void )
 {
     if ( !_bConsoleIsInitialized )
     {
-        //DBGU_Configure( CONSOLE_BAUDRATE, BOARD_MCK ) ;
+        DBGU_Configure( CONSOLE_BAUDRATE, BOARD_MCK ) ;
     }
     return (CONSOLE_DBGU->DBGU_SR & DBGU_SR_RXRDY) > 0 ;
 }

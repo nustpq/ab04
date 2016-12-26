@@ -14,7 +14,7 @@ Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=605109974
+Checksum=1761246034
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -37,13 +37,11 @@ Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_core.c}.1851.5
 Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_core.c}.1848.5" 0 0 1 "" 0 "" 0
 Bp8=_ 0 "EMUL_CODE" "0x2001F3A8" 0 0 1 "" 0 "" 0
 Bp9=_ 0 "EMUL_DATA" "pPath->pOutTarget->txSize" 0 0 0 0 4294967295
-Bp10=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_xc3s50an.c}.408.7" 0 0 1 "" 0 "" 0
-Bp11=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_xc3s50an.c}.427.3" 0 0 1 "" 0 "" 0
-Bp12=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_xc3s50an.c}.402.5" 0 0 1 "" 0 "" 0
-Bp13=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_xc3s50an.c}.1216.5" 0 0 1 "" 0 "" 0
-Bp14=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_xc3s50an.c}.1215.5" 0 0 1 "" 0 "" 0
-Bp15=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_xc3s50an.c}.1156.5" 0 0 1 "" 0 "" 0
-Count=16
+Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_i2s.c}.980.2" 0 0 1 "" 0 "" 0
+Bp11=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\App\task_audio_manager.c}.132.27" 0 0 1 "" 0 "" 0
+Bp12=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\App\task_audio_manager.c}.124.9" 0 0 1 "" 0 "" 0
+Bp13=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\App\task_usb_service.c}.114.17" 0 0 1 "" 0 "" 0
+Count=14
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

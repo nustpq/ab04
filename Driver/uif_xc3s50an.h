@@ -235,5 +235,5 @@ extern void add_data_switch_cfg( FPGA_DATA_SWITCH *cfg ,List *dataList );
 extern void resset_fpga( void );
 extern void init_fpga( void );
 extern void init_fpga_instance( void );
-extern void FPGA_Setup( void ) ;
+extern unsigned char FPGA_Setup( void ) ;
 #endif

@@ -789,7 +789,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     Time_Stamp();
     APP_TRACE_INFO(("\r\n::::: EMB_Data_Parse: cmd type=%d ",cmd_type));
 
-    
+#if 1    
     switch( cmd_type )  {       
               
 //        case 0:
@@ -836,7 +836,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break;
     
     }
-    
+#endif   
     
     
 #if 0
@@ -872,8 +872,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.audio_cfg.master_slave = (uint8_t)temp;
             
             temp = emb_get_attr_int(&root, 12, 0);     //default 0: no SPI recording         
-            PCCmd.audio_cfg.spi_rec_bit_mask = (uint8_t)temp;
-            
+            PCCmd.audio_cfg.spi_rec_bit_mask = (uint8_t)temp;              
            
             err = Setup_Audio( &PCCmd.audio_cfg );
 
@@ -1061,7 +1060,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
                                       pkt_sn, 
                                       DATA_AB_INFO ) ;           
         break ; 
-        
+/*        
         case PC_CMD_REC_VOICE_BUFFER: 
             temp = emb_get_attr_int(&root, 1, -1); //irq gpio index
             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }                 
@@ -1124,15 +1123,15 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
        
         break;       
             
-/*        
-        case PC_CMD_SESSION :
-            if( Session_En ) {
-                Session_En = false;
-            } else {
-                Session_En = true;
-            }            
-        break ;
-*/
+     
+//        case PC_CMD_SESSION :
+//            if( Session_En ) {
+//                Session_En = false;
+//            } else {
+//                Session_En = true;
+//            }            
+//        break ;
+
   
        case PC_CMD_IF_ONOFF : //turn on/off SPI TWI interface for power leakage test
             temp = emb_get_attr_int(&root, 1, -1); 
@@ -1146,7 +1145,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             }            
         break ;       
          
-        
+ */       
 /***************************************************************************
         
 //        case PC_CMD_BURST_WRITE :

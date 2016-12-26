@@ -120,7 +120,7 @@ void BSP_Ser_WrStr_To_Buffer( char *p_str );
 void BSP_Ser_WrStr_To_Buffer_USB( char *p_str );
 
 void Init_Debug_FIFO( void );
-
+void Init_Bulk_FIFO( void );
 void Buzzer_Error( void );
 
 

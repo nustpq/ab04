@@ -179,10 +179,10 @@ uint8_t ssc0_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               //16384B
 uint8_t ssc1_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             //16384B
 uint8_t ssc1_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               //16384B
 
-uint16_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_16K ];
-uint16_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_16K];
-uint16_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_16K ];
-uint16_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_16K ];
+uint16_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
+uint16_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_50K];
+uint16_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
+uint16_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_50K ];
 
 //Buffer Level 4:  PingPong buffer for audio data : MAX 48*2*8*2*2 = 3072 B
 //these buffer is private
@@ -245,15 +245,15 @@ void Init_Bulk_FIFO( void )
 
     //initialize ring buffer relavent spi0;
     pfifo = &spi0_bulkOut_fifo;
-    kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkOut, SPI_RINGOUT_SIZE_16K );
+    kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkOut, SPI_RINGOUT_SIZE_50K );
     pfifo = &spi0_bulkIn_fifo;
-    kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkIn, SPI_RINGIN_SIZE_16K );
+    kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkIn, SPI_RINGIN_SIZE_50K );
 
     //initialize ring buffer relavent spi1;
     pfifo = &spi1_bulkOut_fifo;
-    kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkOut, SPI_RINGOUT_SIZE_16K );
+    kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkOut, SPI_RINGOUT_SIZE_50K );
     pfifo = &spi1_bulkIn_fifo;
-    kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkIn, SPI_RINGIN_SIZE_16K );
+    kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkIn, SPI_RINGIN_SIZE_50K );
 
     //initialize ring buffer relavent usb data ep0;
     pfifo = &ep0BulkOut_fifo;
