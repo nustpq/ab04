@@ -120,7 +120,7 @@ void  App_AudioManager (void *p_arg)
 
         msg = ( uint32_t *)OSMboxPend( App_AudioManager_Mbox,  0,  &err );
         APP_TRACE_INFO(( "\r\n[App_AudioManager_Mbox = 0x%0X ]", *msg ));
-        OSTimeDly(50); //test
+        //OSTimeDly(50); //test
         switch( *msg )
         {
             case ( SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT ):

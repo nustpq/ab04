@@ -213,7 +213,7 @@ void  App_TaskUSBService ( void *p_arg )
                 counter  = kfifo_get_data_size( pPath->pfifoIn );
                 counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pOutTarget->txSize <= counter && pPath->pOutTarget->txSize >= counter ) {
+                if( pPath->pOutTarget->txSize <= counter && pPath->pOutTarget->txSize <= counter2 ) {
                     kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
                              pPath->pOutTarget->txSize );
@@ -238,7 +238,7 @@ void  App_TaskUSBService ( void *p_arg )
                 counter  = kfifo_get_data_size( pPath->pfifoIn );
                 counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pOutTarget->txSize <= counter && pPath->pOutTarget->txSize >= counter ) {
+                if( pPath->pOutTarget->txSize <= counter && pPath->pOutTarget->txSize <= counter2 ) {
                     kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
                              pPath->pOutTarget->txSize );
@@ -263,7 +263,7 @@ void  App_TaskUSBService ( void *p_arg )
                 counter  = kfifo_get_data_size( pPath->pfifoIn );
                 counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pOutTarget->txSize <= counter && pPath->pOutTarget->txSize >= counter ) {
+                if( pPath->pOutTarget->txSize <= counter && pPath->pOutTarget->txSize <= counter2 ) {
                     kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
                              pPath->pOutTarget->txSize );
