@@ -39,8 +39,10 @@ typedef struct _audio_path
   char outHalfName[16];                      //output path
   DataSource  *pInSource;                    //data from
   DataSource  *pOutTarget;                   //data to
-  kfifo_t     *pfifoIn;                      //input ringbuffer handle
-  kfifo_t     *pfifoOut;                     //output ringbuffer handle
+  kfifo_t     *pUpfifoIn;                      //input ringbuffer handle
+  kfifo_t     *pUpfifoOut;                     //output ringbuffer handle  
+  kfifo_t     *pDownfifoIn;                      //input ringbuffer handle
+  kfifo_t     *pDownfifoOut;                     //output ringbuffer handle
   uint32_t    state;                         //work/idle
   uint32_t    epIn;                          //usb end point about this path,
                                              //if not use, ep = 0xff;
