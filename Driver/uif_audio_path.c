@@ -352,15 +352,15 @@ void  createPath( void *source,
 */
 void destroyAllPath( char *pFullName )
 {
-    assert( NULL != pFullName );
-    
+//    assert( NULL != pFullName );
+    pFullName  = pFullName;
     
     while( portsList.size > 0 )
     {
       
       AUDIOPATH *path;
     
-      list_rem_next( &portsList , portsList.tail ,( void * )path );
+      list_rem_next( &portsList , portsList.tail ,( void ** )&path );
     
       if( path->pInSource->peripheral_stop != NULL )
           path->pInSource->peripheral_stop( path->pInSource );

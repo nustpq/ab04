@@ -450,6 +450,7 @@ void Init_Audio_Path()
     AUDIOPATH g_audio_path;
   
     g_audio_path.createAudioPath = createPath;
+    g_audio_path.destroyAudioPath = destroyAllPath;
     g_audio_path.findPort        = findPort;
     
     
@@ -458,6 +459,7 @@ void Init_Audio_Path()
                                    "ep2->ssc0",
                                    &out
                                      );
+ g_audio_path.destroyAudioPath( "any" );
     /*
     g_audio_path.createAudioPath(  "ep1->spi0",
                                    ( void * )&in,
