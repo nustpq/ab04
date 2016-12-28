@@ -556,30 +556,30 @@ unsigned char aic3204_init_default( void )
     unsigned char err;
     CODEC_SETS codec_set;
 
-    codec_set.id = 0;
+    codec_set.id = 0;  //CODEC 0
     codec_set.sr = SAMPLE_RATE_DEFAULT;
     codec_set.sample_len = SAMPLE_LENGTH_DEFAULT;
-    codec_set.format = 2; //I2S-TDM
+    codec_set.format = 0; //I2S-TDM
     codec_set.slot_num = SLOT_NUM_DEFAULT;
-    codec_set.m_s_sel = 1; //master
+    codec_set.m_s_sel = 0; //master
     codec_set.bclk_polarity = 1;
     codec_set.flag = 0;
     codec_set.delay = 0;
-    err = Init_CODEC( &source_twi1,codec_set );
+    err = Init_CODEC( &source_twi2,codec_set ); //CODEC0 connetced to TWI2
     if(err != NO_ERR) {
         return err;
     }
 
-    codec_set.id = 1;
+    codec_set.id = 1;  //CODEC 1
     codec_set.sr = SAMPLE_RATE_DEFAULT;
     codec_set.sample_len = SAMPLE_LENGTH_DEFAULT;
-    codec_set.format = 1;
+    codec_set.format = 0; //I2S-TDM
     codec_set.slot_num = SLOT_NUM_DEFAULT;
-    codec_set.m_s_sel = 0; //slave
+    codec_set.m_s_sel = 1; //slave
     codec_set.bclk_polarity = 1;
     codec_set.flag = 0;
     codec_set.delay = 0;
-    err = Init_CODEC( &source_twi2,codec_set );
+    err = Init_CODEC( &source_twi1,codec_set );//CODEC1 connetced to TWI1
     return err;
 
 }

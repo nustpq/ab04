@@ -115,7 +115,6 @@ void  App_AudioManager (void *p_arg)
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 
-
     while ( DEF_TRUE ) {  /* Task body, always written as an infinite loop.   */
 
         msg = ( uint32_t *)OSMboxPend( App_AudioManager_Mbox,  0,  &err );

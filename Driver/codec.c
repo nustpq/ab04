@@ -1131,7 +1131,7 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
         return CODEC_FORMAT_NOT_SUPPORT_ERR;
     }
     if( codec_set.format == 1 ) {
-        codec_set.slot_num = 2;
+        codec_set.slot_num = 8;
     }
 //    if( codec_set.sample_len == 16 ) {
 //        if( codec_set.slot_num == 2 ) {

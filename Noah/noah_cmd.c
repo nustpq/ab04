@@ -802,7 +802,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
              if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
              audio_0_padding = (uint8_t)temp; 
              Init_Bulk_FIFO();
-             
+             //Init_Audio_Path();
              port_control_info = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );             
              while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
                  OSTimeDly(5);                      

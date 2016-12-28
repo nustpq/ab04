@@ -65,7 +65,7 @@ void  App_TaskUSBService ( void *p_arg )
     err = 0;
     usb_state_saved = 0;
     
-    Init_Audio_Path();
+    
     
     for(;;) 
     {          
@@ -416,16 +416,16 @@ void Init_Audio_Path()
     AUDIO_CFG in,out;
     
     in.bit_length = 16;
-    in.channel_num = 8;
+    in.channel_num = 2;
     in.ssc_delay = 0;
-    in.sample_rate = 48000;
+    in.sample_rate = 16000;
     in.ssc_cki = 0;
     in.ssc_start = 0;
     
     out.bit_length = 16;
-    out.channel_num = 8;
+    out.channel_num = 2;
     out.ssc_delay = 0;
-    out.sample_rate = 48000;
+    out.sample_rate = 16000;
     out.ssc_cki = 1;
     out.ssc_start = 0;
     
