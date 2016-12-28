@@ -801,7 +801,11 @@ void ssc_txRegister_set( void *instance,void *parameter )
     if( reg->channel_num > 0 ) 
     {        
         tfmr.datnb  = reg->channel_num - 1 ; 
-        tfmr.datlen = reg->bit_length-1;  
+        tfmr.datlen = reg->bit_length-1;
+        tfmr.msbf =    1;      //reg->msbf;
+        tfmr.fsedge = 1;       //reg->fsedge;
+        
+        tcmr.cks = 2;  
         tcmr.cki = reg->ssc_cki;
         tcmr.sttdly = reg->ssc_delay;
         tcmr.start = reg->ssc_start;
@@ -840,7 +844,11 @@ void ssc_rxRegister_set( void *instance,void *parameter )
     if( reg->channel_num > 0 ) 
     {        
         rfmr.datnb  = reg->channel_num - 1 ; 
-        rfmr.datlen = reg->bit_length-1;  
+        rfmr.datlen = reg->bit_length-1;
+        rfmr.msbf =    1;      //reg->msbf;
+        rfmr.fsedge = 1;       //reg->fsedge;
+        
+        rcmr.cks = 1;        
         rcmr.cki = reg->ssc_cki;
         rcmr.sttdly = reg->ssc_delay;
         rcmr.start = reg->ssc_start;

@@ -10,6 +10,7 @@
 #include "uif_i2s.h"
 #include "uif_gpio.h"
 
+#if 0
 const static char* halfPath[]={
                                 "ep1->ssc0",                                //0
                                 "ep2<-ssc0",                                //1
@@ -30,7 +31,23 @@ const static char* halfPath[]={
                                 "ssc0->ssc1",                               //14
                                 "ssc1<-ssc0",                               //15
                               };
+#else                                
+const static char* halfPath[]={
+                                "ep1<-ssc0",                                //0
+                                "ep2->ssc0",                                //1
+                                
+                                "ep7<-spi0",                                //2
+                                "ep8->spi0",                                //3
+                                
+                                "ep7<-gpio",                                //4
+                                "ep8->gpio",                                //5
+                                
+                                "ep5<-ssc1",                                //6
+                                "ep6->ssc1",                                //7                              
+                    
+                              };  
 
+#endif
 
 typedef struct _audio_path
 {
@@ -72,7 +89,7 @@ void createPath( void *source,
                  void *outParameter
                 );
 
-void destroyPath( char *pFullName );
+void destroyAllPath( char *pFullName );
 void stratPath( void *path );
 void stopPath( void *path );
 

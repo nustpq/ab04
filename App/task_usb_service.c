@@ -66,7 +66,7 @@ void  App_TaskUSBService ( void *p_arg )
     usb_state_saved = 0;
     
     
-    
+    Init_Audio_Path( );
     for(;;) 
     {          
         usb_state =   USBD_GetState();         
@@ -417,17 +417,17 @@ void Init_Audio_Path()
     
     in.bit_length = 16;
     in.channel_num = 2;
-    in.ssc_delay = 0;
+    in.ssc_delay = 1;
     in.sample_rate = 16000;
-    in.ssc_cki = 0;
-    in.ssc_start = 0;
+    in.ssc_cki = 1;
+    in.ssc_start = 4;
     
     out.bit_length = 16;
     out.channel_num = 2;
-    out.ssc_delay = 0;
+    out.ssc_delay = 1;
     out.sample_rate = 16000;
-    out.ssc_cki = 1;
-    out.ssc_start = 0;
+    out.ssc_cki = 0;
+    out.ssc_start = 4;
     
     AUDIOPATH g_audio_path;
   
@@ -435,10 +435,10 @@ void Init_Audio_Path()
     g_audio_path.findPort        = findPort;
     
     
-    g_audio_path.createAudioPath(  "ep1->ssc0",
-                                   ( void * )&in,
-                                   "ep2<-ssc0",
-                                   ( void * )&out
+    g_audio_path.createAudioPath(  "ep1<-ssc0",
+                                   &in,
+                                   "ep2->ssc0",
+                                   &out
                                      );
     /*
     g_audio_path.createAudioPath(  "ep1->spi0",
