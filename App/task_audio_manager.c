@@ -130,8 +130,8 @@ void  App_AudioManager (void *p_arg)
 
                           source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_PingPongOut,
                                                    sizeof( ssc0_PingPongOut ) >> 1 );
-//                          source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_PingPongIn,
-//                                                   sizeof( ssc0_PingPongIn ) >>1 );
+                          source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_PingPongIn,
+                                                   sizeof( ssc0_PingPongIn ) >>1 );
                           source_ssc0.status[ IN ]  = ( uint8_t )START;
                           source_ssc0.status[ OUT ] = ( uint8_t )START;
 

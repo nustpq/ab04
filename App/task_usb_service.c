@@ -109,18 +109,11 @@ void  App_TaskUSBService ( void *p_arg )
         {
             pPath = ( AUDIOPATH * )e->data;
             
-            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN == pPath->epIn ) {  //SSC0 Rec
-                //step1: calculate space of ssc0/spi0/gpio ring buffer.
-                counter  = kfifo_get_data_size( pPath->pUpfifoIn );             
-                //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pInSource->rxSize < counter )
-                    kfifo_get( pPath->pUpfifoIn,
-                             ( uint8_t * )tmpBuffer,
-                             pPath->pInSource->rxSize );
+            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN == pPath->epIn ) {  //SSC0 Rec      
                 
                 counter = kfifo_get_data_size( &ep0BulkIn_fifo );     
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_in && audio_run_control)  {
-                    APP_TRACE_INFO(("\r\nBulk  In 0 start"));
+                    APP_TRACE_INFO(("\r\nAudio 0 BulkIn start"));
                     restart_audio_0_bulk_in = false ;
                     // ep0 ring --> usb cache
                     kfifo_get( &ep0BulkIn_fifo,
@@ -132,20 +125,26 @@ void  App_TaskUSBService ( void *p_arg )
                                             USB_DATAEP_SIZE_64B,  //64B size for low delay
                                             (TransferCallback)UsbAudio0DataTransmit,
                                             0);  
-                }
-                
-            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->epIn ) {  //SSC1 Rec
-                //step1: calculate space of ssc0/spi0/gpio ring buffer.
-                counter  = kfifo_get_data_size( pPath->pUpfifoIn );             
+                }         
+          
+                counter  = kfifo_get_data_size( pPath->pUpfifoIn );
+                counter2 = kfifo_get_free_space( pPath->pUpfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pInSource->rxSize < counter )
+                if( pPath->pInSource->rxSize <= counter && pPath->pInSource->rxSize <= counter2 ) {
                     kfifo_get( pPath->pUpfifoIn,
                              ( uint8_t * )tmpBuffer,
                              pPath->pInSource->rxSize );
+                    kfifo_put( pPath->pUpfifoOut,
+                             ( uint8_t * )tmpBuffer,
+                             pPath->pInSource->rxSize );                 
+                }  
+                
+                
+            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->epIn ) {  //SSC1 Rec       
                 
                 counter = kfifo_get_data_size( &ep1BulkIn_fifo );     
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_in && audio_run_control)  {
-                    APP_TRACE_INFO(("\r\nBulk  In 1 start"));
+                    APP_TRACE_INFO(("\r\nAudio 1 BulkIn start"));
                     restart_audio_1_bulk_in = false ;
                     // ep0 ring --> usb cache
                     kfifo_get( &ep1BulkIn_fifo,
@@ -157,20 +156,26 @@ void  App_TaskUSBService ( void *p_arg )
                                             USB_DATAEP_SIZE_64B,  //64B size for low delay
                                             (TransferCallback)UsbAudio1DataTransmit,
                                             0);  
-                }
-                
-            } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->epIn ) {  //SPI/GPIO Rec
-                //step1: calculate space of ssc0/spi0/gpio ring buffer.
-                counter  = kfifo_get_data_size( pPath->pUpfifoIn );             
+                }         
+          
+                counter  = kfifo_get_data_size( pPath->pUpfifoIn );
+                counter2 = kfifo_get_free_space( pPath->pUpfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pInSource->rxSize < counter )
+                if( pPath->pInSource->rxSize <= counter && pPath->pInSource->rxSize <= counter2 ) {
                     kfifo_get( pPath->pUpfifoIn,
                              ( uint8_t * )tmpBuffer,
                              pPath->pInSource->rxSize );
+                    kfifo_put( pPath->pUpfifoOut,
+                             ( uint8_t * )tmpBuffer,
+                             pPath->pInSource->rxSize );                 
+                }      
+                
+                
+            } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->epIn ) {  //SPI Rec       
                 
                 counter = kfifo_get_data_size( &ep2BulkIn_fifo );     
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_in && audio_run_control)  {
-                    APP_TRACE_INFO(("\r\nBulk  In 2 start"));
+                    APP_TRACE_INFO(("\r\nAudio 2 BulkIn start"));
                     restart_audio_2_bulk_in = false ;
                     // ep0 ring --> usb cache
                     kfifo_get( &ep2BulkIn_fifo,
@@ -182,7 +187,20 @@ void  App_TaskUSBService ( void *p_arg )
                                             USB_DATAEP_SIZE_64B,  //64B size for low delay
                                             (TransferCallback)UsbSPIDataTransmit,
                                             0);  
-                }
+                }         
+          
+                counter  = kfifo_get_data_size( pPath->pUpfifoIn );
+                counter2 = kfifo_get_free_space( pPath->pUpfifoOut );
+                //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
+                if( pPath->pInSource->rxSize <= counter && pPath->pInSource->rxSize <= counter2 ) {
+                    kfifo_get( pPath->pUpfifoIn,
+                             ( uint8_t * )tmpBuffer,
+                             pPath->pInSource->rxSize );
+                    kfifo_put( pPath->pUpfifoOut,
+                             ( uint8_t * )tmpBuffer,
+                             pPath->pInSource->rxSize );                 
+                } 
+        
                 
             } else {
                 APP_TRACE_INFO(("\r\nPath Ep not defined : %d",pPath->epIn));             
@@ -202,7 +220,7 @@ void  App_TaskUSBService ( void *p_arg )
                 counter = kfifo_get_free_space( pPath->pDownfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out && audio_run_control )  {
                     restart_audio_0_bulk_out = false ;
-                    APP_TRACE_INFO(("\r\nBulk Out 0 start"));
+                    APP_TRACE_INFO(("\r\nAudio 0 BulkOut start"));
                     // send ep0 data ---> pc
                     CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
                                         USB_DATAEP_SIZE_64B,
@@ -227,7 +245,7 @@ void  App_TaskUSBService ( void *p_arg )
                 counter = kfifo_get_free_space( pPath->pDownfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_out && audio_run_control )  {
                     restart_audio_1_bulk_out = false ;
-                    APP_TRACE_INFO(("\r\nBulk Out 1 start"));
+                    APP_TRACE_INFO(("\r\nAudio 1 BulkOut start"));
                     // send ep0 data ---> pc
                     CDCDSerialDriver_ReadAudio_1( usbCacheBulkOut1,
                                         USB_DATAEP_SIZE_64B,
@@ -252,7 +270,7 @@ void  App_TaskUSBService ( void *p_arg )
                 counter = kfifo_get_free_space( pPath->pDownfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_out && audio_run_control )  {
                     restart_audio_2_bulk_out = false ;
-                    APP_TRACE_INFO(("\r\nBulk Out 2 start"));
+                    APP_TRACE_INFO(("\r\nAudio 2 BulkOut start"));
                     // send ep0 data ---> pc
                     CDCDSerialDriver_ReadSPI( usbCacheBulkOut2,
                                         USB_DATAEP_SIZE_64B,
