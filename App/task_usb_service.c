@@ -109,7 +109,7 @@ void  App_TaskUSBService ( void *p_arg )
         {
             pPath = ( AUDIOPATH * )e->data;
             
-            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN == pPath->epIn ) {  //SSC0 Rec      
+            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN == pPath->ep ) {  //SSC0 Rec      
                 
                 counter = kfifo_get_data_size( &ep0BulkIn_fifo );     
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_in && audio_run_control)  {
@@ -127,20 +127,20 @@ void  App_TaskUSBService ( void *p_arg )
                                             0);  
                 }         
           
-                counter  = kfifo_get_data_size( pPath->pUpfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pUpfifoOut );
+                counter  = kfifo_get_data_size( pPath->pfifoIn );
+                counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pInSource->rxSize <= counter && pPath->pInSource->rxSize <= counter2 ) {
-                    kfifo_get( pPath->pUpfifoIn,
+                if( pPath->pSource->rxSize <= counter && pPath->pSource->rxSize <= counter2 ) {
+                    kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pInSource->rxSize );
-                    kfifo_put( pPath->pUpfifoOut,
+                             pPath->pSource->rxSize );
+                    kfifo_put( pPath->pfifoOut,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pInSource->rxSize );                 
+                             pPath->pSource->rxSize );                 
                 }  
                 
                 
-            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->epIn ) {  //SSC1 Rec       
+            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->ep ) {  //SSC1 Rec       
                 
                 counter = kfifo_get_data_size( &ep1BulkIn_fifo );     
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_in && audio_run_control)  {
@@ -158,20 +158,20 @@ void  App_TaskUSBService ( void *p_arg )
                                             0);  
                 }         
           
-                counter  = kfifo_get_data_size( pPath->pUpfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pUpfifoOut );
+                counter  = kfifo_get_data_size( pPath->pfifoIn );
+                counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pInSource->rxSize <= counter && pPath->pInSource->rxSize <= counter2 ) {
-                    kfifo_get( pPath->pUpfifoIn,
+                if( pPath->pSource->rxSize <= counter && pPath->pSource->rxSize <= counter2 ) {
+                    kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pInSource->rxSize );
-                    kfifo_put( pPath->pUpfifoOut,
+                             pPath->pSource->rxSize );
+                    kfifo_put( pPath->pfifoOut,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pInSource->rxSize );                 
+                             pPath->pSource->rxSize );                 
                 }      
                 
                 
-            } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->epIn ) {  //SPI Rec       
+            } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->ep ) {  //SPI Rec       
                 
                 counter = kfifo_get_data_size( &ep2BulkIn_fifo );     
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_in && audio_run_control)  {
@@ -189,21 +189,21 @@ void  App_TaskUSBService ( void *p_arg )
                                             0);  
                 }         
           
-                counter  = kfifo_get_data_size( pPath->pUpfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pUpfifoOut );
+                counter  = kfifo_get_data_size( pPath->pfifoIn );
+                counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pInSource->rxSize <= counter && pPath->pInSource->rxSize <= counter2 ) {
-                    kfifo_get( pPath->pUpfifoIn,
+                if( pPath->pSource->rxSize <= counter && pPath->pSource->rxSize <= counter2 ) {
+                    kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pInSource->rxSize );
-                    kfifo_put( pPath->pUpfifoOut,
+                             pPath->pSource->rxSize );
+                    kfifo_put( pPath->pfifoOut,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pInSource->rxSize );                 
+                             pPath->pSource->rxSize );                 
                 } 
         
                 
             } else {
-                APP_TRACE_INFO(("\r\nPath Ep not defined : %d",pPath->epIn));             
+                APP_TRACE_INFO(("\r\nPath Ep not defined : %d",pPath->ep ));             
               
             }              
             e = e -> next;
@@ -216,8 +216,8 @@ void  App_TaskUSBService ( void *p_arg )
         {
             pPath = ( AUDIOPATH * )e->data;
             
-            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT == pPath->epOut ) { //SSC0 Play
-                counter = kfifo_get_free_space( pPath->pDownfifoIn );
+            if( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT == pPath->ep ) { //SSC0 Play
+                counter = kfifo_get_free_space( pPath->pfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out && audio_run_control )  {
                     restart_audio_0_bulk_out = false ;
                     APP_TRACE_INFO(("\r\nAudio 0 BulkOut start"));
@@ -228,21 +228,21 @@ void  App_TaskUSBService ( void *p_arg )
                                         0);  
                 }
               
-                counter  = kfifo_get_data_size( pPath->pDownfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pDownfifoOut );
+                counter  = kfifo_get_data_size( pPath->pfifoIn );
+                counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pOutTarget->txSize <= counter && pPath->pOutTarget->txSize <= counter2 ) {
-                    kfifo_get( pPath->pDownfifoIn,
+                if( pPath->pSource->txSize <= counter && pPath->pSource->txSize <= counter2 ) {
+                    kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pOutTarget->txSize );
-                    kfifo_put( pPath->pDownfifoOut,
+                             pPath->pSource->txSize );
+                    kfifo_put( pPath->pfifoOut,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pOutTarget->txSize );                 
+                             pPath->pSource->txSize );                 
                 }               
            
                 
-            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->epOut ) {   //SSC1 Play
-                counter = kfifo_get_free_space( pPath->pDownfifoIn );
+            } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->ep ) {   //SSC1 Play
+                counter = kfifo_get_free_space( pPath->pfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_out && audio_run_control )  {
                     restart_audio_1_bulk_out = false ;
                     APP_TRACE_INFO(("\r\nAudio 1 BulkOut start"));
@@ -253,21 +253,21 @@ void  App_TaskUSBService ( void *p_arg )
                                         0);  
                 }
               
-                counter  = kfifo_get_data_size( pPath->pDownfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pDownfifoOut );
+                counter  = kfifo_get_data_size( pPath->pfifoIn );
+                counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pOutTarget->txSize <= counter && pPath->pOutTarget->txSize <= counter2 ) {
-                    kfifo_get( pPath->pDownfifoIn,
+                if( pPath->pSource->txSize <= counter && pPath->pSource->txSize <= counter2 ) {
+                    kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pOutTarget->txSize );
-                    kfifo_put( pPath->pDownfifoOut,
+                             pPath->pSource->txSize );
+                    kfifo_put( pPath->pfifoOut,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pOutTarget->txSize );                 
+                             pPath->pSource->txSize );                 
                 }               
            
                 
-            } else if( CDCDSerialDriverDescriptors_SPI_DATAOUT == pPath->epOut ) { //SPI/GPIO Play
-                counter = kfifo_get_free_space( pPath->pDownfifoIn );
+            } else if( CDCDSerialDriverDescriptors_SPI_DATAOUT == pPath->ep ) { //SPI/GPIO Play
+                counter = kfifo_get_free_space( pPath->pfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_out && audio_run_control )  {
                     restart_audio_2_bulk_out = false ;
                     APP_TRACE_INFO(("\r\nAudio 2 BulkOut start"));
@@ -278,20 +278,20 @@ void  App_TaskUSBService ( void *p_arg )
                                         0);  
                 }
               
-                counter  = kfifo_get_data_size( pPath->pDownfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pDownfifoOut );
+                counter  = kfifo_get_data_size( pPath->pfifoIn );
+                counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pOutTarget->txSize <= counter && pPath->pOutTarget->txSize <= counter2 ) {
-                    kfifo_get( pPath->pDownfifoIn,
+                if( pPath->pSource->txSize <= counter && pPath->pSource->txSize <= counter2 ) {
+                    kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pOutTarget->txSize );
-                    kfifo_put( pPath->pDownfifoOut,
+                             pPath->pSource->txSize );
+                    kfifo_put( pPath->pfifoOut,
                              ( uint8_t * )tmpBuffer,
-                             pPath->pOutTarget->txSize );                 
+                             pPath->pSource->txSize );                 
                 }               
                                       
             } else {
-                APP_TRACE_INFO(("\r\nPath Ep not defined : %d",pPath->epOut));
+                APP_TRACE_INFO(("\r\nPath Ep not defined : %d",pPath->ep ));
                 
             }            
             e = e -> next;
@@ -454,10 +454,8 @@ void Init_Audio_Path()
     g_audio_path.findPort        = findPort;
     
     
-    g_audio_path.createAudioPath(  "ep1<-ssc0",
-                                   &in,
-                                   "ep2->ssc0",
-                                   &out
+    g_audio_path.createAudioPath(  "ep2->ssc0",
+                                   &in
                                      );
 // g_audio_path.destroyAudioPath( "any" );
     /*

@@ -51,28 +51,17 @@ const static char* halfPath[]={
 
 typedef struct _audio_path
 {
-  char fullPathName[32];                     //path name
-  char inHalfName[16];                       //input path
-  char outHalfName[16];                      //output path
-  DataSource  *pInSource;                    //data from
-  DataSource  *pOutTarget;                   //data to
-  kfifo_t     *pUpfifoIn;                      //input ringbuffer handle
-  kfifo_t     *pUpfifoOut;                     //output ringbuffer handle  
-  kfifo_t     *pDownfifoIn;                      //input ringbuffer handle
-  kfifo_t     *pDownfifoOut;                     //output ringbuffer handle
-  uint32_t    state;                         //work/idle
-  uint32_t    epIn;                          //usb end point about this path,
-                                             //if not use, ep = 0xff;
-  uint32_t    epOut;                         //usb end point about this path,  
-                                             //if not use, ep = 0xff;
-      
-//  List *data_path;                        //path list that in used;
+  char name[16];                       //input path
 
+  DataSource  *pSource;                    //data from
+  kfifo_t     *pfifoIn;                      //input ringbuffer handle
+  kfifo_t     *pfifoOut;                     //output ringbuffer handle  
+
+  uint32_t    state;                         //work/idle
+  uint32_t    ep;                          //usb end point about this path,
   
   void ( *createAudioPath )( void *source,
-                             void *inParameter,
-                             void *target,
-                             void *outParameter
+                             void *inParameter
                             );
   
   void ( *destroyAudioPath )( char *pFullName );  
@@ -81,12 +70,9 @@ typedef struct _audio_path
   int  ( *findPort  )( const void *pPath,const void *port );
   
 }AUDIOPATH;
-//
 
 void createPath( void *source,
-                 void *inParameter,
-                 void *target,
-                 void *outParameter
+                 void *inParameter
                 );
 
 void destroyAllPath( char *pFullName );

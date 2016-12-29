@@ -108,7 +108,7 @@ int matchPath( const void *key1,const void *key2 )
   {
       AUDIOPATH * pPath = ( AUDIOPATH * )e->data;
       
-      if( strcmp( pPath->fullPathName , name ) == 0 )
+      if( strcmp( pPath->name , name ) == 0 )
         return 0;
       else
         e = e->next;
@@ -147,7 +147,7 @@ int findPort( const void *pPath,const void *port )
   {
       AUDIOPATH * pPath = ( AUDIOPATH * )e->data;
       
-      p = strstr( pPath->fullPathName , pName );
+      p = strstr( pPath->name , pName );
       
       if(  p != NULL )
         return 0;
@@ -176,28 +176,22 @@ int findPort( const void *pPath,const void *port )
 extern void *malloc( uint32_t num_bytes );
 
 void  createPath( void *source,
-                  void *inParameter,
-                  void *target,
-                  void *outParameter
+                  void *parameter
                           )
 {
     AUDIOPATH *path;
     int8_t index = 0; 
     uint32_t len = strlen( halfPath[ 0 ] ) + 1;
     
-    assert(( NULL != source ) && ( NULL != target ) );
+    assert( NULL != source );
     
     path = ( AUDIOPATH * )malloc( sizeof( AUDIOPATH ) );
     
-    memset( path->inHalfName, 0 ,sizeof( path->inHalfName ) );
-    memset( path->outHalfName, 0 ,sizeof( path->outHalfName ) ); 
-    memset( path->fullPathName , 0 , sizeof( path->fullPathName ) );
+    memset( path->name, 0 ,sizeof( path->name ) );
     
-    memcpy( path->inHalfName , source , len );
-    memcpy( path->outHalfName , target , len );    
-    generateFullPathName( path->inHalfName, path->outHalfName, path->fullPathName );
+    memcpy( path->name , source , len );
     
-    index = getPathIndex( path->inHalfName );
+    index = getPathIndex( path->name );
     assert( index != -1 );
     
     /*step0 : check the ports state and shut down them;
@@ -222,23 +216,23 @@ void  createPath( void *source,
         case 0:                            //ep1<-ssc0
           {
               //step1:install port;
-              path->pInSource = &source_ssc0;
+              path->pSource = &source_ssc0;
               //step2:set initialize function;
-              path->pInSource->set_peripheral = ssc_rxRegister_set;
+              path->pSource->set_peripheral = ssc_rxRegister_set;
               //step3:install buffer;              
-              path->pUpfifoIn = &ssc0_bulkin_fifo;
-              path->pUpfifoOut = &ep0BulkIn_fifo;
+              path->pfifoIn = &ssc0_bulkin_fifo;
+              path->pfifoOut = &ep0BulkIn_fifo;
               //step4: install ep;
-              path->epIn = CDCDSerialDriverDescriptors_AUDIO_0_DATAIN;
+              path->ep = CDCDSerialDriverDescriptors_AUDIO_0_DATAIN;
           }   
           break;
         case 2:                           //ep7<-spi0
           {
-              path->pInSource = &source_spi0;
-              path->pInSource->set_peripheral = spi_register_set;
-              path->pUpfifoIn = &spi0_bulkIn_fifo;
-              path->pUpfifoOut = &ep2BulkIn_fifo;
-              path->epIn = CDCDSerialDriverDescriptors_SPI_DATAIN;              
+              path->pSource = &source_spi0;
+              path->pSource->set_peripheral = spi_register_set;
+              path->pfifoIn = &spi0_bulkIn_fifo;
+              path->pfifoOut = &ep2BulkIn_fifo;
+              path->ep = CDCDSerialDriverDescriptors_SPI_DATAIN;              
           }
           break;
         case 4:                           //ep7<-gpio
@@ -252,48 +246,31 @@ void  createPath( void *source,
           break;
         case 6:                          //ep5<-ssc1
           {
-              path->pInSource = &source_ssc1; 
-              path->pInSource->set_peripheral = ssc_rxRegister_set;
-              path->pUpfifoIn = &ssc1_bulkin_fifo; 
-              path->pUpfifoOut = &ep1BulkIn_fifo;             
-              path->epIn = CDCDSerialDriverDescriptors_AUDIO_1_DATAIN;              
+              path->pSource = &source_ssc1; 
+              path->pSource->set_peripheral = ssc_rxRegister_set;
+              path->pfifoIn = &ssc1_bulkin_fifo; 
+              path->pfifoOut = &ep1BulkIn_fifo;             
+              path->ep = CDCDSerialDriverDescriptors_AUDIO_1_DATAIN;              
           }
           break;
-
-        default:
-          break; 
-    }  
-    
-    //step4:configure port received registers ;
-    AUDIO_CFG *reg = ( AUDIO_CFG * )inParameter;
-    if( path->pInSource->set_peripheral != NULL )  
-            path->pInSource->set_peripheral( path->pInSource,inParameter )
-      ;
-    else
-           APP_TRACE_INFO(("\nCann't configure port !\r\n"));
-
-    index = getPathIndex( path->outHalfName );
-    assert( index != -1 );
     
     //down link usb<--ssc0/spi0/gpio
-    switch( index )
-    {
         case 1:                            //ep2->ssc0
           {
-              path->pOutTarget = &source_ssc0;
-              path->pOutTarget->set_peripheral = ssc_txRegister_set;
-              path->pDownfifoIn = &ep0BulkOut_fifo;          
-              path->pDownfifoOut = &ssc0_bulkout_fifo;
-              path->epOut = CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT;
+              path->pSource = &source_ssc0;
+              path->pSource->set_peripheral = ssc_txRegister_set;
+              path->pfifoIn = &ep0BulkOut_fifo;          
+              path->pfifoOut = &ssc0_bulkout_fifo;
+              path->ep = CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT;
           }
           break;
         case 3:                           //ep8->spi0
           {
-              path->pOutTarget = &source_spi0;
-              path->pOutTarget->set_peripheral = spi_register_set;
-              path->pDownfifoIn = &ep2BulkOut_fifo;           
-              path->pDownfifoOut = &spi0_bulkOut_fifo; 
-              path->epOut = CDCDSerialDriverDescriptors_SPI_DATAOUT; 
+              path->pSource = &source_spi0;
+              path->pSource->set_peripheral = spi_register_set;
+              path->pfifoIn = &ep2BulkOut_fifo;           
+              path->pfifoOut = &spi0_bulkOut_fifo; 
+              path->ep = CDCDSerialDriverDescriptors_SPI_DATAOUT; 
           }
           break;
         case 5:                          //ep8->gpio
@@ -307,11 +284,11 @@ void  createPath( void *source,
           break;
         case 7:                          //ep6->ssc1
           {
-              path->pOutTarget = &source_ssc1;
-              path->pOutTarget->set_peripheral = ssc_txRegister_set;
-              path->pDownfifoIn = &ep1BulkOut_fifo;           
-              path->pDownfifoOut = &ssc1_bulkout_fifo;
-              path->epOut = CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT;  
+              path->pSource = &source_ssc1;
+              path->pSource->set_peripheral = ssc_txRegister_set;
+              path->pfifoIn = &ep1BulkOut_fifo;           
+              path->pfifoOut = &ssc1_bulkout_fifo;
+              path->ep = CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT;  
           }
           break;
 
@@ -320,15 +297,15 @@ void  createPath( void *source,
     }
     
     //step5: configure port sent registers ;
-    if( path->pOutTarget->set_peripheral != NULL )  
-           path->pOutTarget->set_peripheral( path->pOutTarget,outParameter )
+    if( path->pSource->set_peripheral != NULL )  
+           path->pSource->set_peripheral( path->pSource, parameter )
              ;
 
     else
            APP_TRACE_INFO(("\nCan't configure port !\r\n"));
     
     //step6: enquen
-    if( portsList.match( &portsList,path->fullPathName ) )
+    if( portsList.match( &portsList,path->name ) )
         list_ins_next( &portsList,portsList.tail,path );
     else
         APP_TRACE_INFO(("\nPath already in use !\r\n"));
@@ -362,11 +339,8 @@ void destroyAllPath( char *pFullName )
     
       list_rem_next( &portsList , NULL ,( void ** )&path );
     
-      if( path->pInSource->peripheral_stop != NULL )
-          path->pInSource->peripheral_stop( path->pInSource );
-    
-      if( path->pOutTarget->peripheral_stop != NULL )
-          path->pOutTarget->peripheral_stop( path->pOutTarget );
+      if( path->pSource->peripheral_stop != NULL )
+          path->pSource->peripheral_stop( path->pSource );
       
       free( path );
     }
