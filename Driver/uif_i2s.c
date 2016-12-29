@@ -227,17 +227,20 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
      if( temp >= pSource->warmWaterLevel )
      {
        ///Todo: 0xf should be instead with mask;
+       /*
        source_gpio.buffer_read( &source_gpio, 
                                 ( uint8_t * )&source_gpio.pBufferIn[ pSource-> rx_index ], 
-                                 10 );            
+                                 10 );  
+       */
 
        kfifo_put( pSource->pRingBulkIn,
                   ( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
                   pSource->rxSize );
-       
+       /*
        kfifo_put( pSource->pRingBulkIn,
                   ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
                   source_gpio.rxSize );
+       */
  
        pSource->rx_index = 1 - pSource->rx_index;
        
@@ -258,21 +261,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 #endif               
                return;
             }
-     }
-     /*step3:copy data to buffer*/
-#if 0     
-     CDCDSerialDriver_ReadAudio_0(     usbCacheBulkOut0,                              \
-                                USB_DATAEP_SIZE_64B,                           \
-                                (TransferCallback) UsbAudio0DataReceived,      \
-                                  0);
-     CDCDSerialDriver_WriteAudio_0(    usbCacheBulkIn0,                               \
-                                 USB_DATAEP_SIZE_64B,                          \
-                               (TransferCallback) UsbAudio0DataTransmit,       \
-                               0);
-#endif     
-
-
-   
+     }   
 }
 
 /*

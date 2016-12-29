@@ -14,7 +14,7 @@ Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=899779535
+Checksum=1218392110
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -38,8 +38,7 @@ Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_core.c}.1848.5
 Bp8=_ 0 "EMUL_CODE" "0x2001F3A8" 0 0 1 "" 0 "" 0
 Bp9=_ 0 "EMUL_DATA" "pPath->pOutTarget->txSize" 0 0 0 0 4294967295
 Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\App\task_usb_service.c}.231.17" 0 0 1 "" 0 "" 0
-Bp11=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\App\task_usb_service.c}.112.13" 0 0 1 "" 0 "" 0
-Count=12
+Count=11
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -48,8 +47,10 @@ Category=_ 0
 LoggingEnabled=_ 0
 LogFile=_ ""
 [Aliases]
-Count=0
-SuppressDialog=0
+A0=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c"
+A1=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c"
+Count=2
+SuppressDialog=1
 [CallStackLog]
 Enabled=0
 [DriverProfiling]

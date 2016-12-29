@@ -459,7 +459,7 @@ void Init_Audio_Path()
                                    "ep2->ssc0",
                                    &out
                                      );
- g_audio_path.destroyAudioPath( "any" );
+// g_audio_path.destroyAudioPath( "any" );
     /*
     g_audio_path.createAudioPath(  "ep1->spi0",
                                    ( void * )&in,

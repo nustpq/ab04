@@ -367,6 +367,8 @@ void destroyAllPath( char *pFullName )
     
       if( path->pOutTarget->peripheral_stop != NULL )
           path->pOutTarget->peripheral_stop( path->pOutTarget );
+      
+      free( path );
     }
 }
 
