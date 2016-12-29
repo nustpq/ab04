@@ -360,7 +360,7 @@ void destroyAllPath( char *pFullName )
       
       AUDIOPATH *path;
     
-      list_rem_next( &portsList , portsList.tail ,( void ** )&path );
+      list_rem_next( &portsList , NULL ,( void ** )&path );
     
       if( path->pInSource->peripheral_stop != NULL )
           path->pInSource->peripheral_stop( path->pInSource );
