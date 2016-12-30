@@ -51,6 +51,7 @@ static const char* DMA_INFO[ DMAD_CANCELED + 1 ] = { "DMAD_OK",
 extern uint32_t g_portMask;
 extern void BSP_LED_On( uint32_t );
 extern void BSP_LED_Off( uint32_t );
+extern void Alert_Sound_Gen( uint8_t *pdata, uint32_t size, uint32_t REC_SR_Set );
 
 /*
 *********************************************************************************************************
@@ -202,77 +203,11 @@ void _config_pins( uint32_t id)
 *********************************************************************************************************
 */
 
-#ifdef USE_DMA
-#if 0
 void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 {    
     assert( NULL != pArg );
     
     uint32_t temp;
-    INT8U error;
-    
-    DataSource *pSource = ( DataSource *)pArg;
-
-#ifdef ENABLE_PRINT 
-      if (status != DMAD_OK) 
-      { 
-          printf("Rx DMA Status :%s,line:%d\r\n",DMA_INFO[ status ],__LINE__);
-          return;
-      }
-#endif
-      
-     /*step 1:calculate buffer space */ 
-     temp = kfifo_get_free_space( pSource->pRingBulkIn );
-
-     /*step 2:merge buffer according condition */  
-     if( temp >= pSource->warmWaterLevel )
-     {
-       ///Todo: 0xf should be instead with mask;
-       /*
-       source_gpio.buffer_read( &source_gpio, 
-                                ( uint8_t * )&source_gpio.pBufferIn[ pSource-> rx_index ], 
-                                 10 );  
-       */
-
-       kfifo_put( pSource->pRingBulkIn,
-                  ( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
-                  pSource->rxSize );
-       
-       /*
-       kfifo_put( pSource->pRingBulkIn,
-                  ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
-                  source_gpio.rxSize );
-       */
-       
- 
-       pSource->rx_index = 1 - pSource->rx_index;
-       
-       //update state machine of this port;                    
-       pSource->status[ IN ] = ( uint8_t )RUNNING;
-     }
-     else
-     {
-            if( ( uint8_t )START <= pSource->status[ IN ] )
-            {
-                pSource->status[ IN ] = ( uint8_t )BUFFERED;
-                    //error proccess;
-            }
-            else
-            {
-#if DATA_TRANSMIT_TRACE
-               printf( "SSC0-Rx:There is No Space in Fifo,space size = (%d) \r\n",temp);
-#endif               
-               return;
-            }
-     }   
-}
-#else
-void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
-{    
-    assert( NULL != pArg );
-    
-    uint32_t temp;
-    INT8U error;
     
     DataSource *pSource = ( DataSource *)pArg;
 
@@ -339,8 +274,6 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 	 
 }
 
-#endif
-
 /*
 *********************************************************************************************************
 *                                               _SSC1_DmaRxCallback()
@@ -358,52 +291,73 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 {    
     assert( NULL != pArg );
-    INT8U error;
-    uint32_t temp = 0;
-      
+    
+    uint32_t temp;
+    
     DataSource *pSource = ( DataSource *)pArg;
 
-#ifdef ENABLE_PRINT 
-      if (status != DMAD_OK) 
-      { 
-          printf("Rx DMA Status :%s,line:%d\r\n",DMA_INFO[ status ],__LINE__);
-          return;
-      }
-#endif
       
-     /*step 1:calculate buffer space */ 
-     temp = kfifo_get_free_space( pSource->pRingBulkIn );
+	switch( pSource->status[ IN ] ) 
 
-     /*step 2:merge buffer according condition */  
-     if( temp >= pSource->warmWaterLevel )
-     {         
-       kfifo_put( pSource->pRingBulkIn,
-                  ( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
-                  pSource->rxSize );
- 
-       pSource->rx_index = 1 - pSource->rx_index; 
-                   
-       pSource->status[ IN ] = ( uint8_t )RUNNING;
-     }
-     else
-     {
-            if( ( uint8_t )START <= pSource->status[ IN ] )
-            {
-                pSource->status[ IN ] = ( uint8_t )BUFFERED;
-                    //error proccess;
-            }
-            else
-            {
-#if DATA_TRANSMIT_TRACE              
-               printf( "SSC1-Rx:There is No Space in Fifo,space size = (%d) \r\n",temp);
-#endif               
-               return;
-            }
-     }      
-        
-   
+		{
+			case START   :
+			case BUFFERED:
+				  temp = kfifo_get_free_space( pSource->pRingBulkIn );
+
+				  if( temp <= pSource->warmWaterLevel )
+				  	{
+				  		if( ( uint8_t )START <= pSource->status[ IN ] )
+                                                {
+                                                    pSource->status[ IN ] = ( uint8_t )BUFFERED;
+                                                }
+				  	}
+				  else
+				  	{
+						pSource->status[ IN ] = ( uint8_t )RUNNING;
+				  	}
+				break;
+
+			case RUNNING :
+				 temp = kfifo_get_free_space( pSource->pRingBulkIn );
+				 if( temp >= pSource->warmWaterLevel )
+				 	{
+                                               ///Todo: 0xf should be instead with mask;
+                                                /*
+                                                source_gpio.buffer_read( &source_gpio, 
+                                                      ( uint8_t * )&source_gpio.pBufferIn[ pSource-> rx_index ], 
+                                                      10 );  
+                                                */
+                                                 /*
+                                                 kfifo_put( pSource->pRingBulkIn,
+                                                            ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
+                                                            source_gpio.rxSize );
+                                                 */
+                                          
+				 		kfifo_put( pSource->pRingBulkIn,
+                  					( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
+                  					pSource->rxSize );
+						pSource->rx_index = 1 - pSource->rx_index;
+				 	}
+				 else
+				 	{
+						pSource->status[ IN ] = ( uint8_t )BUFFERFULL;
+				 	}
+				break;
+			case BUFFERFULL:
+				memset( ( uint8_t  * )pSource->pBufferIn[ pSource-> rx_index ],
+					     0x10,
+					     sizeof( pSource->pBufferIn[ pSource-> rx_index ] ) );
+				pSource->rx_index = 1 - pSource->rx_index;
+					     
+				break;
+			case STOP:
+				break;
+			default:
+				break;
+
+		}
+	 
 }
-#endif
 
 /*
 *********************************************************************************************************
@@ -418,16 +372,11 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 * Note(s)     : none.
 *********************************************************************************************************
 */
-#ifdef USE_DMA
-#define TEST_BUF 0
 
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
     const uint8_t nDelay = 2;
-    static uint8_t error;
     uint32_t temp = 0;
-    static uint32_t ord = 0;
-
      
     assert( NULL != pArg );
     
@@ -497,55 +446,59 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 */
 void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
 {
-      static uint8_t error;
-      uint32_t temp = 0;
-
-   
+    const uint8_t nDelay = 2;
+    uint32_t temp = 0;
+     
     assert( NULL != pArg );
     
     DataSource *pSource = ( DataSource *)pArg;
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
+           
+     pSource->pBufferOut = ( uint16_t * )&ssc1_PingPongOut[ 1 - pSource->tx_index ];
 
-     //step1: switch Ping-Pong buffer to empty part;
-     pSource->pBufferOut = ( uint16_t * )ssc1_PingPongOut[ 1 - pSource->tx_index ];  
-     //step2: calculate data size of ringbuffer;
-     temp = kfifo_get_data_size( pSource->pRingBulkOut );
-       
-     //step3: copy data to ringbuffer, this will prepare data for usb ringbuffer;
-     if( temp  >=  pSource->txSize ) 
-     {
-          kfifo_get( pSource->pRingBulkOut,
-                      ( uint8_t * )pSource->pBufferOut[ pSource-> tx_index ],
-                      pSource->txSize  );
-          pSource->tx_index = 1 - pSource->tx_index;  
-          
-          // change port machine states;
-          pSource->status[ OUT ] = ( uint8_t )RUNNING;
-     }
-     else
-     {
-            //if this port was started,but no enough data in buffer,
-            //flag this port in buffering state;
-            if( ( uint8_t )START == pSource->status[ OUT ] 
-                    || ( uint8_t )BUFFERED == pSource->status[ OUT ] )               
-            {
-                    pSource->status[ OUT ] = ( uint8_t )BUFFERED;                    
-                    return;
-            }
-            else if( ( uint8_t )RUNNING == pSource->status[ OUT ] )
-            {                  
-                    return;
-            }
-            else
-            {                  
-                    assert( 0 );
-                    return;
-            }
-
-     }
-#endif          
-  
+	switch( pSource->status[ OUT ] )
+		{ 
+			case START    :
+			case BUFFERED :
+				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+				if( temp  <  pSource->txSize  * nDelay ) 
+					{
+						if( pSource->status[ OUT ] == ( uint8_t )START )
+							pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+					}
+				else
+					{
+						pSource->status[ OUT ] = ( uint8_t )RUNNING;
+					}
+				break;
+			case RUNNING  :
+				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+				if( temp  >=  pSource->txSize )
+				{
+                                        kfifo_get( pSource->pRingBulkOut,
+                                                    ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                                                     pSource->txSize );
+                                        pSource->tx_index = 1 - pSource->tx_index;
+				}
+				else
+				{
+					pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
+				}
+									
+				break;
+                        case BUFFEREMPTY:
+                                Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                                                  pSource->txSize, 
+                                                  8000 );
+                                break;
+			case STOP     :
+				break;
+			default:
+                          ;
+				break;
+     
+      }
 }
 
 
