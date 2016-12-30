@@ -188,14 +188,14 @@ void Check_UART_Mixer_Ready( void )
 */
 unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 {
-/*
+
     unsigned char err;
     unsigned char mic_num;
-    unsigned char data  = 0xFF;
-    unsigned char lin_ch = 0;
+    unsigned char data     = 0xFF;
+    unsigned char lin_ch   = 0;
 
     unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG };
-
+    /*
     //APP_TRACE_INFO(("Setup_Audio [%s]:[%d SR]:[%d CH]: %s\r\n",(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
     if( pAudioCfg->type == 0 ) {
         if ( pAudioCfg->lin_ch_mask != 0 ) {
@@ -343,7 +343,10 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     codec_set[pAudioCfg->type].m_s_sel       = pAudioCfg->master_slave;
     codec_set[pAudioCfg->type].delay         = pAudioCfg->ssc_delay;
     codec_set[pAudioCfg->type].bclk_polarity = pAudioCfg->bclk_polarity;
-  */
+    */
+    
+    
+    
     return 0 ;
 }
 
@@ -422,6 +425,28 @@ unsigned char Update_Audio( void )
 
 }
 
+/*
+*********************************************************************************************************
+*                                First_Pack_Padding_BI()
+*
+* Description :  Padding the first USB bulk in package.
+*
+* Argument(s) :  None.
+*
+* Return(s)   :  None.
+*
+* Note(s)     :  Must be called after reset FIFO and before start audio.
+*********************************************************************************************************
+*/
+
+#define   USBDATAEPSIZE  64
+void First_Pack_Padding_BI( unsigned char usb_data_padding )
+{
+    unsigned char temp[ USBDATAEPSIZE ];
+    memset( temp, usb_data_padding, USBDATAEPSIZE );
+    kfifo_put(&ep0BulkIn_fifo, temp, USBDATAEPSIZE) ;
+    kfifo_put(&ep0BulkIn_fifo, temp, USBDATAEPSIZE) ;//2 package incase of PID error
+}
 
 
 /*
@@ -437,6 +462,9 @@ unsigned char Update_Audio( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
+
+CPU_INT32U    port_control_info;
+
 unsigned char Start_Audio( START_AUDIO start_audio )
 {
     unsigned char err;
@@ -469,6 +497,31 @@ unsigned char Start_Audio( START_AUDIO start_audio )
 
     }
      */
+    
+     
+             Init_Bulk_FIFO();
+             
+             Init_Audio_Path();
+             
+             First_Pack_Padding_BI( start_audio.padding );
+             
+             port_control_info = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );             
+             while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
+                 OSTimeDly(5);                      
+             };  
+          
+             audio_start_flag         = true ;
+             audio_run_control        = true ;
+             restart_audio_0_bulk_out = true  ; 
+             restart_audio_0_bulk_in  = true  ;
+             restart_audio_1_bulk_out = true  ;
+             restart_audio_1_bulk_in  = true  ; 
+             restart_audio_2_bulk_out = true  ;
+             restart_audio_2_bulk_in  = true  ;
+             restart_log_bulk_in      = true  ; 
+             restart_cmd_bulk_out     = true  ;
+             restart_cmd_bulk_in      = true  ;   
+             
     return 0 ;
 }
 
@@ -536,6 +589,21 @@ unsigned char Stop_Audio( void )
     }
 #endif
      */
+    
+    
+    
+             audio_run_control        = false  ;
+             restart_audio_0_bulk_out = false  ; 
+             restart_audio_0_bulk_in  = false  ;
+             restart_audio_1_bulk_out = false  ;
+             restart_audio_1_bulk_in  = false  ; 
+             restart_audio_2_bulk_out = false  ;
+             restart_audio_2_bulk_in  = false  ;                       
+             restart_log_bulk_in      = false  ; 
+             restart_cmd_bulk_out     = false  ;
+             restart_cmd_bulk_in      = false  ;  
+             
+             
     return 0 ;
 }
 

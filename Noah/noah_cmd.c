@@ -755,7 +755,6 @@ uint8_t  EMB_Data_Build (  uint16_t   cmd_type,
 * Note(s)     : This routine do NOT support reentrance
 *********************************************************************************************************
 */
-CPU_INT32U    port_control_info;
 
 uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd ) 
 {
@@ -789,7 +788,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     Time_Stamp();
     APP_TRACE_INFO(("\r\n::::: EMB_Data_Parse: cmd type=%d ",cmd_type));
 
-#if 1    
+#if 0   
     switch( cmd_type )  {       
               
 //        case 0:
@@ -815,7 +814,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
              restart_audio_1_bulk_out = true  ;
              restart_audio_1_bulk_in  = true  ; 
              restart_audio_2_bulk_out = true  ;
-             restart_audio_2_bulk_in  = true  ;        
+             restart_audio_2_bulk_in  = true  ;
              restart_log_bulk_in      = true  ; 
              restart_cmd_bulk_out     = true  ;
              restart_cmd_bulk_in      = true  ;   
@@ -839,7 +838,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
 #endif   
     
     
-#if 0
+
     switch( cmd_type )  {  
         
         case PC_CMD_SET_AUDIO_CFG : 
@@ -860,7 +859,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 6, 0);          
             PCCmd.audio_cfg.gpio_rec_bit_mask = (uint8_t)temp; 
             
-            temp = emb_get_attr_int(&root, 7, 1); //default 1, choose I2S  
+            temp = emb_get_attr_int(&root, 7, 1);   //default 1, choose I2S  
             PCCmd.audio_cfg.format = (uint8_t)temp;
             temp = emb_get_attr_int(&root, 8, (PCCmd.audio_cfg.type == 0)? 1:0 ); // default 0: falling egde send for sending, 1: rising edge lock for receiving   
             PCCmd.audio_cfg.ssc_cki = (uint8_t)temp;
@@ -871,12 +870,18 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 11, 0);  //default 0: as master      
             PCCmd.audio_cfg.master_slave = (uint8_t)temp;
             
-            temp = emb_get_attr_int(&root, 12, 0);     //default 0: no SPI recording         
+            temp = emb_get_attr_int(&root, 12, 0);  //default 0: no SPI recording         
             PCCmd.audio_cfg.spi_rec_bit_mask = (uint8_t)temp;              
            
             err = Setup_Audio( &PCCmd.audio_cfg );
 
         break ;
+        
+        case PC_CMD_UPDATE_AUDIO :
+                   
+           //err = Update_Audio(); 
+         
+        break ; 
         
         case PC_CMD_START_AUDIO :
 
@@ -886,7 +891,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.start_audio.padding = (uint8_t)temp; 
-            err = Ruler_Active_Control(1);              
+            //err = Ruler_Active_Control(1);              
             if( err != NO_ERR ) { err = EMB_CMD_ERR;  break; }            
             err = Start_Audio( PCCmd.start_audio );
 
@@ -912,14 +917,10 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             
         break;
         
-        case PC_CMD_UPDATE_AUDIO :
-                   
-            err = Update_Audio(); 
-         
-        break ; 
+
         
         ////////////////////////////////////////////////////////////////////////        
-        
+#if 0        
         case PC_CMD_SET_IF_CFG :
           
             temp = emb_get_attr_int(&root, 1, -1);
@@ -1060,6 +1061,9 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
                                       pkt_sn, 
                                       DATA_AB_INFO ) ;           
         break ; 
+        
+#endif        
+        
 /*        
         case PC_CMD_REC_VOICE_BUFFER: 
             temp = emb_get_attr_int(&root, 1, -1); //irq gpio index
@@ -1359,10 +1363,11 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         
         default :            
             err = CMD_NOT_SUPPORT ;   
+            err = 0 ;      //test use
         break ;
        
     }
-#endif
+
     
     return err;
 

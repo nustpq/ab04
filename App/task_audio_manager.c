@@ -60,7 +60,7 @@ void  App_AudioManager (void *p_arg)
     msg   = NULL ;
 
 ////////////////////////////////////////////////////////////////////////////////
-    #if 0
+#if 0
     memset( ssc0_PingPongOut, 0x5555, sizeof( ssc0_PingPongOut ) );
     memset( ssc1_PingPongOut, 0x5555, sizeof( ssc1_PingPongOut ) );
     memset( ssc0_PingPongIn, 0 , sizeof( ssc0_PingPongIn ) );
@@ -119,6 +119,7 @@ void  App_AudioManager (void *p_arg)
 
         msg = ( uint32_t *)OSMboxPend( App_AudioManager_Mbox,  0,  &err );
         APP_TRACE_INFO(( "\r\n[App_AudioManager_Mbox = 0x%0X ]", *msg ));
+        
         //OSTimeDly(50); //test
         switch( *msg )
         {

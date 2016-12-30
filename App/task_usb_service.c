@@ -65,8 +65,7 @@ void  App_TaskUSBService ( void *p_arg )
     err = 0;
     usb_state_saved = 0;
     
-    
-    Init_Audio_Path( );
+ 
     for(;;) 
     {          
         usb_state =   USBD_GetState();         
@@ -307,126 +306,6 @@ void  App_TaskUSBService ( void *p_arg )
 
 
 
-/*
-#if 0
-static  void  AppTaskUSB_old (void *p_arg)
-{
-    uint8_t  err = 0;
-    uint8_t  evFlags = 0; 
-    uint32_t byteCnt = 0;
-    uint32_t byteCnt2 = 0;
-    uint8_t  usb_state = 0;
-    uint8_t  usb_state_saved = 0;
-    
-    memset( ( uint8_t * )tmpInBuffer , 0x32 , sizeof( tmpInBuffer ) ); 
-    
-    for(;;) 
-    {
-        
-        usb_state =   USBD_GetState();         
-        
-        if( usb_state != usb_state_saved ) { 
-            usb_state_saved = usb_state ;
-            if ( usb_state >= USBD_STATE_CONFIGURED ) {
-                
-                CDCDSerialDriver_ReadCmd(  usbCmdCacheBulkOut,
-                                  USB_CMDEP_SIZE_64B ,
-                                  (TransferCallback) UsbCmdDataReceived,                                
-                                  0);
-            } 
-        }
-        
-        if ( usb_state >= USBD_STATE_CONFIGURED ) {
-            UIF_LED_On( LED_USB );    
-        } else {
-            UIF_LED_Off( LED_USB );             
-        }
-        
-        if ( usb_state >= USBD_STATE_CONFIGURED ) {  
-          
-          
-#if 0 //for test
- //----------------------------------------------------------------------------
-            byteCnt = kfifo_get_free_space( &ep0BulkOut_fifo );
-            if(  byteCnt >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out && audio_run_control )  {
-                restart_audio_0_bulk_out = false ;
-                APP_TRACE_INFO(("\r\nBulk Out 0 start"));
-              // send ep0 data ---> pc
-                CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
-                                        USB_DATAEP_SIZE_64B,
-                                        (TransferCallback)UsbAudio0DataReceived,
-                                        0);  
-            } else {
-                  byteCnt  = kfifo_get_data_size( &ep0BulkOut_fifo );
-                  byteCnt = byteCnt > 256 ?  256 :   byteCnt ;
-                  kfifo_get( &ep0BulkOut_fifo,
-                          ( uint8_t * )tmpOutBuffer,
-                           byteCnt );
-                  dump_buf_debug(( uint8_t * )tmpOutBuffer, byteCnt  ) ;
-            }
-#endif   
-        
-        
-#if 1
- //----------------------------------------------------------------------------
-            byteCnt = kfifo_get_free_space( &ep0BulkOut_fifo );
-            if(  byteCnt >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out && audio_run_control )  {
-                restart_audio_0_bulk_out = false ;
-                APP_TRACE_INFO(("\r\nBulk Out 0 start"));
-              // send ep0 data ---> pc
-                CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
-                                        USB_DATAEP_SIZE_64B,
-                                        (TransferCallback)UsbAudio0DataReceived,
-                                        0);  
-            }
-        
-        
- //----------------------------------------------------------------------------
-            if( audio_start_flag ) {
-                audio_start_flag = false ;
-                memset( tmpInBuffer, audio_0_padding , USB_DATAEP_SIZE_64B*4 );
-                kfifo_put( &ep0BulkIn_fifo,
-                          ( uint8_t * )tmpInBuffer,
-                           USB_DATAEP_SIZE_64B*4 );
-            }
-            //////////
-            byteCnt  = kfifo_get_data_size( &ep0BulkOut_fifo );
-            byteCnt2 = kfifo_get_free_space( &ep0BulkIn_fifo );
-            if( byteCnt >= 1536  && byteCnt2 >= 1536 ) {
-               kfifo_get( &ep0BulkOut_fifo,
-                          ( uint8_t * )tmpOutBuffer,
-                           1536 );        
-               //memset( tmpInBuffer, 0x34 , 1536 );
-               kfifo_put( &ep0BulkIn_fifo,
-                          ( uint8_t * )tmpOutBuffer,
-                           1536 );
-            }
-            //////////
-            byteCnt = kfifo_get_data_size( &ep0BulkIn_fifo );     
-            if(  byteCnt >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_in && audio_run_control)  {
-                APP_TRACE_INFO(("\r\nBulk  In 0 start"));
-                restart_audio_0_bulk_in = false ;
-                // ep0 ring --> usb cache
-                kfifo_get( &ep0BulkIn_fifo,
-                          ( uint8_t * )usbCacheBulkIn0,
-                           USB_DATAEP_SIZE_64B );         
-            
-              // send ep0 data ---> pc
-                CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
-                                        USB_DATAEP_SIZE_64B,
-                                        (TransferCallback)UsbAudio0DataTransmit,
-                                        0);  
-            }
-#endif
-               
-        }
-        OSTimeDlyHMSM( 0,0,0,5 );
-        
-    } //for loop
-}
-#endif
-*/
-
 
 
 void Init_Audio_Path()
@@ -454,52 +333,12 @@ void Init_Audio_Path()
     g_audio_path.findPort        = findPort;
     
     
-    g_audio_path.createAudioPath(  "ep2->ssc0",
-                                   &in
-                                     );
-// g_audio_path.destroyAudioPath( "any" );
-    /*
-    g_audio_path.createAudioPath(  "ep1->spi0",
-                                   ( void * )&in,
-                                   "ep2<-spi0",
-                                   ( void * )&out
-                                     );
-    g_audio_path.createAudioPath(  "ep5->ssc1",
-                                   ( void * )&in,
-                                   "ep6<-ssc1",
-                                   ( void * )&out
-                                     );    
-    g_audio_path.createAudioPath(  "ep1->ssc0",
-                                   ( void * )&in,
-                                   "ep2<-ssc0",
-                                   ( void * )&out
-                                     ); 
-    g_audio_path.createAudioPath(  "ep1->ssc0",
-                                   ( void * )&in,
-                                   "ep2<-ssc0",
-                                   ( void * )&out
-                                     ); 
-    g_audio_path.createAudioPath(  "ep5->ssc1",
-                                   ( void * )&in,
-                                   "ep6<-ssc1",
-                                   ( void * )&out
-                                     );
-    g_audio_path.createAudioPath(  "ep1->spi0",
-                                   ( void * )&in,
-                                   "ep2<-spi0",
-                                   ( void * )&out
-                                     ); 
-    g_audio_path.createAudioPath(  "ep1->gpio",
-                                   ( void * )&in,
-                                   "ep2<-spi0",
-                                   ( void * )&out
-                                     );
-    g_audio_path.createAudioPath(  "ssc0->ssc1",
-                                   ( void * )&in,
-                                   "ssc1<-ssc0",
-                                   ( void * )&out
-                                     );    
-    */
+    g_audio_path.destroyAudioPath( "any" );
+    
+    g_audio_path.createAudioPath(  "ep1->ssc0",  &out )   ;
+    g_audio_path.createAudioPath(  "ep2<-ssc0",  &in )    ;
+                                   
+ 
   
 }
  
