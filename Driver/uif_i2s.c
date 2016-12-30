@@ -449,7 +449,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 					}
 				else
 					{
-						pSource->status[ OUT ] == ( uint8_t )RUNNING;
+						pSource->status[ OUT ] = ( uint8_t )RUNNING;
 					}
 				break;
 			case RUNNING  :
@@ -463,7 +463,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 				}
 				else
 				{
-					pSource->status[ OUT ] == ( uint8_t )BUFFEREMPTY;
+					pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
 				}
 									
 				break;
@@ -475,6 +475,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 			case STOP     :
 				break;
 			default:
+                          ;
 				break;
      
       }
