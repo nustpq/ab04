@@ -52,6 +52,8 @@ typedef enum _status
 	START,
         BUFFERED,
         RUNNING,
+        BUFFEREMPTY,
+        BUFFERFULL,
 	STOP
 }STATUS;
 

@@ -14,6 +14,7 @@ typedef struct _gpio_rec_parameter
   
   uint8_t tdmChannelCnt;    //how much channels for tdm --->global_rec_num
   uint8_t sampleCnt;        //samples per package of one interruption-->global_rec_samples 
+  uint16_t res;
 }GPIO_REC_CFG;
 
 

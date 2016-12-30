@@ -203,6 +203,7 @@ void _config_pins( uint32_t id)
 */
 
 #ifdef USE_DMA
+#if 0
 void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 {    
     assert( NULL != pArg );
@@ -236,11 +237,13 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
        kfifo_put( pSource->pRingBulkIn,
                   ( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
                   pSource->rxSize );
+       
        /*
        kfifo_put( pSource->pRingBulkIn,
                   ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
                   source_gpio.rxSize );
        */
+       
  
        pSource->rx_index = 1 - pSource->rx_index;
        
@@ -263,6 +266,80 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
             }
      }   
 }
+#else
+void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
+{    
+    assert( NULL != pArg );
+    
+    uint32_t temp;
+    INT8U error;
+    
+    DataSource *pSource = ( DataSource *)pArg;
+
+      
+	switch( pSource->status[ IN ] ) 
+
+		{
+			case START   :
+			case BUFFERED:
+				  temp = kfifo_get_free_space( pSource->pRingBulkIn );
+
+				  if( temp <= pSource->warmWaterLevel )
+				  	{
+				  		if( ( uint8_t )START <= pSource->status[ IN ] )
+                                                {
+                                                    pSource->status[ IN ] = ( uint8_t )BUFFERED;
+                                                }
+				  	}
+				  else
+				  	{
+						pSource->status[ IN ] = ( uint8_t )RUNNING;
+				  	}
+				break;
+
+			case RUNNING :
+				 temp = kfifo_get_free_space( pSource->pRingBulkIn );
+				 if( temp >= pSource->warmWaterLevel )
+				 	{
+                                               ///Todo: 0xf should be instead with mask;
+                                                /*
+                                                source_gpio.buffer_read( &source_gpio, 
+                                                      ( uint8_t * )&source_gpio.pBufferIn[ pSource-> rx_index ], 
+                                                      10 );  
+                                                */
+                                                 /*
+                                                 kfifo_put( pSource->pRingBulkIn,
+                                                            ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
+                                                            source_gpio.rxSize );
+                                                 */
+                                          
+				 		kfifo_put( pSource->pRingBulkIn,
+                  					( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
+                  					pSource->rxSize );
+						pSource->rx_index = 1 - pSource->rx_index;
+				 	}
+				 else
+				 	{
+						pSource->status[ IN ] = ( uint8_t )BUFFERFULL;
+				 	}
+				break;
+			case BUFFERFULL:
+				memset( ( uint8_t  * )pSource->pBufferIn[ pSource-> rx_index ],
+					     0x10,
+					     sizeof( pSource->pBufferIn[ pSource-> rx_index ] ) );
+				pSource->rx_index = 1 - pSource->rx_index;
+					     
+				break;
+			case STOP:
+				break;
+			default:
+				break;
+
+		}
+	 
+}
+
+#endif
 
 /*
 *********************************************************************************************************
@@ -344,9 +421,9 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 #ifdef USE_DMA
 #define TEST_BUF 0
 
-
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
+    const uint8_t nDelay = 2;
     static uint8_t error;
     uint32_t temp = 0;
     static uint32_t ord = 0;
@@ -357,80 +434,50 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     DataSource *pSource = ( DataSource *)pArg;
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
-#ifdef ENABLE_PRINT 
-    static int cnt;
-    if (status != DMAD_OK) 
-    { 
-          printf("Tx DMA Status :%d-%s,line:%d,cnt(%d)\r\n",status,DMA_INFO[ status ],__LINE__,cnt++);
-          return;
-    } 
-#endif
-
-            
+           
      pSource->pBufferOut = ( uint16_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
-#if 1
-     temp = kfifo_get_data_size( pSource->pRingBulkOut );
-     if( temp  >=  pSource->txSize ) 
-     {
-          kfifo_get( pSource->pRingBulkOut,
-                      ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                      pSource->txSize );
-          pSource->tx_index = 1 - pSource->tx_index;
-          //update state machine of this port;                    
-          pSource->status[ OUT ] = ( uint8_t )RUNNING;
-#if DATA_TRANSMIT_TRACE 
-                     ord ++;
-                     ord %= 10000;
-                     printf( "SSC0-Tx( %d ):data size = ( %d ) \r\n",ord,temp);
-#endif          
-     }
-     else
-     {
-            //if this port was started,but no enough data in buffer,
-            //flag this port in buffering state;
-            if( ( uint8_t )START == pSource->status[ OUT ] 
-                    || ( uint8_t )BUFFERED == pSource->status[ OUT ] )               
-            {
-                    pSource->status[ OUT ] = ( uint8_t )BUFFERED;
-                    //Todo : error proccess--here do nothing
-#if DATA_TRANSMIT_TRACE
-                     printf( "SSC0-Tx:Data buffering,data size = (%d) \r\n",temp);
-#endif                     
-                    return;
-            }
-            else if( ( uint8_t )RUNNING == pSource->status[ OUT ] )
-            {       
-                  if( temp  >=  pSource->txSize * 2 ) 
-                  {
-                          kfifo_get( pSource->pRingBulkOut,
-                                      ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                                      pSource->txSize );
-                          pSource->tx_index = 1 - pSource->tx_index;
-                                                 
-                  }
-                  else
-                  {
-#if DATA_TRANSMIT_TRACE
-                    printf( "SSC0-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
-#endif                    
-                            ///Todo: error proccess
-                            // filled invalid data to ringbuffer and send it to pc that is a tip;
-                            return;
-                  }
-            }
-            else
-            {       //
-#if DATA_TRANSMIT_TRACE
-//                    printf( "SSC0-Tx:Port not ready!\n");
-#endif                    
-                    //port machine state is wrong, firmware has bug;
-                    assert( 0 );
-                    return;
-            }
-     }
-#endif
 
+	switch( pSource->status[ OUT ] )
+		{ 
+			case START    :
+			case BUFFERED :
+				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+				if( temp  <  pSource->txSize  * nDelay ) 
+					{
+						if( pSource->status[ OUT ] == ( uint8_t )START )
+							pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+					}
+				else
+					{
+						pSource->status[ OUT ] == ( uint8_t )RUNNING;
+					}
+				break;
+			case RUNNING  :
+				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+				if( temp  >=  pSource->txSize )
+				{
+                                        kfifo_get( pSource->pRingBulkOut,
+                                                    ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                                                     pSource->txSize );
+                                        pSource->tx_index = 1 - pSource->tx_index;
+				}
+				else
+				{
+					pSource->status[ OUT ] == ( uint8_t )BUFFEREMPTY;
+				}
+									
+				break;
+                        case BUFFEREMPTY:
+                                Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                                                  pSource->txSize, 
+                                                  8000 );
+                                break;
+			case STOP     :
+				break;
+			default:
+				break;
      
+      }
 }
 
 /*
@@ -458,21 +505,12 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
     DataSource *pSource = ( DataSource *)pArg;
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
-#ifdef ENABLE_PRINT    
-    if (status != DMAD_OK) 
-    { 
-          printf("Tx DMA Status :%d-%s,line:%d,cnt(%d)\r\n",status,DMA_INFO[ status ],__LINE__,cnt++);
-          return;
-    } 
-#endif
 
      //step1: switch Ping-Pong buffer to empty part;
      pSource->pBufferOut = ( uint16_t * )ssc1_PingPongOut[ 1 - pSource->tx_index ];  
      //step2: calculate data size of ringbuffer;
      temp = kfifo_get_data_size( pSource->pRingBulkOut );
-#if DATA_TRANSMIT_TRACE              
-//               printf( "SSC1-Tx:data size = (%d) -------->\r\n",temp);
-#endif       
+       
      //step3: copy data to ringbuffer, this will prepare data for usb ringbuffer;
      if( temp  >=  pSource->txSize ) 
      {
@@ -491,27 +529,15 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
             if( ( uint8_t )START == pSource->status[ OUT ] 
                     || ( uint8_t )BUFFERED == pSource->status[ OUT ] )               
             {
-                    pSource->status[ OUT ] = ( uint8_t )BUFFERED;
-                    //error proccess;
-#if DATA_TRANSMIT_TRACE 
-//                     ord ++;
-//                     ord %= 10000;
-//                     printf( "SSC1-Tx( %d ):Data buffering,data size = (%d) \r\n",ord,temp);
-#endif                     
+                    pSource->status[ OUT ] = ( uint8_t )BUFFERED;                    
                     return;
             }
             else if( ( uint8_t )RUNNING == pSource->status[ OUT ] )
-            { 
-#if DATA_TRANSMIT_TRACE              
-                    printf( "SSC1-Tx:There is No Data in RingBuffer,data size = (%d) \r\n",temp);
-#endif                    
+            {                  
                     return;
             }
             else
-            {
-#if DATA_TRANSMIT_TRACE              
-                    printf( "SSC1-Tx:Port not ready!\n");
-#endif                    
+            {                  
                     assert( 0 );
                     return;
             }

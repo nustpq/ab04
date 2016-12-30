@@ -71,9 +71,7 @@ void ISR_TC1( void )
     state = 1 - state;
     OS_EXIT_CRITICAL();
     
-           source_gpio.buffer_read( &source_gpio, 
-                                ( uint8_t * )&source_gpio.pBufferIn[ source_gpio.rx_index ], 
-                                 10 );  
+
   
   
 }
