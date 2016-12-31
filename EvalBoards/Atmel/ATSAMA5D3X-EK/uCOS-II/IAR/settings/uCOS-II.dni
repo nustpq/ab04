@@ -10,11 +10,11 @@ LimitSize=0
 ByteLimit=50
 [JLinkDriver]
 WatchCond=_ 0
-Watch0=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
-Watch1=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
+Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
+Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=-395393495
+Checksum=1016646512
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -22,23 +22,12 @@ StopOnThrow=_ 0
 ShowArgs=0
 [Disassembly]
 MixedMode=1
+[array_types]
+Fmt0=uint16_t[3072]	4	0
 [watch_formats]
-Fmt0={W}0:status	4	0
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
-[CallStackLog]
-Enabled=0
-[DriverProfiling]
-Enabled=0
-Mode=0
-Graph=0
-Symbiont=0
-Exclusions=
+Fmt0={W}0:pTds[1].dwDstAddr	4	0
+Fmt1={W}0:pTds[1].dwSrcAddr	4	0
+Fmt2={W}0:status	4	0
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -52,10 +41,25 @@ Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_core.c}.1851.5
 Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\uCOS-II\Source\os_core.c}.1848.5" 0 0 1 "" 0 "" 0
 Bp8=_ 0 "EMUL_CODE" "0x2001F3A8" 0 0 1 "" 0 "" 0
 Bp9=_ 0 "EMUL_DATA" "pPath->pOutTarget->txSize" 0 0 0 0 4294967295
-Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\App\task_usb_service.c}.230.17" 0 0 1 "" 0 "" 0
+Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\App\task_usb_service.c}.288.9" 0 0 1 "" 0 "" 0
 Count=11
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
 [Aliases]
 A0=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c"
 A1=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c"
 Count=2
 SuppressDialog=1
+[CallStackLog]
+Enabled=0
+[DriverProfiling]
+Enabled=0
+Mode=0
+Graph=0
+Symbiont=0
+Exclusions=

@@ -19,6 +19,7 @@
 #include "uif_i2s.h"
 #include "Kfifo.h"
 #include "uif_usb.h"
+#include <includes.h>
 
 #ifndef USE_UCOS
 #include  <ucos_ii.h>
@@ -71,9 +72,9 @@ void ISR_HDMA( void )
 {  
     OS_CPU_SR cpu_sr;
 
-    OS_ENTER_CRITICAL();
+   // OS_ENTER_CRITICAL();
     DMAD_Handler(&g_dmad);
-    OS_EXIT_CRITICAL();
+  //  OS_EXIT_CRITICAL();
 
 }
 #endif
@@ -202,7 +203,6 @@ void _config_pins( uint32_t id)
 * Note(s)     : none.
 *********************************************************************************************************
 */
-
 void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 {    
     assert( NULL != pArg );
@@ -217,24 +217,24 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 		{
 			case START   :
 			case BUFFERED:
-				  temp = kfifo_get_free_space( pSource->pRingBulkIn );
-
-				  if( temp <= pSource->warmWaterLevel )
-				  	{
-				  		if( ( uint8_t )START <= pSource->status[ IN ] )
-                                                {
-                                                    pSource->status[ IN ] = ( uint8_t )BUFFERED;
-                                                }
-				  	}
-				  else
-				  	{
-						pSource->status[ IN ] = ( uint8_t )RUNNING;
-				  	}
-				break;
+//				  temp = kfifo_get_free_space( pSource->pRingBulkIn );
+//
+//				  if( temp <= pSource->warmWaterLevel )
+//				  	{
+//				  		if( ( uint8_t )START <= pSource->status[ IN ] )
+//                                                {
+//                                                    pSource->status[ IN ] = ( uint8_t )BUFFERED;
+//                                                }
+//				  	}
+//				  else
+//				  	{
+//						pSource->status[ IN ] = ( uint8_t )RUNNING;
+//				  	}
+//				break;
 
 			case RUNNING :
 				 temp = kfifo_get_free_space( pSource->pRingBulkIn );
-				 if( temp >= pSource->warmWaterLevel )
+				 if( temp >= pSource->rxSize )
 				 	{
                                                ///Todo: 0xf should be instead with mask;
                                                 /*
@@ -247,9 +247,13 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                                                             ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
                                                             source_gpio.rxSize );
                                                  */
-                                          
+                        memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ], 0x55, pSource->rxSize );  
+                       // memset( tempp, 0x55, sizeof(tempp)  ); 
+                        
 				 		kfifo_put( pSource->pRingBulkIn,
-                  					( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
+                  					( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ], 
+                                    //( uint8_t * )&pSource->pBufferIn[ pSource-> rx_index ],
+                                    
                   					pSource->rxSize );
 						pSource->rx_index = 1 - pSource->rx_index;
 				 	}
@@ -260,7 +264,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 				break;
 			case BUFFERFULL:
 				memset( ( uint8_t  * )pSource->pBufferIn[ pSource-> rx_index ],
-					     0x10,
+					     0x33,
 					     sizeof( pSource->pBufferIn[ pSource-> rx_index ] ) );
 				pSource->rx_index = 1 - pSource->rx_index;
 					     
@@ -375,59 +379,66 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
-    const uint8_t nDelay = 2;
-    uint32_t temp = 0;
-     
-    assert( NULL != pArg );
-    
-    DataSource *pSource = ( DataSource *)pArg;
-    Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
-
-           
-     pSource->pBufferOut = ( uint16_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
-
-	switch( pSource->status[ OUT ] )
-		{ 
-			case START    :
-			case BUFFERED :
-				temp = kfifo_get_data_size( pSource->pRingBulkOut );
-				if( temp  <  pSource->txSize  * nDelay ) 
-					{
-						if( pSource->status[ OUT ] == ( uint8_t )START )
-							pSource->status[ OUT ] = ( uint8_t )BUFFERED;
-					}
-				else
-					{
-						pSource->status[ OUT ] = ( uint8_t )RUNNING;
-					}
-				break;
-			case RUNNING  :
-				temp = kfifo_get_data_size( pSource->pRingBulkOut );
-				if( temp  >=  pSource->txSize )
-				{
-                                        kfifo_get( pSource->pRingBulkOut,
-                                                    ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                                                     pSource->txSize );
-                                        pSource->tx_index = 1 - pSource->tx_index;
-				}
-				else
-				{
-					pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
-				}
-									
-				break;
-                        case BUFFEREMPTY:
-                                Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                                                  pSource->txSize, 
-                                                  8000 );
-                                break;
-			case STOP     :
-				break;
-			default:
-                          ;
-				break;
-     
-      }
+  
+  if(status) {
+    APP_TRACE_INFO(( "\r\nERR: %d",status ));
+  } else {
+       APP_TRACE_INFO(( " ----------ok" ));
+  }
+//    const uint8_t nDelay = 2;
+//    uint32_t temp = 0;
+       
+//    assert( NULL != pArg );
+//    
+//    DataSource *pSource = ( DataSource *)pArg;
+//    Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
+//
+//     UIF_LED_On( LED_RUN );       
+//     pSource->pBufferOut = ( uint16_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
+//     
+//	switch( pSource->status[ OUT ] )
+//		{ 
+//			case START    :
+//			case BUFFERED :
+//				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+//				if( temp  <  pSource->txSize  * nDelay ) 
+//					{
+//						if( pSource->status[ OUT ] == ( uint8_t )START )
+//							pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+//					}
+//				else
+//					{
+//						pSource->status[ OUT ] = ( uint8_t )RUNNING;
+//					}
+//				break;
+//			case RUNNING  :
+//				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+//				if( temp  >=  pSource->txSize )
+//				{
+//                                        kfifo_get( pSource->pRingBulkOut,
+//                                                    ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+//                                                     pSource->txSize );
+//                                        pSource->tx_index = 1 - pSource->tx_index;
+//				}
+//				else
+//				{
+//					pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
+//				}
+//									
+//				break;
+//                        case BUFFEREMPTY:
+//                                Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+//                                                  pSource->txSize, 
+//                                                  8000 );
+//                                break;
+//			case STOP     :
+//				break;
+//			default:
+//                          ;
+//				break;
+//     
+//      }
+//    UIF_LED_Off( LED_RUN );  
 }
 
 /*
@@ -542,7 +553,8 @@ uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
         pTds[0].dwDscAddr = (uint32_t) &pTds[1];
         
         pTds[1].dwSrcAddr = ( uint32_t )&SSC0->SSC_RHR;
-        pTds[1].dwDstAddr = ( uint32_t )( buf + ( sizeof( ssc0_PingPongIn ) >> 2 ) ); 
+        pTds[1].dwDstAddr = ( uint32_t )( buf + ( sizeof( ssc0_PingPongIn ) >> 1 ) ); 
+        pTds[1].dwDstAddr = ( uint32_t )&ssc0_PingPongIn[1];
         pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
                                | DMAC_CTRLA_SRC_WIDTH_HALF_WORD 
                                | DMAC_CTRLA_DST_WIDTH_HALF_WORD;          
@@ -661,9 +673,9 @@ uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 			    | DMAC_CTRLB_FC_MEM2PER_DMA_FC
 			    | DMAC_CTRLB_SRC_INCR_INCREMENTING
 			    | DMAC_CTRLB_DST_INCR_FIXED;
-	pTds[0].dwDscAddr = (uint32_t) &pTds[1];
-        
-	pTds[1].dwSrcAddr = (uint32_t) ( buf + ( sizeof( ssc0_PingPongOut ) >> 2 ) ); 
+	pTds[0].dwDscAddr = (uint32_t) &pTds[1];         
+	pTds[1].dwSrcAddr = (uint32_t) ( buf + ( sizeof( ssc0_PingPongOut ) >> 1 ) ); 
+    pTds[1].dwSrcAddr = ( uint32_t )&ssc0_PingPongOut[1];
 	pTds[1].dwDstAddr = (uint32_t)	&pSsc->SSC_THR;
 	pTds[1].dwCtrlA   = DMAC_CTRLA_BTSIZE( len >> 1 )
                           | DMAC_CTRLA_SRC_WIDTH_HALF_WORD | DMAC_CTRLA_DST_WIDTH_HALF_WORD;

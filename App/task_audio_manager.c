@@ -128,11 +128,15 @@ void  App_AudioManager (void *p_arg)
                         &&( ( uint8_t )BUFFERED != source_ssc0.status[ IN ] )
                         &&( ( uint8_t )RUNNING != source_ssc0.status[ IN ] ) )
                     {
-
+                          memset( ( uint8_t * )&ssc0_PingPongOut[ 0], 0x55, source_ssc0.txSize );  
+                          memset( ( uint8_t * )&ssc0_PingPongOut[ 1], 0x55, source_ssc0.txSize );  
                           source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_PingPongOut,
-                                                   sizeof( ssc0_PingPongOut ) >> 1 );
+                                                    //sizeof( ssc0_PingPongOut ) >> 1 );
+                                                    source_ssc0.txSize );
+                          OSTimeDly(1);
                           source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_PingPongIn,
-                                                   sizeof( ssc0_PingPongIn ) >>1 );
+                                                   //sizeof( ssc0_PingPongIn ) >>1 );
+                                                    source_ssc0.rxSize );
                           source_ssc0.status[ IN ]  = ( uint8_t )START;
                           source_ssc0.status[ OUT ] = ( uint8_t )START;
 

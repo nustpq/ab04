@@ -83,6 +83,7 @@
 #define USB_DATAEP_SIZE_64B                (    64    )            // force use 64Bytes
 #define USB_LOGEP_SIZE_256B                (    256   )            // force use 256Bytes
 #define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
+
 #define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
 #define USB_RINGIN_SIZE_16K                ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
 #define USB_CMD_RINGOUT_SIZE_1K            ( 1024  )                  //USB cmd data, size MUST be 2^n .

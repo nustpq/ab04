@@ -81,9 +81,9 @@ void ssc0_init_default( void )
     source_ssc0.tx_index = 0;
     source_ssc0.rx_index = 0;
     source_ssc0.peripheralParameter = ( void * )Audio_Configure_Instance0;
-    source_ssc0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 ) * 2;
-    source_ssc0.txSize = ((SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
-    source_ssc0.rxSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 )* SLOT_NUM_DEFAULT * 2 );
+    source_ssc0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
+    source_ssc0.txSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
+    source_ssc0.rxSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
 
 
     source_ssc0.init_source = init_I2S;
