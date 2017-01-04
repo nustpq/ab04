@@ -551,25 +551,49 @@ uint8_t CODEC_Set_Volume( const DataSource *pSource,float vol_spk, float vol_lou
     I2CWrite_Codec_AIC3204(pSource,83,ADC_GAIN);
     I2CWrite_Codec_AIC3204(pSource,84,ADC_GAIN);
 
-    int8_t DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
-    uint8_t flag1=0,flag2=0;
-    for(int8_t k=-127;k<48+1;k++){
-      for(int8_t m=-6;m<29+1;m++){
+        signed char DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
+    unsigned char flag1=0,flag2=0;
+    for(signed char k=0;k<48+1;k++){
+      for(signed char m=-6;m<29+1;m++){
           temp=k*0.5+m;
           if(temp==vol_lout && flag1==0){
               DAC_GAIN=encode(k);
-              HPL_GAIN=encode(m);
+              LOL_GAIN=encode(m);
               flag1=1;
           }
           if(temp==vol_spk && flag2==0 ){
               DAC_GAIN=encode(k);
-              LOL_GAIN=encode(m);
+              HPL_GAIN=encode(m);            
               flag2=1;
           }
-          if(flag1==1 && flag2==1)break;
+          if(flag1==1 && flag2==1)break;    
       }
       if(flag1==1 && flag2==1)break;
+      flag1=0;
+      flag2=0;
     }
+    if(flag1==0 || flag2==0){
+         for(signed char k=0;k>-127-1;k--){
+            for(signed char m=-6;m<29+1;m++){
+              temp=k*0.5+m;
+              if(temp==vol_lout && flag1==0){
+              DAC_GAIN=encode(k);
+              LOL_GAIN=encode(m);
+              flag1=1;
+            }
+            if(temp==vol_spk && flag2==0 ){
+              DAC_GAIN=encode(k);
+              HPL_GAIN=encode(m);            
+              flag2=1;
+            }
+            if(flag1==1 && flag2==1)break;    
+          }
+        if(flag1==1 && flag2==1)break;
+        flag1=0;
+        flag2=0;
+        }
+    }  
+	
     flag1=0;
     flag2=0;
     I2CWrite_Codec_AIC3204(pSource,0,0); //switch to Page0
@@ -1047,8 +1071,8 @@ uint8_t Set_Codec_PLL( const DataSource *pSource,uint32_t sr, uint8_t sample_len
     MADC  = MDAC ;
 
     for( i = 0 ; i< sizeof(codec_para)>>1 ; i++ ) {
-        if( (bclk_polarity == 0) && (codec_para[i][0] == 0x1D) ) {
-            codec_para[i][1] |= 0x08 ; //blck poarity inverted
+        if( (bclk_polarity == 1) && (codec_para[i][0] == 0x1D) ) {
+            codec_para[i][1] |= 0x08 ; //blck poarity = 1, bclk inverted
         }
         err = I2CWrite_Codec_AIC3204(pSource,codec_para[i][0],codec_para[i][1]);
         if( OS_ERR_NONE != err ){
@@ -1078,6 +1102,9 @@ uint8_t Set_Codec_PLL( const DataSource *pSource,uint32_t sr, uint8_t sample_len
 }
 
 
+
+
+
 CODEC_SETS Codec_Set_Saved[2];   //for 2 CODEC
 
 uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
@@ -1092,6 +1119,8 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
         (Codec_Set_Saved[codec_set.id].sample_len == codec_set.sample_len) &&\
         (Codec_Set_Saved[codec_set.id].format == codec_set.format) &&\
         (Codec_Set_Saved[codec_set.id].slot_num == codec_set.slot_num) &&\
+        (Codec_Set_Saved[codec_set.id].bclk_polarity == codec_set.bclk_polarity) &&\
+        (Codec_Set_Saved[codec_set.id].delay == codec_set.delay) &&\
         (Codec_Set_Saved[codec_set.id].m_s_sel == codec_set.m_s_sel)   ) {
         APP_TRACE_INFO(("No need Re-Init CODEC[%d]\r\n",codec_set.id));
         return 0;
@@ -1123,10 +1152,11 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
         return CODEC_BIT_LEN_NOT_SUPPORT_ERR;
     }
 
-    if( codec_set.format == 0 || codec_set.format == 1) { //I2S || TDM-I2S
+    if( codec_set.format == 1 || codec_set.format == 2) {  //PDM or I2S/TDM-I2S
         if_set += 0x00;
-    } else if( codec_set.format == 2){   //PCM DSP
+    } else if( codec_set.format == 3){   //PCM DSP
         if_set += 0x40;
+        codec_set.bclk_polarity ^= 1; //for PCM : TLV320AIC3204 polarity definition is different from FM1388
     } else {
         return CODEC_FORMAT_NOT_SUPPORT_ERR;
     }

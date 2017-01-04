@@ -21,7 +21,7 @@
 #define TIMEOUT_AUDIO_COM    2000    //Max 2s timeout
 #define TIMEOUT_RULER_COM    5000    //Max 5s timeout
 
-//#define RULER_MASK(mic_mask,ruler_id)    ((mic_mask>>(ruler_id<<3))&0xFF) 
+//#define RULER_MASK(mic_mask,ruler_id)    ((mic_mask>>(ruler_id<<3))&0xFF)
 
 #define RULER_TYPE_RULER                  0
 #define RULER_TYPE_HANDSET                1
@@ -43,7 +43,7 @@
 #define RULER_ID_DEFAULT                  0xFF
 
 #define SAMPLE_LENGTH_DEFAULT             16
-#define SAMPLE_RATE_DEFAULT               16000
+#define SAMPLE_RATE_DEFAULT               8000
 #define SLOT_NUM_DEFAULT                  8
 #define SET_VOLUME_MUTE                   1000
 //ruler state defines
@@ -60,14 +60,14 @@
 #define  AUDIO_TYPE_REC                 0x00
 #define  AUDIO_TYPE_PLAY                0x01
 
-//host mcu cmd defines 
+//host mcu cmd defines
 #define  RULER_CMD_SET_AUDIO_CFG        0x01
 #define  RULER_CMD_START_AUDIO          0x02
 #define  RULER_CMD_STOP_AUDIO           0x03
 #define  RULER_CMD_SET_RULER            0x04
 #define  RULER_CMD_RAED_RULER_STATUS    0x05
 #define  RULER_CMD_RAED_RULER_INFO      0x06
-#define  RULER_CMD_WRITE_RULER_INFO     0x07     
+#define  RULER_CMD_WRITE_RULER_INFO     0x07
 #define  RULER_CMD_READ_MIC_CALI_DATA   0x08
 #define  RULER_CMD_WRITE_MIC_CALI_DATA  0x09
 #define  RULER_CMD_TOGGLE_MIC           0x0A
@@ -78,7 +78,7 @@
 #define  RULER_CMD_SETUP_SYNC           0x0F
 #define  RULER_CMD_RESET_AUDIO          0x10
 #define  RULER_CMD_START_RD_VOICE_BUF   0x11
- 
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DEF_VERSION_STR_LEN             ( 11 + 1 )
@@ -100,12 +100,12 @@
 #define FLASH_ADDR_FW_BIN            ( FLASH_ADDR_FW_STATE + AT91C_IFLASH_PAGE_SIZE ) //from 128kB+256
 
 #define FLASH_ADDR_FW_VEC_SIZE       ( 0x2000 ) //8kB
-#define FLASH_ADDR_FW_VEC_NUM        ( 7 )      //(64kB = 8kB*7 
+#define FLASH_ADDR_FW_VEC_NUM        ( 7 )      //(64kB = 8kB*7
 #define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH1 +  FLASH_RULER_FW_BIN_MAX_SIZE  ) //256*4
 #define FLASH_ADDR_FW_VEC            ( FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * FLASH_ADDR_FW_VEC_NUM ) //from 128kB + 64kB + (0.256*4)kB
 #define FLASH_HOST_FW_BIN_MAX_SIZE   ( 0x1C000 ) //128kB for host MCU fw bin
 
-//#define FLASH_RULER_FW_BIN_MAX_SIZE  ( 0x10000 - AT91C_IFLASH_PAGE_SIZE )  //64kB max for ruler fw bin, 
+//#define FLASH_RULER_FW_BIN_MAX_SIZE  ( 0x10000 - AT91C_IFLASH_PAGE_SIZE )  //64kB max for ruler fw bin,
 //#define FLASH_VOICE_BUFFER_MAX_SIZE  ( 0x20000 - AT91C_IFLASH_PAGE_SIZE )  //128kB max for ruler fw bin
 //#define FLASH_ADDR_FW_STATE          ( AT91C_IFLASH1 )  //from 128kB -> (128k+256)B
 //#define FLASH_ADDR_FW_BIN            ( FLASH_ADDR_FW_STATE + AT91C_IFLASH_PAGE_SIZE ) //store from 128kB+256B ->end
@@ -113,50 +113,50 @@
 //#define FLASH_HOST_FW_BIN_MAX_SIZE   ( 0x1C000 ) //128kB for host MCU fw bin
 //#define FLASH_ADDR_FW_VEC_SIZE       ( 0x800 ) //2kB/vec
 //#define FLASH_ADDR_FW_VEC_NUM        ( 8 )     //(16kB = 2kB*8
-//#define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH0 +  FLASH_HOST_FW_BIN_MAX_SIZE  ) 
+//#define FLASH_ADDR_FW_VEC_STATE      ( AT91C_IFLASH0 +  FLASH_HOST_FW_BIN_MAX_SIZE  )
 //#define FLASH_ADDR_FW_VEC            ( FLASH_ADDR_FW_VEC_STATE + AT91C_IFLASH_PAGE_SIZE * FLASH_ADDR_FW_VEC_NUM ) // 0x80000 + 0x1C000 + (0.256*8)kB = 0x9C800
 
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef  unsigned char  VERSION_DATA[ DEF_VERSION_STR_LEN ] ;  
-typedef  unsigned char  MODEL_DATA[ DEF_MODEL_STR_LEN ] ;  
+typedef  unsigned char  VERSION_DATA[ DEF_VERSION_STR_LEN ] ;
+typedef  unsigned char  MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
 
 typedef struct {
-    float           phase ;  
+    float           phase ;
     float           sensitivity ;
     float           noise_floor ;
     unsigned int    inlet_position ;
     unsigned int    data_len ; //add
-    unsigned char  *p_data ; 
+    unsigned char  *p_data ;
 }MIC_CALIB_INFO ;
 
 
-typedef struct { 
-    MODEL_DATA     model;  
+typedef struct {
+    MODEL_DATA     model;
     VERSION_DATA   hw_ver;
-    VERSION_DATA   sw_ver; 
+    VERSION_DATA   sw_ver;
 }BRIDGE_INFO ;
 
 typedef struct {
-    unsigned char    POST_status;   
-    unsigned char    ruler_status; 
+    unsigned char    POST_status;
+    unsigned char    ruler_status;
     unsigned char    mic_status;
 }BRIDGE_STATUS ;
-    
-typedef struct {    
-    VERSION_DATA    mic_vendor ; //string    
-    VERSION_DATA    mic_part_no ;//string 
-    unsigned char   mic_type ; 
-    unsigned char   mic_id ;   
+
+typedef struct {
+    VERSION_DATA    mic_vendor ; //string
+    VERSION_DATA    mic_part_no ;//string
+    unsigned char   mic_type ;
+    unsigned char   mic_id ;
 }MIC_INFO ;
 
 //this is a struct with flexible length
 typedef struct {
     MODEL_DATA       model ;//format: 'R''X''X'0
     VERSION_DATA     hw_ver ;
-    VERSION_DATA     sw_ver ;      
+    VERSION_DATA     sw_ver ;
     MIC_INFO        *p_mic_info[16] ; //H01  16?
     unsigned char    mic_num ;
     unsigned char    date[1];
@@ -164,103 +164,103 @@ typedef struct {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-
-typedef struct { 
+typedef struct {
   unsigned char  type;//Rec =0, Play =1
-  unsigned char  channel_num; //valid data cahnnel num 1~8  
-  unsigned short sample_rate; //8000, 16000, 24000, 32000, 48000 
+  unsigned char  channel_num; //valid data cahnnel num 1~8
+  unsigned short sample_rate; //8000, 16000, 24000, 32000, 48000
 
   unsigned char  bit_length; // 16, 24, 32
   unsigned char  lin_ch_mask;
-  
+
   unsigned char  gpio_rec_num;
   unsigned char  gpio_rec_start_index;
   unsigned char  gpio_rec_bit_mask;
-  
+
   unsigned char  spi_rec_num;
   unsigned char  spi_rec_start_index;
   unsigned char  spi_rec_bit_mask;
-  
-  unsigned char  format;  //1:I2S  2:PDM  3:PCM/TDM  
+
+  unsigned char  format;  //1:I2S  2:PDM  3:PCM/TDM
   unsigned char  slot_num;  //bus BCLK slot num
   unsigned char  ssc_cki;
   unsigned char  ssc_delay;
-  
+
   unsigned char  ssc_start;
   unsigned char  master_slave;
   unsigned char  bclk_polarity;  //0 or 1
-  
-  unsigned char  reserved[1];
+
+  unsigned char  id;  //0: SSC0 , 1: SSC1, 2
 }AUDIO_CFG;
 
+
 typedef struct {
-  unsigned int    spi_speed; 
-  
+  unsigned int    spi_speed;
+
   unsigned short  rec_ch_mask;
   unsigned short  play_ch_mask;
-  
+
   unsigned short  chip_id;
-  unsigned char   spi_mode;  
-  unsigned char   gpio_irq; 
-  
-  unsigned char   time_dly; 
+  unsigned char   spi_mode;
+  unsigned char   gpio_irq;
+
+  unsigned char   time_dly;
   unsigned char   slave;
   unsigned char   reserved[2];
 
 }SPI_PLAY_REC_CFG;
 
 typedef struct {
-    unsigned char    type;    //rec = 1,  play = 2, rec&play = 3   
+    unsigned char    type;    //bit[0..5]= [I2S0 rec, I2S0 play, I2S1 rec, I2S1 play, SPI rec, SPI play]       eg. rec = 1,  play = 2, rec&play = 3
     unsigned char    padding; //usb first package padding
 }START_AUDIO;
 
 typedef struct {
-    unsigned char    ruler_id; 
+    unsigned char    ruler_id;
 }READ_RULER_INFO;
 
-typedef struct {      
-    RULER_INFO       ruler_info; 
-    unsigned char    ruler_id;     
+typedef struct {
+    RULER_INFO       ruler_info;
+    unsigned char    ruler_id;
 }WRITE_RULER_INFO ;
 
 typedef struct {
-    unsigned char    ruler_id;   
-    unsigned char    mic_id;  
+    unsigned char    ruler_id;
+    unsigned char    mic_id;
 }READ_MIC_CLAIB_INFO ;
 
 typedef struct {
-    unsigned char    ruler_id;   
-    unsigned char    mic_id; 
+    unsigned char    ruler_id;
+    unsigned char    mic_id;
     MIC_CALIB_INFO   mic_calib_info;
 }WRITE_MIC_CALIB_INFO ;
- 
+
 typedef struct {
-    unsigned char    ruler_id;   
-    unsigned char    mic_id; 
+    unsigned char    ruler_id;
+    unsigned char    mic_id;
     unsigned char    on_off;
 }TOGGLE_MIC ;
 
 typedef struct {
-    signed int    mic;   
-    signed int    lout; 
+    signed int    mic;
+    signed int    lout;
     signed int    spk;
-    signed int    lin; 
+    signed int    lin;
 }SET_VOLUME ;
 
 typedef struct {
-    unsigned char    port;   
-    unsigned char   *pdata; 
+    unsigned char    port;
+    unsigned char   *pdata;
 }RAW_DATA_TRANS ;
 
 typedef struct {
-    unsigned char    ruler_id;   
-    unsigned char    cmd; 
-    unsigned char   *pdata; 
+    unsigned char    ruler_id;
+    unsigned char    cmd;
+    unsigned char   *pdata;
 }UPDATE_RULER_FW ;
 
 typedef struct {
-    unsigned char    cmd; 
-    unsigned char    *pdata; 
+    unsigned char    cmd;
+    unsigned char    *pdata;
 }UPDATE_BRIDGE_FW ;
 
 typedef struct {
@@ -282,14 +282,14 @@ typedef struct {
 
 
 typedef struct {
-    unsigned char    if_type;      
-    unsigned char    dev_addr;   
+    unsigned char    if_type;
+    unsigned char    dev_addr;
     unsigned int     data_len;
     unsigned char*   pdata;
 }RAW_WRITE ;
 
 typedef struct {
-    unsigned char    if_type;      
+    unsigned char    if_type;
     unsigned char    dev_addr;
     unsigned int     data_len_read;
     unsigned int     data_len_write;
@@ -298,58 +298,58 @@ typedef struct {
 }RAW_READ ;
 
 typedef struct {
-    unsigned short   mem_addr_l; 
-    unsigned short   mem_addr_h; 
-    unsigned int     data_len;    
+    unsigned short   mem_addr_l;
+    unsigned short   mem_addr_h;
+    unsigned int     data_len;
     unsigned char*   pdata;
-    unsigned char    if_type;      
+    unsigned char    if_type;
     unsigned char    dev_addr;
     unsigned char    mem_addr_len;
 }BURST_WRITE ;
 
 typedef struct {
-    unsigned char    if_type;      
-    unsigned char    dev_addr;    
+    unsigned char    if_type;
+    unsigned char    dev_addr;
     unsigned char    data_len;
     unsigned char    read_data_len;
-    unsigned short   mem_addr_l; 
-    unsigned short   mem_addr_h; 
+    unsigned short   mem_addr_l;
+    unsigned short   mem_addr_h;
     unsigned int     mem_addr_len;
     unsigned char*   pdata;
-    
+
 }BURST_READ ;
 
 typedef struct {
-    unsigned char    addr_index;   
+    unsigned char    addr_index;
     unsigned int     data_len;
     unsigned char*   pdata;
     unsigned char*   pStr;
 }MCU_FLASH ;
 
 typedef struct {
-    unsigned char    vec_index_a;   
+    unsigned char    vec_index_a;
     unsigned char    vec_index_b;
     unsigned char    flag;
     unsigned char    type; //41£º iM401,  51: iM501
-    unsigned int     delay; 
+    unsigned int     delay;
     unsigned char    gpio; //irq trigger GPIO index
     unsigned char    trigger_en;
     unsigned char    pdm_clk_off; //trun off pdm clk after pwd or not
     unsigned char    if_type;//1: I2C, 2:SPI
-}SET_VEC_CFG ;  
-   
+}SET_VEC_CFG ;
+
 typedef struct {
-    unsigned char    gpio_num;   
+    unsigned char    gpio_num;
     unsigned char    gpio_value[7];
     unsigned int     delay_us[7];
-}GPIO_SESSION ; 
+}GPIO_SESSION ;
 
 
 
 extern unsigned char Audio_Version[];
 extern unsigned char Ruler_CMD_Result;
 
-extern volatile unsigned char Global_Ruler_Type[]; 
+extern volatile unsigned char Global_Ruler_Type[];
 extern volatile unsigned char Global_Ruler_State[];
 extern volatile unsigned char Global_Ruler_Index; //current ruler index
 extern volatile unsigned char Global_Mic_State[];
@@ -362,11 +362,11 @@ extern volatile unsigned char Global_SPI_Rec_En;
 extern SET_VEC_CFG  Global_VEC_Cfg;
 
 extern void          Init_Global_Var( void );
-extern unsigned char Update_Audio( void );
+extern unsigned char Update_Audio( unsigned char id );
 extern unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg );
 extern unsigned char Start_Audio( START_AUDIO start_audio  );
-extern unsigned char Stop_Audio( void );  
-extern unsigned char Reset_Audio( void );  
+extern unsigned char Stop_Audio( void );
+extern unsigned char Reset_Audio( void );
 extern unsigned char Get_Audio_Version( void );
 extern unsigned char Init_Ruler( unsigned char ruler_slot_id ) ;
 extern unsigned char Setup_Ruler( unsigned char ruler_slot_id );

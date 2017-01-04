@@ -46,7 +46,7 @@ int usb_init_default( void )
     else
     {
         APP_TRACE_INFO(("this version isn't a release version \r\n"));
-	return -1;
+        return -1;
     }
     return 0;
 }
@@ -72,29 +72,29 @@ void ssc0_init_default( void )
     //initialize ssc0 object and it's operation
     memset( ( void * )&source_ssc0, 0 , sizeof( DataSource ) );
     memset( ( void * )ssc0_PingPongOut, 0 , sizeof( ssc0_PingPongOut ) );
-    memset( ( void * )ssc0_PingPongIn, 0 , sizeof( ssc0_PingPongIn ) );
-    source_ssc0.dev.direct = ( uint8_t )BI;
+    memset( ( void * )ssc0_PingPongIn,  0 , sizeof( ssc0_PingPongIn ) );
+    source_ssc0.dev.direct   = ( uint8_t )BI;
     source_ssc0.dev.identify = ID_SSC0;
     source_ssc0.dev.instanceHandle = (uint32_t)SSC0;
-    source_ssc0.status[ IN ] = ( uint8_t )FREE;
+    source_ssc0.status[ IN ]  = ( uint8_t )FREE;
     source_ssc0.status[ OUT ] = ( uint8_t )FREE;
     source_ssc0.tx_index = 0;
     source_ssc0.rx_index = 0;
     source_ssc0.peripheralParameter = ( void * )Audio_Configure_Instance0;
-    source_ssc0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
-    source_ssc0.txSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
-    source_ssc0.rxSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
+    source_ssc0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PP_SIZE_MS );
+    source_ssc0.txSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PP_SIZE_MS );
+    source_ssc0.rxSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PP_SIZE_MS );
 
 
-    source_ssc0.init_source = init_I2S;
+    source_ssc0.init_source  = init_I2S;
     source_ssc0.buffer_write = ssc0_buffer_write;
     source_ssc0.buffer_read  = ssc0_buffer_read;
     source_ssc0.peripheral_stop = stop_ssc;
 
     source_ssc0.pRingBulkOut = &ssc0_bulkout_fifo;
-    source_ssc0.pRingBulkIn = &ssc0_bulkin_fifo;
+    source_ssc0.pRingBulkIn  = &ssc0_bulkin_fifo;
     source_ssc0.pBufferOut = ( uint16_t * )ssc0_PingPongOut;
-    source_ssc0.pBufferIn = ( uint16_t * )ssc0_PingPongIn;
+    source_ssc0.pBufferIn  = ( uint16_t * )ssc0_PingPongIn;
 
     if( NULL != source_ssc0.init_source )
         source_ssc0.init_source( &source_ssc0,NULL );
@@ -559,10 +559,10 @@ unsigned char aic3204_init_default( void )
     codec_set.id = 0;  //CODEC 0
     codec_set.sr = SAMPLE_RATE_DEFAULT;
     codec_set.sample_len = SAMPLE_LENGTH_DEFAULT;
-    codec_set.format = 0; //I2S-TDM
+    codec_set.format = 2; //I2S-TDM
     codec_set.slot_num = SLOT_NUM_DEFAULT;
     codec_set.m_s_sel = 0; //master
-    codec_set.bclk_polarity = 1;
+    codec_set.bclk_polarity = 0;
     codec_set.flag = 0;
     codec_set.delay = 0;
     err = Init_CODEC( &source_twi2,codec_set ); //CODEC0 connetced to TWI2
@@ -573,10 +573,10 @@ unsigned char aic3204_init_default( void )
     codec_set.id = 1;  //CODEC 1
     codec_set.sr = SAMPLE_RATE_DEFAULT;
     codec_set.sample_len = SAMPLE_LENGTH_DEFAULT;
-    codec_set.format = 0; //I2S-TDM
+    codec_set.format = 2; //I2S-TDM
     codec_set.slot_num = SLOT_NUM_DEFAULT;
     codec_set.m_s_sel = 1; //slave
-    codec_set.bclk_polarity = 1;
+    codec_set.bclk_polarity = 0;
     codec_set.flag = 0;
     codec_set.delay = 0;
     err = Init_CODEC( &source_twi1,codec_set );//CODEC1 connetced to TWI1
@@ -604,7 +604,7 @@ void uif_ports_init_default( void )
 {
     usb_init_default( ); //init USB
     ssc0_init_default( );
-    ssc1_init_default( );
+    ssc1_init_default( );  
     spi0_init_default( );
     spi1_init_default( );
     twi0_init_default( );

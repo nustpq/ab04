@@ -64,8 +64,11 @@ extern sDmaTransferDescriptor dmaTdSSC1Tx[2];
 
 
 #ifdef USE_DMA
+void ISR_HDMA( void );
 void _SSC0_DmaRxCallback( uint8_t status, void *pArg);
+void _SSC1_DmaRxCallback( uint8_t status, void *pArg);
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg);
+void _SSC1_DmaTxCallback( uint8_t status, void *pArg);
 #endif
 
 /*------------------public interface -------------*/
@@ -107,6 +110,9 @@ static void _SSC_Init( uint32_t id,
 		uint8_t slot_num, 
 		uint8_t slot_len );
 static void _init_I2S( void *pInstance,void *dParameter );
+
+
+
 
 
 #endif //

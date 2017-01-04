@@ -85,7 +85,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
     }  
     else 
     {      
-        printf( "\r\nERROR : UsbAudio0DataReceived: Transfer error\r\n" ); 
+        APP_TRACE_INFO(("\r\nERROR : UsbAudio0DataReceived: Transfer error\r\n" )); 
         
     }
     
@@ -130,7 +130,7 @@ void UsbAudio1DataReceived(  uint32_t unused,
     }  
     else 
     {      
-        printf( "\r\nERROR : UsbAudio1DataReceived: Transfer error\r\n" ); 
+        APP_TRACE_INFO(( "\r\nERROR : UsbAudio1DataReceived: Transfer error\r\n" )); 
         
     }      
 }
@@ -168,7 +168,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
                                 USB_DATAEP_SIZE_64B,
                                 (TransferCallback) UsbAudio0DataTransmit,
                                 0);  
-        TRACE_WARNING( "\r\nERROR : UsbAudio0DataTransmit: Rr-transfer hit\r\n" );  
+        APP_TRACE_INFO(( "\r\nERROR : UsbAudio0DataTransmit: Rr-transfer hit\r\n" ));  
         
     }    
     
@@ -208,7 +208,7 @@ void UsbAudio1DataTransmit(  uint32_t unused,
                                          USB_DATAEP_SIZE_64B,
                                          (TransferCallback) UsbAudio1DataTransmit,
                                          0);  
-        TRACE_WARNING( "\r\nERROR : UsbAudio1DataTransmit: Rr-transfer hit\r\n" );  
+        APP_TRACE_INFO(( "\r\nERROR : UsbAudio1DataTransmit: Rr-transfer hit\r\n" ));  
         
     }        
 }
@@ -250,7 +250,7 @@ void UsbSPIDataReceived(  uint32_t unused,
     }  
     else 
     {      
-        printf( "\r\nERROR : UsbSPIDataReceived: Transfer error\r\n" ); 
+        APP_TRACE_INFO(( "\r\nERROR : UsbSPIDataReceived: Transfer error\r\n" )); 
         
     }      
 }
@@ -291,7 +291,7 @@ void UsbSPIDataTransmit(      uint32_t unused,
                                          USB_DATAEP_SIZE_64B,
                                          (TransferCallback) UsbSPIDataTransmit,
                                          0);  
-        TRACE_WARNING( "\r\nERROR : UsbSPIDataTransmit: Rr-transfer hit\r\n" );  
+        APP_TRACE_INFO(( "\r\nERROR : UsbSPIDataTransmit: Rr-transfer hit\r\n" ));  
         
     }        
 }
@@ -331,7 +331,7 @@ void UsbLogDataTransmit(      uint32_t unused,
                                          USB_DATAEP_SIZE_64B,
                                          (TransferCallback) UsbLogDataTransmit,
                                          0);  
-        TRACE_WARNING( "\r\nERROR : UsbLogDataTransmit: Rr-transfer hit\r\n" );  
+        APP_TRACE_INFO(( "\r\nERROR : UsbLogDataTransmit: Rr-transfer hit\r\n" ));  
         
     }        
 }
@@ -369,7 +369,7 @@ void UsbCmdDataReceived(  uint32_t unused,
     }  
     else 
     {      
-        printf( "\r\nERROR : UsbCmdDataReceived: Transfer error\r\n" ); 
+        APP_TRACE_INFO(( "\r\nERROR : UsbCmdDataReceived: Transfer error\r\n" )); 
         
     }
     
@@ -419,12 +419,12 @@ static void ISR_Vbus(const Pin *pPin)
     /* Check current level on VBus */
     if (PIO_Get(pPin))
     {
-        TRACE_INFO("VBUS conn\n\r");
+        APP_TRACE_INFO(("VBUS conn\n\r"));
         USBD_Connect();
     }
     else
     {
-        TRACE_INFO("VBUS discon\n\r");
+        APP_TRACE_INFO(("VBUS discon\n\r"));
         USBD_Disconnect();
     }
     OSIntExit();
@@ -432,7 +432,7 @@ static void ISR_Vbus(const Pin *pPin)
 
 static void VBus_Configure( void )
 {
-    TRACE_INFO("VBus configuration\n\r");
+    APP_TRACE_INFO(("VBus configuration\n\r"));
 
     /* Configure PIO */
     PIO_Configure(&pinVbus, 1);
@@ -443,7 +443,7 @@ static void VBus_Configure( void )
     if (PIO_Get(&pinVbus))
     {
         /* if VBUS present, force the connect */
-        TRACE_INFO("conn\n\r");
+        APP_TRACE_INFO(("conn\n\r"));
         USBD_Connect();
     }
     else

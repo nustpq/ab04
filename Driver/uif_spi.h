@@ -22,7 +22,10 @@ void init_spi(void *pInstance,void *parameter );
 uint8_t _spiDmaRx( void *pInstance, const uint8_t *buf,uint32_t len  );
 uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  );
 //static void _spi_ConfigureDma( void *pInstance );
-
+void _SPI0_DmaRxCallback( uint8_t status, void* pArg );
+void _SPI0_DmaTxCallback( uint8_t status, void* pArg );
+void _SPI1_DmaRxCallback( uint8_t status, void* pArg );
+void _SPI1_DmaTxCallback( uint8_t status, void* pArg );
 #endif
 static void _ConfigureSpi( DataSource *pInstance,uint32_t mode,uint32_t clk );
 

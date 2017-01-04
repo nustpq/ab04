@@ -41,7 +41,7 @@
 AUDIO_CFG  Audio_Configure_Instance0[ 2 ];
 AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
 
-extern void Init_Bulk_FIFO( void );
+extern void Init_Audio_Bulk_FIFO( void );
 
 /*
 *********************************************************************************************************
@@ -251,7 +251,7 @@ static void Audio_Stop( void )
 //    delay_ms(50);             //--avoid error leo 
  
 //    SSC_Reset(); //I2S_Init();   //--avoid error leo     
-    Init_Bulk_FIFO();    
+    Init_Audio_Bulk_FIFO();    
 //    LED_Clear( USBD_LEDDATA ); 
 }
 

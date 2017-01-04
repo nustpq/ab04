@@ -142,7 +142,7 @@ void  App_TaskJoy (void *p_arg)
          
         //Service_To_iM501_IRQ();
         
-        OSTimeDly(1); 
+        OSTimeDly(2); 
        
     }
       

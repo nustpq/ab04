@@ -308,6 +308,9 @@
       <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_adc.h</file>
       <file>$PROJ_DIR$\Debug\Obj\lcd_font.pbi</file>
       <file>$PROJ_DIR$\Debug\Obj\gmacb.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\Driver\uif_gpio.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\libboard_sama5d3x.pbd</file>
+      <file>$PROJ_DIR$\..\..\..\..\Driver\uif_usb.c</file>
     </outputs>
     <file>
       <name>$PROJ_DIR$\..\..\source\board_lowlevel.c</name>

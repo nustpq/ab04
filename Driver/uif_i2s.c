@@ -247,13 +247,12 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                                                             ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
                                                             source_gpio.rxSize );
                                                  */
-                        memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ], 0x55, pSource->rxSize );  
-                       // memset( tempp, 0x55, sizeof(tempp)  ); 
+                        //memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ], 0x55, pSource->rxSize );  
+                        // memset( tempp, 0x55, sizeof(tempp)  ); 
                         
 				 		kfifo_put( pSource->pRingBulkIn,
-                  					( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ], 
-                                    //( uint8_t * )&pSource->pBufferIn[ pSource-> rx_index ],
-                                    
+                  					//( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ], 
+                                    ( uint8_t * )&pSource->pBufferIn[ pSource-> rx_index ],                                    
                   					pSource->rxSize );
 						pSource->rx_index = 1 - pSource->rx_index;
 				 	}
@@ -264,7 +263,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 				break;
 			case BUFFERFULL:
 				memset( ( uint8_t  * )pSource->pBufferIn[ pSource-> rx_index ],
-					     0x33,
+					     0x10,
 					     sizeof( pSource->pBufferIn[ pSource-> rx_index ] ) );
 				pSource->rx_index = 1 - pSource->rx_index;
 					     
@@ -380,65 +379,66 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
   
-  if(status) {
-    APP_TRACE_INFO(( "\r\nERR: %d",status ));
-  } else {
-       APP_TRACE_INFO(( " ----------ok" ));
-  }
-//    const uint8_t nDelay = 2;
-//    uint32_t temp = 0;
+//  if(status) {
+//    APP_TRACE_INFO(( "\r\nERR: %d",status ));
+//  } else {
+//    APP_TRACE_INFO(( " ----------ok" ));
+//  }
+  
+    const uint8_t nDelay = 2;
+    uint32_t temp = 0;
        
-//    assert( NULL != pArg );
-//    
-//    DataSource *pSource = ( DataSource *)pArg;
-//    Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
-//
-//     UIF_LED_On( LED_RUN );       
-//     pSource->pBufferOut = ( uint16_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
-//     
-//	switch( pSource->status[ OUT ] )
-//		{ 
-//			case START    :
-//			case BUFFERED :
-//				temp = kfifo_get_data_size( pSource->pRingBulkOut );
-//				if( temp  <  pSource->txSize  * nDelay ) 
-//					{
-//						if( pSource->status[ OUT ] == ( uint8_t )START )
-//							pSource->status[ OUT ] = ( uint8_t )BUFFERED;
-//					}
-//				else
-//					{
-//						pSource->status[ OUT ] = ( uint8_t )RUNNING;
-//					}
-//				break;
-//			case RUNNING  :
-//				temp = kfifo_get_data_size( pSource->pRingBulkOut );
-//				if( temp  >=  pSource->txSize )
-//				{
-//                                        kfifo_get( pSource->pRingBulkOut,
-//                                                    ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-//                                                     pSource->txSize );
-//                                        pSource->tx_index = 1 - pSource->tx_index;
-//				}
-//				else
-//				{
-//					pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
-//				}
-//									
-//				break;
-//                        case BUFFEREMPTY:
-//                                Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-//                                                  pSource->txSize, 
-//                                                  8000 );
-//                                break;
-//			case STOP     :
-//				break;
-//			default:
-//                          ;
-//				break;
-//     
-//      }
-//    UIF_LED_Off( LED_RUN );  
+    assert( NULL != pArg );
+    
+    DataSource *pSource = ( DataSource *)pArg;
+    Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
+
+     UIF_LED_On( LED_RUN );       
+     pSource->pBufferOut = ( uint16_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
+     
+	switch( pSource->status[ OUT ] )
+		{ 
+			case START    :
+			case BUFFERED :
+				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+				if( temp  <  pSource->txSize  * nDelay ) 
+					{
+						if( pSource->status[ OUT ] == ( uint8_t )START )
+							pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+					}
+				else
+					{
+						pSource->status[ OUT ] = ( uint8_t )RUNNING;
+					}
+				break;
+			case RUNNING  :
+				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+				if( temp  >=  pSource->txSize )
+				{
+                                        kfifo_get( pSource->pRingBulkOut,
+                                                    ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                                                     pSource->txSize );
+                                        pSource->tx_index = 1 - pSource->tx_index;
+				}
+				else
+				{
+					pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
+				}
+									
+				break;
+                        case BUFFEREMPTY:
+                                Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                                                  pSource->txSize, 
+                                                  16000 );
+                                break;
+			case STOP     :
+				break;
+			default:
+                          ;
+				break;
+     
+      }
+    UIF_LED_Off( LED_RUN );  
 }
 
 /*
@@ -963,7 +963,7 @@ static void _init_I2S( void *pInstance,void *dParameter )
     IRQ_DisableIT( pSource->dev.identify );
 
     /* initialize ssc port to default state,if other config,invoke set_parameter interface */
-    _SSC_Init( pSource->dev.identify ,pSource->dev.direct,0,BOARD_MCK , 2 , 16 );    
+    _SSC_Init( pSource->dev.identify ,pSource->dev.direct,0,BOARD_MCK , 8 , 16 );    
 }
 
                                                   

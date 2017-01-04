@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.93]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.94]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
@@ -192,7 +192,8 @@ void  BSP_Init (void)
     BSP_OS_TmrTickInit(1000u);
 
     Init_Debug_FIFO( );
-    Init_Bulk_FIFO( );
+    Init_CMD_Bulk_FIFO( );
+    Init_Audio_Bulk_FIFO( );
 
     uif_miscPin_init_default( );
     uif_ports_init_default( );

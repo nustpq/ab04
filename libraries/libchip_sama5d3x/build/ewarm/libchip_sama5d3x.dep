@@ -263,6 +263,8 @@
       <file>$PROJ_DIR$\..\..\include\instance\instance_adc.h</file>
       <file>$PROJ_DIR$\Debug\Obj\cp15.o</file>
       <file>$PROJ_DIR$\..\..\include\component\component_mpddrc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\Driver\uif_gpio.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\libchip_sama5d3x.pbd</file>
     </outputs>
     <file>
       <name>$PROJ_DIR$\..\..\cp15\cp15.c</name>

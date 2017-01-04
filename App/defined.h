@@ -77,9 +77,9 @@
 #define  ERR_CMD_TYPE                   252u
 #define  ERR_TDM_FORMAT                 253u
 
-
-#define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*2*4 )               //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
-#define I2S_PINGPONG_OUT_SIZE_3K           ( 48*8*2*4 )    // 
+#define I2S_PP_SIZE_MS                      10
+#define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*I2S_PP_SIZE_MS*4 )          //10ms //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
+#define I2S_PINGPONG_OUT_SIZE_3K           ( 48*8*I2S_PP_SIZE_MS*4 )    // 
 #define USB_DATAEP_SIZE_64B                (    64    )            // force use 64Bytes
 #define USB_LOGEP_SIZE_256B                (    256   )            // force use 256Bytes
 #define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B

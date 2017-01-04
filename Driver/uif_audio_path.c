@@ -76,6 +76,33 @@ static int8_t getPathIndex( char *name )
   return -1;
 }
 
+/*
+*********************************************************************************************************
+*                                               getPathName()
+*
+* Description : trans index to path name 
+*
+* Arguments   : name   :path index
+*            
+*             
+* Returns     : name
+*
+* Note(s)     : none.
+*********************************************************************************************************
+*/
+char * getPathName( unsigned char index )
+{
+  
+  unsigned char *p_path_name;
+  if( index >= 8 ){
+        APP_TRACE_INFO( ("invalid path index\r\n") );
+        return NULL;
+  }
+  p_path_name = (unsigned char *)halfPath[index];
+  
+  return p_path_name;
+}
+
 
 /*
 *********************************************************************************************************
@@ -297,12 +324,11 @@ void  createPath( void *source,
     }
     
     //step5: configure port sent registers ;
-    if( path->pSource->set_peripheral != NULL )  
-           path->pSource->set_peripheral( path->pSource, parameter )
-             ;
-
-    else
-           APP_TRACE_INFO(("\nCan't configure port !\r\n"));
+    if( path->pSource->set_peripheral != NULL ) { 
+        path->pSource->set_peripheral( path->pSource, parameter );
+    } else {
+        APP_TRACE_INFO(("\nCan't configure port !\r\n"));
+    }
     
     //step6: enquen
     if( portsList.match( &portsList,path->name ) )
@@ -382,4 +408,46 @@ void stratPath( void *path )
 void stopPath( void *path )
 {
   assert( NULL != path );
+}
+
+
+/*
+*********************************************************************************************************
+*                                               xxx_Audio_Path()
+*
+* Description : audio path related functions;
+*
+* Arguments   :  
+*             
+*            
+* Returns     : none
+*
+* Note(s)     : none.
+*********************************************************************************************************
+*/
+AUDIOPATH g_audio_path;
+
+void Init_Audio_Path( void )
+{
+    g_audio_path.createAudioPath  = createPath;
+    g_audio_path.destroyAudioPath = destroyAllPath;
+    g_audio_path.findPort         = findPort;    
+    
+    g_audio_path.destroyAudioPath( "any" );
+  
+}
+
+void Destroy_Audio_Path( void )
+{
+   g_audio_path.destroyAudioPath( "any" );
+
+}
+
+void Add_Audio_Path( void *path_name, AUDIO_CFG *pAudioCfg )
+{
+        
+   //g_audio_path.createAudioPath(  "ep1->ssc0",  pAudioCfg );
+   g_audio_path.createAudioPath(  path_name,  pAudioCfg );                        
+ 
+  
 }

@@ -90,7 +90,7 @@ void  App_TaskDebugInfo (void *p_arg)
             }
 
         } else {
-            OSTimeDly(1);
+            OSTimeDly(2);
 
         }
 
@@ -110,7 +110,7 @@ void  App_TaskDebugInfo (void *p_arg)
                                                  0); 
 
             } else {
-                OSTimeDly(1);
+                OSTimeDly(2);
 
             }
         }

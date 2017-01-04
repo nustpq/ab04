@@ -50,10 +50,10 @@ typedef enum _status
 	FREE = 0,
 	CONFIGURED,
 	START,
-        BUFFERED,
-        RUNNING,
-        BUFFEREMPTY,
-        BUFFERFULL,
+    BUFFERED,
+    RUNNING,
+    BUFFEREMPTY,
+    BUFFERFULL,
 	STOP
 }STATUS;
 

@@ -49,8 +49,8 @@
 
 //
 #define MAX_RESEND_TIMES        3
-#define DBG_UART_Send_Buf_Size  4096 //kFIFO
-#define DBG_USB_Send_Buf_Size   4096 //kFIFO
+#define DBG_UART_Send_Buf_Size  8192 //kFIFO
+#define DBG_USB_Send_Buf_Size   8192 //kFIFO
 
 
 extern OS_MEM       *pMEM_Part_MsgUART;

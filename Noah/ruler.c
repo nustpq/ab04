@@ -194,26 +194,26 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     unsigned char data     = 0xFF;
     unsigned char lin_ch   = 0;
 
-    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG };
-    /*
-    //APP_TRACE_INFO(("Setup_Audio [%s]:[%d SR]:[%d CH]: %s\r\n",(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
+    //unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG };
+    
+    //APP_TRACE_INFO(("Setup_Audio[%d] [%s]:[%d SR]:[%d CH]: %s\r\n",pAudioCfg->id,(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
     if( pAudioCfg->type == 0 ) {
         if ( pAudioCfg->lin_ch_mask != 0 ) {
             lin_ch = 2;// 2 channel LINE IN
             pAudioCfg->channel_num += lin_ch;
             //APP_TRACE_INFO(("LIN 2CH added up to %d CH\r\n",pAudioCfg->channel_num));
         }
-        APP_TRACE_INFO(("\r\nSetup_Audio [REC ]:[%d SR]:[%d CH]:[%d-Bit]:[LIN %d]", pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length, lin_ch));
+        APP_TRACE_INFO(("\r\nSetup_Audio[%d] [REC ]:[%d SR]:[%d CH]:[%d-Bit]:[LIN %d]", pAudioCfg->id, pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length, lin_ch));
     } else if( pAudioCfg->type == 1 ){
-        APP_TRACE_INFO(("\r\nSetup_Audio [PLAY]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length ));
+        APP_TRACE_INFO(("\r\nSetup_Audio[%d] [PLAY]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->id, pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length ));
     } else {
-        APP_TRACE_INFO(("\r\nSetup_Audio ERROR: Unsupported pAudioCfg->type, %d\r\n",pAudioCfg->type));
+        APP_TRACE_INFO(("\r\nSetup_Audio[%d] ERROR: Unsupported pAudioCfg->type, %d\r\n",pAudioCfg->id, pAudioCfg->type));
         return AUD_CFG_ERR;
     }
 
     err = Check_SR_Support( pAudioCfg->sample_rate );
     if( err != NO_ERR ) {
-        APP_TRACE_INFO(("\r\nSetup_Audio ERROR: Unsupported sample rate!\r\n"));
+        APP_TRACE_INFO(("\r\nSetup_Audio[%d] ERROR: Unsupported sample rate!\r\n",pAudioCfg->id));
         return err;
     }
 
@@ -244,7 +244,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     }
 #endif
 
-#ifdef BOARD_TYPE_UIF
+#ifdef BOARD_TYPE_AB04 //BOARD_TYPE_UIF
     if( pAudioCfg->type == 0) {
         mic_num = pAudioCfg->channel_num ;
         Global_Mic_Mask[0] = mic_num;
@@ -253,8 +253,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     }
 
 #endif
-#ifdef BOARD_TYPE_AB04
-#endif
+
 
 #ifdef BOARD_TYPE_AB04 //BOARD_TYPE_UIF
     if ( pAudioCfg->type == 0 ) {
@@ -322,29 +321,32 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         break;
     }
     //Dump_Data(buf, sizeof(buf));
-    UART2_Mixer(3);
-    USART_SendBuf( AUDIO_UART, buf, sizeof(buf)) ;
-    USART_SendBuf( AUDIO_UART, (unsigned char *)pAudioCfg, sizeof(AUDIO_CFG)) ;
-    err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM);
-    if( err != NO_ERR ) {
-        APP_TRACE_INFO(("\r\nSetup_Audio ERROR: timeout\r\n"));
-        return err;
-    }
-    if( data != NO_ERR ) {
-        APP_TRACE_INFO(("\r\nSetup_Audio ERROR: %d\r\n ",data));
-        return data;
-    }
+    //UART2_Mixer(3);
+    //USART_SendBuf( AUDIO_UART, buf, sizeof(buf)) ;
+    //USART_SendBuf( AUDIO_UART, (unsigned char *)pAudioCfg, sizeof(AUDIO_CFG)) ;
+    //err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM);
+    //if( err != NO_ERR ) {
+    //    APP_TRACE_INFO(("\r\nSetup_Audio ERROR: timeout\r\n"));
+    //    return err;
+    //}
+    //if( data != NO_ERR ) {
+    //    APP_TRACE_INFO(("\r\nSetup_Audio ERROR: %d\r\n ",data));
+    //    return data;
+    //}
 
-    codec_set[pAudioCfg->type].flag          = 1;  //cfg received
-    codec_set[pAudioCfg->type].sr            = pAudioCfg->sample_rate;
-    codec_set[pAudioCfg->type].sample_len    = pAudioCfg->bit_length;
-    codec_set[pAudioCfg->type].format        = pAudioCfg->format;
-    codec_set[pAudioCfg->type].slot_num      = pAudioCfg->slot_num;
-    codec_set[pAudioCfg->type].m_s_sel       = pAudioCfg->master_slave;
-    codec_set[pAudioCfg->type].delay         = pAudioCfg->ssc_delay;
-    codec_set[pAudioCfg->type].bclk_polarity = pAudioCfg->bclk_polarity;
-    */
     
+    
+    Add_Audio_Path( getPathName( pAudioCfg->id *2 + pAudioCfg->type ) , pAudioCfg );
+      
+    Codec_Set[pAudioCfg->id][pAudioCfg->type].flag          = 1;  //cfg received
+    Codec_Set[pAudioCfg->id][pAudioCfg->type].sr            = pAudioCfg->sample_rate;
+    Codec_Set[pAudioCfg->id][pAudioCfg->type].sample_len    = pAudioCfg->bit_length;
+    Codec_Set[pAudioCfg->id][pAudioCfg->type].format        = pAudioCfg->format;
+    Codec_Set[pAudioCfg->id][pAudioCfg->type].slot_num      = pAudioCfg->slot_num;
+    Codec_Set[pAudioCfg->id][pAudioCfg->type].m_s_sel       = pAudioCfg->master_slave;
+    Codec_Set[pAudioCfg->id][pAudioCfg->type].delay         = pAudioCfg->ssc_delay;
+    Codec_Set[pAudioCfg->id][pAudioCfg->type].bclk_polarity = pAudioCfg->bclk_polarity;
+    Codec_Set[pAudioCfg->id][pAudioCfg->type].id            = pAudioCfg->id;              
     
     
     return 0 ;
@@ -365,62 +367,61 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-unsigned char Update_Audio( void )
+unsigned char Update_Audio( unsigned char id )
 {
     unsigned char err;
     unsigned char index ;
- /*
-    APP_TRACE_INFO(("\r\nUpdate_Audio : [REC] = %d [PLAY] = %d\r\n", codec_set[0].flag, codec_set[1].flag));
+    const DataSource data_source[] = {source_twi2, source_twi1};
+    
+    APP_TRACE_INFO(("\r\nUpdate_Audio[id] : [REC] = %d [PLAY] = %d\r\n", Codec_Set[id][0].flag, Codec_Set[id][1].flag));
     err = 0;
-    if( (codec_set[0].flag == 1)  && (codec_set[1].flag == 1) ) {
-        if( (codec_set[0].sr !=  codec_set[1].sr) ||
-            (codec_set[0].slot_num != codec_set[1].slot_num) ||
-            (codec_set[0].format !=  codec_set[1].format)  ||
-            (codec_set[0].m_s_sel !=  codec_set[1].m_s_sel) ||
-            (codec_set[0].sample_len !=  codec_set[1].sample_len) ||
-            (codec_set[0].bclk_polarity !=  codec_set[1].bclk_polarity) ) {
+    
+    if( (Codec_Set[id][0].flag == 1)  && (Codec_Set[id][1].flag == 1) ) {
+        if( (Codec_Set[id][0].sr !=  Codec_Set[id][1].sr) ||
+            (Codec_Set[id][0].slot_num != Codec_Set[id][1].slot_num) ||
+            (Codec_Set[id][0].format !=  Codec_Set[id][1].format)  ||
+            (Codec_Set[id][0].m_s_sel !=  Codec_Set[id][1].m_s_sel) ||
+            (Codec_Set[id][0].sample_len !=  Codec_Set[id][1].sample_len) ||
+            (Codec_Set[id][0].bclk_polarity !=  Codec_Set[id][1].bclk_polarity) ) {
             err = AUD_CFG_ERR;
             APP_TRACE_INFO(("\r\nERROR: [REC] and [PLAY] audio settings conflicts!\r\n"));
         }
         index = 0;
-    } else if( codec_set[0].flag == 1 ) {
+    } else if( Codec_Set[id][0].flag == 1 ) {
         index = 0;
-    } else if( codec_set[1].flag == 1 ) {
+    } else if( Codec_Set[id][1].flag == 1 ) {
         index = 1;
     } else {
         err = AUD_CFG_ERR;
     }
-    codec_set[0].flag = 0; //reset Cfg flag
-    codec_set[1].flag = 0;
+    Codec_Set[id][0].flag = 0; //reset Cfg flag
+    Codec_Set[id][1].flag = 0;
 
     if( err != NO_ERR ) {
         return err;
     }
-    APP_TRACE_INFO(("\r\n\r\n############## BCLK POLARITY = %d\r\n\r\n", codec_set[index].bclk_polarity));
-    I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_CODEC( codec_set[index] );
-    I2C_Mixer(I2C_MIX_UIF_S);
+    APP_TRACE_INFO(("\r\n\r\n############## BCLK POLARITY = %d\r\n\r\n", Codec_Set[id][index].bclk_polarity));
+    //I2C_Mixer(I2C_MIX_FM36_CODEC);
+    err = Init_CODEC( &data_source[id], Codec_Set[id][index] );
+    //I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         APP_TRACE_INFO(("\r\nUpdate_Audio Init_CODEC ERROR: %d\r\n",err));
         return err;
     }
 
-    I2C_Mixer(I2C_MIX_FM36_CODEC);
-#ifdef BOARD_TYPE_AB03
-    err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, 1, 0 ); //Lin from SP1_RX, slot0~1
-#elif defined BOARD_TYPE_AB04 //BOARD_TYPE_UIF
-    if( flag_bypass_fm36 == 0 ) {
-      err = Init_FM36_AB03( codec_set[index].sr, Global_Mic_Mask[0], 1, 0, codec_set[index].sample_len, codec_set[index].slot_num==2 ? 0:1, 0 ); //Lin from SP1_RX, slot0~1
-    } else{
-        err = FM36_PWD_Bypass();
+    if( 0 == id ) {  //FM36 connected to SSC0 
+        if( flag_bypass_fm36 == 0 ) {
+            err = Init_FM36_AB03( Codec_Set[0][index].sr, Global_Mic_Mask[0], 1, 0, Codec_Set[0][index].sample_len, Codec_Set[0][index].slot_num==2 ? 0:1, 0 ); //Lin from SP1_RX, slot0~1
+        } else{
+            err = FM36_PWD_Bypass();
+        }
+         
+        if( err != NO_ERR ) {
+            APP_TRACE_INFO(("\r\nUpdate_Audio ReInit_FM36 ERROR: %d\r\n",err));
+            return err;
+        }
     }
-    I2C_Mixer(I2C_MIX_UIF_S);
-#endif
-    if( err != NO_ERR ) {
-        APP_TRACE_INFO(("\r\nUpdate_Audio ReInit_FM36 ERROR: %d\r\n",err));
-        return err;
-    }
-  */
+    
     return 0 ;
 
 }
@@ -470,8 +471,8 @@ unsigned char Start_Audio( START_AUDIO start_audio )
     unsigned char err;
     unsigned char data  = 0xFF;
     unsigned char ruler_id;
-    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_START_AUDIO, start_audio.type&0x03, start_audio.padding };
-  /*
+  
+    /*
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -499,28 +500,26 @@ unsigned char Start_Audio( START_AUDIO start_audio )
      */
     
      
-             Init_Bulk_FIFO();
+                          
+                             
+    First_Pack_Padding_BI( start_audio.padding );
              
-             Init_Audio_Path();
-             
-             First_Pack_Padding_BI( start_audio.padding );
-             
-             port_control_info = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );             
-             while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
-                 OSTimeDly(5);                      
-             };  
-          
-             audio_start_flag         = true ;
-             audio_run_control        = true ;
-             restart_audio_0_bulk_out = true  ; 
-             restart_audio_0_bulk_in  = true  ;
-             restart_audio_1_bulk_out = true  ;
-             restart_audio_1_bulk_in  = true  ; 
-             restart_audio_2_bulk_out = true  ;
-             restart_audio_2_bulk_in  = true  ;
-             restart_log_bulk_in      = true  ; 
-             restart_cmd_bulk_out     = true  ;
-             restart_cmd_bulk_in      = true  ;   
+    port_control_info = SSC0_IN | SSC0_OUT  ;             
+    while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
+        OSTimeDly(5);                      
+    };  
+        
+    audio_start_flag         = true ;
+    audio_run_control        = true ;
+    restart_audio_0_bulk_out = true  ; 
+    restart_audio_0_bulk_in  = true  ;
+    restart_audio_1_bulk_out = true  ;
+    restart_audio_1_bulk_in  = true  ; 
+    restart_audio_2_bulk_out = true  ;
+    restart_audio_2_bulk_in  = true  ;
+    restart_log_bulk_in      = true  ; 
+    restart_cmd_bulk_out     = true  ;
+    restart_cmd_bulk_in      = true  ;   
              
     return 0 ;
 }
@@ -591,19 +590,21 @@ unsigned char Stop_Audio( void )
      */
     
     
+              
+    audio_run_control        = false  ;
+    restart_audio_0_bulk_out = false  ; 
+    restart_audio_0_bulk_in  = false  ;
+    restart_audio_1_bulk_out = false  ;
+    restart_audio_1_bulk_in  = false  ; 
+    restart_audio_2_bulk_out = false  ;
+    restart_audio_2_bulk_in  = false  ;                       
+    restart_log_bulk_in      = false  ; 
+    restart_cmd_bulk_out     = false  ;
+    restart_cmd_bulk_in      = false  ;  
+             
+    Destroy_Audio_Path();
+    Init_Audio_Bulk_FIFO(); 
     
-             audio_run_control        = false  ;
-             restart_audio_0_bulk_out = false  ; 
-             restart_audio_0_bulk_in  = false  ;
-             restart_audio_1_bulk_out = false  ;
-             restart_audio_1_bulk_in  = false  ; 
-             restart_audio_2_bulk_out = false  ;
-             restart_audio_2_bulk_in  = false  ;                       
-             restart_log_bulk_in      = false  ; 
-             restart_cmd_bulk_out     = false  ;
-             restart_cmd_bulk_in      = false  ;  
-             
-             
     return 0 ;
 }
 

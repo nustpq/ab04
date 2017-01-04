@@ -27,9 +27,8 @@
 * Note(s)       :
 *********************************************************************************************************
 */
-#include "emb.h"
-#include "noah_cmd.h"
-#include "defined.h"
+#include <includes.h>
+
 
 #define MAXBUFLEN   MsgUARTBody_SIZE
  
@@ -787,56 +786,6 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     
     Time_Stamp();
     APP_TRACE_INFO(("\r\n::::: EMB_Data_Parse: cmd type=%d ",cmd_type));
-
-#if 0   
-    switch( cmd_type )  {       
-              
-//        case 0:
-//            taskMsg = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );
-//            OSMboxPost( g_pPortManagerMbox, (void *)&taskMsg ); 
-//        break;
-        
-        case PC_CMD_START_AUDIO : 
-             temp = emb_get_attr_int(&root, 2, -1);
-             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
-             audio_0_padding = (uint8_t)temp; 
-             Init_Bulk_FIFO();
-             Init_Audio_Path();
-             port_control_info = (SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT );             
-             while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
-                 OSTimeDly(5);                      
-             };  
-          
-             audio_start_flag         = true ;
-             audio_run_control        = true ;
-             restart_audio_0_bulk_out = true  ; 
-             restart_audio_0_bulk_in  = true  ;
-             restart_audio_1_bulk_out = true  ;
-             restart_audio_1_bulk_in  = true  ; 
-             restart_audio_2_bulk_out = true  ;
-             restart_audio_2_bulk_in  = true  ;
-             restart_log_bulk_in      = true  ; 
-             restart_cmd_bulk_out     = true  ;
-             restart_cmd_bulk_in      = true  ;   
-             
-        break;
-        
-        case PC_CMD_STOP_AUDIO : 
-             audio_run_control        = false  ;
-             restart_audio_0_bulk_out = false  ; 
-             restart_audio_0_bulk_in  = false  ;
-             restart_audio_1_bulk_out = false  ;
-             restart_audio_1_bulk_in  = false  ; 
-             restart_audio_2_bulk_out = false  ;
-             restart_audio_2_bulk_in  = false  ;                       
-             restart_log_bulk_in      = false  ; 
-             restart_cmd_bulk_out     = false  ;
-             restart_cmd_bulk_in      = false  ;            
-        break;
-    
-    }
-#endif   
-    
     
 
     switch( cmd_type )  {  
@@ -845,43 +794,52 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
            
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.audio_cfg.type = (uint8_t)temp;            
+            PCCmd.audio_cfg.type = (CPU_INT08U)temp;            
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.audio_cfg.sample_rate = (uint16_t)temp;            
+            PCCmd.audio_cfg.sample_rate = (CPU_INT16U)temp;            
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.audio_cfg.channel_num = (uint8_t)temp; 
+            PCCmd.audio_cfg.channel_num = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 4, 0);            
-            PCCmd.audio_cfg.lin_ch_mask = (uint8_t)temp; 
+            PCCmd.audio_cfg.lin_ch_mask = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 5, 0);            
-            PCCmd.audio_cfg.bit_length = (uint8_t)temp; 
+            PCCmd.audio_cfg.bit_length = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 6, 0);          
-            PCCmd.audio_cfg.gpio_rec_bit_mask = (uint8_t)temp; 
+            PCCmd.audio_cfg.gpio_rec_bit_mask = (CPU_INT08U)temp; 
             
-            temp = emb_get_attr_int(&root, 7, 1);   //default 1, choose I2S  
-            PCCmd.audio_cfg.format = (uint8_t)temp;
-            temp = emb_get_attr_int(&root, 8, (PCCmd.audio_cfg.type == 0)? 1:0 ); // default 0: falling egde send for sending, 1: rising edge lock for receiving   
-            PCCmd.audio_cfg.ssc_cki = (uint8_t)temp;
+            temp = emb_get_attr_int(&root, 7, 2); //1: PDM  2:I2S/I2S-TDM 3: PCM/PCM-TDM 
+            PCCmd.audio_cfg.format = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 8, 0 ); // default polarity =0
+            PCCmd.audio_cfg.bclk_polarity = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 9, 1);   //default 1 cycle delay          
-            PCCmd.audio_cfg.ssc_delay = (uint8_t)temp;
-            temp = emb_get_attr_int(&root, 10, 4);  //default 4: falling edge trigger for low left          
-            PCCmd.audio_cfg.ssc_start = (uint8_t)temp;
+            PCCmd.audio_cfg.ssc_delay = (CPU_INT08U)temp;
+            //temp = emb_get_attr_int(&root, 10, 4);  //default 4: falling edge trigger for low left          
+            //PCCmd.audio_cfg.ssc_start = (CPU_INT08U)temp;
             temp = emb_get_attr_int(&root, 11, 0);  //default 0: as master      
-            PCCmd.audio_cfg.master_slave = (uint8_t)temp;
+            PCCmd.audio_cfg.master_slave = (CPU_INT08U)temp; 
             
-            temp = emb_get_attr_int(&root, 12, 0);  //default 0: no SPI recording         
-            PCCmd.audio_cfg.spi_rec_bit_mask = (uint8_t)temp;              
-           
+            temp = emb_get_attr_int(&root, 12, 0);     //default 0: no SPI recording         
+            PCCmd.audio_cfg.spi_rec_bit_mask = (CPU_INT08U)temp;
+            
+            temp = emb_get_attr_int(&root, 13, 8);     //default 8: Bus slot number         
+            PCCmd.audio_cfg.slot_num = (CPU_INT08U)temp;
+            
+			temp = emb_get_attr_int(&root, 14, 0);  //default 0: SSC0         
+            PCCmd.audio_cfg.id = (uint8_t)temp; 
+            
             err = Setup_Audio( &PCCmd.audio_cfg );
 
         break ;
         
+        
         case PC_CMD_UPDATE_AUDIO :
-                   
-           //err = Update_Audio(); 
+          
+           temp = emb_get_attr_int(&root, 1, 0);  //default 0: SSC0
+           err = Update_Audio( temp ); 
          
         break ; 
+        
         
         case PC_CMD_START_AUDIO :
 
@@ -896,6 +854,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             err = Start_Audio( PCCmd.start_audio );
 
         break ;
+        
         
         case PC_CMD_STOP_AUDIO :
              

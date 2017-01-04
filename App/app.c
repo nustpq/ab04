@@ -207,337 +207,6 @@ uint16_t gpio_PingPong_bufferIn[2][I2S_PINGPONG_IN_SIZE_3K];
 //--------------------------------twi  buffer --------------------------------//
 uint8_t twi_ring_buffer[ MAXTWI ][ 256 ];
 
-/*
-*********************************************************************************************************
-*                                               Init_Bulk_FIFO()
-*
-* Description : all ring buffer initialize
-*
-* Arguments   : none.
-*
-* Returns     : none.
-*
-* Note(s)     : none.
-*********************************************************************************************************
-*/
-void Init_Bulk_FIFO( void )
-{
-    kfifo_t *pfifo;
-
-    //initialize ring buffer relavent ssc0;
-    pfifo = &ssc0_bulkout_fifo;
-    kfifo_init_static(pfifo, ssc0_RingBulkOut, USB_RINGOUT_SIZE_16K );
-    pfifo = &ssc0_bulkin_fifo;
-    kfifo_init_static(pfifo, ssc0_RingBulkIn, USB_RINGIN_SIZE_16K );
-
-    //initialize ring buffer relavent ssc1,extend from old structure;
-    pfifo = &ssc1_bulkout_fifo;
-    kfifo_init_static(pfifo, ssc1_RingBulkOut, USB_RINGOUT_SIZE_16K );
-    pfifo = &ssc1_bulkin_fifo;
-    kfifo_init_static(pfifo, ssc1_RingBulkIn, USB_RINGIN_SIZE_16K );
-
-    //initialize ring buffer relavent usb cmd ep;
-    pfifo = &cmdEpBulkOut_fifo;
-    kfifo_init_static(pfifo, usbCmdRingBulkOut, USB_CMD_RINGOUT_SIZE_1K );
-    pfifo = &cmdEpBulkIn_fifo;
-    kfifo_init_static(pfifo, usbCmdRingBulkIn, USB_CMD_RINGIN_SIZE_1k );
-
-
-    //initialize ring buffer relavent spi0;
-    pfifo = &spi0_bulkOut_fifo;
-    kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkOut, SPI_RINGOUT_SIZE_50K );
-    pfifo = &spi0_bulkIn_fifo;
-    kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkIn, SPI_RINGIN_SIZE_50K );
-
-    //initialize ring buffer relavent spi1;
-    pfifo = &spi1_bulkOut_fifo;
-    kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkOut, SPI_RINGOUT_SIZE_50K );
-    pfifo = &spi1_bulkIn_fifo;
-    kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkIn, SPI_RINGIN_SIZE_50K );
-
-    //initialize ring buffer relavent usb data ep0;
-    pfifo = &ep0BulkOut_fifo;
-    kfifo_init_static(pfifo, usbRingBufferBulkOut0, sizeof( usbRingBufferBulkOut0 ) );
-    pfifo = &ep0BulkIn_fifo;
-    kfifo_init_static(pfifo, usbRingBufferBulkIn0, sizeof( usbRingBufferBulkIn0 ) );
-
-    //initialize ring buffer relavent usb data ep1;
-    pfifo = &ep1BulkOut_fifo;
-    kfifo_init_static(pfifo, usbRingBufferBulkOut1, sizeof( usbRingBufferBulkOut1 ) );
-    pfifo = &ep1BulkIn_fifo;
-    kfifo_init_static(pfifo, usbRingBufferBulkIn1, sizeof( usbRingBufferBulkIn1 ) );
-
-    //initialize ring buffer relavent usb data ep1;
-    pfifo = &ep2BulkOut_fifo;
-    kfifo_init_static(pfifo, usbRingBufferBulkOut2, sizeof( usbRingBufferBulkOut2 ) );
-    pfifo = &ep2BulkIn_fifo;
-    kfifo_init_static(pfifo, usbRingBufferBulkIn2, sizeof( usbRingBufferBulkIn2 ) );
-}
-
-
-/*
-*********************************************************************************************************
-*                                               Dma_configure()
-*
-* Description : all ports dma configure
-*
-* Arguments   : none.
-*
-* Returns     : none.
-*
-* Note(s)     : none.
-*********************************************************************************************************
-*/
-extern void ISR_HDMA( void );
-extern void _SSC0_DmaRxCallback( uint8_t status, void *pArg);
-extern void _SSC1_DmaRxCallback( uint8_t status, void *pArg);
-extern void _SSC0_DmaTxCallback( uint8_t status, void *pArg);
-extern void _SSC1_DmaTxCallback( uint8_t status, void *pArg);
-extern void _SPI0_DmaRxCallback( uint8_t status, void* pArg );
-extern void _SPI0_DmaTxCallback( uint8_t status, void* pArg );
-extern void _SPI1_DmaRxCallback( uint8_t status, void* pArg );
-extern void _SPI1_DmaTxCallback( uint8_t status, void* pArg );
-extern void _USART0_DmaRxCallback( uint8_t status, void* pArg );
-extern void _USART0_DmaTxCallback( uint8_t status, void* pArg );
-extern void _USART1_DmaRxCallback( uint8_t status, void* pArg );
-extern void _USART1_DmaTxCallback( uint8_t status, void* pArg );
-
-void Dma_configure(void)
-{
-    sDmad *pDmad = &g_dmad;
-    uint32_t dwCfg;
-    uint8_t iController;
-    /* Driver initialize */
-    DMAD_Initialize( pDmad, 0 );
-    /* IRQ configure */
-    IRQ_ConfigureIT( ID_DMAC0, 0, ISR_HDMA );
-    IRQ_ConfigureIT( ID_DMAC1, 0, ISR_HDMA );
-    IRQ_EnableIT(ID_DMAC0);
-    IRQ_EnableIT(ID_DMAC1);
-
-/*----------------------------------------------------------------------------*/
-    // Allocate DMA channels for SSC0
-    source_ssc0.dev.txDMAChannel = DMAD_AllocateChannel( pDmad, DMAD_TRANSFER_MEMORY, ID_SSC0);
-    source_ssc0.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad, ID_SSC0, DMAD_TRANSFER_MEMORY);
-    if (   source_ssc0.dev.txDMAChannel == DMAD_ALLOC_FAILED || source_ssc0.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
-    {
-        printf("DMA channel allocat error\n\r");
-        while(1);
-    }
-
-    // Set RX callback
-    DMAD_SetCallback(pDmad, source_ssc0.dev.rxDMAChannel,
-                    (DmadTransferCallback)_SSC0_DmaRxCallback, ( void * )&source_ssc0 );
-    // Set TX callback
-    DMAD_SetCallback(pDmad, source_ssc0.dev.txDMAChannel,
-                    (DmadTransferCallback)_SSC0_DmaTxCallback, ( void * )&source_ssc0 );
-    // Configure DMA RX channel
-    iController = (source_ssc0.dev.rxDMAChannel >> 8);
-    dwCfg = 0
-            | DMAC_CFG_SRC_PER(
-                DMAIF_Get_ChannelNumber( iController, ID_SSC0, DMAD_TRANSFER_RX ))
-            | DMAC_CFG_SRC_H2SEL
-            | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_ssc0.dev.rxDMAChannel, dwCfg );
-    // Configure DMA TX channel
-    iController = ( source_ssc0.dev.txDMAChannel >> 8);
-    dwCfg = 0
-            | DMAC_CFG_DST_PER(
-               DMAIF_Get_ChannelNumber( iController, ID_SSC0, DMAD_TRANSFER_TX ))
-            | DMAC_CFG_DST_H2SEL
-            | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_ssc0.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------*/
-    // Allocate DMA channels for SSC1
-    source_ssc1.dev.txDMAChannel = DMAD_AllocateChannel( pDmad, DMAD_TRANSFER_MEMORY, ID_SSC1);
-    source_ssc1.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad, ID_SSC1, DMAD_TRANSFER_MEMORY);
-    if (   source_ssc1.dev.txDMAChannel == DMAD_ALLOC_FAILED || source_ssc1.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
-    {
-        printf("DMA channel allocat error\n\r");
-        while(1);
-    }
-
-    // Set RX callback
-    DMAD_SetCallback(pDmad, source_ssc1.dev.rxDMAChannel,
-                    (DmadTransferCallback)_SSC1_DmaRxCallback,( void * )&source_ssc1 );
-    // Set TX callback
-    DMAD_SetCallback(pDmad, source_ssc1.dev.txDMAChannel,
-                    (DmadTransferCallback)_SSC1_DmaTxCallback,( void * )&source_ssc1 );
-
-
-    // Configure DMA RX channel
-    iController = (source_ssc1.dev.rxDMAChannel >> 8);
-    dwCfg = 0
-            | DMAC_CFG_SRC_PER(
-                DMAIF_Get_ChannelNumber( iController, ID_SSC1, DMAD_TRANSFER_RX ))
-            | DMAC_CFG_SRC_H2SEL
-            | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_ssc1.dev.rxDMAChannel, dwCfg );
-
-    // Configure DMA TX channel
-    iController = (source_ssc1.dev.txDMAChannel >> 8);
-    dwCfg = 0
-            | DMAC_CFG_DST_PER(
-               DMAIF_Get_ChannelNumber( iController, ID_SSC1, DMAD_TRANSFER_TX ))
-            | DMAC_CFG_DST_H2SEL
-            | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_ssc1.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------*/
-     // Allocate DMA channels for SPI0
-    source_spi0.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
-                                              DMAD_TRANSFER_MEMORY, ID_SPI0);
-    source_spi0.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad,
-                                              ID_SPI0, DMAD_TRANSFER_MEMORY);
-    if (   source_spi0.dev.txDMAChannel == DMAD_ALLOC_FAILED
-        || source_spi0.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
-    {
-        printf("DMA channel allocat error\n\r");
-        while(1);
-    }
-    // Set RX callback
-    DMAD_SetCallback(pDmad, source_spi0.dev.rxDMAChannel,
-                    (DmadTransferCallback)_SPI0_DmaRxCallback, ( void * )&source_spi0 );
-    // Configure DMA RX channel
-    iController = (source_spi0.dev.rxDMAChannel >> 8);
-    dwCfg = 0
-           | DMAC_CFG_SRC_PER(
-                DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_RX )& 0x0F)
-           | DMAC_CFG_SRC_PER_MSB(
-                (DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_RX )& 0xF0) >> 4 )
-           | DMAC_CFG_SRC_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_spi0.dev.rxDMAChannel, dwCfg );
-
-    // Configure DMA TX channel
-    DMAD_SetCallback(pDmad, source_spi0.dev.txDMAChannel,
-                    (DmadTransferCallback)_SPI0_DmaTxCallback, ( void * )&source_spi0 );
-    iController = (source_spi0.dev.txDMAChannel >> 8);
-    dwCfg = 0
-           | DMAC_CFG_DST_PER(
-                DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_TX )& 0x0F)
-           | DMAC_CFG_DST_PER_MSB(
-                (DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_TX )& 0xF0) >> 4 )
-           | DMAC_CFG_DST_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_spi0.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------*/
-#if 1
-     // Allocate DMA channels for SPI1
-    source_spi1.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
-                                              DMAD_TRANSFER_MEMORY, ID_SPI1);
-    source_spi1.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad,
-                                              ID_SPI1, DMAD_TRANSFER_MEMORY);
-    if (   source_spi1.dev.txDMAChannel == DMAD_ALLOC_FAILED
-        || source_spi1.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
-    {
-        printf("DMA channel allocat error\n\r");
-        while(1);
-    }
-    /* Set RX callback */
-    DMAD_SetCallback(pDmad, source_spi1.dev.rxDMAChannel,
-                    (DmadTransferCallback)_SPI1_DmaRxCallback, ( void * )&source_spi1 );
-    /* Configure DMA RX channel */
-    iController = (source_spi1.dev.rxDMAChannel >> 8);
-    dwCfg = 0
-           | DMAC_CFG_SRC_PER(
-                DMAIF_Get_ChannelNumber( iController, ID_SPI1, DMAD_TRANSFER_RX )& 0x0F)
-           | DMAC_CFG_SRC_PER_MSB(
-                (DMAIF_Get_ChannelNumber( iController, ID_SPI1, DMAD_TRANSFER_RX )& 0xF0) >> 4 )
-           | DMAC_CFG_SRC_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_spi1.dev.rxDMAChannel, dwCfg );
-
-    /* Configure DMA TX channel */
-    DMAD_SetCallback(pDmad, source_spi1.dev.txDMAChannel,
-                    (DmadTransferCallback)_SPI1_DmaTxCallback, ( void * )&source_spi1 );
-    iController = (source_spi1.dev.txDMAChannel >> 8);
-    dwCfg = 0
-           | DMAC_CFG_DST_PER(
-                DMAIF_Get_ChannelNumber( iController, ID_SPI1, DMAD_TRANSFER_TX )& 0x0F)
-           | DMAC_CFG_DST_PER_MSB(
-                (DMAIF_Get_ChannelNumber( iController, ID_SPI1, DMAD_TRANSFER_TX )& 0xF0) >> 4 )
-           | DMAC_CFG_DST_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( pDmad, source_spi1.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------*/
-    // Allocate DMA channels for USART1
-    source_usart1.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
-                                              DMAD_TRANSFER_MEMORY, ID_USART1);
-    source_usart1.dev.rxDMAChannel = DMAD_AllocateChannel( &g_dmad,
-                                              ID_USART1, DMAD_TRANSFER_MEMORY);
-    if (  source_usart1.dev.txDMAChannel == DMAD_ALLOC_FAILED
-        || source_usart1.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
-    {
-        printf("DMA channel allocat error\n\r");
-        while(1);
-    }
-    // Set RX callback
-    DMAD_SetCallback(&g_dmad, source_usart1.dev.txDMAChannel,
-                    (DmadTransferCallback)_USART1_DmaTxCallback, 0);
-    DMAD_SetCallback(&g_dmad, source_usart1.dev.rxDMAChannel,
-                    (DmadTransferCallback)_USART1_DmaRxCallback, 0);
-    // Configure DMA RX channel
-    iController = ( source_usart1.dev.rxDMAChannel >> 8 );
-    dwCfg = 0
-           | DMAC_CFG_SRC_PER(
-              DMAIF_Get_ChannelNumber( iController, ID_USART1, DMAD_TRANSFER_RX ))
-           | DMAC_CFG_SRC_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, source_usart1.dev.rxDMAChannel, dwCfg );
-    // Configure DMA TX channel
-    iController = ( source_usart1.dev.txDMAChannel >> 8);
-    dwCfg = 0
-           | DMAC_CFG_DST_PER(
-              DMAIF_Get_ChannelNumber( iController, ID_USART1, DMAD_TRANSFER_TX ))
-           | DMAC_CFG_DST_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, source_usart1.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------*/
-    // Allocate DMA channels for USART0
-    source_usart0.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
-                                              DMAD_TRANSFER_MEMORY, ID_USART0);
-    source_usart0.dev.rxDMAChannel = DMAD_AllocateChannel( &g_dmad,
-                                              ID_USART0, DMAD_TRANSFER_MEMORY);
-    if (  source_usart0.dev.txDMAChannel == DMAD_ALLOC_FAILED
-        || source_usart0.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
-    {
-        printf("DMA channel allocat error\n\r");
-        while(1);
-    }
-    // Set RX callback
-    DMAD_SetCallback(&g_dmad, source_usart0.dev.txDMAChannel,
-                    (DmadTransferCallback)_USART0_DmaTxCallback, 0);
-    DMAD_SetCallback(&g_dmad, source_usart0.dev.rxDMAChannel,
-                    (DmadTransferCallback)_USART0_DmaRxCallback, 0);
-    // Configure DMA RX channel
-    iController = ( source_usart0.dev.rxDMAChannel >> 8 );
-    dwCfg = 0
-           | DMAC_CFG_SRC_PER(
-              DMAIF_Get_ChannelNumber( iController, ID_USART0, DMAD_TRANSFER_RX ))
-           | DMAC_CFG_SRC_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, source_usart0.dev.rxDMAChannel, dwCfg );
-    // Configure DMA TX channel
-    iController = ( source_usart0.dev.txDMAChannel >> 8);
-    dwCfg = 0
-           | DMAC_CFG_DST_PER(
-              DMAIF_Get_ChannelNumber( iController, ID_USART0, DMAD_TRANSFER_TX ))
-           | DMAC_CFG_DST_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, source_usart0.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------*/
-#endif
-}
-
-
 
 /*
 *********************************************************************************************************
@@ -1126,5 +795,328 @@ static void  App_EventCreate (void)
 
 #endif
 
+}
+
+
+/*
+*********************************************************************************************************
+*                                               Init_Audio_Bulk_FIFO()
+*
+* Description : all audio ring buffer initialize
+*
+* Arguments   : none.
+*
+* Returns     : none.
+*
+* Note(s)     : none.
+*********************************************************************************************************
+*/
+void Init_Audio_Bulk_FIFO( void )
+{
+    kfifo_t *pfifo;
+
+    //initialize ring buffer relavent ssc0;
+    pfifo = &ssc0_bulkout_fifo;
+    kfifo_init_static(pfifo, ssc0_RingBulkOut, USB_RINGOUT_SIZE_16K );
+    pfifo = &ssc0_bulkin_fifo;
+    kfifo_init_static(pfifo, ssc0_RingBulkIn, USB_RINGIN_SIZE_16K );
+
+    //initialize ring buffer relavent ssc1,extend from old structure;
+    pfifo = &ssc1_bulkout_fifo;
+    kfifo_init_static(pfifo, ssc1_RingBulkOut, USB_RINGOUT_SIZE_16K );
+    pfifo = &ssc1_bulkin_fifo;
+    kfifo_init_static(pfifo, ssc1_RingBulkIn, USB_RINGIN_SIZE_16K );
+
+    //initialize ring buffer relavent spi0;
+    pfifo = &spi0_bulkOut_fifo;
+    kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkOut, SPI_RINGOUT_SIZE_50K );
+    pfifo = &spi0_bulkIn_fifo;
+    kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkIn, SPI_RINGIN_SIZE_50K );
+
+    //initialize ring buffer relavent spi1;
+    pfifo = &spi1_bulkOut_fifo;
+    kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkOut, SPI_RINGOUT_SIZE_50K );
+    pfifo = &spi1_bulkIn_fifo;
+    kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkIn, SPI_RINGIN_SIZE_50K );
+
+    //initialize ring buffer relavent usb data ep0;
+    pfifo = &ep0BulkOut_fifo;
+    kfifo_init_static(pfifo, usbRingBufferBulkOut0, sizeof( usbRingBufferBulkOut0 ) );
+    pfifo = &ep0BulkIn_fifo;
+    kfifo_init_static(pfifo, usbRingBufferBulkIn0, sizeof( usbRingBufferBulkIn0 ) );
+
+    //initialize ring buffer relavent usb data ep1;
+    pfifo = &ep1BulkOut_fifo;
+    kfifo_init_static(pfifo, usbRingBufferBulkOut1, sizeof( usbRingBufferBulkOut1 ) );
+    pfifo = &ep1BulkIn_fifo;
+    kfifo_init_static(pfifo, usbRingBufferBulkIn1, sizeof( usbRingBufferBulkIn1 ) );
+
+    //initialize ring buffer relavent usb data ep1;
+    pfifo = &ep2BulkOut_fifo;
+    kfifo_init_static(pfifo, usbRingBufferBulkOut2, sizeof( usbRingBufferBulkOut2 ) );
+    pfifo = &ep2BulkIn_fifo;
+    kfifo_init_static(pfifo, usbRingBufferBulkIn2, sizeof( usbRingBufferBulkIn2 ) );
+}
+
+void Init_CMD_Bulk_FIFO( void )
+{
+    kfifo_t *pfifo;
+
+    //initialize ring buffer relavent usb cmd ep;
+    pfifo = &cmdEpBulkOut_fifo;
+    kfifo_init_static(pfifo, usbCmdRingBulkOut, USB_CMD_RINGOUT_SIZE_1K );
+    pfifo = &cmdEpBulkIn_fifo;
+    kfifo_init_static(pfifo, usbCmdRingBulkIn, USB_CMD_RINGIN_SIZE_1k );
+
+
+}
+/*
+*********************************************************************************************************
+*                                               Dma_configure()
+*
+* Description : all ports dma configure
+*
+* Arguments   : none.
+*
+* Returns     : none.
+*
+* Note(s)     : none.
+*********************************************************************************************************
+*/
+
+
+void Dma_configure( void )
+{
+    sDmad *pDmad = &g_dmad;
+    uint32_t dwCfg;
+    uint8_t iController;
+    /* Driver initialize */
+    DMAD_Initialize( pDmad, 0 );
+    /* IRQ configure */
+    IRQ_ConfigureIT( ID_DMAC0, 7, ISR_HDMA ); //highest priority
+    IRQ_ConfigureIT( ID_DMAC1, 7, ISR_HDMA );
+    IRQ_EnableIT(ID_DMAC0);
+    IRQ_EnableIT(ID_DMAC1);
+
+/*----------------------------------------------------------------------------*/
+    // Allocate DMA channels for SSC0
+    source_ssc0.dev.txDMAChannel = DMAD_AllocateChannel( pDmad, DMAD_TRANSFER_MEMORY, ID_SSC0);
+    source_ssc0.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad, ID_SSC0, DMAD_TRANSFER_MEMORY);
+    if (   source_ssc0.dev.txDMAChannel == DMAD_ALLOC_FAILED || source_ssc0.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
+    {
+        printf("DMA channel allocat error\n\r");
+        while(1);
+    }
+
+    // Set RX callback
+    DMAD_SetCallback(pDmad, source_ssc0.dev.rxDMAChannel,
+                    (DmadTransferCallback)_SSC0_DmaRxCallback, ( void * )&source_ssc0 );
+    // Set TX callback
+    DMAD_SetCallback(pDmad, source_ssc0.dev.txDMAChannel,
+                    (DmadTransferCallback)_SSC0_DmaTxCallback, ( void * )&source_ssc0 );
+    // Configure DMA RX channel
+    iController = (source_ssc0.dev.rxDMAChannel >> 8);
+    dwCfg = 0
+            | DMAC_CFG_SRC_PER(
+                DMAIF_Get_ChannelNumber( iController, ID_SSC0, DMAD_TRANSFER_RX ))
+            | DMAC_CFG_SRC_H2SEL
+            | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_ssc0.dev.rxDMAChannel, dwCfg );
+    // Configure DMA TX channel
+    iController = ( source_ssc0.dev.txDMAChannel >> 8);
+    dwCfg = 0
+            | DMAC_CFG_DST_PER(
+               DMAIF_Get_ChannelNumber( iController, ID_SSC0, DMAD_TRANSFER_TX ))
+            | DMAC_CFG_DST_H2SEL
+            | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_ssc0.dev.txDMAChannel, dwCfg );
+/*----------------------------------------------------------------------------*/
+    // Allocate DMA channels for SSC1
+    source_ssc1.dev.txDMAChannel = DMAD_AllocateChannel( pDmad, DMAD_TRANSFER_MEMORY, ID_SSC1);
+    source_ssc1.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad, ID_SSC1, DMAD_TRANSFER_MEMORY);
+    if (   source_ssc1.dev.txDMAChannel == DMAD_ALLOC_FAILED || source_ssc1.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
+    {
+        printf("DMA channel allocat error\n\r");
+        while(1);
+    }
+
+    // Set RX callback
+    DMAD_SetCallback(pDmad, source_ssc1.dev.rxDMAChannel,
+                    (DmadTransferCallback)_SSC1_DmaRxCallback,( void * )&source_ssc1 );
+    // Set TX callback
+    DMAD_SetCallback(pDmad, source_ssc1.dev.txDMAChannel,
+                    (DmadTransferCallback)_SSC1_DmaTxCallback,( void * )&source_ssc1 );
+
+
+    // Configure DMA RX channel
+    iController = (source_ssc1.dev.rxDMAChannel >> 8);
+    dwCfg = 0
+            | DMAC_CFG_SRC_PER(
+                DMAIF_Get_ChannelNumber( iController, ID_SSC1, DMAD_TRANSFER_RX ))
+            | DMAC_CFG_SRC_H2SEL
+            | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_ssc1.dev.rxDMAChannel, dwCfg );
+
+    // Configure DMA TX channel
+    iController = (source_ssc1.dev.txDMAChannel >> 8);
+    dwCfg = 0
+            | DMAC_CFG_DST_PER(
+               DMAIF_Get_ChannelNumber( iController, ID_SSC1, DMAD_TRANSFER_TX ))
+            | DMAC_CFG_DST_H2SEL
+            | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_ssc1.dev.txDMAChannel, dwCfg );
+/*----------------------------------------------------------------------------*/
+     // Allocate DMA channels for SPI0
+    source_spi0.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
+                                              DMAD_TRANSFER_MEMORY, ID_SPI0);
+    source_spi0.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad,
+                                              ID_SPI0, DMAD_TRANSFER_MEMORY);
+    if (   source_spi0.dev.txDMAChannel == DMAD_ALLOC_FAILED
+        || source_spi0.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
+    {
+        printf("DMA channel allocat error\n\r");
+        while(1);
+    }
+    // Set RX callback
+    DMAD_SetCallback(pDmad, source_spi0.dev.rxDMAChannel,
+                    (DmadTransferCallback)_SPI0_DmaRxCallback, ( void * )&source_spi0 );
+    // Configure DMA RX channel
+    iController = (source_spi0.dev.rxDMAChannel >> 8);
+    dwCfg = 0
+           | DMAC_CFG_SRC_PER(
+                DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_RX )& 0x0F)
+           | DMAC_CFG_SRC_PER_MSB(
+                (DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_RX )& 0xF0) >> 4 )
+           | DMAC_CFG_SRC_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_spi0.dev.rxDMAChannel, dwCfg );
+
+    // Configure DMA TX channel
+    DMAD_SetCallback(pDmad, source_spi0.dev.txDMAChannel,
+                    (DmadTransferCallback)_SPI0_DmaTxCallback, ( void * )&source_spi0 );
+    iController = (source_spi0.dev.txDMAChannel >> 8);
+    dwCfg = 0
+           | DMAC_CFG_DST_PER(
+                DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_TX )& 0x0F)
+           | DMAC_CFG_DST_PER_MSB(
+                (DMAIF_Get_ChannelNumber( iController, ID_SPI0, DMAD_TRANSFER_TX )& 0xF0) >> 4 )
+           | DMAC_CFG_DST_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_spi0.dev.txDMAChannel, dwCfg );
+/*----------------------------------------------------------------------------*/
+#if 1
+     // Allocate DMA channels for SPI1
+    source_spi1.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
+                                              DMAD_TRANSFER_MEMORY, ID_SPI1);
+    source_spi1.dev.rxDMAChannel = DMAD_AllocateChannel( pDmad,
+                                              ID_SPI1, DMAD_TRANSFER_MEMORY);
+    if (   source_spi1.dev.txDMAChannel == DMAD_ALLOC_FAILED
+        || source_spi1.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
+    {
+        printf("DMA channel allocat error\n\r");
+        while(1);
+    }
+    /* Set RX callback */
+    DMAD_SetCallback(pDmad, source_spi1.dev.rxDMAChannel,
+                    (DmadTransferCallback)_SPI1_DmaRxCallback, ( void * )&source_spi1 );
+    /* Configure DMA RX channel */
+    iController = (source_spi1.dev.rxDMAChannel >> 8);
+    dwCfg = 0
+           | DMAC_CFG_SRC_PER(
+                DMAIF_Get_ChannelNumber( iController, ID_SPI1, DMAD_TRANSFER_RX )& 0x0F)
+           | DMAC_CFG_SRC_PER_MSB(
+                (DMAIF_Get_ChannelNumber( iController, ID_SPI1, DMAD_TRANSFER_RX )& 0xF0) >> 4 )
+           | DMAC_CFG_SRC_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_spi1.dev.rxDMAChannel, dwCfg );
+
+    /* Configure DMA TX channel */
+    DMAD_SetCallback(pDmad, source_spi1.dev.txDMAChannel,
+                    (DmadTransferCallback)_SPI1_DmaTxCallback, ( void * )&source_spi1 );
+    iController = (source_spi1.dev.txDMAChannel >> 8);
+    dwCfg = 0
+           | DMAC_CFG_DST_PER(
+                DMAIF_Get_ChannelNumber( iController, ID_SPI1, DMAD_TRANSFER_TX )& 0x0F)
+           | DMAC_CFG_DST_PER_MSB(
+                (DMAIF_Get_ChannelNumber( iController, ID_SPI1, DMAD_TRANSFER_TX )& 0xF0) >> 4 )
+           | DMAC_CFG_DST_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( pDmad, source_spi1.dev.txDMAChannel, dwCfg );
+/*----------------------------------------------------------------------------*/
+    // Allocate DMA channels for USART1
+    source_usart1.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
+                                              DMAD_TRANSFER_MEMORY, ID_USART1);
+    source_usart1.dev.rxDMAChannel = DMAD_AllocateChannel( &g_dmad,
+                                              ID_USART1, DMAD_TRANSFER_MEMORY);
+    if (  source_usart1.dev.txDMAChannel == DMAD_ALLOC_FAILED
+        || source_usart1.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
+    {
+        printf("DMA channel allocat error\n\r");
+        while(1);
+    }
+    // Set RX callback
+    DMAD_SetCallback(&g_dmad, source_usart1.dev.txDMAChannel,
+                    (DmadTransferCallback)_USART1_DmaTxCallback, 0);
+    DMAD_SetCallback(&g_dmad, source_usart1.dev.rxDMAChannel,
+                    (DmadTransferCallback)_USART1_DmaRxCallback, 0);
+    // Configure DMA RX channel
+    iController = ( source_usart1.dev.rxDMAChannel >> 8 );
+    dwCfg = 0
+           | DMAC_CFG_SRC_PER(
+              DMAIF_Get_ChannelNumber( iController, ID_USART1, DMAD_TRANSFER_RX ))
+           | DMAC_CFG_SRC_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( &g_dmad, source_usart1.dev.rxDMAChannel, dwCfg );
+    // Configure DMA TX channel
+    iController = ( source_usart1.dev.txDMAChannel >> 8);
+    dwCfg = 0
+           | DMAC_CFG_DST_PER(
+              DMAIF_Get_ChannelNumber( iController, ID_USART1, DMAD_TRANSFER_TX ))
+           | DMAC_CFG_DST_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( &g_dmad, source_usart1.dev.txDMAChannel, dwCfg );
+/*----------------------------------------------------------------------------*/
+    // Allocate DMA channels for USART0
+    source_usart0.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
+                                              DMAD_TRANSFER_MEMORY, ID_USART0);
+    source_usart0.dev.rxDMAChannel = DMAD_AllocateChannel( &g_dmad,
+                                              ID_USART0, DMAD_TRANSFER_MEMORY);
+    if (  source_usart0.dev.txDMAChannel == DMAD_ALLOC_FAILED
+        || source_usart0.dev.rxDMAChannel == DMAD_ALLOC_FAILED )
+    {
+        printf("DMA channel allocat error\n\r");
+        while(1);
+    }
+    // Set RX callback
+    DMAD_SetCallback(&g_dmad, source_usart0.dev.txDMAChannel,
+                    (DmadTransferCallback)_USART0_DmaTxCallback, 0);
+    DMAD_SetCallback(&g_dmad, source_usart0.dev.rxDMAChannel,
+                    (DmadTransferCallback)_USART0_DmaRxCallback, 0);
+    // Configure DMA RX channel
+    iController = ( source_usart0.dev.rxDMAChannel >> 8 );
+    dwCfg = 0
+           | DMAC_CFG_SRC_PER(
+              DMAIF_Get_ChannelNumber( iController, ID_USART0, DMAD_TRANSFER_RX ))
+           | DMAC_CFG_SRC_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( &g_dmad, source_usart0.dev.rxDMAChannel, dwCfg );
+    // Configure DMA TX channel
+    iController = ( source_usart0.dev.txDMAChannel >> 8);
+    dwCfg = 0
+           | DMAC_CFG_DST_PER(
+              DMAIF_Get_ChannelNumber( iController, ID_USART0, DMAD_TRANSFER_TX ))
+           | DMAC_CFG_DST_H2SEL
+           | DMAC_CFG_SOD
+           | DMAC_CFG_FIFOCFG_ALAP_CFG;
+    DMAD_PrepareChannel( &g_dmad, source_usart0.dev.txDMAChannel, dwCfg );
+/*----------------------------------------------------------------------------*/
+#endif
 }
 

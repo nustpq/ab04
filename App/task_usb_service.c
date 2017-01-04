@@ -32,8 +32,9 @@
 
 
 uint8_t tmpBuffer[ I2S_PINGPONG_IN_SIZE_3K ];
- uint8_t tmpBuffer1[ I2S_PINGPONG_IN_SIZE_3K ];
+uint8_t tmpBuffer1[ I2S_PINGPONG_IN_SIZE_3K ];
 void Init_Audio_Path();
+
 /*
 *********************************************************************************************************
 *                                    App_TaskUSBService()
@@ -102,7 +103,7 @@ void  App_TaskUSBService ( void *p_arg )
             OSTimeDly(5);
             continue;      
         }
-     /*  
+       
         e = portsList.head;         
         while( e != NULL )
         {
@@ -284,8 +285,8 @@ void  App_TaskUSBService ( void *p_arg )
             e = e -> next;
             
         }
-         */
-        OSTimeDly( 1 );
+         
+        OSTimeDly( 2 );
         
     } //for loop
     
@@ -296,37 +297,5 @@ void  App_TaskUSBService ( void *p_arg )
 
 
 
-void Init_Audio_Path()
-{
-    AUDIO_CFG in,out;
-    
-    in.bit_length = 16;
-    in.channel_num = 8;
-    in.ssc_delay = 1;
-    in.sample_rate = 16000;
-    in.ssc_cki = 1;
-    in.ssc_start = 4;
-    
-    out.bit_length = 16;
-    out.channel_num = 8;
-    out.ssc_delay = 1;
-    out.sample_rate = 16000;
-    out.ssc_cki = 0;
-    out.ssc_start = 4;
-    
-    AUDIOPATH g_audio_path;
-  
-    g_audio_path.createAudioPath = createPath;
-    g_audio_path.destroyAudioPath = destroyAllPath;
-    g_audio_path.findPort        = findPort;
-    
-    
-    g_audio_path.destroyAudioPath( "any" );
-    
-    g_audio_path.createAudioPath(  "ep1->ssc0",  &out )   ;
-    g_audio_path.createAudioPath(  "ep2<-ssc0",  &in )    ;
-                                   
- 
-  
-}
+
  

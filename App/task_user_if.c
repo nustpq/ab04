@@ -72,6 +72,7 @@ void  App_TaskUserIF (void *p_arg)
     
     //Ruler_Power_Switch(1);
     Init_Global_Var();
+    Init_Audio_Path();
     //iM401_Ctrl_Enable = 1;
     OSTimeDly(100);
     if( AB_POST() )  {

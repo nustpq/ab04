@@ -29,6 +29,7 @@ const static char* halfPath[]={
 
 
 
+                                
 typedef struct _audio_path
 {
   char name[16];                             //input path
@@ -70,4 +71,10 @@ static void path_set_buffer( char *pFullName,
 
 int matchPath(const void *key1,const void *key2 );
 int findPort( const void *pPath,const void *port );
+
+char * getPathName( unsigned char index );
+void Init_Audio_Path( void );   
+void Destroy_Audio_Path( void ); 
+void Add_Audio_Path( void *path_name, AUDIO_CFG *pAudioCfg );
+
 #endif

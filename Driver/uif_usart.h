@@ -33,5 +33,9 @@ void usart_init( void *pInstance, void *parameter );
 static void _ConfigureDma( void* pInstance );
 static void _configureUsart( void *pInstance );
 
+void _USART0_DmaRxCallback( uint8_t status, void* pArg );
+void _USART0_DmaTxCallback( uint8_t status, void* pArg );
+void _USART1_DmaRxCallback( uint8_t status, void* pArg );
+void _USART1_DmaTxCallback( uint8_t status, void* pArg );
 #endif
 
