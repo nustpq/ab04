@@ -444,6 +444,7 @@ unsigned char Update_Audio( unsigned char id )
 void First_Pack_Padding_BI( unsigned char usb_data_padding )
 {
     unsigned char temp[ USBDATAEPSIZE ];
+    APP_TRACE_INFO(("\r\nUSB data padding = %d\r\n",usb_data_padding));
     memset( temp, usb_data_padding, USBDATAEPSIZE );
     kfifo_put(&ep0BulkIn_fifo, temp, USBDATAEPSIZE) ;
     kfifo_put(&ep0BulkIn_fifo, temp, USBDATAEPSIZE) ;//2 package incase of PID error
@@ -500,15 +501,15 @@ unsigned char Start_Audio( START_AUDIO start_audio )
      */
     
      
-                          
-                             
-    First_Pack_Padding_BI( start_audio.padding );
-             
-    port_control_info = SSC0_IN | SSC0_OUT  ;             
+    Hold_Task_for_Audio();                      
+                            
+    First_Pack_Padding_BI( start_audio.padding );             
+    port_control_info = SSC0_IN | SSC0_OUT  ; 
+    
     while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
-        OSTimeDly(5);                      
+         OSTimeDly(5);                     
     };  
-        
+    OSTimeDly(5);     
     audio_start_flag         = true ;
     audio_run_control        = true ;
     restart_audio_0_bulk_out = true  ; 
@@ -604,6 +605,7 @@ unsigned char Stop_Audio( void )
              
     Destroy_Audio_Path();
     Init_Audio_Bulk_FIFO(); 
+    Release_Task_for_Audio(); 
     
     return 0 ;
 }

@@ -253,7 +253,7 @@ void _SPI1_DmaRxCallback( uint8_t status, void* pArg )
     
      DataSource *pSource = ( DataSource *)pArg;
               
-     pSource->pBufferIn = ( uint16_t * )spi1_2MSIn[ 1 - pSource->rx_index ];
+     pSource->pBufferIn = ( uint8_t * )spi1_2MSIn[ 1 - pSource->rx_index ];
 
      temp = kfifo_get_free_space( pSource->pRingBulkIn );
     

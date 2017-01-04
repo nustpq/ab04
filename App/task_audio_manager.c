@@ -132,7 +132,8 @@ void  App_AudioManager (void *p_arg)
                                       ( uint8_t * )ssc0_PingPongIn,                                              
                                       source_ssc0.rxSize );
             source_ssc0.status[ IN ]  = ( uint8_t )START;
-        }        
+        } 
+        //OSTimeDly(4);
         if ( (cfg_data & SSC0_OUT) && ( source_ssc0.status[OUT] >= CONFIGURED ) ){
             source_ssc0.buffer_write(  &source_ssc0,
                                        ( uint8_t * )ssc0_PingPongOut,                                                

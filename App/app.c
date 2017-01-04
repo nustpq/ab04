@@ -186,8 +186,8 @@ uint16_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_50K ];
 
 //Buffer Level 4:  PingPong buffer for audio data : MAX 48*2*8*2*2 = 3072 B
 //these buffer is private
-uint16_t ssc0_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         // Play
-uint16_t ssc0_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          // Record
+uint8_t ssc0_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         // Play
+uint8_t ssc0_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          // Record
 uint16_t ssc1_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         // Play
 uint16_t ssc1_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          // Record
 
@@ -1120,3 +1120,58 @@ void Dma_configure( void )
 #endif
 }
 
+//#define TASKLEDPRIORITY                                    8
+//
+//#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       6
+//#define  APP_CFG_TASK_USB_SEV_PRIO                         1
+//#define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
+//#define  APP_CFG_TASK_UART_TX_PRIO                         3
+//#define  APP_CFG_TASK_NOAH_PRIO                            4
+//#define  APP_CFG_TASK_UART_RX_PRIO                         5
+//
+//#define  APP_CFG_TASK_USER_IF_PRIO                         10
+//#define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+1)
+//
+//#define  APP_CFG_TASK_UART_TX_RULER_PRIO                   13
+//#define  APP_CFG_TASK_NOAH_RULER_PRIO                      16
+//
+//#define  APP_CFG_TASK_SHELL_PRIO                           30
+//#define  APP_CFG_TASK_DBG_INFO_PRIO                        31
+//#define  APP_CFG_TASK_START_PRIO                           35
+//#define  APP_CFG_TASK_PROBE_STR_PRIO                       37
+//#define  PROBE_DEMO_INTRO_CFG_TASK_LED_PRIO                38
+//#define  OS_PROBE_TASK_PRIO                                40
+//#define  OS_PROBE_TASK_ID                                  40 //ID
+//#define  OS_TASK_TMR_PRIO                         (OS_LOWEST_PRIO - 2)
+
+
+void Hold_Task_for_Audio( void )
+{
+    APP_TRACE_INFO(("Hold_Task_for_Audio\r\n "));
+    OSTaskSuspend(APP_CFG_TASK_USER_IF_PRIO);
+    OSTaskSuspend(APP_CFG_TASK_JOY_PRIO);
+    OSTaskSuspend(APP_CFG_TASK_SHELL_PRIO);
+    OSTaskSuspend(APP_CFG_TASK_DBG_INFO_PRIO);
+    OSTaskSuspend(APP_CFG_TASK_START_PRIO);
+    OSTaskSuspend(APP_CFG_TASK_PROBE_STR_PRIO);    
+    OSTaskSuspend(PROBE_DEMO_INTRO_CFG_TASK_LED_PRIO);
+    OSTaskSuspend(OS_PROBE_TASK_PRIO);
+
+    
+}
+
+
+void Release_Task_for_Audio( void )
+{
+    APP_TRACE_INFO(("Release_Task_for_Audio\r\n "));
+    OSTaskResume(APP_CFG_TASK_USER_IF_PRIO);
+    OSTaskResume(APP_CFG_TASK_JOY_PRIO);
+    OSTaskResume(APP_CFG_TASK_SHELL_PRIO);
+    OSTaskResume(APP_CFG_TASK_DBG_INFO_PRIO);
+    OSTaskResume(APP_CFG_TASK_START_PRIO);
+    OSTaskResume(APP_CFG_TASK_PROBE_STR_PRIO);    
+    OSTaskResume(PROBE_DEMO_INTRO_CFG_TASK_LED_PRIO);
+    OSTaskResume(OS_PROBE_TASK_PRIO);
+    
+}
+ 

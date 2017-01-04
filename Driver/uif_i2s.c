@@ -203,6 +203,8 @@ void _config_pins( uint32_t id)
 * Note(s)     : none.
 *********************************************************************************************************
 */
+unsigned char testbuf[2560];
+
 void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 {    
     assert( NULL != pArg );
@@ -251,8 +253,9 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                         // memset( tempp, 0x55, sizeof(tempp)  ); 
                         
 				 		kfifo_put( pSource->pRingBulkIn,
-                  					//( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ], 
-                                    ( uint8_t * )&pSource->pBufferIn[ pSource-> rx_index ],                                    
+                  					( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
+                                    //( uint8_t * )&(pSource->pBufferIn[ pSource-> rx_index ]), 
+                                    //testbuf,
                   					pSource->rxSize );
 						pSource->rx_index = 1 - pSource->rx_index;
 				 	}
@@ -394,7 +397,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
      UIF_LED_On( LED_RUN );       
-     pSource->pBufferOut = ( uint16_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
+     pSource->pBufferOut = ( uint8_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
      
 	switch( pSource->status[ OUT ] )
 		{ 
@@ -415,10 +418,11 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 				temp = kfifo_get_data_size( pSource->pRingBulkOut );
 				if( temp  >=  pSource->txSize )
 				{
-                                        kfifo_get( pSource->pRingBulkOut,
-                                                    ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                                                     pSource->txSize );
-                                        pSource->tx_index = 1 - pSource->tx_index;
+                    kfifo_get( pSource->pRingBulkOut,
+                    //( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                    ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
+                    pSource->txSize );
+                    pSource->tx_index = 1 - pSource->tx_index;
 				}
 				else
 				{
@@ -466,7 +470,7 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
            
-     pSource->pBufferOut = ( uint16_t * )&ssc1_PingPongOut[ 1 - pSource->tx_index ];
+     pSource->pBufferOut = ( uint8_t * )&ssc1_PingPongOut[ 1 - pSource->tx_index ];
 
 	switch( pSource->status[ OUT ] )
 		{ 
@@ -571,6 +575,9 @@ uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
         DMAD_StartTransfer(&g_dmad, pSource->dev.rxDMAChannel);
         
         SSC_EnableReceiver(pSsc); 
+        
+        
+        memset( testbuf, 0x55, sizeof(testbuf)  ); 
         
         return 0;
 }

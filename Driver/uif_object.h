@@ -127,8 +127,8 @@ typedef struct _DataSource
 //these points followed pointed public buffers        
         kfifo_t *pRingBulkOut;      //the out ring buffer that this port relevant
         kfifo_t *pRingBulkIn;       //the in  ring buffer that this port relevant
-        uint16_t *pBufferIn;        //the pointer pointed PingPong buffer in
-        uint16_t *pBufferOut;       //the pointer pointed PingPong buffer out
+        uint8_t *pBufferIn;        //the pointer pointed PingPong buffer in
+        uint8_t *pBufferOut;       //the pointer pointed PingPong buffer out
 	    uint8_t status[BI];         //state machine of port
         uint16_t unused;            //keep alive
         

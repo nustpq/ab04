@@ -123,7 +123,8 @@ void Init_Debug_FIFO( void );
 void Init_Bulk_FIFO( void );
 void Buzzer_Error( void );
 
-
+void Release_Task_for_Audio( void ) ;
+void Hold_Task_for_Audio( void ) ;
 
 #endif
 

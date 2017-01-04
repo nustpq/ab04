@@ -478,6 +478,7 @@
       <file>$PROJ_DIR$\..\..\..\..\..\Noah\commands.c</file>
       <file>$PROJ_DIR$\..\..\..\..\..\libraries\libboard_sama5d3x-ek\source\dmad.c</file>
       <file>$PROJ_DIR$\..\..\..\..\..\libraries\libchip_sama5d3x\source\dmac.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\..\libraries\libchip_sama5d3x\source\USBD_HAL.c</file>
     </outputs>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Noah\sine_table.c</name>

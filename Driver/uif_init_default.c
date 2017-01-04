@@ -93,8 +93,8 @@ void ssc0_init_default( void )
 
     source_ssc0.pRingBulkOut = &ssc0_bulkout_fifo;
     source_ssc0.pRingBulkIn  = &ssc0_bulkin_fifo;
-    source_ssc0.pBufferOut = ( uint16_t * )ssc0_PingPongOut;
-    source_ssc0.pBufferIn  = ( uint16_t * )ssc0_PingPongIn;
+    source_ssc0.pBufferOut = ( uint8_t * )ssc0_PingPongOut;
+    source_ssc0.pBufferIn  = ( uint8_t * )ssc0_PingPongIn;
 
     if( NULL != source_ssc0.init_source )
         source_ssc0.init_source( &source_ssc0,NULL );
@@ -141,8 +141,8 @@ void ssc1_init_default( void )
 
     source_ssc1.pRingBulkOut = &ssc1_bulkout_fifo;
     source_ssc1.pRingBulkIn = &ssc1_bulkin_fifo;
-    source_ssc1.pBufferOut = ( uint16_t * )ssc1_PingPongOut;
-    source_ssc1.pBufferIn = ( uint16_t * )ssc1_PingPongIn;
+    source_ssc1.pBufferOut = ( uint8_t * )ssc1_PingPongOut;
+    source_ssc1.pBufferIn = ( uint8_t * )ssc1_PingPongIn;
 
     if( NULL != source_ssc1.init_source )
        source_ssc1.init_source( &source_ssc1,NULL );
@@ -193,8 +193,8 @@ void spi0_init_default( void )
 
     source_spi0.pRingBulkOut = &spi0_bulkOut_fifo;
     source_spi0.pRingBulkIn = &spi0_bulkIn_fifo;
-    source_spi0.pBufferOut = ( uint16_t * )spi0_2MSOut;
-    source_spi0.pBufferIn = ( uint16_t * )spi0_2MSIn;
+    source_spi0.pBufferOut = ( uint8_t * )spi0_2MSOut;
+    source_spi0.pBufferIn = ( uint8_t * )spi0_2MSIn;
 
     if( NULL != source_spi0.init_source )
        source_spi0.init_source( &source_spi0,&spi0_cfg );
@@ -247,8 +247,8 @@ void spi1_init_default( void )
 
     source_spi1.pRingBulkOut = &spi1_bulkOut_fifo;
     source_spi1.pRingBulkIn = &spi1_bulkIn_fifo;
-    source_spi1.pBufferOut = ( uint16_t * )spi1_2MSOut;
-    source_spi1.pBufferIn = ( uint16_t * )spi1_2MSIn;
+    source_spi1.pBufferOut = ( uint8_t * )spi1_2MSOut;
+    source_spi1.pBufferIn = ( uint8_t * )spi1_2MSIn;
 
     if( NULL != source_spi1.init_source )
        source_spi1.init_source( &source_spi1,&spi1_cfg );
@@ -528,8 +528,8 @@ void gpio_init_default( void )
 
     source_gpio.pRingBulkOut = &ep0BulkOut_fifo;
     source_gpio.pRingBulkIn = &ep0BulkIn_fifo;
-    source_gpio.pBufferOut = ( uint16_t * )gpio_PingPong_bufferOut;
-    source_gpio.pBufferIn = ( uint16_t * )gpio_PingPong_bufferIn;
+    source_gpio.pBufferOut = ( uint8_t * )gpio_PingPong_bufferOut;
+    source_gpio.pBufferIn = ( uint8_t * )gpio_PingPong_bufferIn;
 
     if( NULL != source_gpio.init_source )
        source_gpio.init_source( &source_gpio,NULL );
