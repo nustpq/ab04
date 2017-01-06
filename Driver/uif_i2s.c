@@ -786,6 +786,11 @@ void ssc_txRegister_set( void *instance,void *parameter )
     AUDIO_CFG *reg = ( AUDIO_CFG * )parameter;
     Ssc *pSSC = ( Ssc * )pSource->dev.instanceHandle;
     
+    pSource->status[OUT] = ( uint8_t )FREE;
+    pSource->txSize =  (( reg->sample_rate)  / 1000 ) * ( reg->bit_length / 8 ) * (reg->slot_num) * I2S_PP_SIZE_MS ; //????  slot_num or channel_num?
+    pSource->warmWaterLevel = (pSource->txSize) * I2S_PRE_PLAY_BUF_SIZE_PP;
+    pSource->tx_index = 0;
+    
     if( reg->channel_num > 0 ) 
     {        
         tfmr.datnb  = reg->channel_num - 1 ; 
@@ -828,6 +833,11 @@ void ssc_rxRegister_set( void *instance,void *parameter )
     DataSource * pSource = ( DataSource * )instance;
     AUDIO_CFG *reg = ( AUDIO_CFG * )parameter;
     Ssc *pSSC = ( Ssc * )pSource->dev.instanceHandle;
+    
+    pSource->status[IN] = ( uint8_t )FREE;
+    pSource->rxSize =  (( reg->sample_rate)  / 1000 ) * ( reg->bit_length / 8 ) * (reg->slot_num) * I2S_PP_SIZE_MS ; //????  slot_num or channel_num?
+    pSource->warmWaterLevel = (pSource->rxSize) * I2S_PRE_PLAY_BUF_SIZE_PP;
+    pSource->rx_index = 0;
     
     if( reg->channel_num > 0 ) 
     {        

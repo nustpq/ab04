@@ -116,6 +116,8 @@ void  App_AudioManager (void *p_arg)
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 
+    
+    
     while ( DEF_TRUE ) {  /* Task body, always written as an infinite loop.   */
 
         msg = ( uint32_t *)OSMboxPend( App_AudioManager_Mbox,  0,  &err );
@@ -153,45 +155,8 @@ void  App_AudioManager (void *p_arg)
                                        source_ssc1.txSize ); 
             source_ssc1.status[ OUT ] = ( uint8_t )START;
         }
-        
-        /*
-        switch( *msg )
-        {
-            case ( SSC0_IN | SSC0_OUT | SSC1_IN | SSC1_OUT ):
-                    if( ( ( uint8_t )START != source_ssc0.status[ IN ] )
-                        &&( ( uint8_t )BUFFERED != source_ssc0.status[ IN ] )
-                        &&( ( uint8_t )RUNNING != source_ssc0.status[ IN ] ) )
-                    {
-                          memset( ( uint8_t * )&ssc0_PingPongOut[ 0], 0x55, source_ssc0.txSize );  
-                          memset( ( uint8_t * )&ssc0_PingPongOut[ 1], 0x55, source_ssc0.txSize );  
-                          source_ssc0.buffer_write( &source_ssc0,( uint8_t * )ssc0_PingPongOut,
-                                                    //sizeof( ssc0_PingPongOut ) >> 1 );
-                                                    source_ssc0.txSize );
-                          OSTimeDly(4);
-                          source_ssc0.buffer_read( &source_ssc0,( uint8_t * )ssc0_PingPongIn,
-                                                   //sizeof( ssc0_PingPongIn ) >>1 );
-                                                    source_ssc0.rxSize );
-                          source_ssc0.status[ IN ]  = ( uint8_t )START;
-                          source_ssc0.status[ OUT ] = ( uint8_t )START;
-
-//                          source_ssc1.buffer_write( &source_ssc1,( uint8_t * )ssc1_PingPongOut,
-//                                                   sizeof( ssc1_PingPongOut ) >> 1 );
-//                          source_ssc1.buffer_read( &source_ssc1,( uint8_t * )ssc1_PingPongIn,
-//                                                   sizeof( ssc1_PingPongIn ) >> 1 );
-//                          source_ssc1.status[ IN ]  = ( uint8_t )START;
-//                          source_ssc1.status[ OUT ] = ( uint8_t )START;
-
-                    }
-          break;
-
-          default:
-          break;
-
-        }
-        */
-        
-        
-        OSTimeDly(10);
+               
+        //OSTimeDly(10);
 
     }
 

@@ -110,7 +110,7 @@
 #include "codec.h"
 //#include "sine_table.h"
 
-#include "uif_cmdparse.h"
+#include "audio.h"
 #include "uif_i2s.h"
 #include "uif_usb.h"
 #include "uif_spi.h"

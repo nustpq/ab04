@@ -2026,12 +2026,6 @@
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_audio_path.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_cmdParse.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_cmdparse.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_dsp.c</name>
     </file>
     <file>
@@ -2141,6 +2135,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Noah\alert_table.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\audio.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Noah\audio.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Noah\commands.c</name>

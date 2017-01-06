@@ -17,7 +17,7 @@
 #include "uif_usb.h"
 
 #include "defined.h"
-#include "uif_cmdParse.h"
+#include "audio.h"
 #include "uif_i2s.h"
 
 
@@ -28,11 +28,11 @@
 *
 *                                         Atmel  AT91SAMA5D3
 *                                               on the
-*                                      Audio Bridge 04 Board (AB04 V1.0)
+*                                    Audio Bridge 04 Board (AB04 V1.0)
 *
-* Filename      : uif_cmdparse.c
+* Filename      : audio.c
 * Version       : V0.0.1
-* Programmer(s) : Leo
+* Programmer(s) : PQ
 *********************************************************************************************************
 * Note(s)       :editor from uif board first version that writed by PQ.
 *********************************************************************************************************
