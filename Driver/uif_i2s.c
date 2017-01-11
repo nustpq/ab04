@@ -388,7 +388,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 //    APP_TRACE_INFO(( " ----------ok" ));
 //  }
   
-    const uint8_t nDelay = 2;
+    const uint8_t nDelay = 64;
     uint32_t temp = 0;
        
     assert( NULL != pArg );
@@ -412,17 +412,23 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 				else
 					{
 						pSource->status[ OUT ] = ( uint8_t )RUNNING;
+                                                source_ssc0.buffer_read(   &source_ssc0,
+                                                                            ( uint8_t * )ssc0_PingPongIn,                                              
+                                                                            source_ssc0.rxSize );
+                                                source_ssc0.status[ IN ]  = ( uint8_t )START;
+                                                restart_audio_0_bulk_in  = true  ;
 					}
 				break;
+//                        case BUFFEREMPTY:                                
 			case RUNNING  :
 				temp = kfifo_get_data_size( pSource->pRingBulkOut );
 				if( temp  >=  pSource->txSize )
 				{
-                    kfifo_get( pSource->pRingBulkOut,
-                    //( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                    ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
-                    pSource->txSize );
-                    pSource->tx_index = 1 - pSource->tx_index;
+                                      kfifo_get( pSource->pRingBulkOut,
+                                      //( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                                      ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
+                                      pSource->txSize );
+                                      pSource->tx_index = 1 - pSource->tx_index;
 				}
 				else
 				{

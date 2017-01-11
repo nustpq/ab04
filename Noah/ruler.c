@@ -509,11 +509,11 @@ unsigned char Start_Audio( START_AUDIO start_audio )
     while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
          OSTimeDly(5);                     
     };  
-    OSTimeDly(5);     
+//    OSTimeDly(5);     
     audio_start_flag         = true ;
     audio_run_control        = true ;
     restart_audio_0_bulk_out = true  ; 
-    restart_audio_0_bulk_in  = true  ;
+//    restart_audio_0_bulk_in  = true  ;
     restart_audio_1_bulk_out = true  ;
     restart_audio_1_bulk_in  = true  ; 
     restart_audio_2_bulk_out = true  ;

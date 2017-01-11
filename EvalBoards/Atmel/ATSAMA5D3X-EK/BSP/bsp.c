@@ -468,13 +468,13 @@ void UIF_LED_Init( void )
 
 void UIF_Beep_On ( )
 {
-    SAMA5_REG_PIOA_CODR = DEF_BIT_08;
+//    SAMA5_REG_PIOA_CODR = DEF_BIT_08;
 
 }
 
 void UIF_Beep_Off ( )
 {
-    SAMA5_REG_PIOA_SODR = DEF_BIT_08;
+//    SAMA5_REG_PIOA_SODR = DEF_BIT_08;
 
 }
 
