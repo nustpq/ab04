@@ -646,6 +646,8 @@ void uif_miscPin_init_default( void )
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
     UIF_Misc_On ( FAST_PLUS_RST );
-    UIF_Misc_On ( LEVEL_SHIFT_OE );
+//    UIF_Misc_On ( LEVEL_SHIFT_OE );
     UIF_Misc_On ( FPGA_RST );
+    
+    UIF_Misc_Off ( LEVEL_SHIFT_OE );
 }
