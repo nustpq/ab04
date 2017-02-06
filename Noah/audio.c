@@ -405,7 +405,59 @@ void Get_Run_Time( uint32_t time )
     min  = time / 600 %60 ;
     hour = time / 36000 %24 ; 
     day  = time / 36000 /24 ;
-    printf("[%d:%02d:%02d:%02d.%d]", day, hour, min, sec, msec );       
+    printf("[%d:%02d:%02d:%02d.%d]", day, hour, min, sec, msec ); 
+    
+}
+
+
+/*
+*********************************************************************************************************
+*                                    Audio_Manager()
+*
+* Description : Audio Port Manager .
+*
+* Argument(s) : confif data
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void Audio_Manager( unsigned char cfg_data )
+{
+
+    APP_TRACE_INFO(( "\r\nAudio Manager: config data = 0X%0X ]", cfg_data ));
+
+        
+        if( (cfg_data & SSC0_IN) && ( source_ssc0.status[IN] >= CONFIGURED ) ) {
+
+            source_ssc0.buffer_read(   &source_ssc0,
+                                      ( uint8_t * )ssc0_PingPongIn,                                              
+                                      source_ssc0.rxSize );
+            source_ssc0.status[ IN ]  = ( uint8_t )START;
+        } 
+              
+        if ( (cfg_data & SSC0_OUT) && ( source_ssc0.status[OUT] >= CONFIGURED ) ){
+            source_ssc0.buffer_write(  &source_ssc0,
+                                       ( uint8_t * )ssc0_PingPongOut,                                                
+                                       source_ssc0.txSize ); 
+            source_ssc0.status[ OUT ] = ( uint8_t )START;
+        }
+        if( (cfg_data & SSC1_IN) && ( source_ssc1.status[IN] >= CONFIGURED ) ) {
+
+            source_ssc1.buffer_read(   &source_ssc1,
+                                      ( uint8_t * )ssc1_PingPongIn,                                              
+                                      source_ssc1.rxSize );
+            source_ssc1.status[ IN ]  = ( uint8_t )START;
+        }        
+        if ( (cfg_data & SSC1_OUT) && ( source_ssc1.status[OUT] >= CONFIGURED ) ){
+            source_ssc1.buffer_write(  &source_ssc1,
+                                       ( uint8_t * )ssc1_PingPongOut,                                                
+                                       source_ssc1.txSize ); 
+            source_ssc1.status[ OUT ] = ( uint8_t )START;
+        }
+               
+      
 }
 
 

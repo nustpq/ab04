@@ -361,19 +361,19 @@ static  void  App_TaskStart (void *p_arg)
 #endif
     
 /**/    
-    os_err = OSTaskCreateExt((void (*)(void *)) App_AudioManager,
-                    (void           *) 0,
-                    (OS_STK         *)&App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE - 1],
-                    (INT8U           ) APP_CFG_TASK_AUDIO_MGR_PRIO,
-                    (INT16U          ) APP_CFG_TASK_AUDIO_MGR_PRIO,
-                    (OS_STK         *)&App_TaskAudioMgrStk[0],
-                    (INT32U          ) APP_CFG_TASK_AUDIO_MGR_STK_SIZE,
-                    (void *)0,
-                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-
-#if (OS_TASK_NAME_EN > 0)
-    OSTaskNameSet(APP_CFG_TASK_AUDIO_MGR_PRIO, "Audio Manager", &os_err);
-#endif
+//    os_err = OSTaskCreateExt((void (*)(void *)) App_AudioManager,
+//                    (void           *) 0,
+//                    (OS_STK         *)&App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE - 1],
+//                    (INT8U           ) APP_CFG_TASK_AUDIO_MGR_PRIO,
+//                    (INT16U          ) APP_CFG_TASK_AUDIO_MGR_PRIO,
+//                    (OS_STK         *)&App_TaskAudioMgrStk[0],
+//                    (INT32U          ) APP_CFG_TASK_AUDIO_MGR_STK_SIZE,
+//                    (void *)0,
+//                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+//
+//#if (OS_TASK_NAME_EN > 0)
+//    OSTaskNameSet(APP_CFG_TASK_AUDIO_MGR_PRIO, "Audio Manager", &os_err);
+//#endif
 
     
 /**/    

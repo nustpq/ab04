@@ -465,7 +465,6 @@ void First_Pack_Padding_BI( unsigned char usb_data_padding )
 *********************************************************************************************************
 */
 
-CPU_INT32U    port_control_info;
 
 unsigned char Start_Audio( START_AUDIO start_audio )
 {
@@ -504,12 +503,10 @@ unsigned char Start_Audio( START_AUDIO start_audio )
     Hold_Task_for_Audio();                      
                             
     First_Pack_Padding_BI( start_audio.padding );             
-    port_control_info = SSC0_IN | SSC0_OUT  ; 
+ 
+    Audio_Manager( SSC0_IN | SSC0_OUT ); 
+    OSTimeDly(5);
     
-    while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
-         OSTimeDly(5);                     
-    };  
-    OSTimeDly(5);     
     audio_start_flag         = true ;
     audio_run_control        = true ;
     restart_audio_0_bulk_out = true  ; 

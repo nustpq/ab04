@@ -24,4 +24,6 @@ static void Audio_Stop( void );
 void Audio_State_Control( uint8_t *msg );
 static void Get_Run_Time( unsigned int time );
 
+void Audio_Manager( unsigned char cfg_data );
+
 #endif

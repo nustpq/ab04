@@ -65,8 +65,8 @@ void  App_TaskUSBService ( void *p_arg )
     
     err = 0;
     usb_state_saved = 0;
-         OS_CPU_SR cpu_sr;
-
+    
+    OS_CPU_SR cpu_sr;  
 
  
     for(;;) 
