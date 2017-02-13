@@ -71,8 +71,8 @@ void ssc0_init_default( void )
 {
     //initialize ssc0 object and it's operation
     memset( ( void * )&source_ssc0, 0 , sizeof( DataSource ) );
-    memset( ( void * )ssc0_PingPongOut, 0 , sizeof( ssc0_PingPongOut ) );
-    memset( ( void * )ssc0_PingPongIn,  0 , sizeof( ssc0_PingPongIn ) );
+    memset( ( void * )ssc0_PingPongOut, 0x00 , sizeof( ssc0_PingPongOut ) );
+    memset( ( void * )ssc0_PingPongIn,  0x00 , sizeof( ssc0_PingPongIn ) );
     source_ssc0.dev.direct   = ( uint8_t )BI;
     source_ssc0.dev.identify = ID_SSC0;
     source_ssc0.dev.instanceHandle = (uint32_t)SSC0;
@@ -84,8 +84,7 @@ void ssc0_init_default( void )
     source_ssc0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PP_SIZE_MS );
     source_ssc0.txSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PP_SIZE_MS );
     source_ssc0.rxSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PP_SIZE_MS );
-
-
+   
     source_ssc0.init_source  = init_I2S;
     source_ssc0.buffer_write = ssc0_buffer_write;
     source_ssc0.buffer_read  = ssc0_buffer_read;
@@ -100,6 +99,7 @@ void ssc0_init_default( void )
         source_ssc0.init_source( &source_ssc0,NULL );
 }
 
+    
 /*
 *********************************************************************************************************
 *                                    ssc1_init_default()

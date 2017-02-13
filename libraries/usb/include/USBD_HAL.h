@@ -115,4 +115,6 @@ extern uint32_t LED_Clear( uint32_t dwLed ) ;
 
 /**@}*/
 
+extern void End_Audio_Transfer( void );
+
 #endif // #define USBD_HAL_H

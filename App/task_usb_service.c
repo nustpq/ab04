@@ -94,13 +94,13 @@ void  App_TaskUSBService ( void *p_arg )
         
         if ( usb_state < USBD_STATE_CONFIGURED ) {  
           
-            OSTimeDly(5);
+            OSTimeDly(2);
             continue;      
         }
     
-        if ( !audio_run_control ) {  
+        if ( audio_run_control == false) {  
           
-            OSTimeDly(5);
+            OSTimeDly(2);
             continue;      
         }
        
@@ -111,12 +111,12 @@ void  App_TaskUSBService ( void *p_arg )
             
             if( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN == pPath->ep ) {  //SSC0 Rec      
                 
-                counter = kfifo_get_data_size( &ep0BulkIn_fifo );     
-                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_in && audio_run_control)  {
+                counter = kfifo_get_data_size( pPath->pfifoOut );  //&ep0BulkIn_fifo   
+                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_in )  {
                     //APP_TRACE_INFO(("\r\nAudio 0 BulkIn start"));
                     restart_audio_0_bulk_in = false ;
                     // ep0 ring --> usb cache
-                    kfifo_get( &ep0BulkIn_fifo,
+                    kfifo_get( pPath->pfifoOut,
                            ( uint8_t * )usbCacheBulkIn0,
                            USB_DATAEP_SIZE_64B );         
                 
@@ -144,7 +144,7 @@ void  App_TaskUSBService ( void *p_arg )
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->ep ) {  //SSC1 Rec       
                 
                 counter = kfifo_get_data_size( &ep1BulkIn_fifo );     
-                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_in && audio_run_control)  {
+                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_in )  {
                     APP_TRACE_INFO(("\r\nAudio 1 BulkIn start"));
                     restart_audio_1_bulk_in = false ;
                     // ep0 ring --> usb cache
@@ -175,7 +175,7 @@ void  App_TaskUSBService ( void *p_arg )
             } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->ep ) {  //SPI Rec       
                 
                 counter = kfifo_get_data_size( &ep2BulkIn_fifo );     
-                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_in && audio_run_control)  {
+                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_in )  {
                     APP_TRACE_INFO(("\r\nAudio 2 BulkIn start"));
                     restart_audio_2_bulk_in = false ;
                     // ep0 ring --> usb cache
@@ -206,7 +206,7 @@ void  App_TaskUSBService ( void *p_arg )
                 
             } else if( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT == pPath->ep ) { //SSC0 Play
                 counter = kfifo_get_free_space( pPath->pfifoIn );
-                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out && audio_run_control )  {
+                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out  )  {
                     restart_audio_0_bulk_out = false ;
                     //APP_TRACE_INFO(("\r\nAudio 0 BulkOut start"));
                     // send ep0 data ---> pc
@@ -231,7 +231,7 @@ void  App_TaskUSBService ( void *p_arg )
                 
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->ep ) {   //SSC1 Play
                 counter = kfifo_get_free_space( pPath->pfifoIn );
-                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_out && audio_run_control )  {
+                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_out  )  {
                     restart_audio_1_bulk_out = false ;
                     APP_TRACE_INFO(("\r\nAudio 1 BulkOut start"));
                     // send ep0 data ---> pc
@@ -256,7 +256,7 @@ void  App_TaskUSBService ( void *p_arg )
                 
             } else if( CDCDSerialDriverDescriptors_SPI_DATAOUT == pPath->ep ) { //SPI/GPIO Play
                 counter = kfifo_get_free_space( pPath->pfifoIn );
-                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_out && audio_run_control )  {
+                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_out  )  {
                     restart_audio_2_bulk_out = false ;
                     APP_TRACE_INFO(("\r\nAudio 2 BulkOut start"));
                     // send ep0 data ---> pc
@@ -286,7 +286,7 @@ void  App_TaskUSBService ( void *p_arg )
             
         }
          
-        OSTimeDly( 2 );
+        OSTimeDly( 1 );
         
     } //for loop
     

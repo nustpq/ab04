@@ -265,7 +265,7 @@ static  void  App_TaskStart             (void        *p_arg);
 *********************************************************************************************************
 */
 
-int main()
+int main() 
 {
 
     CPU_INT08U  os_err;
@@ -361,19 +361,19 @@ static  void  App_TaskStart (void *p_arg)
 #endif
     
 /**/    
-//    os_err = OSTaskCreateExt((void (*)(void *)) App_AudioManager,
-//                    (void           *) 0,
-//                    (OS_STK         *)&App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE - 1],
-//                    (INT8U           ) APP_CFG_TASK_AUDIO_MGR_PRIO,
-//                    (INT16U          ) APP_CFG_TASK_AUDIO_MGR_PRIO,
-//                    (OS_STK         *)&App_TaskAudioMgrStk[0],
-//                    (INT32U          ) APP_CFG_TASK_AUDIO_MGR_STK_SIZE,
-//                    (void *)0,
-//                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-//
-//#if (OS_TASK_NAME_EN > 0)
-//    OSTaskNameSet(APP_CFG_TASK_AUDIO_MGR_PRIO, "Audio Manager", &os_err);
-//#endif
+    os_err = OSTaskCreateExt((void (*)(void *)) App_AudioManager,
+                    (void           *) 0,
+                    (OS_STK         *)&App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE - 1],
+                    (INT8U           ) APP_CFG_TASK_AUDIO_MGR_PRIO,
+                    (INT16U          ) APP_CFG_TASK_AUDIO_MGR_PRIO,
+                    (OS_STK         *)&App_TaskAudioMgrStk[0],
+                    (INT32U          ) APP_CFG_TASK_AUDIO_MGR_STK_SIZE,
+                    (void *)0,
+                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+
+#if (OS_TASK_NAME_EN > 0)
+    OSTaskNameSet(APP_CFG_TASK_AUDIO_MGR_PRIO, "Audio Manager", &os_err);
+#endif
 
     
 /**/    
@@ -509,8 +509,8 @@ static  void  AppTaskLED ( void *p_arg )
     memset( spi1_RingBulkIn, 0x55, sizeof( spi1_RingBulkIn ));
     memset( spi1_2MSOut, 0x38, sizeof( spi1_2MSOut ));
     memset( twi_ring_buffer[ 0 ],0x55,sizeof( twi_ring_buffer[ 0 ] ));
-    memset( usart1Buffer[ 0 ], 0x55 , 1024 );
-    memset( usart1Buffer[ 1 ], 0x55 , 1024 );
+    memset( usart1Buffer[ 0 ], 0x77 , 1024 );
+    memset( usart1Buffer[ 1 ], 0x99 , 1024 );
     memset( spi0_RingBulkOut, 0x55, sizeof( spi0_RingBulkOut ) );
 
     for(;;)
@@ -893,8 +893,8 @@ void Dma_configure( void )
     /* Driver initialize */
     DMAD_Initialize( pDmad, 0 );
     /* IRQ configure */
-    IRQ_ConfigureIT( ID_DMAC0, 7, ISR_HDMA ); //highest priority
-    IRQ_ConfigureIT( ID_DMAC1, 7, ISR_HDMA );
+    IRQ_ConfigureIT( ID_DMAC0, 0, ISR_HDMA ); //highest priority
+    IRQ_ConfigureIT( ID_DMAC1, 0, ISR_HDMA );
     IRQ_EnableIT(ID_DMAC0);
     IRQ_EnableIT(ID_DMAC1);
 

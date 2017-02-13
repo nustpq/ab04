@@ -47,7 +47,7 @@
 
 
 #define  DBG_UART_METHOD_TASK_EN  //this define enable the DBG UART in task for speed up, PQ
-#define  DBG_USB_LOG_EN     //enable usb log info
+//#define  DBG_USB_LOG_EN     //enable usb log info
 /*
 *********************************************************************************************************
 *                                        TASK PRIORITIES

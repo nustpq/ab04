@@ -858,7 +858,7 @@ static void UDPHS_DmaHandler(uint8_t bEndpoint)
     }
     else
     {
-        TRACE_ERROR("UDPHS_DmaHandler: ST 0x%X\n\r", (unsigned int)dwDmaSr);
+        TRACE_DEBUG_WP("UDPHS_DmaHandler: ST 0x%X\n\r", (unsigned int)dwDmaSr);
         bRc = USBD_STATUS_ABORTED;
     }
     /* Callback */
@@ -1237,7 +1237,7 @@ void USBD_IrqHandler(void)
         status &= pUdp->UDPHS_IEN;
                                        
        
-        LED_CLEAR_USB_DATA ;
+       
         
         TRACE_DEBUG_WP("\n\r");
         if (status)
@@ -1245,6 +1245,8 @@ void USBD_IrqHandler(void)
             TRACE_DEBUG_WP(" - ");
         }
     }
+    LED_CLEAR_USB_DATA ;
+    
 }
 
 /**
@@ -2205,4 +2207,24 @@ void USBD_HAL_Test( uint8_t bIndex )
 }
 
 /**@}*/
+ #define CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT     5
+/// Audio Data IN endpoint number.
+#define CDCDSerialDriverDescriptors_AUDIO_1_DATAIN      6
 
+/// SPI Audio Data OUT endpoint number.
+#define CDCDSerialDriverDescriptors_SPI_DATAOUT         7
+/// SPI Audio Data IN endpoint number.
+#define CDCDSerialDriverDescriptors_SPI_DATAIN          8
+   
+
+//void End_Audio_Transfer( void )
+//{
+//  
+//    UDPHS_EndOfTransfer(CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT, USBD_STATUS_ABORTED);
+//    UDPHS_EndOfTransfer(CDCDSerialDriverDescriptors_AUDIO_0_DATAIN, USBD_STATUS_ABORTED);
+//    UDPHS_EndOfTransfer(CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT, USBD_STATUS_ABORTED);
+//    UDPHS_EndOfTransfer(CDCDSerialDriverDescriptors_AUDIO_1_DATAIN, USBD_STATUS_ABORTED);
+//    UDPHS_EndOfTransfer(CDCDSerialDriverDescriptors_SPI_DATAOUT, USBD_STATUS_ABORTED);
+//    UDPHS_EndOfTransfer(CDCDSerialDriverDescriptors_SPI_DATAIN, USBD_STATUS_ABORTED);
+//    
+//}

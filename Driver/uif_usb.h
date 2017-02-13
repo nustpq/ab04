@@ -80,8 +80,7 @@ extern bool restart_log_bulk_in        ;
 extern bool restart_cmd_bulk_out       ; 
 extern bool restart_cmd_bulk_in        ;
 extern bool audio_run_control          ;
-extern bool audio_start_flag           ;
+extern bool padding_audio_0_bulk_out   ;
 
-extern uint8_t audio_0_padding         ;
 
 #endif

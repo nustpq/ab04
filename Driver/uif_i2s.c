@@ -203,6 +203,20 @@ void _config_pins( uint32_t id)
 * Note(s)     : none.
 *********************************************************************************************************
 */
+
+static unsigned int  test_b = 0;
+void fill_buf_debug( unsigned char *pChar, unsigned int size) 
+{
+    unsigned int i;
+    unsigned short  *pInt;
+    pInt = (unsigned short *)pChar;
+
+    for( i = 0; i< (size>>1); i++ ) { 
+       *(pInt+i) =  test_b++; 
+    }
+    
+    
+}
 unsigned char testbuf[2560];
 
 void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
@@ -213,7 +227,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
     
     DataSource *pSource = ( DataSource *)pArg;
 
-      
+    //  UIF_LED_On( LED_HDMI );  
 	switch( pSource->status[ IN ] ) 
 
 		{
@@ -237,38 +251,37 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 			case RUNNING :
 				 temp = kfifo_get_free_space( pSource->pRingBulkIn );
 				 if( temp >= pSource->rxSize )
-				 	{
-                                               ///Todo: 0xf should be instead with mask;
-                                                /*
-                                                source_gpio.buffer_read( &source_gpio, 
-                                                      ( uint8_t * )&source_gpio.pBufferIn[ pSource-> rx_index ], 
-                                                      10 );  
-                                                */
-                                                 /*
-                                                 kfifo_put( pSource->pRingBulkIn,
-                                                            ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
-                                                            source_gpio.rxSize );
-                                                 */
-                        //memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ], 0x55, pSource->rxSize );  
-                        // memset( tempp, 0x55, sizeof(tempp)  ); 
-                        
+				 {
+                 ///Todo: 0xf should be instead with mask;
+                 /*
+                        source_gpio.buffer_read( &source_gpio, 
+                        ( uint8_t * )&source_gpio.pBufferIn[ pSource-> rx_index ], 
+                        10 );  
+                        kfifo_put( pSource->pRingBulkIn,
+                       ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
+                       source_gpio.rxSize );
+                 */
+                        //memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], 0x66, pSource->rxSize );  
+                        // memset( tempp, 0x55, sizeof(tempp)  );
+                        //fill_buf_debug( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], pSource->rxSize ) ;
+                        //fill_buf_debug( ( uint8_t * )&testbuf, pSource->rxSize ) ;
 				 		kfifo_put( pSource->pRingBulkIn,
                   					( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
                                     //( uint8_t * )&(pSource->pBufferIn[ pSource-> rx_index ]), 
                                     //testbuf,
                   					pSource->rxSize );
-						pSource->rx_index = 1 - pSource->rx_index;
-				 	}
+						//pSource->rx_index = 1 - pSource->rx_index;
+                 }
 				 else
-				 	{
+				 {
 						pSource->status[ IN ] = ( uint8_t )BUFFERFULL;
-				 	}
+				 }
 				break;
 			case BUFFERFULL:
 				memset( ( uint8_t  * )pSource->pBufferIn[ pSource-> rx_index ],
 					     0x10,
 					     sizeof( pSource->pBufferIn[ pSource-> rx_index ] ) );
-				pSource->rx_index = 1 - pSource->rx_index;
+				//pSource->rx_index = 1 - pSource->rx_index;
 					     
 				break;
 			case STOP:
@@ -277,7 +290,8 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 				break;
 
 		}
-	 
+	   pSource->rx_index = 1 - pSource->rx_index;
+    // UIF_LED_Off( LED_HDMI ); 
 }
 
 /*
@@ -388,7 +402,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 //    APP_TRACE_INFO(( " ----------ok" ));
 //  }
   
-    const uint8_t nDelay = 2;
+    const uint8_t nDelay = 10;
     uint32_t temp = 0;
        
     assert( NULL != pArg );
@@ -396,15 +410,15 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     DataSource *pSource = ( DataSource *)pArg;
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
-     UIF_LED_On( LED_RUN );       
-     pSource->pBufferOut = ( uint8_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
+    //UIF_LED_On( LED_RUN );       
+    pSource->pBufferOut = ( uint8_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
      
 	switch( pSource->status[ OUT ] )
 		{ 
 			case START    :
 			case BUFFERED :
 				temp = kfifo_get_data_size( pSource->pRingBulkOut );
-				if( temp  <  pSource->txSize  * nDelay ) 
+				if( temp  < ( pSource->txSize  * nDelay ) )
 					{
 						if( pSource->status[ OUT ] == ( uint8_t )START )
 							pSource->status[ OUT ] = ( uint8_t )BUFFERED;
@@ -422,7 +436,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
                     //( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
                     ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
                     pSource->txSize );
-                    pSource->tx_index = 1 - pSource->tx_index;
+                    //pSource->tx_index = 1 - pSource->tx_index;
 				}
 				else
 				{
@@ -430,7 +444,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 				}
 									
 				break;
-                        case BUFFEREMPTY:
+            case BUFFEREMPTY:
                                 Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
                                                   pSource->txSize, 
                                                   16000 );
@@ -442,7 +456,8 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 				break;
      
       }
-    UIF_LED_Off( LED_RUN );  
+    pSource->tx_index = 1 - pSource->tx_index;
+    //UIF_LED_Off( LED_RUN );  
 }
 
 /*
@@ -577,7 +592,7 @@ uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
         SSC_EnableReceiver(pSsc); 
         
         
-        memset( testbuf, 0x55, sizeof(testbuf)  ); 
+        //memset( testbuf, 0x55, sizeof(testbuf)  ); 
         
         return 0;
 }

@@ -44,9 +44,8 @@ bool restart_log_bulk_in       = true ;
 bool restart_cmd_bulk_out      = false ; 
 bool restart_cmd_bulk_in       = false ; 
 bool audio_run_control         = false ; 
-bool audio_start_flag          = false ;
+bool padding_audio_0_bulk_out  = false ;
 
-uint8_t audio_0_padding = 0;
 
 void UsbAudio0DataReceived(  uint32_t unused,
                               uint8_t status,
@@ -55,14 +54,30 @@ void UsbAudio0DataReceived(  uint32_t unused,
 {   
     remaining = remaining;
     uint32_t size;
-    
+      UIF_LED_On( 3 );
     if ( status == USBD_STATUS_SUCCESS ) 
     {     
+//        // Check 1st data package:
+//        if( padding_audio_0_bulk_out ) {
+//            kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);         
+//        } else {
+//            padding_audio_0_bulk_out = First_Pack_Check_BO(&usbCacheBulkOut0, received);             
+//        } 
+     
         // Check every data package:        
-      
-        //copy data from usb endpoit to fifo
-        kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);
-
+       // LED_CLEAR_DATA;
+          bool flag = First_Pack_Check_BO(&usbCacheBulkOut0, received);          
+          if( flag ) {            
+              if( ! padding_audio_0_bulk_out ) {             
+                  padding_audio_0_bulk_out = true;
+              }              
+          } else {              
+              if( padding_audio_0_bulk_out ) {
+                  kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);  
+              }              
+          }             
+       // LED_SET_DATA;  
+          
         size = kfifo_get_free_space( &ep0BulkOut_fifo );
         if ( USB_DATAEP_SIZE_64B <=  size ) 
         { 
@@ -88,7 +103,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
         APP_TRACE_INFO(("\r\nERROR : UsbAudio0DataReceived: Transfer error\r\n" )); 
         
     }
-    
+      UIF_LED_Off( 3 );
     
 }
 
@@ -140,7 +155,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
                               uint32_t transmit,
                               uint32_t remaining )
 {          
-    
+    UIF_LED_On( 1 ); 
     if ( status == USBD_STATUS_SUCCESS  ) 
     {              
         if ( USB_DATAEP_SIZE_64B <= kfifo_get_data_size(  &ep0BulkIn_fifo )  ) 
@@ -170,7 +185,8 @@ void UsbAudio0DataTransmit(  uint32_t unused,
                                 0);  
         APP_TRACE_INFO(( "\r\nERROR : UsbAudio0DataTransmit: Rr-transfer hit\r\n" ));  
         
-    }    
+    } 
+    UIF_LED_Off( 1 ); 
     
 }
 

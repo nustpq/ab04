@@ -12,10 +12,8 @@
 */
 
 #include "stdio.h"
-#include "stdint.h"
-
-#include "uif_usb.h"
-
+#include "stdint.h" 
+#include "uif_usb.h"  
 #include "defined.h"
 #include "audio.h"
 #include "uif_i2s.h"
@@ -43,6 +41,9 @@ AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
 
 extern void Init_Audio_Bulk_FIFO( void );
 
+unsigned char  padding_data_save;
+
+
 /*
 *********************************************************************************************************
 *                                    Init_Play_Setting()
@@ -56,7 +57,7 @@ extern void Init_Audio_Bulk_FIFO( void );
 * Note(s)     : None.
 *********************************************************************************************************
 */
-static uint8_t init_Play_Setting( void *pInstance )
+static uint8_t Init_Play_Setting( void *pInstance )
 {
     uint8_t err = NULL;
     
@@ -102,7 +103,7 @@ static uint8_t init_Play_Setting( void *pInstance )
 
 /*
 *********************************************************************************************************
-*                                    init_Rec_Setting()
+*                                    Init_Rec_Setting()
 *
 * Description :  Initialize USB bulk in (record) settings.
 *
@@ -113,7 +114,7 @@ static uint8_t init_Play_Setting( void *pInstance )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-static uint8_t init_Rec_Setting( void *pInstance )
+static uint8_t Init_Rec_Setting( void *pInstance )
 {
     uint8_t  err = NULL;
     
@@ -214,8 +215,8 @@ static uint8_t Audio_Start_Play( void )
 {  
     uint8_t err;  
 //    Init_I2S_Buffer();         //--avoid error leo 
-    err = init_Play_Setting( &source_ssc0 ); 
-    err = init_Play_Setting( &source_ssc1 );
+    err = Init_Play_Setting( &source_ssc0 ); 
+    err = Init_Play_Setting( &source_ssc1 );
     if( err != 0 ) 
     {
         return err;
@@ -412,6 +413,65 @@ void Get_Run_Time( uint32_t time )
 
 /*
 *********************************************************************************************************
+*                                  First_Pack_Check_BO()
+*
+* Description :  Check if first USB bulk out package is same as padding data.
+*
+* Argument(s) :  None.
+*
+*Return(s)   :   true  - check ok.
+*                false - check failed.
+*
+* Note(s)     :  None.
+*********************************************************************************************************
+*/
+
+bool First_Pack_Check_BO( unsigned char *pData, unsigned int size )
+{    
+    
+    unsigned int i;
+    
+    for( i = 0; i < size ; i++ )   {
+        if( padding_data_save != *pData++) {
+            return false;
+        }
+    }
+     //printf("\r\nSync\r\n");
+    return true; 
+
+}
+
+/*
+*********************************************************************************************************
+*                                First_Pack_Padding_BI()
+*
+* Description :  Padding the first USB bulk in package.
+*
+* Argument(s) :  None.
+*
+* Return(s)   :  None.
+*
+* Note(s)     :  Must be called after reset FIFO and before start audio.
+*********************************************************************************************************
+*/
+
+
+void First_Pack_Padding_BI( unsigned char usb_data_padding )
+{
+    unsigned char temp[ USB_DATAEP_SIZE_64B ];
+    
+    APP_TRACE_INFO(("\r\nUSB data padding = %d\r\n",usb_data_padding));
+    padding_data_save = usb_data_padding;
+    memset( temp, usb_data_padding, USB_DATAEP_SIZE_64B );
+    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;
+    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;//2 package incase of PID error
+}
+
+
+
+
+/*
+*********************************************************************************************************
 *                                    Audio_Manager()
 *
 * Description : Audio Port Manager .
@@ -436,7 +496,7 @@ void Audio_Manager( unsigned char cfg_data )
                                       source_ssc0.rxSize );
             source_ssc0.status[ IN ]  = ( uint8_t )START;
         } 
-              
+        OSTimeDly(2);      
         if ( (cfg_data & SSC0_OUT) && ( source_ssc0.status[OUT] >= CONFIGURED ) ){
             source_ssc0.buffer_write(  &source_ssc0,
                                        ( uint8_t * )ssc0_PingPongOut,                                                

@@ -78,9 +78,9 @@
 #define  ERR_TDM_FORMAT                 253u
 
 #define I2S_PRE_PLAY_BUF_SIZE_PP            10 //10 X pingpong size, 40ms preplay buffer 
-#define I2S_PP_SIZE_MS                      4  //4ms per pingpong buufer
-#define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*I2S_PP_SIZE_MS*4 )          //10ms //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
-#define I2S_PINGPONG_OUT_SIZE_3K           ( 48*8*I2S_PP_SIZE_MS*4 )    // 
+#define I2S_PP_SIZE_MS                      4  //4ms per pingpong buffer
+#define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*4*I2S_PP_SIZE_MS )          //10ms //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
+#define I2S_PINGPONG_OUT_SIZE_3K           ( 48*8*4*I2S_PP_SIZE_MS )    // 
 #define USB_DATAEP_SIZE_64B                (    64    )            // force use 64Bytes
 #define USB_LOGEP_SIZE_256B                (    256   )            // force use 256Bytes
 #define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
@@ -94,7 +94,7 @@
 #define SPI_RINGOUT_SIZE_50K               ( 3072 * 16 )              //3072B/2ms * 16 > ( 3072B * 5 )
 #define SPI_RINGIN_SIZE_50K                ( 3072 * 16 )              //3072B/2ms * 16 > ( 3072B * 5 )
 
-#define PLAY_BUF_DLY_CNT                  5
+#define PLAY_BUF_DLY_CNT                    5
 
 
 /*

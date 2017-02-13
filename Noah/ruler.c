@@ -426,30 +426,6 @@ unsigned char Update_Audio( unsigned char id )
 
 }
 
-/*
-*********************************************************************************************************
-*                                First_Pack_Padding_BI()
-*
-* Description :  Padding the first USB bulk in package.
-*
-* Argument(s) :  None.
-*
-* Return(s)   :  None.
-*
-* Note(s)     :  Must be called after reset FIFO and before start audio.
-*********************************************************************************************************
-*/
-
-#define   USBDATAEPSIZE  64
-void First_Pack_Padding_BI( unsigned char usb_data_padding )
-{
-    unsigned char temp[ USBDATAEPSIZE ];
-    APP_TRACE_INFO(("\r\nUSB data padding = %d\r\n",usb_data_padding));
-    memset( temp, usb_data_padding, USBDATAEPSIZE );
-    kfifo_put(&ep0BulkIn_fifo, temp, USBDATAEPSIZE) ;
-    kfifo_put(&ep0BulkIn_fifo, temp, USBDATAEPSIZE) ;//2 package incase of PID error
-}
-
 
 /*
 *********************************************************************************************************
@@ -465,7 +441,7 @@ void First_Pack_Padding_BI( unsigned char usb_data_padding )
 *********************************************************************************************************
 */
 
-
+CPU_INT32U    port_control_info;
 unsigned char Start_Audio( START_AUDIO start_audio )
 {
     unsigned char err;
@@ -504,10 +480,17 @@ unsigned char Start_Audio( START_AUDIO start_audio )
                             
     First_Pack_Padding_BI( start_audio.padding );             
  
-    Audio_Manager( SSC0_IN | SSC0_OUT ); 
-    OSTimeDly(5);
+    port_control_info = SSC0_IN | SSC0_OUT  ; 
     
-    audio_start_flag         = true ;
+    while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
+         OSTimeDly(5);                     
+    };  
+    
+    
+    //Audio_Manager( SSC0_IN | SSC0_OUT ); 
+    //OSTimeDly(1);
+    
+
     audio_run_control        = true ;
     restart_audio_0_bulk_out = true  ; 
     restart_audio_0_bulk_in  = true  ;
@@ -518,7 +501,8 @@ unsigned char Start_Audio( START_AUDIO start_audio )
     restart_log_bulk_in      = true  ; 
     restart_cmd_bulk_out     = true  ;
     restart_cmd_bulk_in      = true  ;   
-             
+    padding_audio_0_bulk_out = false ;   
+    
     return 0 ;
 }
 
@@ -601,8 +585,17 @@ unsigned char Stop_Audio( void )
     restart_cmd_bulk_in      = false  ;  
              
     Destroy_Audio_Path();
+    
     Init_Audio_Bulk_FIFO(); 
+    
     Release_Task_for_Audio(); 
+    
+    memset( ( void * )ssc0_PingPongOut, 0x00 , sizeof( ssc0_PingPongOut ) );
+    memset( ( void * )ssc0_PingPongIn,  0x00 , sizeof( ssc0_PingPongIn ) );
+    source_ssc0.tx_index = 0;
+    source_ssc0.rx_index = 0;
+    
+    //End_Audio_Transfer();
     
     return 0 ;
 }
