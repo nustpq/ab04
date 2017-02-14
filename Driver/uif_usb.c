@@ -54,29 +54,30 @@ void UsbAudio0DataReceived(  uint32_t unused,
 {   
     remaining = remaining;
     uint32_t size;
+    static bool flag = 0;
       UIF_LED_On( 3 );
     if ( status == USBD_STATUS_SUCCESS ) 
-    {     
-//        // Check 1st data package:
-//        if( padding_audio_0_bulk_out ) {
-//            kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);         
-//        } else {
-//            padding_audio_0_bulk_out = First_Pack_Check_BO(&usbCacheBulkOut0, received);             
-//        } 
-     
-        // Check every data package:        
+    {         
+       // Check every data package:        
        // LED_CLEAR_DATA;
-          bool flag = First_Pack_Check_BO(&usbCacheBulkOut0, received);          
-          if( flag ) {            
-              if( ! padding_audio_0_bulk_out ) {             
-                  padding_audio_0_bulk_out = true;
-              }              
-          } else {              
-              if( padding_audio_0_bulk_out ) {
-                  kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);  
-              }              
-          }             
-       // LED_SET_DATA;  
+//          flag = First_Pack_Check_BO(&usbCacheBulkOut0, received); 
+//          if( flag ) {            
+//              if( ! padding_audio_0_bulk_out ) {                            
+//                  padding_audio_0_bulk_out = true;
+//              }              
+//          } else {              
+//              if( padding_audio_0_bulk_out ) {
+//                  kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);  
+//              }              
+//          }             
+       // LED_SET_DATA;
+      if( false == padding_audio_0_bulk_out )
+         padding_audio_0_bulk_out = First_Pack_Check_BO(&usbCacheBulkOut0, received);      
+      else
+         if( false == flag )
+            flag = true;
+         else
+            kfifo_put(&ep0BulkOut_fifo, usbCacheBulkOut0, received);  
           
         size = kfifo_get_free_space( &ep0BulkOut_fifo );
         if ( USB_DATAEP_SIZE_64B <=  size ) 
