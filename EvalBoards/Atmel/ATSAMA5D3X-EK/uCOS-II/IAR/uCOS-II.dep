@@ -2,7 +2,7 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>100524203</fileChecksum>
+  <fileChecksum>3737325181</fileChecksum>
   <configuration>
     <name>Debug</name>
     <outputs>
@@ -476,6 +476,7 @@
       <file>$PROJ_DIR$\Debug\Obj\emb.o</file>
       <file>$PROJ_DIR$\..\..\..\..\..\libraries\usb\include\CDCNotifications.h</file>
       <file>$PROJ_DIR$\Debug\Obj\audio.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\..\libraries\usb\include\USBLib_Trace.h</file>
     </outputs>
     <file>
       <name>$PROJ_DIR$\Debug\Exe\c.out</name>

@@ -80,7 +80,7 @@ void App_TaskCMDParse( void *p_arg )
         
         if( pTaskMsgIN != NULL && OS_ERR_NONE == err )   { 
             
-            UIF_LED_On( LED_RUN );
+//            UIF_LED_On( LED_RUN );
             //UIF_Beep_On();
             
             pNewCmd  = (pNEW_CMD)pTaskMsgIN ; //change to NOAH CMD type           
@@ -88,7 +88,7 @@ void App_TaskCMDParse( void *p_arg )
             OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );  //release mem
             Send_Report( pNewCmd->pkt_sn, err );
             
-            UIF_LED_Off( LED_RUN );
+//            UIF_LED_Off( LED_RUN );
             //UIF_Beep_Off();
         }
         

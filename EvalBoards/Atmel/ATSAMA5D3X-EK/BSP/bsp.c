@@ -646,12 +646,12 @@ void Beep( INT32U beep_cycles)
    for( INT32U i = 0; i< beep_cycles; i++)  {
 
         UIF_Beep_On(); //beep on
-        UIF_LED_On(LED_RUN);
+//        UIF_LED_On(LED_RUN);
         UIF_LED_On(LED_USB);
         UIF_LED_On(LED_HDMI);
         OSTimeDly(250);
         UIF_Beep_Off(); //beep off
-        UIF_LED_Off(LED_RUN);
+//        UIF_LED_Off(LED_RUN);
         UIF_LED_Off(LED_USB);
         UIF_LED_Off(LED_HDMI);
         OSTimeDly(250); //delay_ms(250);

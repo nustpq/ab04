@@ -129,8 +129,10 @@ void stop_ssc( void *pInstance )
     SSC_DisableReceiver( pSSC );
     
     //step2: stop dma channel
-    DMAD_StopTransfer(&g_dmad, pSource->dev.rxDMAChannel);
+    DMAD_StopTransfer( &g_dmad, pSource->dev.rxDMAChannel );
+    DMAD_ClearAuto( &g_dmad, pSource->dev.rxDMAChannel );
     DMAD_StopTransfer(&g_dmad, pSource->dev.txDMAChannel);
+    DMAD_ClearAuto( &g_dmad, pSource->dev.txDMAChannel );
     
     //step3:clear buffer about this port
     memset( pSource->pBufferIn, 0 , sizeof( uint16_t ) * I2S_PINGPONG_IN_SIZE_3K );
@@ -226,7 +228,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
     uint32_t temp;
     
     DataSource *pSource = ( DataSource *)pArg;
-
+//    DMAD_StopTransfer( &g_dmad, pSource->dev.rxDMAChannel );
     //  UIF_LED_On( LED_HDMI );  
 	switch( pSource->status[ IN ] ) 
 
@@ -267,8 +269,6 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                         //fill_buf_debug( ( uint8_t * )&testbuf, pSource->rxSize ) ;
 				 		kfifo_put( pSource->pRingBulkIn,
                   					( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
-                                    //( uint8_t * )&(pSource->pBufferIn[ pSource-> rx_index ]), 
-                                    //testbuf,
                   					pSource->rxSize );
 						//pSource->rx_index = 1 - pSource->rx_index;
                  }
@@ -292,6 +292,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 		}
 	   pSource->rx_index = 1 - pSource->rx_index;
     // UIF_LED_Off( LED_HDMI ); 
+    // DMAD_StartTransfer( &g_dmad, pSource->dev.rxDMAChannel );
 }
 
 /*
@@ -396,12 +397,6 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
   
-//  if(status) {
-//    APP_TRACE_INFO(( "\r\nERR: %d",status ));
-//  } else {
-//    APP_TRACE_INFO(( " ----------ok" ));
-//  }
-  
     const uint8_t nDelay = 10;
     uint32_t temp = 0;
        
@@ -409,8 +404,11 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     
     DataSource *pSource = ( DataSource *)pArg;
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
+    
+    sDmaTransferDescriptor *pTds = dmaTdSSC0Tx;
 
-    //UIF_LED_On( LED_RUN );       
+    UIF_LED_On( LED_RUN ); 
+    //DMAD_StopTransfer( &g_dmad, pSource->dev.txDMAChannel );
     pSource->pBufferOut = ( uint8_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
      
 	switch( pSource->status[ OUT ] )
@@ -432,11 +430,11 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 				temp = kfifo_get_data_size( pSource->pRingBulkOut );
 				if( temp  >=  pSource->txSize )
 				{
-                    kfifo_get( pSource->pRingBulkOut,
-                    //( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                    ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
-                    pSource->txSize );
-                    //pSource->tx_index = 1 - pSource->tx_index;
+                                      kfifo_get( pSource->pRingBulkOut,
+                                      //( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                                      ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
+                                      pSource->txSize );
+                                      //pSource->tx_index = 1 - pSource->tx_index;
 				}
 				else
 				{
@@ -444,7 +442,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 				}
 									
 				break;
-            case BUFFEREMPTY:
+                        case BUFFEREMPTY:
                                 Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
                                                   pSource->txSize, 
                                                   16000 );
@@ -457,7 +455,8 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
      
       }
     pSource->tx_index = 1 - pSource->tx_index;
-    //UIF_LED_Off( LED_RUN );  
+    //DMAD_StartTransfer( &g_dmad, pSource->dev.txDMAChannel );
+    UIF_LED_Off( LED_RUN );  
 }
 
 /*

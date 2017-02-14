@@ -14,7 +14,7 @@ Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=-1905131780
+Checksum=578049231
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -22,15 +22,6 @@ StopOnThrow=_ 0
 ShowArgs=0
 [Disassembly]
 MixedMode=1
-[array_types]
-Fmt0=uint16_t[15360]	4	0
-Fmt1=uint16_t[3072]	4	0
-Fmt2=uint8_t[131072]	4	0
-Fmt3=uint8_t[6144]	4	0
-[watch_formats]
-Fmt0={W}0:pTds[1].dwDstAddr	4	0
-Fmt1={W}0:pTds[1].dwSrcAddr	4	0
-Fmt2={W}0:status	4	0
 [InterruptLog]
 LogEnabled=0
 SumEnabled=0
@@ -55,6 +46,15 @@ Stop=1
 [Simulator]
 Freq=10000000
 MultiCoreRunAll=1
+[array_types]
+Fmt0=uint16_t[15360]	4	0
+Fmt1=uint16_t[3072]	4	0
+Fmt2=uint8_t[131072]	4	0
+Fmt3=uint8_t[6144]	4	0
+[watch_formats]
+Fmt0={W}0:pTds[1].dwDstAddr	4	0
+Fmt1={W}0:pTds[1].dwSrcAddr	4	0
+Fmt2={W}0:status	4	0
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -69,7 +69,8 @@ LogFile=_ ""
 [Aliases]
 A0=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c"
 A1=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c"
-Count=2
+A2=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libchip_sama5d3x\source\USBD_HAL.c" ""
+Count=3
 SuppressDialog=1
 [CallStackLog]
 Enabled=0

@@ -363,6 +363,7 @@
       <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_smd.h</file>
       <file>$PROJ_DIR$\Debug\Obj\CDCMSDDriver.pbi</file>
       <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_emac.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\Driver\uif_i2s.c</file>
       <file>$PROJ_DIR$\Debug\Obj\libusb.pbd</file>
     </outputs>
     <file>
