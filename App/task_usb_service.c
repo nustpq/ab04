@@ -84,23 +84,23 @@ void  App_TaskUSBService ( void *p_arg )
             }
         }
         
-        if ( usb_state >= USBD_STATE_CONFIGURED ) {
+//        if ( usb_state >= USBD_STATE_CONFIGURED ) {
           
-            UIF_LED_On( LED_USB );    
-        } else {
+//            UIF_LED_On( LED_USB );    
+//        } else {
           
-            UIF_LED_Off( LED_USB );             
-        }
+//            UIF_LED_Off( LED_USB );             
+//        }
         
         if ( usb_state < USBD_STATE_CONFIGURED ) {  
           
-            OSTimeDly(2);
+            OSTimeDly( 2 );
             continue;      
         }
     
         if ( audio_run_control == false) {  
           
-            OSTimeDly(2);
+            OSTimeDly( 2 );
             continue;      
         }
        
@@ -226,7 +226,17 @@ void  App_TaskUSBService ( void *p_arg )
                     kfifo_put( pPath->pfifoOut,
                              ( uint8_t * )tmpBuffer,
                              pPath->pSource->txSize );                 
-                }               
+                }
+                
+                counter  = kfifo_get_free_space( pPath->pfifoOut );
+                if( ( counter  <= pPath->pSource->txSize )
+                  && ( source_ssc0.status[ OUT ] < ( uint8_t )START ) )    
+                {
+                    source_ssc0.buffer_write(  &source_ssc0,
+                                               ( uint8_t * )ssc0_PingPongOut,                                                
+                                               source_ssc0.txSize ); 
+                    source_ssc0.status[ OUT ] = ( uint8_t )START;                                    
+                }
            
                 
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->ep ) {   //SSC1 Play

@@ -397,7 +397,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
   
-    const uint8_t nDelay = 10;
+    const uint8_t nDelay = 16;
     uint32_t temp = 0;
        
     assert( NULL != pArg );
@@ -415,17 +415,17 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 		{ 
 			case START    :
 			case BUFFERED :
-				temp = kfifo_get_data_size( pSource->pRingBulkOut );
-				if( temp  < ( pSource->txSize  * nDelay ) )
-					{
-						if( pSource->status[ OUT ] == ( uint8_t )START )
-							pSource->status[ OUT ] = ( uint8_t )BUFFERED;
-					}
-				else
-					{
-						pSource->status[ OUT ] = ( uint8_t )RUNNING;
-					}
-				break;
+//				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+//				if( temp  < ( pSource->txSize  * nDelay ) )
+//					{
+//						if( pSource->status[ OUT ] == ( uint8_t )START )
+//							pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+//					}
+//				else
+//					{
+//						pSource->status[ OUT ] = ( uint8_t )RUNNING;
+//					}
+//				break;
 			case RUNNING  :
 				temp = kfifo_get_data_size( pSource->pRingBulkOut );
 				if( temp  >=  pSource->txSize )

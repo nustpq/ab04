@@ -143,14 +143,14 @@ void  App_AudioManager (void *p_arg)
             source_ssc1.status[ IN ]  = ( uint8_t )START;
         } 
         
-        OSTimeDly(1); 
+//        OSTimeDly( 1 ); 
         
-        if ( (cfg_data & SSC0_OUT) && ( source_ssc0.status[OUT] >= CONFIGURED ) ){
-            source_ssc0.buffer_write(  &source_ssc0,
-                                       ( uint8_t * )ssc0_PingPongOut,                                                
-                                       source_ssc0.txSize ); 
-            source_ssc0.status[ OUT ] = ( uint8_t )START;
-        }      
+//        if ( (cfg_data & SSC0_OUT) && ( source_ssc0.status[OUT] >= CONFIGURED ) ){
+//            source_ssc0.buffer_write(  &source_ssc0,
+//                                       ( uint8_t * )ssc0_PingPongOut,                                                
+//                                       source_ssc0.txSize ); 
+//            source_ssc0.status[ OUT ] = ( uint8_t )START;
+//        }      
         if ( (cfg_data & SSC1_OUT) && ( source_ssc1.status[OUT] >= CONFIGURED ) ){
             source_ssc1.buffer_write(  &source_ssc1,
                                        ( uint8_t * )ssc1_PingPongOut,                                                
