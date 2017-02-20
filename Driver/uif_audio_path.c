@@ -253,25 +253,7 @@ void  createPath( void *source,
               path->ep = CDCDSerialDriverDescriptors_AUDIO_0_DATAIN;
           }   
           break;
-        case 2:                           //ep7<-spi0
-          {
-              path->pSource = &source_spi0;
-              path->pSource->set_peripheral = spi_register_set;
-              path->pfifoIn = &spi0_bulkIn_fifo;
-              path->pfifoOut = &ep2BulkIn_fifo;
-              path->ep = CDCDSerialDriverDescriptors_SPI_DATAIN;              
-          }
-          break;
-        case 4:                           //ep7<-gpio
-          {
-//              path->pInSource = &source_gpio; 
-//              path->pInSource->set_peripheral = gpio_Init;
-//              path->pUpfifoIn = &ssc0_bulkin_fifo; 
-//              path->pUpfifoOut = &ep0BulkIn_fifo;
-//              path->epIn = CDCDSerialDriverDescriptors_AUDIO_0_DATAIN;              
-          }
-          break;
-        case 6:                          //ep5<-ssc1
+        case 2:                          //ep5<-ssc1
           {
               path->pSource = &source_ssc1; 
               path->pSource->set_peripheral = ssc_rxRegister_set;
@@ -280,6 +262,25 @@ void  createPath( void *source,
               path->ep = CDCDSerialDriverDescriptors_AUDIO_1_DATAIN;              
           }
           break;
+        case 4:                           //ep7<-spi0
+          {
+              path->pSource = &source_spi0;
+              path->pSource->set_peripheral = spi_register_set;
+              path->pfifoIn = &spi0_bulkIn_fifo;
+              path->pfifoOut = &ep2BulkIn_fifo;
+              path->ep = CDCDSerialDriverDescriptors_SPI_DATAIN;              
+          }
+          break;
+        case 6:                           //ep7<-gpio
+          {
+//              path->pInSource = &source_gpio; 
+//              path->pInSource->set_peripheral = gpio_Init;
+//              path->pUpfifoIn = &ssc0_bulkin_fifo; 
+//              path->pUpfifoOut = &ep0BulkIn_fifo;
+//              path->epIn = CDCDSerialDriverDescriptors_AUDIO_0_DATAIN;              
+          }
+          break;
+
     
     //down link usb<--ssc0/spi0/gpio
         case 1:                            //ep2->ssc0
@@ -291,7 +292,16 @@ void  createPath( void *source,
               path->ep = CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT;
           }
           break;
-        case 3:                           //ep8->spi0
+        case 3:                          //ep6->ssc1
+          {
+              path->pSource = &source_ssc1;
+              path->pSource->set_peripheral = ssc_txRegister_set;
+              path->pfifoIn = &ep1BulkOut_fifo;           
+              path->pfifoOut = &ssc1_bulkout_fifo;
+              path->ep = CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT;  
+          }
+          break;  
+        case 5:                           //ep8->spi0
           {
               path->pSource = &source_spi0;
               path->pSource->set_peripheral = spi_register_set;
@@ -300,7 +310,7 @@ void  createPath( void *source,
               path->ep = CDCDSerialDriverDescriptors_SPI_DATAOUT; 
           }
           break;
-        case 5:                          //ep8->gpio
+        case 7:                          //ep8->gpio
           {
 //              path->pOutTarget = &source_gpio;
 //              path->pOutTarget->set_peripheral = gpio_Init; 
@@ -309,15 +319,7 @@ void  createPath( void *source,
 //              path->epOut = CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT;
           }          
           break;
-        case 7:                          //ep6->ssc1
-          {
-              path->pSource = &source_ssc1;
-              path->pSource->set_peripheral = ssc_txRegister_set;
-              path->pfifoIn = &ep1BulkOut_fifo;           
-              path->pfifoOut = &ssc1_bulkout_fifo;
-              path->ep = CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT;  
-          }
-          break;
+
 
         default:
           break;      

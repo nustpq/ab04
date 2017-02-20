@@ -13,17 +13,17 @@
                                
 const static char* halfPath[]={
   
-                                "ep1->ssc0",                                //0
-                                "ep2<-ssc0",                                //1
+                                "ep1<-ssc0",                                //0
+                                "ep2->ssc0",                                //1
                                 
-                                "ep5->ssc1",                                //2
-                                "ep6<-ssc1",                                //3 
+                                "ep5<-ssc1",                                //2
+                                "ep6->ssc1",                                //3 
                                 
-                                "ep7->spi0",                                //4
-                                "ep8<-spi0",                                //5
+                                "ep7<-spi0",                                //4
+                                "ep8->spi0",                                //5
                                 
-                                "ep7->gpio",                                //6
-                                "ep8<-gpio",                                //7
+                                "ep7<-gpio",                                //6
+                                "ep8->gpio",                                //7
                     
                               };  
 
