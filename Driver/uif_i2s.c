@@ -263,13 +263,14 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                        ( uint8_t * )source_gpio.pBufferIn[ pSource-> rx_index ],
                        source_gpio.rxSize );
                  */
-                        //memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], 0x66, pSource->rxSize );  
+                        //memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], 0, pSource->rxSize );  
                         // memset( tempp, 0x55, sizeof(tempp)  );
                         //fill_buf_debug( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], pSource->rxSize ) ;
                         //fill_buf_debug( ( uint8_t * )&testbuf, pSource->rxSize ) ;
 				 		kfifo_put( pSource->pRingBulkIn,
                   					( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
                   					pSource->rxSize );
+                                                memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], 0, pSource->rxSize );
 						//pSource->rx_index = 1 - pSource->rx_index;
                  }
 				 else
@@ -428,12 +429,14 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 //				break;
 			case RUNNING  :
 				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+                                memset( ( uint8_t * )&ssc0_PingPongOut[ pSource-> tx_index ][0], 0, pSource->txSize );
 				if( temp  >=  pSource->txSize )
 				{
                                       kfifo_get( pSource->pRingBulkOut,
                                       //( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
                                       ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
                                       pSource->txSize );
+//                                       memset( ( uint8_t * )&ssc0_PingPongOut[ pSource-> tx_index ][0], 0, pSource->txSize );
                                       //pSource->tx_index = 1 - pSource->tx_index;
 				}
 				else

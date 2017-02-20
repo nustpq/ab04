@@ -128,13 +128,14 @@ void  App_AudioManager (void *p_arg)
         APP_TRACE_INFO(( "\r\n[App_AudioManager_Mbox - cfg_data = 0X%0X ]", cfg_data ));
 
        
-        if( (cfg_data & SSC0_IN) && ( source_ssc0.status[IN] >= CONFIGURED ) ) {
+//        if( (cfg_data & SSC0_IN) && ( source_ssc0.status[IN] >= CONFIGURED ) ) {
 
-            source_ssc0.buffer_read(   &source_ssc0,
-                                      ( uint8_t * )ssc0_PingPongIn,                                              
-                                      source_ssc0.rxSize );
-            source_ssc0.status[ IN ]  = ( uint8_t )START;
-        } 
+//            source_ssc0.buffer_read(   &source_ssc0,
+//                                      ( uint8_t * )ssc0_PingPongIn,                                              
+//                                      source_ssc0.rxSize );
+//            source_ssc0.status[ IN ]  = ( uint8_t )START;
+//        } 
+        
         if( (cfg_data & SSC1_IN) && ( source_ssc1.status[IN] >= CONFIGURED ) ) {
 
             source_ssc1.buffer_read(   &source_ssc1,

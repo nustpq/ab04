@@ -55,7 +55,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
     remaining = remaining;
     uint32_t size;
     static bool flag = 0;
-      UIF_LED_On( 3 );
+//      UIF_LED_On( 3 );
     if ( status == USBD_STATUS_SUCCESS ) 
     {         
        // Check every data package:        
@@ -104,7 +104,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
         APP_TRACE_INFO(("\r\nERROR : UsbAudio0DataReceived: Transfer error\r\n" )); 
         
     }
-      UIF_LED_Off( 3 );
+//      UIF_LED_Off( 3 );
     
 }
 
@@ -156,10 +156,10 @@ void UsbAudio0DataTransmit(  uint32_t unused,
                               uint32_t transmit,
                               uint32_t remaining )
 {          
-//    UIF_LED_On( 1 ); 
+    UIF_LED_On( 3 ); 
     if ( status == USBD_STATUS_SUCCESS  ) 
     {              
-        if ( USB_DATAEP_SIZE_64B <= kfifo_get_data_size(  &ep0BulkIn_fifo )  ) 
+        if ( USB_DATAEP_SIZE_64B * 2 <= kfifo_get_data_size(  &ep0BulkIn_fifo )  ) 
         { 
             //enough data to send to PC           
             kfifo_get( &ep0BulkIn_fifo, usbCacheBulkIn0, USB_DATAEP_SIZE_64B ); 
@@ -187,7 +187,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
         APP_TRACE_INFO(( "\r\nERROR : UsbAudio0DataTransmit: Rr-transfer hit\r\n" ));  
         
     } 
-//    UIF_LED_Off( 1 ); 
+    UIF_LED_Off( 3 ); 
     
 }
 
@@ -488,7 +488,7 @@ static void USBPower_Configure( void )
  */
 void USBDCallbacks_Initialized(void)
 {
-    IRQ_ConfigureIT(ID_UDPHS, 1, USBD_IrqHandler);
+    IRQ_ConfigureIT(ID_UDPHS, 2, USBD_IrqHandler);
     IRQ_EnableIT(ID_UDPHS);
 }
 

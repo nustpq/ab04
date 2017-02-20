@@ -130,7 +130,8 @@ void  App_TaskUSBService ( void *p_arg )
                 counter  = kfifo_get_data_size( pPath->pfifoIn );
                 counter2 = kfifo_get_free_space( pPath->pfifoOut );
                 //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pSource->rxSize <= counter && pPath->pSource->rxSize <= counter2 ) {
+                if( pPath->pSource->rxSize <= counter 
+                    && pPath->pSource->rxSize <= counter2  ) {                    
                         //OS_ENTER_CRITICAL();
                     kfifo_get( pPath->pfifoIn,
                              ( uint8_t * )tmpBuffer,
@@ -235,7 +236,15 @@ void  App_TaskUSBService ( void *p_arg )
                     source_ssc0.buffer_write(  &source_ssc0,
                                                ( uint8_t * )ssc0_PingPongOut,                                                
                                                source_ssc0.txSize ); 
-                    source_ssc0.status[ OUT ] = ( uint8_t )START;                                    
+                    source_ssc0.status[ OUT ] = ( uint8_t )START; 
+                    
+//                    OSTimeDly( 1 );
+
+                    source_ssc0.buffer_read(   &source_ssc0,
+                                                ( uint8_t * )ssc0_PingPongIn,                                              
+                                                source_ssc0.rxSize );
+                    source_ssc0.status[ IN ]  = ( uint8_t )START;
+         
                 }
            
                 
@@ -297,7 +306,8 @@ void  App_TaskUSBService ( void *p_arg )
         }
          
         OSTimeDly( 1 );
-        
+//        OS_Sched();
+          
     } //for loop
     
 }

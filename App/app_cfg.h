@@ -56,8 +56,8 @@
 
 #define TASKLEDPRIORITY                                    8
 
-#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       6
-#define  APP_CFG_TASK_USB_SEV_PRIO                         1
+#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       1
+#define  APP_CFG_TASK_USB_SEV_PRIO                         6
 #define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
 #define  APP_CFG_TASK_UART_TX_PRIO                         3
 #define  APP_CFG_TASK_NOAH_PRIO                            4
