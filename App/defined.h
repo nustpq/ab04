@@ -23,6 +23,10 @@
 #include "uif_object.h"
 #include "ruler.h"
 
+
+#define   DEFAULT_SPI_SPEED     ( 10 * 1000 * 1000 )
+#define   DEFAULT_TWI_SPEED     ( 100 * 1000 )
+
 /*
 *********************************************************************************************************
 *                                        global macro switch
@@ -77,10 +81,10 @@
 #define  ERR_CMD_TYPE                   252u
 #define  ERR_TDM_FORMAT                 253u
 
-#define I2S_PRE_PLAY_BUF_SIZE_PP            10 //10 X pingpong size, 40ms preplay buffer 
-#define I2S_PP_SIZE_MS                      4  //4ms per pingpong buffer
-#define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*4*I2S_PP_SIZE_MS )          //10ms //audio data transfered per frame, Max 48 kHz:   48k*8Slot*2ms*4B=3072
-#define I2S_PINGPONG_OUT_SIZE_3K           ( 48*8*4*I2S_PP_SIZE_MS )    // 
+#define I2S_PLAY_PRE_BUF_NUM              10 //10 x I2S_PINGPONG_OUT_SIZE_3K,  4ms * 10 = 40ms preplay buffer 
+#define I2S_PINGPONG_BUF_SIZE_MS           4  //4ms per ssc pingpong buffer
+#define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*4*I2S_PINGPONG_BUF_SIZE_MS )    //Max size:   48k*8Slot*4B*4ms = 6144B
+#define I2S_PINGPONG_OUT_SIZE_3K           ( 48*8*4*I2S_PINGPONG_BUF_SIZE_MS )    // 
 #define USB_DATAEP_SIZE_64B                (    64    )            // force use 64Bytes
 #define USB_LOGEP_SIZE_256B                (    256   )            // force use 256Bytes
 #define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
