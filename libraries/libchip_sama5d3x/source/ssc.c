@@ -166,6 +166,13 @@ void SSC_DisableReceiver(Ssc *ssc)
     ssc->SSC_CR = SSC_CR_RXDIS;
 }
 
+
+void SSC_Stop_Reset(Ssc *ssc)
+{
+    ssc->SSC_CR =  SSC_CR_RXDIS | SSC_CR_TXDIS | SSC_CR_SWRST;
+}
+                                                             
+
 /**
  * \brief Enables one or more interrupt sources of a SSC peripheral.
  * \param ssc  Pointer to an SSC instance. 

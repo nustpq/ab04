@@ -16,6 +16,12 @@
 */
 #include "uif_hardware_init.h"
 
+TWI_CFG twi0_chipConf[ 2 ];
+TWI_CFG twi1_chipConf[ 2 ];
+TWI_CFG twi2_chipConf[ 2 ];
+SPI_PLAY_REC_CFG spi0_cfg;
+SPI_PLAY_REC_CFG spi1_cfg;
+
 extern CODEC_SETS Codec_Set[];
 /*
 *********************************************************************************************************
@@ -32,7 +38,7 @@ extern CODEC_SETS Codec_Set[];
 * Note(s)     : None.
 *********************************************************************************************************
 */
-int usb_init_default( void )
+int usb_init( void )
 {
 
     //initialize usb object and it's operation
@@ -67,12 +73,13 @@ int usb_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void ssc0_init_default( void )
+void ssc0_init( void )
 {
     //initialize ssc0 object and it's operation
     memset( ( void * )&source_ssc0, 0 , sizeof( DataSource ) );
-    memset( ( void * )ssc0_PingPongOut, 0x00 , sizeof( ssc0_PingPongOut ) );
-    memset( ( void * )ssc0_PingPongIn,  0x00 , sizeof( ssc0_PingPongIn ) );
+    memset( ( void * )ssc0_PingPongOut, 0 , sizeof( ssc0_PingPongOut ) );
+    memset( ( void * )ssc0_PingPongIn,  0 , sizeof( ssc0_PingPongIn ) );
+    
     source_ssc0.dev.direct   = ( uint8_t )BI;
     source_ssc0.dev.identify = ID_SSC0;
     source_ssc0.dev.instanceHandle = (uint32_t)SSC0;
@@ -81,10 +88,11 @@ void ssc0_init_default( void )
     source_ssc0.tx_index = 0;
     source_ssc0.rx_index = 0;
     source_ssc0.peripheralParameter = ( void * )Audio_Configure_Instance0;
-    source_ssc0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PP_SIZE_MS );
-    source_ssc0.txSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PP_SIZE_MS );
-    source_ssc0.rxSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PP_SIZE_MS );
-   
+    
+    source_ssc0.txSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PINGPONG_BUF_SIZE_MS );
+    source_ssc0.rxSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PINGPONG_BUF_SIZE_MS );
+    source_ssc0.warmWaterLevel =   I2S_PLAY_PRE_BUF_NUM  * source_ssc0.txSize ;
+      
     source_ssc0.init_source  = init_I2S;
     source_ssc0.buffer_write = ssc0_buffer_write;
     source_ssc0.buffer_read  = ssc0_buffer_read;
@@ -115,7 +123,7 @@ void ssc0_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void ssc1_init_default( void )
+void ssc1_init( void )
 {
       //initialize ssc1 object and it's operation
     memset( ( void * )&source_ssc1, 0 , sizeof( DataSource ) );
@@ -163,10 +171,9 @@ void ssc1_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void spi0_init_default( void )
+void spi0_init( unsigned int speed_hz, unsigned int mode )
 {
       //initialize spi0 object and it's operation
-    SPI_PLAY_REC_CFG spi0_cfg;
     memset( ( void * )&source_spi0, 0 , sizeof( DataSource ) );
     memset( ( void * )&spi0_cfg, 0 , sizeof( SPI_PLAY_REC_CFG ) );
     source_spi0.dev.direct = ( uint8_t )BI;
@@ -178,9 +185,9 @@ void spi0_init_default( void )
     source_spi0.rx_index = 0;
 
 	source_spi0.peripheralParameter = ( void * )&spi0_cfg;
-    source_spi0.privateData = spi0_RingBulkIn;
-    spi0_cfg.spi_speed = 10 * 1000 * 1000;
-    spi0_cfg.spi_mode = 1;
+    source_spi0.privateData    = spi0_RingBulkIn;
+    spi0_cfg.spi_speed = speed_hz;
+    spi0_cfg.spi_mode  = mode;
     source_spi0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
     source_spi0.txSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
     source_spi0.rxSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 )* SLOT_NUM_DEFAULT * 2 );
@@ -188,7 +195,7 @@ void spi0_init_default( void )
     source_spi0.init_source = init_spi;
     source_spi0.peripheral_stop = stop_spi;
     source_spi0.buffer_write = _spiDmaTx;
-    source_spi0.buffer_read = _spiDmaRx;
+    source_spi0.buffer_read  = _spiDmaRx;
     source_spi0.set_peripheral = spi_register_set;
 
     source_spi0.pRingBulkOut = &spi0_bulkOut_fifo;
@@ -215,10 +222,9 @@ void spi0_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void spi1_init_default( void )
+void spi1_init( unsigned int speed_hz, unsigned int mode )
 {
       //initialize spi1 object and it's operation
-    SPI_PLAY_REC_CFG spi1_cfg;
     memset( ( void * )&source_spi1, 0 , sizeof( DataSource ) );
     memset( ( void * )&spi1_cfg, 0 , sizeof( SPI_PLAY_REC_CFG ) );
     source_spi1.dev.direct = ( uint8_t )BI;
@@ -232,8 +238,8 @@ void spi1_init_default( void )
     source_spi1.peripheralParameter = ( void * )&spi1_cfg;
     source_spi1.privateData = spi1_RingBulkIn;
     source_spi1.buffer = ( uint8_t * )spi1_2MSOut;
-    spi1_cfg.spi_speed = 10 * 1000 * 1000;
-    spi1_cfg.spi_mode  = 1;
+    spi1_cfg.spi_speed = speed_hz;
+    spi1_cfg.spi_mode  = mode;
     source_spi1.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 ) * 2;
     source_spi1.txSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 ) * 2;
     source_spi1.rxSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 )* SLOT_NUM_DEFAULT * 2 ) * 2;
@@ -270,16 +276,14 @@ void spi1_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void twi0_init_default( void )
+void twi0_init( unsigned int speed_hz )
 {
-    uint32_t twi_hz = 100000;
-      //initialize twi0 object and it's operation
-    TWI_CFG twi0ChipConf[ 2 ];
-    memset( ( void * )&twi0ChipConf[ 0 ], 0 ,sizeof( TWI_CFG ) << 1 );
-    twi0ChipConf[ 0 ].address = 0xc0 >> 1;
-    twi0ChipConf[ 0 ].iaddress = 0;
-    twi0ChipConf[ 0 ].isize = 0;
-    twi0ChipConf[ 0 ].revers = 0;
+     //initialize twi0 object and it's operation
+    memset( ( void * )&twi0_chipConf[ 0 ], 0 ,sizeof( TWI_CFG ) << 1 );
+    twi0_chipConf[ 0 ].address = 0xc0 >> 1;
+    twi0_chipConf[ 0 ].iaddress = 0;
+    twi0_chipConf[ 0 ].isize = 0;
+    twi0_chipConf[ 0 ].revers = 0;
 
     memset( ( void * )&source_twi0, 0 , sizeof( DataSource ) );
     source_twi0.dev.direct = ( uint8_t )BI;
@@ -289,14 +293,14 @@ void twi0_init_default( void )
     source_twi0.status[ OUT ] = ( uint8_t )FREE;
     source_twi0.tx_index = 0;
     source_twi0.rx_index = 0;
-    source_twi0.privateData = &twi0ChipConf[ 0 ];
+    source_twi0.privateData = &twi0_chipConf[ 0 ];
 
     source_twi0.init_source = twi_init_master;
     source_twi0.buffer_write = twi0_uname_write;
     source_twi0.buffer_read = twi0_uname_read;
 
     if( NULL != source_twi0.init_source )
-        source_twi0.init_source( &source_twi0,&twi_hz );
+        source_twi0.init_source( &source_twi0,&speed_hz );
 }
 
 
@@ -315,12 +319,10 @@ void twi0_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void twi1_init_default( void )
+void twi1_init( unsigned int speed_hz )
 {
-    uint32_t twi_hz = 100000;
-
+ 
     //initialize twi0 object and it's operation
-    TWI_CFG twi1_chipConf[ 2 ];
     memset( ( void * )&twi1_chipConf[ 0 ], 0 ,sizeof( TWI_CFG ) << 1 );
     twi1_chipConf[ 0 ].address = 0x18;
     twi1_chipConf[ 0 ].iaddress = 0;
@@ -329,7 +331,7 @@ void twi1_init_default( void )
 
     twi1_chipConf[ 1 ].address = 0x18;
     twi1_chipConf[ 1 ].iaddress = 0;
-    twi1_chipConf[ 1 ].isize = 0;
+    twi1_chipConf[ 1 ].isize  = 0;
     twi1_chipConf[ 1 ].revers = 0;
 
     memset( ( void * )&source_twi1, 0 , sizeof( DataSource ) );
@@ -347,7 +349,7 @@ void twi1_init_default( void )
     source_twi1.buffer_read = twi1_read;
 
     if( NULL != source_twi1.init_source )
-        source_twi1.init_source( &source_twi1,&twi_hz );
+        source_twi1.init_source( &source_twi1,&speed_hz );
 }
 
 /*
@@ -365,12 +367,10 @@ void twi1_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void twi2_init_default( void )
+void twi2_init( unsigned int speed_hz )
 {
-    uint32_t twi_hz = 100000;
 
-    //initialize twi2 object and it's operation
-    TWI_CFG twi2_chipConf[ 2 ];
+    //initialize twi2 object and it's operation    
     memset( ( void * )&twi2_chipConf[ 0 ], 0 ,sizeof( TWI_CFG ) << 1 );
     twi2_chipConf[ 0 ].address = 0x18;
     twi2_chipConf[ 0 ].iaddress = 0;
@@ -386,7 +386,7 @@ void twi2_init_default( void )
     source_twi2.dev.direct = ( uint8_t )BI;
     source_twi2.dev.identify = ID_TWI2;
     source_twi2.dev.instanceHandle = (uint32_t)TWI2;
-    source_twi2.status[ IN ] = ( uint8_t )FREE;
+    source_twi2.status[ IN ]  = ( uint8_t )FREE;
     source_twi2.status[ OUT ] = ( uint8_t )FREE;
     source_twi2.tx_index = 0;
     source_twi2.rx_index = 0;
@@ -397,7 +397,7 @@ void twi2_init_default( void )
     source_twi2.buffer_read = twi2_read;
 
     if( NULL != source_twi2.init_source )
-        source_twi2.init_source( &source_twi2,&twi_hz );
+        source_twi2.init_source( &source_twi2,&speed_hz );
 }
 
 /*
@@ -415,7 +415,7 @@ void twi2_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void usart0_init_default( void )
+void usart0_init( void )
 {
     //initialize usart1 object and it's operation
     memset( ( void * )&source_usart0, 0 , sizeof( DataSource ) );
@@ -449,7 +449,7 @@ void usart0_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void usart1_init_default( void )
+void usart1_init( void )
 {
     //initialize usart1 object and it's operation
     memset( ( void * )&source_usart1, 0 , sizeof( DataSource ) );
@@ -487,9 +487,9 @@ void usart1_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void gpio_init_default( void )
+void gpio_init( void )
 {
-  extern const Pin gpio_pins[ ];
+ // extern const Pin gpio_pins[ ];
     //initialize usart1 object and it's operation
     memset( ( void * )&source_gpio, 0 , sizeof( DataSource ) );
 
@@ -550,7 +550,6 @@ void gpio_init_default( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-
 unsigned char aic3204_init_default( void )
 {
     unsigned char err;
@@ -602,16 +601,16 @@ unsigned char aic3204_init_default( void )
 */
 void uif_ports_init_default( void )
 {
-    usb_init_default( ); //init USB
-    ssc0_init_default( );
-    ssc1_init_default( );  
-    spi0_init_default( );
-    spi1_init_default( );
-    twi0_init_default( );
-    twi1_init_default( );
-    twi2_init_default( );
-    usart1_init_default( );
-    gpio_init_default( );
+    usb_init( ); //init USB
+    ssc0_init( );
+    ssc1_init( );  
+    spi0_init( DEFAULT_SPI_SPEED, 0 );
+    spi1_init( DEFAULT_SPI_SPEED, 0 );
+    twi0_init( DEFAULT_TWI_SPEED );
+    twi1_init( DEFAULT_TWI_SPEED );
+    twi2_init( DEFAULT_TWI_SPEED );
+    usart1_init( );
+    gpio_init( );
 }
 
 /*

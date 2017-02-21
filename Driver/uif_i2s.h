@@ -100,8 +100,8 @@ void SSC1_Recording( void *pInstance );
 void _ssc_ConfigureDma( void* instance );
 #endif
 
-void ssc_rxRegister_set( void *instance,void *parameter );
-void ssc_txRegister_set( void *instance,void *parameter );
+uint8_t ssc_rxRegister_set( void *instance,void *parameter );
+uint8_t ssc_txRegister_set( void *instance,void *parameter );
 
 static void _SSC_Init( uint32_t id,
 		uint32_t slave,

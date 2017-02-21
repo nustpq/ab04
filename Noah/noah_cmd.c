@@ -874,12 +874,11 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         
             err = AB_POST();
             
-        break;
-        
+        break;                 
 
-        
+  /*      
         ////////////////////////////////////////////////////////////////////////        
-#if 0        
+        
         case PC_CMD_SET_IF_CFG :
           
             temp = emb_get_attr_int(&root, 1, -1);
@@ -894,6 +893,22 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             err = Setup_Interface( &PCCmd.interface_cfg );
             
         break ;
+        
+        case PC_CMD_UPDATE_FPGA_SWITCH :
+          
+            temp = emb_get_attr_int(&root, 1, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
+            PCCmd.interface_cfg.if_type = (uint8_t)temp;             
+            temp = emb_get_attr_int(&root, 2, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
+            PCCmd.interface_cfg.speed = (uint16_t)temp;   
+            temp = emb_get_attr_int(&root, 3, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
+            PCCmd.interface_cfg.attribute = (uint16_t)temp; 
+            err = Setup_Interface( &PCCmd.interface_cfg );
+            
+        break ;
+        
         
         case PC_CMD_RAW_WRITE :  
         
@@ -937,7 +952,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             PCCmd.raw_read.pdata_write = (uint8_t *)pBin; 
             
             err = Raw_Read( &PCCmd.raw_read );
-            if( err != NO_ERR ) { /*err = EMB_CMD_ERR; */ break; } 
+            if( err != NO_ERR ) { err = EMB_CMD_ERR;  break; } 
             
             err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
                                       &PCCmd,
@@ -1021,7 +1036,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
                                       DATA_AB_INFO ) ;           
         break ; 
         
-#endif        
+ */       
         
 /*        
         case PC_CMD_REC_VOICE_BUFFER: 

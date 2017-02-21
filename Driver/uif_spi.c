@@ -848,12 +848,12 @@ static void spi_master_transfer( void *pInstance,
 *             : parameter : spi config parameter
 *             
 *             
-* Returns     : none
+* Returns     : Error
 *
 * Note(s)     : 
 *********************************************************************************************************
 */
-void spi_register_set( void *instance,void *parameter )
+uint8_t spi_register_set( void *instance,void *parameter )
 {
    assert( NULL != instance );
    assert( NULL != parameter );
@@ -889,5 +889,7 @@ void spi_register_set( void *instance,void *parameter )
      // configure SPI csr0
      SPI_ConfigureNPCS( pSpi, 0, csr0 ) ;
      SPI_Enable( pSpi ) ;  
+     
+     return 0;
 }
 

@@ -17,7 +17,8 @@
 #include "defined.h"
 #include "audio.h"
 #include "uif_i2s.h"
-
+#include "noah_cmd.h"
+#include "codec.h"
 
 /*
 *********************************************************************************************************
@@ -41,71 +42,70 @@ AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
 
 extern void Init_Audio_Bulk_FIFO( void );
 
-unsigned char  padding_data_save;
+unsigned char  audio_padding_byte;
 
 
 /*
 *********************************************************************************************************
-*                                    Init_Play_Setting()
+*                                  First_Pack_Check_BO()
 *
-* Description :  Initialize USB bulk out (play) settings.
+* Description :  Check if first USB bulk out package is same as padding data.
+*
+* Argument(s) :  None.
+*
+*Return(s)   :   true  - check ok.
+*                false - check failed.
+*
+* Note(s)     :  None.
+*********************************************************************************************************
+*/
+bool First_Pack_Check_BO( unsigned char *pData, unsigned int size )
+{    
+    
+    unsigned int i;
+    
+    for( i = 0; i < size ; i++ )   {
+        if( audio_padding_byte != *pData++) {
+            return false;
+        }
+    }
+     //printf("\r\nSync\r\n");
+    return true; 
+
+}
+
+/*
+*********************************************************************************************************
+*                                First_Pack_Padding_BI()
+*
+* Description :  Padding the first USB bulk in package.
 *
 * Argument(s) :  None.
 *
 * Return(s)   :  None.
 *
-* Note(s)     : None.
+* Note(s)     :  Must be called after reset FIFO and before start audio.
 *********************************************************************************************************
-*/
-static uint8_t Init_Play_Setting( void *pInstance )
+*/      
+void First_Pack_Padding_BI( void )
 {
-    uint8_t err = NULL;
+    unsigned char temp[ USB_DATAEP_SIZE_64B ];
     
-    assert( NULL != pInstance );
-    
-    DataSource *pSource = ( DataSource * )pInstance;
-    AUDIO_CFG  *reg = ( AUDIO_CFG * )pSource->peripheralParameter;    
-    
-    if( ( reg[ PLAY ].channel_num == 0 ) 
-      || ( reg[ PLAY ].channel_num > 8 ) ) 
-    {        
-        err = ERR_TDM_FORMAT ; 
-    }
-    
-    if( ( reg[ PLAY ].bit_length != 16 ) 
-       && ( reg[ PLAY ].bit_length != 32 )  ) 
-    {        
-        err = ERR_TDM_FORMAT ; 
-    }
-    
-    if( NULL != err ) {
-        printf( "Init Play Setting Error !\r\n" );
-        return err;
-    }
-    
-    if( reg[ PLAY ].bit_length == 16 ) 
-    {
-        pSource->warmWaterLevel = reg[ PLAY ].sample_rate / 1000 * reg[ PLAY ].channel_num * 2 * 2;
-    } 
-    else 
-    { //32
-        pSource->warmWaterLevel = reg[ PLAY ].sample_rate / 1000 * reg[ PLAY ].channel_num * 2 * 4;        
-    }
-    
-     pSource->set_peripheral = ssc_txRegister_set;
-     
-     if( NULL != pSource->set_peripheral )
-       pSource->set_peripheral( ( void * )pSource,( void * )&Audio_Configure_Instance1[ PLAY ] );
-    
-      return err;
+    APP_TRACE_INFO(("\r\nPadding USB data [0x%0x]...\r\n",audio_padding_byte));  
+    memset( temp, audio_padding_byte, USB_DATAEP_SIZE_64B );
+    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;
+    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;//2 package incase of PID error
 }
+
+
+
 
 
 /*
 *********************************************************************************************************
-*                                    Init_Rec_Setting()
+*                                    Audio_Start()
 *
-* Description :  Initialize USB bulk in (record) settings.
+* Description :  Start USB data transfer.
 *
 * Argument(s) :  None.
 *
@@ -114,117 +114,28 @@ static uint8_t Init_Play_Setting( void *pInstance )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-static uint8_t Init_Rec_Setting( void *pInstance )
-{
-    uint8_t  err = NULL;
-    
-    assert( NULL != pInstance );
-    
-    DataSource *pSource = ( DataSource * )pInstance;
-    AUDIO_CFG  *reg = ( AUDIO_CFG * )pSource->peripheralParameter; 
-
-#if 0    
-    printf( "\r\nStart [%dth]Rec [%dCH - %dHz - %dBit][%d%s - %dDelay - %d%sLeft]...\r\n",\
-             counter_rec++,
-             channels_rec,
-             sample_rate,
-             bit_length,
-             cki,(cki==0)?"Fall" :"Rise",
-             delay,
-             start,
-             ( start == 4 )?"Low":"High" );   
-#endif
-    
-    if( ( reg[ REC ].channel_num == 0 ) 
-      || ( reg[ REC ].channel_num > 8 ) ) 
-    {        
-        err = ERR_TDM_FORMAT ; 
-    }
-    
-    if( ( reg[ REC ].bit_length != 16 ) 
-       && ( reg[ REC ].bit_length != 32 )  ) 
-    {        
-        err = ERR_TDM_FORMAT ; 
-    }
-    
-    if( NULL != err ) 
-    {
-        printf("Init Rec Setting Error !\r\n");
-        return err;
-    }
-    
-    if( reg[ REC ].bit_length == 16 ) 
-    { 
-        pSource->warmWaterLevel  = reg[ REC ].sample_rate / 1000 * reg[ REC ].channel_num  * 2 * 2; // 2ms * 16bit
-    } 
-    else 
-    { //32bit case
-        pSource->warmWaterLevel  = reg[ REC ].sample_rate / 1000 * reg[ REC ].channel_num  * 2 * 4; // 2ms * 32bit       
-    }
-    
-     pSource->set_peripheral = ssc_rxRegister_set;
-     
-     if( NULL != pSource->set_peripheral )
-       pSource->set_peripheral( ( void * )pSource,( void * )&Audio_Configure_Instance1[ REC ] );
-                 
-    return 0;
-}
-
-
-/*
-*********************************************************************************************************
-*                                    Audio_Start_Rec()
-*
-* Description :  Start USB data transfer for recording.
-*
-* Argument(s) :  None.
-*
-* Return(s)   :  None.
-*
-* Note(s)     : None.
-*********************************************************************************************************
-*/
-static uint8_t Audio_Start_Rec( void )
+void Audio_Start( void )
 {  
-    uint8_t err;  
     
-    err = init_Rec_Setting( &source_ssc0 );
-    if( err != 0 ) {
-        return err;
-    }
-//    SSC_Record_Start(); 
-   
-    return 0;  
-}
+    Hold_Task_for_Audio();                      
+                            
+    First_Pack_Padding_BI( ); 
+    
+    
+    //Audio_Manager( SSC0_IN | SSC0_OUT );  //start audio
+    
+    //OSTimeDly(1);    
+    audio_play_buffer_ready  = false ;
+    audio_run_control        = true ;
+    
+    restart_audio_0_bulk_out = true  ; 
+    restart_audio_0_bulk_in  = true  ;
+    restart_audio_1_bulk_out = true  ;
+    restart_audio_1_bulk_in  = true  ; 
+    restart_audio_2_bulk_out = true  ;
+    restart_audio_2_bulk_in  = true  ;
 
-
-/*
-*********************************************************************************************************
-*                                    Audio_Start_Play()
-*
-* Description :  Start USB data transfer for playing.
-*
-* Argument(s) :  None.
-*
-* Return(s)   :  None.
-*
-* Note(s)     : None.
-*********************************************************************************************************
-*/
-static uint8_t Audio_Start_Play( void )
-{  
-    uint8_t err;  
-//    Init_I2S_Buffer();         //--avoid error leo 
-    err = Init_Play_Setting( &source_ssc0 ); 
-    err = Init_Play_Setting( &source_ssc1 );
-    if( err != 0 ) 
-    {
-        return err;
-    }
-//    SSC_Play_Start();                 //--avoid error leo 
-//    bulkout_enable  = true ;
-     
-    return 0;
+  
 }
 
 
@@ -241,21 +152,90 @@ static uint8_t Audio_Start_Play( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-static void Audio_Stop( void )
-{     
-    printf( "\r\nEnd Audio Transfer..."); 
-//    End_Audio_Transfer();      //--avoid error leo
-//    delay_ms(10);              //--avoid error leo
+void Audio_Stop( void )
+{  
+        
+    printf( "\r\nStop Play & Rec..."); 
     
-    printf("\r\nReset USB EP...");
+    audio_run_control        = false  ; 
+    OSTimeDly(20);
+//    delay_ms(20); //wait until DMA interruption done
+//    
+// 
+//    
+//    SSC_Play_Stop();  
+//    SSC_Record_Stop(); 
+//    
+//    delay_ms(10);  
+//    
+//    printf( "\r\nEnd Audio Transfer..."); 
+//    //End_Audio_Transfer(); 
+//    delay_ms(10); 
+//    
+//    printf("\r\nReset USB EP...");
+//    if( audio_state_check != 0 ) { //in case of error from repeat Stop CMD 
+//        Toggle_PID_BI =  Check_Toggle_State();
+//    }
+    
+    //Reset Endpoint Fifos
+    //AT91C_BASE_UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIODATAOUT;
+    //AT91C_BASE_UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIODATAIN; 
+    //delay_ms(50);
 
-//    delay_ms(50);             //--avoid error leo 
+    
+    Destroy_Audio_Path();
+    
+    
+    
+    UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT;
+    UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIO_0_DATAIN; 
+    OSTimeDly(10);
+    //SSC_Reset(); //I2S_Init();        
+     
+    Dma_configure();
+    
+    //LED_Clear( USBD_LEDDATA );
+    
+    
+    
+    padding_audio_0_bulk_out = false  ; 
+    
+    restart_audio_0_bulk_out = false  ; 
+    restart_audio_0_bulk_in  = false  ;
+    restart_audio_1_bulk_out = false  ;
+    restart_audio_1_bulk_in  = false  ; 
+    restart_audio_2_bulk_out = false  ;
+    restart_audio_2_bulk_in  = false  ;                       
  
-//    SSC_Reset(); //I2S_Init();   //--avoid error leo     
-    Init_Audio_Bulk_FIFO();    
-//    LED_Clear( USBD_LEDDATA ); 
-}
+    audio_play_buffer_ready  = false  ;         
+       
+    //Init_Audio_Bulk_FIFO(); 
+    
+    Release_Task_for_Audio(); 
+    
 
+    
+    //End_Audio_Transfer();
+    
+    
+//    //reset debug counters
+//    BO_free_size_max      = 0 ;
+//    BI_free_size_min      = 100 ; 
+//    total_received        = 0 ;
+//    total_transmit        = 0 ;
+//    error_bulkout_full    = 0 ;
+//    error_bulkout_empt    = 0 ;
+//    error_bulkin_full     = 0 ;
+//    error_bulkin_empt     = 0 ;    
+//    debug_trans_counter1  = 0 ;
+//    debug_trans_counter2  = 0 ;
+//    debug_trans_counter3  = 0 ;
+//    debug_trans_counter4  = 0 ; 
+//    debug_usb_dma_IN      = 0 ;
+//    debug_usb_dma_OUT     = 0 ;    
+//    test_dump             = 0 ;
+
+}
 
 /*
 *********************************************************************************************************
@@ -270,117 +250,119 @@ static void Audio_Stop( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void Audio_State_Control( uint8_t *msg )
-{    
- /*
-  uint8_t err = 0;
-    uint32_t  temp ;    
-
-    static uint16_t audio_cmd_index;      //just defined it avoid compile error by leo
-    static uint16_t audio_state_check;    //just defined it avoid compile error by leo
-    static uint32_t time_start_test;      //just defined it avoid compile error by leo
-    static uint32_t second_counter;       //just defined it aboid compile error by leo
-    
-    if( audio_cmd_index == AUDIO_CMD_IDLE ) {
- //       printf( " program return at %d \n\r",__LINE__);
- //       return;
-    }
-
-//    if( USBD_GetState() < USBD_STATE_CONFIGURED && 
-//        audio_cmd_index != AUDIO_CMD_VERSION ) {
-//        err = ERR_USB_STATE;
-        
-//    } else {
-   
-        switch( audio_cmd_index ) 
-        {           
-            case AUDIO_CMD_START_REC :                
-                if( audio_state_check != 0 ) 
-                {
-                    Audio_Stop(); 
-//                    Rec_Voice_Buf_Stop();      //--avoid error leo 
-//                    counter_stop_cmd_miss++;
-                }                 
+//void Audio_State_Control( void )
+//{    
+//    unsigned char err ;
+//    unsigned int  temp ;    
+//    
+//    err = 0 ;
+//
+//   
+//        switch( audio_cmd_index ) {
+//            
+//            case AUDIO_CMD_START_REC :                
+//                if( audio_state_check != 0 ) {
+//                    Audio_Stop(); 
+//                    //Rec_Voice_Buf_Stop(); 
+//                    Stop_CMD_Miss_Counter++;
+//                }                 
 //                bulkout_trigger = true; //trigger paly&rec sync
-                err = Audio_Start_Rec();  
-                time_start_test = second_counter ;
-                audio_state_check = 1;
-            break;
-         
-            case AUDIO_CMD_START_PLAY :                
-                if( audio_state_check != 0 ) 
-                {
-                    Audio_Stop(); 
-//                    Rec_Voice_Buf_Stop();        //--avoid error leo 
-//                    counter_stop_cmd_miss++;
-                }                     
-                err = Audio_Start_Play();  
-                time_start_test = second_counter ;
-                audio_state_check = 2; 
-            break;
-     
-            case AUDIO_CMD_START_PALYREC :                
-                if( audio_state_check != 0 ) 
-                {
-                    Audio_Stop();
-//                    Rec_Voice_Buf_Stop();      //--avoid error leo 
-//                    counter_stop_cmd_miss++;
-                }                                         
-                err = Audio_Start_Play();
-                if( err == 0 ) 
-                {                    
-//                delay_ms(1);  //make sure play and rec enter interruption in turns 2ms              
-                  err = Audio_Start_Rec(); 
-                }
-                time_start_test = second_counter ;
-                audio_state_check = 3; 
-            break;
-            
-            case AUDIO_CMD_STOP : 
-                if( audio_state_check != 0 ) 
-                {
-                  Audio_Stop(); 
-//                  Rec_Voice_Buf_Stop(); 
-                  printf("\r\nThis cycle test time cost: ");
-                  Get_Run_Time(second_counter - time_start_test);   
-                  printf("\r\n\r\n");
-                  time_start_test = 0 ;
-                  audio_state_check = 0; 
-                }
-
-            case AUDIO_CMD_CFG: 
-                if( Audio_Configure_Instance1[ PLAY ].bit_length == 16 ) 
-                {
-                    temp = Audio_Configure_Instance1[ PLAY ].sr / 1000 *  Audio_Configure_Instance1[ PLAY ].channels * 2 * 2;
-                } 
-                else 
-                { //32
-                    temp = Audio_Configure_Instance1[ PLAY ].sr / 1000 *  Audio_Configure_Instance1[ PLAY ].channels * 2 * 4;        
-                }            
-                if( ( temp * PLAY_BUF_DLY_CNT ) > USB_RINGOUT_SIZE_16K ) 
-                { //play pre-buffer must not exceed whole play buffer
-                    err = ERR_AUD_CFG;
-                }              
-            break;
-            
-            case AUDIO_CMD_VERSION: 
-
-            break;         
-            
-            case AUDIO_CMD_RESET:                     
-            break;  
-            
-            case AUDIO_CMD_READ_VOICE_BUF : 
+//                err = Audio_Start_Rec();  
+//                time_start_test = second_counter ;
+//                audio_state_check = 1;
+//            break;
+//
+//            case AUDIO_CMD_START_PLAY :                
+//                if( audio_state_check != 0 ) {
+//                    Audio_Stop(); 
+//                    Rec_Voice_Buf_Stop(); 
+//                    Stop_CMD_Miss_Counter++;
+//                }                     
+//                err = Audio_Start_Play();  
+//                time_start_test = second_counter ;
+//                audio_state_check = 2; 
+//            break;
+//            
+//            case AUDIO_CMD_START_PALYREC :                
+//                if( audio_state_check != 0 ) {
+//                    Audio_Stop();
+//                    Rec_Voice_Buf_Stop(); 
+//                    Stop_CMD_Miss_Counter++;
+//                }                                         
+//                err = Audio_Start_Play();
+//                if( err == 0 ) {                    
+//                  delay_ms(1);  //make sure play and rec enter interruption in turns 2ms              
+//                  err = Audio_Start_Rec(); 
+//                }
+//                time_start_test = second_counter ;
+//                audio_state_check = 3; 
+//            break;
+//
+//            case AUDIO_CMD_STOP : 
+//                if( audio_state_check != 0 ) {
+//                  Audio_Stop(); 
+//                  err = Rec_Voice_Buf_Stop(); 
+//                  if( err != 0 ) {
+//                      printf("Rec_Voice_Buf_Stop failed : %d", err);
+//                  }
+//                  printf("\r\nThis cycle test time cost: ");
+//                  Get_Run_Time(second_counter - time_start_test);   
+//                  printf("\r\n\r\n");
+//                  time_start_test = 0 ;
+//                  audio_state_check = 0; 
+//                }
+//            break;   
+//        
+//            case AUDIO_CMD_CFG: 
+//                if( Audio_Configure[1].bit_length == 16 ) {
+//                    temp = Audio_Configure[1].sample_rate / 1000 *  Audio_Configure[1].channel_num * 2 * 2;
+//                } else { //32
+//                    temp = Audio_Configure[1].sample_rate / 1000 *  Audio_Configure[1].channel_num * 2 * 4;        
+//                }            
+//                if( (temp * PLAY_BUF_DLY_N) > USB_OUT_BUFFER_SIZE ) { //play pre-buffer must not exceed whole play buffer
+//                    err = ERR_AUD_CFG;
+//                }              
+//            break;
+//            
+//            case AUDIO_CMD_VERSION: 
+//                USART_WriteBuffer( AT91C_BASE_US0,(void *)fw_version, sizeof(fw_version) );  //Version string, no ACK 
+//            break;         
+//            
+////            case AUDIO_CMD_RESET:                 
+////                printf("\r\nReset USB EP...");   
+////                if( audio_state_check != 0 ) { //in case of error from repeat Stop CMD 
+////                    Toggle_PID_BI =  Check_Toggle_State();
+////                }
+////                //Reset Endpoint Fifos
+////                AT91C_BASE_UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIODATAOUT;
+////                AT91C_BASE_UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIODATAIN; 
+////                delay_ms(10);
+////                AT91C_BASE_UDPHS->UDPHS_EPT[CDCDSerialDriverDescriptors_AUDIODATAOUT].UDPHS_EPTCLRSTA = 0xFFFF; //AT91C_UDPHS_NAK_OUT | AT91C_UDPHS_TOGGLESQ | AT91C_UDPHS_FRCESTALL;                  
+////                AT91C_BASE_UDPHS->UDPHS_EPT[CDCDSerialDriverDescriptors_AUDIODATAIN].UDPHS_EPTCLRSTA  = 0xFFFF;//AT91C_UDPHS_TOGGLESQ | AT91C_UDPHS_FRCESTALL;
+////                AT91C_BASE_UDPHS->UDPHS_EPT[CDCDSerialDriverDescriptors_AUDIODATAIN].UDPHS_EPTSETSTA  = AT91C_UDPHS_KILL_BANK ;
+////                printf("Done.\r\n");
+////                delay_ms(10); 
+////                printf("\r\nReset USB EP...");
+//    
+//            break;  
+//            
+//            case AUDIO_CMD_READ_VOICE_BUF : 
+//                if( Audio_Configure[0].channel_num != 1 ) { //make sure  no other channel recording while SPI recording
+//                    err = ERR_AUD_CFG;
+//                } else {
 //                    Rec_Voice_Buf_Start();
-            break;          
-            
-            default:         
-                err = ERR_CMD_TYPE;
-            break;
+//                }
+//            break;          
+//            
+//            default:         
+//                err = ERR_CMD_TYPE;
+//            break;
+//        
+//        }
         
-        }   
-  */
-}
+     
+    
+//}
 
 /*
 *********************************************************************************************************
@@ -411,64 +393,8 @@ void Get_Run_Time( uint32_t time )
 }
 
 
-/*
-*********************************************************************************************************
-*                                  First_Pack_Check_BO()
-*
-* Description :  Check if first USB bulk out package is same as padding data.
-*
-* Argument(s) :  None.
-*
-*Return(s)   :   true  - check ok.
-*                false - check failed.
-*
-* Note(s)     :  None.
-*********************************************************************************************************
-*/
 
-bool First_Pack_Check_BO( unsigned char *pData, unsigned int size )
-{    
-    
-    unsigned int i;
-    
-    for( i = 0; i < size ; i++ )   {
-        if( padding_data_save != *pData++) {
-            return false;
-        }
-    }
-     //printf("\r\nSync\r\n");
-    return true; 
-
-}
-
-/*
-*********************************************************************************************************
-*                                First_Pack_Padding_BI()
-*
-* Description :  Padding the first USB bulk in package.
-*
-* Argument(s) :  None.
-*
-* Return(s)   :  None.
-*
-* Note(s)     :  Must be called after reset FIFO and before start audio.
-*********************************************************************************************************
-*/
-
-
-void First_Pack_Padding_BI( unsigned char usb_data_padding )
-{
-    unsigned char temp[ USB_DATAEP_SIZE_64B ];
-    
-    APP_TRACE_INFO(("\r\nUSB data padding = %d\r\n",usb_data_padding));
-    padding_data_save = usb_data_padding;
-    memset( temp, usb_data_padding, USB_DATAEP_SIZE_64B );
-    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;
-    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;//2 package incase of PID error
-}
-
-
-
+      
 
 /*
 *********************************************************************************************************
@@ -496,20 +422,22 @@ void Audio_Manager( unsigned char cfg_data )
                                       source_ssc0.rxSize );
             source_ssc0.status[ IN ]  = ( uint8_t )START;
         } 
-        OSTimeDly(2);      
+        if( (cfg_data & SSC1_IN) && ( source_ssc1.status[IN] >= CONFIGURED ) ) {
+
+            source_ssc1.buffer_read(   &source_ssc1,
+                                     ( uint8_t * )ssc1_PingPongIn,                                              
+                                      source_ssc1.rxSize );
+            source_ssc1.status[ IN ]  = ( uint8_t )START;
+        } 
+        
+        OSTimeDly(2); 
+        
         if ( (cfg_data & SSC0_OUT) && ( source_ssc0.status[OUT] >= CONFIGURED ) ){
             source_ssc0.buffer_write(  &source_ssc0,
                                        ( uint8_t * )ssc0_PingPongOut,                                                
                                        source_ssc0.txSize ); 
             source_ssc0.status[ OUT ] = ( uint8_t )START;
-        }
-        if( (cfg_data & SSC1_IN) && ( source_ssc1.status[IN] >= CONFIGURED ) ) {
-
-            source_ssc1.buffer_read(   &source_ssc1,
-                                      ( uint8_t * )ssc1_PingPongIn,                                              
-                                      source_ssc1.rxSize );
-            source_ssc1.status[ IN ]  = ( uint8_t )START;
-        }        
+        }      
         if ( (cfg_data & SSC1_OUT) && ( source_ssc1.status[OUT] >= CONFIGURED ) ){
             source_ssc1.buffer_write(  &source_ssc1,
                                        ( uint8_t * )ssc1_PingPongOut,                                                
@@ -519,5 +447,5 @@ void Audio_Manager( unsigned char cfg_data )
                
       
 }
-
+    
 

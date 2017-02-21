@@ -46,6 +46,20 @@
 #define  __APP_CFG_H__
 
 
+/*
+*********************************************************************************************************
+*                                        Interrupt PRIORITIES
+*********************************************************************************************************
+*/
+#define  DMA_PRIORITY       2
+#define  USB_PRIORITY       1
+#define  GPIO_PRIORITY      0
+#define  TWI_PRIORITY       0
+/*
+*********************************************************************************************************
+*                                        Debug Info Enables
+*********************************************************************************************************
+*/
 #define  DBG_UART_METHOD_TASK_EN  //this define enable the DBG UART in task for speed up, PQ
 //#define  DBG_USB_LOG_EN     //enable usb log info
 /*

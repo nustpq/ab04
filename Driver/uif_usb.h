@@ -70,17 +70,17 @@ void init_usb( void *pParameter,void *dParameter );
 
 
 
-extern bool restart_audio_0_bulk_out   ; 
-extern bool restart_audio_0_bulk_in    ; 
-extern bool restart_audio_1_bulk_out   ; 
-extern bool restart_audio_1_bulk_in    ; 
-extern bool restart_audio_2_bulk_out   ; 
-extern bool restart_audio_2_bulk_in    ; 
-extern bool restart_log_bulk_in        ; 
-extern bool restart_cmd_bulk_out       ; 
-extern bool restart_cmd_bulk_in        ;
-extern bool audio_run_control          ;
-extern bool padding_audio_0_bulk_out   ;
-
-
+extern volatile bool restart_audio_0_bulk_out   ; 
+extern volatile bool restart_audio_0_bulk_in    ; 
+extern volatile bool restart_audio_1_bulk_out   ; 
+extern volatile bool restart_audio_1_bulk_in    ; 
+extern volatile bool restart_audio_2_bulk_out   ; 
+extern volatile bool restart_audio_2_bulk_in    ; 
+extern volatile bool restart_log_bulk_in        ; 
+extern volatile bool restart_cmd_bulk_out       ; 
+extern volatile bool restart_cmd_bulk_in        ;
+extern volatile bool audio_run_control          ;
+extern volatile bool padding_audio_0_bulk_out   ;
+extern volatile bool flag_stop                  ;
+extern bool volatile audio_play_buffer_ready    ;
 #endif

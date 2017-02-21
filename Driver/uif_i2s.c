@@ -20,6 +20,7 @@
 #include "Kfifo.h"
 #include "uif_usb.h"
 #include <includes.h>
+#include "ssc.h"
 
 #ifndef USE_UCOS
 #include  <ucos_ii.h>
@@ -53,6 +54,9 @@ extern uint32_t g_portMask;
 extern void BSP_LED_On( uint32_t );
 extern void BSP_LED_Off( uint32_t );
 extern void Alert_Sound_Gen( uint8_t *pdata, uint32_t size, uint32_t REC_SR_Set );
+
+unsigned int counter_play;
+unsigned int counter_rec;
 
 /*
 *********************************************************************************************************
@@ -125,8 +129,7 @@ void stop_ssc( void *pInstance )
     Ssc *pSSC = ( Ssc * )pSource->dev.instanceHandle;
  
     //step1: stop ssc port
-    SSC_DisableTransmitter( pSSC );
-    SSC_DisableReceiver( pSSC );
+    SSC_Stop_Reset( pSSC );
     
     //step2: stop dma channel
     DMAD_StopTransfer( &g_dmad, pSource->dev.rxDMAChannel );
@@ -219,7 +222,7 @@ void fill_buf_debug( unsigned char *pChar, unsigned int size)
     
     
 }
-unsigned char testbuf[2560];
+
 
 void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 {    
@@ -228,7 +231,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
     uint32_t temp;
     
     DataSource *pSource = ( DataSource *)pArg;
-//    DMAD_StopTransfer( &g_dmad, pSource->dev.rxDMAChannel );
+
     //  UIF_LED_On( LED_HDMI );  
 	switch( pSource->status[ IN ] ) 
 
@@ -405,8 +408,6 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     
     DataSource *pSource = ( DataSource *)pArg;
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
-    
-    sDmaTransferDescriptor *pTds = dmaTdSSC0Tx;
 
     UIF_LED_On( LED_RUN ); 
     //DMAD_StopTransfer( &g_dmad, pSource->dev.txDMAChannel );
@@ -429,15 +430,14 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 //				break;
 			case RUNNING  :
 				temp = kfifo_get_data_size( pSource->pRingBulkOut );
-                                memset( ( uint8_t * )&ssc0_PingPongOut[ pSource-> tx_index ][0], 0, pSource->txSize );
+                memset( ( uint8_t * )&ssc0_PingPongOut[ pSource-> tx_index ][0], 0, pSource->txSize );
 				if( temp  >=  pSource->txSize )
 				{
-                                      kfifo_get( pSource->pRingBulkOut,
-                                      //( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                                      ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
-                                      pSource->txSize );
-//                                       memset( ( uint8_t * )&ssc0_PingPongOut[ pSource-> tx_index ][0], 0, pSource->txSize );
-                                      //pSource->tx_index = 1 - pSource->tx_index;
+                    kfifo_get( pSource->pRingBulkOut,
+                    //( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
+                    ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
+                    pSource->txSize );
+                    //pSource->tx_index = 1 - pSource->tx_index;
 				}
 				else
 				{
@@ -445,7 +445,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 				}
 									
 				break;
-                        case BUFFEREMPTY:
+            case BUFFEREMPTY:
                                 Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
                                                   pSource->txSize, 
                                                   16000 );
@@ -458,7 +458,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
      
       }
     pSource->tx_index = 1 - pSource->tx_index;
-    //DMAD_StartTransfer( &g_dmad, pSource->dev.txDMAChannel );
+
     UIF_LED_Off( LED_RUN );  
 }
 
@@ -787,43 +787,89 @@ uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 * Description : config ssc hardware tx registers
 *
 * Arguments   : Details in datasheet
-* Returns     : none
+* Returns     : error 
 *
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void ssc_txRegister_set( void *instance,void *parameter )
+uint8_t ssc_txRegister_set( void *instance,void *parameter )
 {    
-    assert( ( NULL != instance ) && ( NULL != parameter ) );
+    unsigned char  err;
+    unsigned short sample_rate ; //not support 44.1khz now
+    unsigned char  channels_play;
+    unsigned char  bit_length;
+    unsigned char  cki;
+    unsigned char  delay;
+    unsigned char  start;
+    unsigned char  id;
     
     static TCMR tcmr ;
     static TFMR tfmr ;
+    assert( ( NULL != instance ) && ( NULL != parameter ) );
+    err  = NULL;
     
     DataSource * pSource = ( DataSource * )instance;
     AUDIO_CFG *reg = ( AUDIO_CFG * )parameter;
     Ssc *pSSC = ( Ssc * )pSource->dev.instanceHandle;
     
-    //pSource->status[OUT] = ( uint8_t )FREE; //PQ
-    pSource->txSize =  (( reg->sample_rate)  / 1000 ) * ( reg->bit_length / 8 ) * (reg->slot_num) * I2S_PP_SIZE_MS ; //????  slot_num or channel_num?
-    pSource->warmWaterLevel = (pSource->txSize) * I2S_PRE_PLAY_BUF_SIZE_PP;
-    pSource->tx_index = 0;
+    channels_play = reg->channel_num ; 
+    sample_rate   = reg->sample_rate ;
+    bit_length    = reg->bit_length ; 
+    cki           = reg->ssc_cki;
+    delay         = reg->ssc_delay;
+    start         = reg->ssc_start;
+    id            = reg->id ;
     
-    if( reg->channel_num > 0 ) 
+    APP_TRACE_INFO(( "\r\nSSC[%d] [%dth]Play[%dCH - %dHz - %dBit][%d%s - %dDelay - %d%sLeft] ...\r\n",\
+             id,counter_play++,channels_play ,sample_rate,bit_length,cki,(cki==0)?"Fall" :"Rise",delay,start,(start==4)?"Low":"High" ));  
+    
+    if( (channels_play == 0) || (channels_play > 8) ) {        
+        err = ERR_TDM_FORMAT ; 
+    }  
+    if( (bit_length != 16) && (bit_length != 32)  ) {        
+        err = ERR_TDM_FORMAT ; 
+    }  
+    if( NULL != err ) {
+        APP_TRACE_INFO(("Init Play Setting Error !\r\n"));
+        return err;
+    }
+          
+    pSource->txSize   =  ( sample_rate / 1000 ) * ( bit_length / 8 ) * channels_play * I2S_PINGPONG_BUF_SIZE_MS ; 
+    pSource->warmWaterLevel = I2S_PLAY_PRE_BUF_NUM * (pSource->txSize)  ;
+    pSource->tx_index = 0;
+          
+    if( channels_play > 0 ) 
     {        
-        tfmr.datnb  = reg->channel_num - 1 ; 
-        tfmr.datlen = reg->bit_length-1;
-        tfmr.msbf =    1;      //reg->msbf;
+        tfmr.datnb  = channels_play - 1 ; 
+        tfmr.datlen = bit_length-1;
+        tfmr.msbf   = 1;       //reg->msbf;
         tfmr.fsedge = 1;       //reg->fsedge;
         
         tcmr.cks = 2;  
-        tcmr.cki = reg->ssc_cki;
-        tcmr.sttdly = reg->ssc_delay;
-        tcmr.start = reg->ssc_start;
+        tcmr.cki = cki;
+        tcmr.sttdly = delay;
+        tcmr.start  = start;
         
         SSC_ConfigureTransmitter( pSSC,  tcmr.value,  tfmr.value );
         SSC_DisableTransmitter( pSSC );
         
-    }       
+        pSource->status[OUT] = ( uint8_t )CONFIGURED; //PQ
+        
+    } else {
+        err =  ERR_TDM_FORMAT ; 
+        
+    }
+    
+    //To Do:  DMA set
+//    if( bit_length == 16 ) {
+//        DMA_CtrA_Reg_Mode  = DMA_CTRA_MODE_16BIT ;
+//        DMA_CtrA_Len_Shift = 1;    
+//    } else { //32bit
+//        DMA_CtrA_Reg_Mode  = DMA_CTRA_MODE_32BIT ;
+//        DMA_CtrA_Len_Shift = 2;  
+//    }
+    
+    return err;
          
 }
 
@@ -840,39 +886,85 @@ void ssc_txRegister_set( void *instance,void *parameter )
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void ssc_rxRegister_set( void *instance,void *parameter )
+uint8_t ssc_rxRegister_set( void *instance,void *parameter )
 {    
-    assert( ( NULL != instance ) && ( NULL != parameter ) );
+    unsigned char  err;
+    unsigned short sample_rate ; //not support 44.1khz now
+    unsigned char  channels_rec;
+    unsigned char  bit_length;
+    unsigned char  cki;
+    unsigned char  delay;
+    unsigned char  start;
+    unsigned char  id;
     
     static RCMR rcmr ;
     static RFMR rfmr ;
+    assert( ( NULL != instance ) && ( NULL != parameter ) );
+    err  = NULL;
     
     DataSource * pSource = ( DataSource * )instance;
     AUDIO_CFG *reg = ( AUDIO_CFG * )parameter;
     Ssc *pSSC = ( Ssc * )pSource->dev.instanceHandle;
     
-    //pSource->status[IN] = ( uint8_t )FREE;   //PQ
-    pSource->rxSize =  (( reg->sample_rate)  / 1000 ) * ( reg->bit_length / 8 ) * (reg->slot_num) * I2S_PP_SIZE_MS ; //????  slot_num or channel_num?
-    pSource->warmWaterLevel = (pSource->rxSize) * I2S_PRE_PLAY_BUF_SIZE_PP;
-    pSource->rx_index = 0;
+    channels_rec = reg->channel_num ; 
+    sample_rate   = reg->sample_rate ;
+    bit_length    = reg->bit_length ; 
+    cki           = reg->ssc_cki;
+    delay         = reg->ssc_delay;
+    start         = reg->ssc_start;
+    id            = reg->id ;
     
-    if( reg->channel_num > 0 ) 
+    APP_TRACE_INFO(( "\r\nSSC[%d] [%dth]Rec[%dCH - %dHz - %dBit][%d%s - %dDelay - %d%sLeft] ...\r\n",\
+             id,counter_rec++,channels_rec ,sample_rate,bit_length,cki,(cki==0)?"Fall" :"Rise",delay,start,(start==4)?"Low":"High" ));  
+    
+    if( (channels_rec == 0) || (channels_rec > 8) ) {        
+        err = ERR_TDM_FORMAT ; 
+    }  
+    if( (bit_length != 16) && (bit_length != 32)  ) {        
+        err = ERR_TDM_FORMAT ; 
+    }  
+    if( NULL != err ) {
+        APP_TRACE_INFO(("Init Rec Setting Error !\r\n"));
+        return err;
+    }
+          
+    pSource->rxSize   =  ( sample_rate / 1000 ) * ( bit_length / 8 ) * channels_rec * I2S_PINGPONG_BUF_SIZE_MS ; 
+    pSource->warmWaterLevel = 0;   //no need pre-buffer for Rec 
+    pSource->rx_index = 0;
+          
+    if( channels_rec > 0 ) 
     {        
-        rfmr.datnb  = reg->channel_num - 1 ; 
-        rfmr.datlen = reg->bit_length-1;
-        rfmr.msbf =    1;      //reg->msbf;
+        rfmr.datnb  = channels_rec - 1 ; 
+        rfmr.datlen = bit_length-1;
+        rfmr.msbf   = 1;       //reg->msbf;
         rfmr.fsedge = 1;       //reg->fsedge;
         
         rcmr.cks = 1;        
-        rcmr.cki = reg->ssc_cki;
-        rcmr.sttdly = reg->ssc_delay;
-        rcmr.start = reg->ssc_start;
+        rcmr.cki = cki;
+        rcmr.sttdly = delay;
+        rcmr.start = start;
 
         SSC_ConfigureReceiver(  pSSC,  rcmr.value , rfmr.value );
         SSC_DisableReceiver( pSSC ); 
         
-    }       
-         
+        pSource->status[IN] = ( uint8_t )CONFIGURED; //PQ
+        
+    } else {
+        err =  ERR_TDM_FORMAT ; 
+        
+    }
+    
+    //To Do:  DMA set
+//    if( bit_length == 16 ) {
+//        DMA_CtrA_Reg_Mode  = DMA_CTRA_MODE_16BIT ;
+//        DMA_CtrA_Len_Shift = 1;    
+//    } else { //32bit
+//        DMA_CtrA_Reg_Mode  = DMA_CTRA_MODE_32BIT ;
+//        DMA_CtrA_Len_Shift = 2;  
+//    }
+    
+    return err;    
+          
 }
 
 /*

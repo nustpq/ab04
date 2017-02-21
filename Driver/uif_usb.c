@@ -16,7 +16,7 @@
 */
      
 #include  <ucos_ii.h>
-
+#include "app_cfg.h"
 #include "uif_usb.h"
 #include "defined.h"
 
@@ -34,19 +34,20 @@ extern kfifo_t  cmdEpBulkIn_fifo;
 
 extern kfifo_t DBG_USB_Send_kFIFO;
 
-bool restart_audio_0_bulk_out  = false ; 
-bool restart_audio_0_bulk_in   = false ; 
-bool restart_audio_1_bulk_out  = false ; 
-bool restart_audio_1_bulk_in   = false ; 
-bool restart_audio_2_bulk_out  = false ; 
-bool restart_audio_2_bulk_in   = false ; 
-bool restart_log_bulk_in       = true ;
-bool restart_cmd_bulk_out      = false ; 
-bool restart_cmd_bulk_in       = false ; 
-bool audio_run_control         = false ; 
-bool padding_audio_0_bulk_out  = false ;
+bool volatile restart_audio_0_bulk_out  = false ; 
+bool volatile restart_audio_0_bulk_in   = false ; 
+bool volatile restart_audio_1_bulk_out  = false ; 
+bool volatile restart_audio_1_bulk_in   = false ; 
+bool volatile restart_audio_2_bulk_out  = false ; 
+bool volatile restart_audio_2_bulk_in   = false ; 
+bool volatile restart_log_bulk_in       = true ;
+bool volatile restart_cmd_bulk_out      = false ; 
+bool volatile restart_cmd_bulk_in       = false ; 
+bool volatile audio_run_control         = false ; 
+bool volatile padding_audio_0_bulk_out  = false ;
+bool volatile audio_play_buffer_ready   = false ; 
 
-
+//paly
 void UsbAudio0DataReceived(  uint32_t unused,
                               uint8_t status,
                               uint32_t received,
@@ -151,6 +152,7 @@ void UsbAudio1DataReceived(  uint32_t unused,
     }      
 }
 
+//recprd
 void UsbAudio0DataTransmit(  uint32_t unused,
                               uint8_t status,
                               uint32_t transmit,

@@ -15,6 +15,7 @@
 *********************************************************************************************************
 */
 
+#include "app_cfg.h"
 #include "uif_gpio.h"
 #include "uif_object.h"
 
@@ -480,7 +481,6 @@ static void _gpio_event_Handler( const Pin * pin)
 */
 void Config_GPIO_Interrupt( void *pInstance, void (*isr_handler)( void ) )
 {
-    uint8_t const GPIO_PRIORITY = 3;
     uint8_t per_id;
 
     DataSource *pSource = ( DataSource * )pInstance;
@@ -544,8 +544,7 @@ void Disable_GPIO_Interrupt( void *pInstance )
 */
 static void _ConfigureRecGpios( void )
 {
-    uint8_t const GPIO_PRIORITY = 3;
-
+    
     /* Configure pios as inputs. */
     PIO_Configure( gpio_pins, PIO_LISTSIZE( gpio_pins )  ) ;
 

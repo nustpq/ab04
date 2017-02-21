@@ -31,8 +31,8 @@
 #include <includes.h>     
 
 
-uint8_t tmpBuffer[ I2S_PINGPONG_IN_SIZE_3K ];
-uint8_t tmpBuffer1[ I2S_PINGPONG_IN_SIZE_3K ];
+uint8_t tmpBuffer[ USB_RINGOUT_SIZE_16K];
+//uint8_t tmpBuffer1[ I2S_PINGPONG_IN_SIZE_3K ];
 void Init_Audio_Path();
 
 /*

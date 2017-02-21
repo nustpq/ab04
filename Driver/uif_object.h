@@ -97,7 +97,7 @@ typedef struct _DataSource
 //public interface to reveal ucosII task,that I want to hide peripheral info in this struct;
 	uint32_t ( *register_source )( void *type );
     void ( *init_source )( void *pParameter,void *dParameter );    //initialize the hardware according result that parse protocol
-	void ( *set_peripheral )( void *instance,void *parameter );    //set register;
+	uint8_t ( *set_peripheral )( void *instance,void *parameter );    //set register;
 	void ( *peripheral_start )( void *instance );                  //starting peripheral
 	void ( *peripheral_stop )( void *instance );		       //stoping peripheral
   

@@ -140,23 +140,22 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
     
     APP_TRACE_INFO(("\r\nSetup_Interface: if_type=%d, speed=%dkHz, attribute=0x%X ",\
                          pInterface_Cfg->if_type,pInterface_Cfg->speed, pInterface_Cfg->attribute));
-    
+#if 0   
     err   = NULL;
     temp  = pInterface_Cfg->speed ;
     temp2 = pInterface_Cfg->attribute ;
-//    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed) &&
-//         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type) )  {
-//       
-//        if( Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute == pInterface_Cfg->attribute ) {
-//            APP_TRACE_INFO(("\r\nNo need to set same interface\r\n"));
-//        } else {
-//            Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute;
-//            APP_TRACE_INFO(("\r\nChanged the interface attribute!\r\n"));
-//        }    
-//        return err;
-//    }
+    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed) &&
+         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type) )  {
+       
+        if( Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute == pInterface_Cfg->attribute ) {
+            APP_TRACE_INFO(("\r\nNo need to set same interface\r\n"));
+        } else {
+            Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute;
+            APP_TRACE_INFO(("\r\nChanged the interface attribute!\r\n"));
+        }    
+        return err;
+    }
 
-#if 0
     switch( pInterface_Cfg->if_type )  {
         
         case UIF_TYPE_I2C :
@@ -236,7 +235,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
   
         break;
         default:
-            err = UIF_TYPE_NOT_SUPPORT;
+            err = UIF_TYPE_NOT_SUPPORT_ERR;
         break;
         
     }
@@ -487,7 +486,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
         break;
         
         default:
-             err = UIF_TYPE_NOT_SUPPORT ;             
+             err = UIF_TYPE_NOT_SUPPORT_ERR ;             
         break;
     }
         
@@ -601,7 +600,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
         break;
         
         default:
-             err = UIF_TYPE_NOT_SUPPORT ;             
+             err = UIF_TYPE_NOT_SUPPORT_ERR ;             
         break;
         
     }       

@@ -76,7 +76,7 @@ void  App_TaskUserIF (void *p_arg)
     //iM401_Ctrl_Enable = 1;
     OSTimeDly(100);
     if( AB_POST() )  {
-        Buzzer_Error();
+        //Buzzer_Error();
     }
         
 

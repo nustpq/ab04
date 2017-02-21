@@ -26,4 +26,6 @@ uint8_t   gpio_Pin_Get( void *pinInstance, const uint8_t * pdata,uint32_t mask )
 void      stop_gpio( void * pInstance );
 void      GPIOPIN_Set_Session( uint32_t pin , uint32_t dat );
 
+extern Pin gpio_pins[ ];
+
 #endif

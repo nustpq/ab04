@@ -63,6 +63,7 @@ extern void SSC_DisableInterrupts(Ssc *ssc, uint32_t sources);
 extern void SSC_Write(Ssc *ssc, uint32_t frame);
 extern uint32_t SSC_Read(Ssc *ssc );
 extern uint8_t SSC_IsRxReady(Ssc *ssc);
+extern void SSC_Stop_Reset(Ssc *ssc);
 
 //porting these from old lib version;
 typedef union __TCMR

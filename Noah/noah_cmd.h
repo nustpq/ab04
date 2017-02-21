@@ -78,9 +78,10 @@
 #define AUD_CFG_MIC_NUM_DISMATCH_ERR   201u
 #define AUD_CFG_PLAY_CH_ZERO_ERR       202u
 #define AUD_CFG_ERR                    203u
-#define UIF_TYPE_NOT_SUPPORT           204u
-#define AUD_CFG_SPI_REC_CONFLICT       205u
+#define UIF_TYPE_NOT_SUPPORT_ERR       204u
+#define AUD_CFG_SPI_REC_CONFLICT_ERR   205u
 #define POST_ERR_FPGA                  206u
+#define AUD_CFG_AUDIOPATH_ERR          207u
 
 #define FW_BIN_STATE_ERR         211u
 #define FW_BIN_STATE_0_ERR       212u
@@ -225,6 +226,7 @@
 #define  PC_CMD_SET_VOLUME           14
 #define  PC_CMD_RESET_AUDIO          15
 #define  PC_CMD_UPDATE_AUDIO         16
+#define  PC_CMD_UPDATE_FPGA_SWITCH   17
 
 #define  PC_CMD_AB_POST              20
 

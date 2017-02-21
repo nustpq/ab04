@@ -43,5 +43,5 @@ static void spi_slave_initialize( void );
 static void spi_master_initialize( void );
 
 //static void spi_set_clock_configuration( uint8_t configuration );
-void spi_register_set( void *instance,void *parameter );
+uint8_t spi_register_set( void *instance,void *parameter );
 #endif

@@ -41,7 +41,7 @@ typedef struct _audio_path
   uint32_t    state;                         //work/idle
   uint32_t    ep;                            //usb end point about this path,
   
-  void ( *createAudioPath )( void *source,
+  unsigned char ( *createAudioPath )( void *source,
                              void *inParameter
                             );
   
@@ -52,7 +52,7 @@ typedef struct _audio_path
   
 }AUDIOPATH;
 
-void createPath( void *source,
+unsigned char createPath( void *source,
                  void *inParameter
                 );
 
@@ -75,6 +75,6 @@ int findPort( const void *pPath,const void *port );
 char * getPathName( unsigned char index );
 void Init_Audio_Path( void );   
 void Destroy_Audio_Path( void ); 
-void Add_Audio_Path( void *path_name, AUDIO_CFG *pAudioCfg );
+unsigned char Add_Audio_Path( void *path_name, AUDIO_CFG *pAudioCfg );
 
 #endif

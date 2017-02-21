@@ -109,7 +109,7 @@ sDmad g_dmad;                                           //dma descriptor object
 *                                        GPIO pin
 *********************************************************************************************************
 */
-extern const Pin gpio_pins[ ];
+//extern const Pin gpio_pins[ ];
 
 /*
 *********************************************************************************************************
@@ -221,9 +221,6 @@ uint8_t twi_ring_buffer[ MAXTWI ][ 256 ];
 *********************************************************************************************************
 */
 
-static  CPU_STK  AppTaskLEDStk[4096u];  
-
-
 static  OS_STK       App_TaskUSBSevStk[APP_CFG_TASK_USB_SEV_STK_SIZE];
 static  OS_STK       App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE];
 static  OS_STK       App_TaskStartStk[APP_CFG_TASK_START_STK_SIZE];
@@ -328,7 +325,7 @@ static  void  App_TaskStart (void *p_arg)
     App_BufferCreate();
     App_EventCreate();
     
-    
+   
 ////////////////////////////////////////////////////////////////////////////////
 /**/    
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskDebugInfo ,

@@ -14,6 +14,7 @@
 * Note(s)           : twi communicate implement
 *********************************************************************************************************
 */
+#include "app_cfg.h"
 #include "defined.h"
 #include "uif_twi.h"
 
@@ -244,8 +245,9 @@ void twi_init_master( void *pInstance, void * pFreq )
     }
     else
     {
-	APP_TRACE_INFO(("ALERT:error deive used,please check it!\n\t"));
-    }    
+        APP_TRACE_INFO(("ALERT:error deive used,please check it!\n\t"));
+    }
+    
 }
 
 
@@ -297,15 +299,15 @@ void twi_init_slave( void *pInstance, void* pSlave )
     /* Configure TWI interrupts */
     if( ID_TWI0 == pSource->dev.identify )
     {
-          IRQ_ConfigureIT( pSource->dev.identify, 0, TWI0_IrqHandler );      
+          IRQ_ConfigureIT( pSource->dev.identify, TWI_PRIORITY, TWI0_IrqHandler );      
     }
     else if( ID_TWI1 == pSource->dev.identify )
     {
-        IRQ_ConfigureIT( pSource->dev.identify, 0, TWI1_IrqHandler );        
+        IRQ_ConfigureIT( pSource->dev.identify, TWI_PRIORITY, TWI1_IrqHandler );        
     }
     else if( ID_TWI2 == pSource->dev.identify )
     {	
-        IRQ_ConfigureIT( pSource->dev.identify, 0, TWI2_IrqHandler );
+        IRQ_ConfigureIT( pSource->dev.identify, TWI_PRIORITY, TWI2_IrqHandler );
     }
     else
     {

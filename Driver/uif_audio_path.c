@@ -16,11 +16,9 @@
 */
 
 
-//#include "uif_audio_path.h"
-//#include "uif_list.h"
-
 #include <includes.h>
 
+AUDIOPATH g_audio_path;
 
 //private interface 
 /*
@@ -197,25 +195,26 @@ int findPort( const void *pPath,const void *port )
 *
 * Returns     : index
 *
-* Note(s)     : none.
+* Note(s)     : Error.
 *********************************************************************************************************
 */
 extern void *malloc( uint32_t num_bytes );
 
-void  createPath( void *source,
+unsigned char  createPath( void *source,
                   void *parameter
                           )
 {
+    unsigned char err;
     AUDIOPATH *path;
-    int8_t index = 0; 
-    uint32_t len = strlen( halfPath[ 0 ] ) + 1;
+    int8_t     index = 0; 
+    uint32_t   len   = strlen( halfPath[ 0 ] ) + 1;
+    err = 0;
     
     assert( NULL != source );
     
     path = ( AUDIOPATH * )malloc( sizeof( AUDIOPATH ) );
     
-    memset( path->name, 0 ,sizeof( path->name ) );
-    
+    memset( path->name, 0 ,sizeof( path->name ) );     
     memcpy( path->name , source , len );
     
     index = getPathIndex( path->name );
@@ -237,9 +236,10 @@ void  createPath( void *source,
     }
     */
    
-    //up link usb<--ssc0/spi0/gpio
+
     switch( index )
     {
+      //up link usb<--ssc0/spi0/gpio          : Recording
         case 0:                            //ep1<-ssc0
           {
               //step1:install port;
@@ -322,23 +322,30 @@ void  createPath( void *source,
 
 
         default:
+          return AUD_CFG_AUDIOPATH_ERR ;         
           break;      
     }
     
     //step5: configure port sent registers ;
     if( path->pSource->set_peripheral != NULL ) { 
-        path->pSource->set_peripheral( path->pSource, parameter );
+        err = path->pSource->set_peripheral( path->pSource, parameter );
     } else {
+        err = AUD_CFG_AUDIOPATH_ERR ;
         APP_TRACE_INFO(("\nCan't configure port !\r\n"));
+    }
+    if( err != NO_ERR ) {
+        return err;
     }
     
     //step6: enquen
-    if( portsList.match( &portsList,path->name ) )
+    if( portsList.match( &portsList,path->name ) ) {
         list_ins_next( &portsList,portsList.tail,path );
-    else
+    }else{
         APP_TRACE_INFO(("\nPath already in use !\r\n"));
-            
-    return;
+        err = AUD_CFG_AUDIOPATH_ERR;
+    } 
+    
+    return err;
 }
 
 /*
@@ -367,8 +374,12 @@ void destroyAllPath( char *pFullName )
     
       list_rem_next( &portsList , NULL ,( void ** )&path );
     
-      if( path->pSource->peripheral_stop != NULL )
+      if( path->pSource->peripheral_stop != NULL ){
           path->pSource->peripheral_stop( path->pSource );
+      }
+      
+      kfifo_reset( path->pfifoIn );
+      kfifo_reset( path->pfifoOut );
       
       free( path );
     }
@@ -427,8 +438,6 @@ void stopPath( void *path )
 * Note(s)     : none.
 *********************************************************************************************************
 */
-AUDIOPATH g_audio_path;
-
 void Init_Audio_Path( void )
 {
     g_audio_path.createAudioPath  = createPath;
@@ -445,11 +454,10 @@ void Destroy_Audio_Path( void )
 
 }
 
-void Add_Audio_Path( void *path_name, AUDIO_CFG *pAudioCfg )
+
+unsigned char Add_Audio_Path( void *path_name, AUDIO_CFG *pAudioCfg )
 {
-        
-   //g_audio_path.createAudioPath(  "ep1->ssc0",  pAudioCfg );
-   g_audio_path.createAudioPath(  path_name,  pAudioCfg );                        
- 
-  
+   unsigned char err; 
+   err = g_audio_path.createAudioPath(  path_name,  pAudioCfg );                        
+   return err;   
 }

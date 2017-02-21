@@ -336,8 +336,11 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 
     
     
-    Add_Audio_Path( getPathName( pAudioCfg->id *2 + pAudioCfg->type ) , pAudioCfg );
-      
+    err = Add_Audio_Path( getPathName( pAudioCfg->id *2 + pAudioCfg->type ) , pAudioCfg );
+    if( err != NO_ERR ) {         
+        return err;
+    }  
+    
     Codec_Set[pAudioCfg->id][pAudioCfg->type].flag          = 1;  //cfg received
     Codec_Set[pAudioCfg->id][pAudioCfg->type].sr            = pAudioCfg->sample_rate;
     Codec_Set[pAudioCfg->id][pAudioCfg->type].sample_len    = pAudioCfg->bit_length;
@@ -441,20 +444,23 @@ unsigned char Update_Audio( unsigned char id )
 *********************************************************************************************************
 */
 
-CPU_INT32U    port_control_info;
+
 unsigned char Start_Audio( START_AUDIO start_audio )
 {
     unsigned char err;
     unsigned char data  = 0xFF;
     unsigned char ruler_id;
   
-    /*
+    audio_padding_byte = start_audio.padding;
+    
+
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;
 #endif
 
     APP_TRACE_INFO(("\r\nStart_Audio : type = [%d], padding = [0x%X]\r\n", start_audio.type, start_audio.padding));
-
+    
+    /*
     UART2_Mixer(3);
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) );
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );
@@ -475,33 +481,9 @@ unsigned char Start_Audio( START_AUDIO start_audio )
     }
      */
     
-     
-    Hold_Task_for_Audio();                      
-                            
-    First_Pack_Padding_BI( start_audio.padding );             
- 
-    port_control_info = SSC0_IN | SSC0_OUT  ; 
     
-    while ( OSMboxPost(App_AudioManager_Mbox, &port_control_info) == OS_ERR_MBOX_FULL ) {
-         OSTimeDly(5);                     
-    };  
-    
-    
-    //Audio_Manager( SSC0_IN | SSC0_OUT ); 
-    //OSTimeDly(1);
-    
-
-    audio_run_control        = true ;
-    restart_audio_0_bulk_out = true  ; 
-    restart_audio_0_bulk_in  = true  ;
-    restart_audio_1_bulk_out = true  ;
-    restart_audio_1_bulk_in  = true  ; 
-    restart_audio_2_bulk_out = true  ;
-    restart_audio_2_bulk_in  = true  ;
-    restart_log_bulk_in      = true  ; 
-    restart_cmd_bulk_out     = true  ;
-    restart_cmd_bulk_in      = true  ;   
-    padding_audio_0_bulk_out = false ;   
+    Audio_Start();
+  
     
     return 0 ;
 }
@@ -525,6 +507,9 @@ unsigned char Stop_Audio( void )
     unsigned char data  = 0xFF;
     unsigned char ruler_id;
     unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_STOP_AUDIO };
+    
+    Audio_Stop();
+    
      /*
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 // Storage for CPU status register
@@ -569,33 +554,7 @@ unsigned char Stop_Audio( void )
         Global_Mic_Mask[ruler_id] = 0 ;
     }
 #endif
-     */
-    
-    
-              
-    audio_run_control        = false  ;
-    restart_audio_0_bulk_out = false  ; 
-    restart_audio_0_bulk_in  = false  ;
-    restart_audio_1_bulk_out = false  ;
-    restart_audio_1_bulk_in  = false  ; 
-    restart_audio_2_bulk_out = false  ;
-    restart_audio_2_bulk_in  = false  ;                       
-    restart_log_bulk_in      = false  ; 
-    restart_cmd_bulk_out     = false  ;
-    restart_cmd_bulk_in      = false  ;  
-             
-    Destroy_Audio_Path();
-    
-    Init_Audio_Bulk_FIFO(); 
-    
-    Release_Task_for_Audio(); 
-    
-    memset( ( void * )ssc0_PingPongOut, 0x00 , sizeof( ssc0_PingPongOut ) );
-    memset( ( void * )ssc0_PingPongIn,  0x00 , sizeof( ssc0_PingPongIn ) );
-    source_ssc0.tx_index = 0;
-    source_ssc0.rx_index = 0;
-    
-    //End_Audio_Transfer();
+     */     
     
     return 0 ;
 }

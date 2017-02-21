@@ -11,8 +11,8 @@
 *********************************************************************************************************
 */
 
-#ifndef _CMDPARASE_H_
-#define _CMDPARASE_H_ 
+#ifndef _AUDIO_H_
+#define _AUDIO_H_ 
 
 #include "uif_object.h"
 
@@ -23,13 +23,17 @@ static uint8_t Init_Rec_Setting( void *pInstance );
 static uint8_t Audio_Start_Rec( void );
 static uint8_t Audio_Start_Play( void );
 
-static void Audio_Stop( void );
+void Audio_Stop( void );
+void Audio_Start( void );
 
 void Audio_State_Control( uint8_t *msg );
 
 static void Get_Run_Time( unsigned int time );
 bool First_Pack_Check_BO( unsigned char *pData, unsigned int size );
-void First_Pack_Padding_BI( unsigned char usb_data_padding );
+void First_Pack_Padding_BI( void );
 void Audio_Manager( unsigned char cfg_data );
+
+
+extern unsigned char  audio_padding_byte;
 
 #endif
