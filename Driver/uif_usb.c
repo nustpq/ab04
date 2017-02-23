@@ -161,7 +161,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
     UIF_LED_On( 3 ); 
     if ( status == USBD_STATUS_SUCCESS  ) 
     {              
-        if ( USB_DATAEP_SIZE_64B * 2 <= kfifo_get_data_size(  &ep0BulkIn_fifo )  ) 
+        if ( USB_DATAEP_SIZE_64B  <= kfifo_get_data_size(  &ep0BulkIn_fifo )  ) 
         { 
             //enough data to send to PC           
             kfifo_get( &ep0BulkIn_fifo, usbCacheBulkIn0, USB_DATAEP_SIZE_64B ); 
@@ -429,6 +429,11 @@ void UsbCmdDataTransmit(  uint32_t unused,
         TRACE_WARNING( "\r\nERROR : UsbCmdDataTransmit: Rr-transfer hit\r\n" );  
         
     }        
+}
+                             
+uint32_t usb_CloseData( uint8_t bEndpoint )
+{
+  return CDCDSerialDriver_CloseStream( bEndpoint , 1 );  
 }
 
 

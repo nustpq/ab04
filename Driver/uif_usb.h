@@ -59,6 +59,8 @@ void UsbLogDataTransmit(      uint32_t unused,
                               uint32_t transmit,
                               uint32_t remaining );
 
+uint32_t usb_CloseData( uint8_t bEndpoint );
+
 static void ISR_Vbus( const Pin *pPin );
 static void VBus_Configure( void );
 static void USBPower_Configure( void );
