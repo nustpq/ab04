@@ -113,5 +113,18 @@ void CDCDSerialDriver_RequestHandler(const USBGenericRequest *request)
         USBDDriver_RequestHandler(pUsbd, request);
 }
 
+uint32_t CDCDSerialDriver_CloseStream( uint8_t bEndpoint, bool cfg )
+{
+    USBD_HAL_ResetEPs( bEndpoint,
+                       USBD_STATUS_RESET,
+//                       USBRC_CANCELED,
+                       cfg );
+//   USBD_HAL_ResetEPs(  0xFFFFFFFF, 
+//                         USBD_STATUS_RESET, 
+//                         1 );
+
+    return USBRC_SUCCESS;
+}
+
 /**@}*/
 

@@ -212,6 +212,8 @@ extern void CDCDSerialDriver_ConfigurationChangedHandler(uint8_t cfgnum);
 extern void CDCDSerialDriver_RequestHandler(
     const USBGenericRequest *request);
 
+uint32_t CDCDSerialDriver_CloseStream( uint8_t bEndpoint, bool cfg );
+
 /**
  * Sends a data buffer through the virtual COM port created by the CDC
  * device serial driver. This function behaves exactly like USBD_Write.
