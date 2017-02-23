@@ -270,7 +270,25 @@ void  App_TaskUSBService ( void *p_arg )
                     kfifo_put( pPath->pfifoOut,
                              ( uint8_t * )tmpBuffer,
                              pPath->pSource->txSize );                 
-                }          
+                }
+                
+                counter  = kfifo_get_free_space( pPath->pfifoOut );
+                if( ( counter  <= pPath->pSource->txSize )
+                  && ( source_ssc1.status[ OUT ] < ( uint8_t )START ) )    
+                {
+                    source_ssc1.buffer_write(  &source_ssc1,
+                                               ( uint8_t * )ssc1_PingPongOut,                                                
+                                               source_ssc1.txSize ); 
+                    source_ssc1.status[ OUT ] = ( uint8_t )START; 
+                    
+//                    OSTimeDly( 1 );
+
+                    source_ssc1.buffer_read(   &source_ssc1,
+                                                ( uint8_t * )ssc1_PingPongIn,                                              
+                                                source_ssc1.rxSize );
+                    source_ssc1.status[ IN ]  = ( uint8_t )START;
+         
+                }
            
                 
             } else if( CDCDSerialDriverDescriptors_SPI_DATAOUT == pPath->ep ) { //SPI/GPIO Play
