@@ -501,6 +501,7 @@ extern AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
 *Note: Maybe should move all of these defines to a standard-alone file? that read easier;
 *********************************************************************************************************
 */
+//for commit adding comments
 //Buffer Level 1:  USB data stream buffer : 64 B
 extern uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B] ;
 extern uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B] ;
