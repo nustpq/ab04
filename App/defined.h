@@ -501,16 +501,15 @@ extern AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
 *Note: Maybe should move all of these defines to a standard-alone file? that read easier;
 *********************************************************************************************************
 */
-//for commit adding comments
 //Buffer Level 1:  USB data stream buffer : 64 B
-extern uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B] ;
-extern uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B] ;
+extern uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
+extern uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
 
-extern uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B] ;
-extern uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B] ;
+extern uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
+extern uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
 
-extern uint8_t usbCacheBulkOut2[USB_DATAEP_SIZE_64B] ;
-extern uint8_t usbCacheBulkIn2[USB_DATAEP_SIZE_64B] ; 
+extern uint8_t usbCacheBulkOut2[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
+extern uint8_t usbCacheBulkIn2[USB_DATAEP_SIZE_64B * 16 * 3 ] ; 
 
 extern uint8_t usbCacheBulkIn3[USB_LOGEP_SIZE_256B] ;
 
@@ -544,27 +543,27 @@ extern uint8_t ssc0_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;
 extern uint8_t ssc1_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             
 extern uint8_t ssc1_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               
 
-extern uint16_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
-extern uint16_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_50K];
+extern uint8_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
+extern uint8_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_50K];
 
-extern uint16_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
-extern uint16_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_50K ];
+extern uint8_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
+extern uint8_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_50K ];
 
 //Buffer Level 4:  PingPong buffer for audio data : MAX 48*2*8*2*2 = 3072 B
 //these buffer is private 
 extern uint8_t ssc0_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         
 extern uint8_t ssc0_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          
-extern uint16_t ssc1_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         
-extern uint16_t ssc1_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          
+extern uint8_t ssc1_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         
+extern uint8_t ssc1_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          
 
-extern uint16_t spi0_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
-extern uint16_t spi0_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
-extern uint16_t spi1_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
-extern uint16_t spi1_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
+extern uint8_t spi0_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
+extern uint8_t spi0_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
+extern uint8_t spi1_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
+extern uint8_t spi1_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
 
 // gpio has no private ring buffer, it share with ssc0;
-extern uint16_t gpio_PingPong_bufferOut[2][I2S_PINGPONG_OUT_SIZE_3K];
-extern uint16_t gpio_PingPong_bufferIn[2][I2S_PINGPONG_IN_SIZE_3K];
+extern uint8_t gpio_PingPong_bufferOut[2][I2S_PINGPONG_OUT_SIZE_3K];
+extern uint8_t gpio_PingPong_bufferIn[2][I2S_PINGPONG_IN_SIZE_3K];
 
 //buffer for usart0 and usart1;
 extern uint8_t usart0Buffer[ 2 ][ USART_BUFFER_SIZE_1K ];

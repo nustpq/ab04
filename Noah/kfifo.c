@@ -63,7 +63,10 @@ void kfifo_reset(kfifo_t *fifo) {
 }
 
 //#pragma optimize= none
-uint32_t kfifo_put(kfifo_t *fifo, uint8_t *buffer, uint32_t len) {
+uint32_t kfifo_put(kfifo_t *fifo, uint8_t *buffer, uint32_t len) 
+{
+        if( 0 == len ) return len;   //Here are some defensive code to prevent errors --Leo
+
 	uint32_t l;
         //__disable_interrupt(); //PQ
 	len = min(len, fifo->size - fifo->in + fifo->out);
@@ -80,7 +83,9 @@ uint32_t kfifo_put(kfifo_t *fifo, uint8_t *buffer, uint32_t len) {
 
 //extern kfifo_t bulkout_fifo;
 //#pragma optimize= none
-uint32_t kfifo_get(kfifo_t *fifo, uint8_t *buffer, uint32_t len) {
+uint32_t kfifo_get(kfifo_t *fifo, uint8_t *buffer, uint32_t len) 
+{
+        if( 0 == len ) return len;   //Here are some defensive code to prevent errors --Leo
 	uint32_t l;       
         //__disable_interrupt(); //PQ
 	len = min(len, fifo->in - fifo->out);

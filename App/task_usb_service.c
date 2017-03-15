@@ -65,6 +65,7 @@ void  App_TaskUSBService ( void *p_arg )
     
     err = 0;
     usb_state_saved = 0;
+    extern uint8_t debug_cnt;
     
     OS_CPU_SR cpu_sr;  
 
@@ -92,14 +93,12 @@ void  App_TaskUSBService ( void *p_arg )
 //            UIF_LED_Off( LED_USB );             
 //        }
         
-        if ( usb_state < USBD_STATE_CONFIGURED ) {  
-          
+        if ( usb_state < USBD_STATE_CONFIGURED ) {            
             OSTimeDly( 2 );
             continue;      
         }
     
-        if ( audio_run_control == false) {  
-          
+        if ( audio_run_control == false) {            
             OSTimeDly( 2 );
             continue;      
         }
@@ -110,9 +109,9 @@ void  App_TaskUSBService ( void *p_arg )
             pPath = ( AUDIOPATH * )e->data;
             
             if( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN == pPath->ep ) {  //SSC0 Rec      
-                
+#if 0                
                 counter = kfifo_get_data_size( pPath->pfifoOut );  //&ep0BulkIn_fifo   
-                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_in )  {
+                if(  counter >= USB_DATAEP_SIZE_64B  && restart_audio_0_bulk_in )  {
                     //APP_TRACE_INFO(("\r\nAudio 0 BulkIn start"));
                     restart_audio_0_bulk_in = false ;
                     // ep0 ring --> usb cache
@@ -126,30 +125,15 @@ void  App_TaskUSBService ( void *p_arg )
                                             (TransferCallback)UsbAudio0DataTransmit,
                                             0);  
                 }         
-          
-                counter  = kfifo_get_data_size( pPath->pfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pfifoOut );
-                //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pSource->rxSize <= counter 
-                    && pPath->pSource->rxSize <= counter2  ) {                    
-                        //OS_ENTER_CRITICAL();
-                    kfifo_get( pPath->pfifoIn,
-                             ( uint8_t * )tmpBuffer,
-                             pPath->pSource->rxSize ); 
-                       //OS_EXIT_CRITICAL();                    
-                    kfifo_put( pPath->pfifoOut,
-                             ( uint8_t * )tmpBuffer,
-                             pPath->pSource->rxSize );                 
-                }  
-                
+#endif               
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->ep ) {  //SSC1 Rec       
-                
-                counter = kfifo_get_data_size( &ep1BulkIn_fifo );     
+#if 0                
+                counter = kfifo_get_data_size( pPath->pfifoOut );     
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_in )  {
-                    APP_TRACE_INFO(("\r\nAudio 1 BulkIn start"));
+//                    APP_TRACE_INFO(("\r\nAudio 1 BulkIn start"));
                     restart_audio_1_bulk_in = false ;
                     // ep0 ring --> usb cache
-                    kfifo_get( &ep1BulkIn_fifo,
+                    kfifo_get( pPath->pfifoOut,
                            ( uint8_t * )usbCacheBulkIn1,
                            USB_DATAEP_SIZE_64B );         
                 
@@ -158,21 +142,8 @@ void  App_TaskUSBService ( void *p_arg )
                                             USB_DATAEP_SIZE_64B,  //64B size for low delay
                                             (TransferCallback)UsbAudio1DataTransmit,
                                             0);  
-                }         
-          
-                counter  = kfifo_get_data_size( pPath->pfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pfifoOut );
-                //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pSource->rxSize <= counter && pPath->pSource->rxSize <= counter2 ) {
-                    kfifo_get( pPath->pfifoIn,
-                             ( uint8_t * )tmpBuffer,
-                             pPath->pSource->rxSize );
-                    kfifo_put( pPath->pfifoOut,
-                             ( uint8_t * )tmpBuffer,
-                             pPath->pSource->rxSize );                 
-                }      
-                
-                
+                }                       
+#endif                
             } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->ep ) {  //SPI Rec       
                 
                 counter = kfifo_get_data_size( &ep2BulkIn_fifo );     
@@ -203,94 +174,61 @@ void  App_TaskUSBService ( void *p_arg )
                              pPath->pSource->rxSize );                 
                 } 
         
-             ///////////////////////////////////////////////////////////////////  
-                
+             ///////////////////////////////////////////////////////////////////                  
             } else if( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT == pPath->ep ) { //SSC0 Play
-                counter = kfifo_get_free_space( pPath->pfifoIn );
-                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out  )  {
-                    restart_audio_0_bulk_out = false ;
-                    //APP_TRACE_INFO(("\r\nAudio 0 BulkOut start"));
-                    // send ep0 data ---> pc
-                    CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
-                                        USB_DATAEP_SIZE_64B,
-                                        (TransferCallback)UsbAudio0DataReceived,
-                                        0);  
-                }
-              
-                counter  = kfifo_get_data_size( pPath->pfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pfifoOut );
-                //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pSource->txSize <= counter && pPath->pSource->txSize <= counter2 ) {
-                    kfifo_get( pPath->pfifoIn,
-                             ( uint8_t * )tmpBuffer,
-                             pPath->pSource->txSize );
-                    kfifo_put( pPath->pfifoOut,
-                             ( uint8_t * )tmpBuffer,
-                             pPath->pSource->txSize );                 
-                }
-                
-                counter  = kfifo_get_free_space( pPath->pfifoOut );
-                if( ( counter  <= pPath->pSource->txSize )
-                  && ( source_ssc0.status[ OUT ] < ( uint8_t )START ) )    
+                if( source_ssc0.status[ OUT ] == ( uint8_t )CONFIGURED )
                 {
-                    source_ssc0.buffer_write(  &source_ssc0,
-                                               ( uint8_t * )ssc0_PingPongOut,                                                
-                                               source_ssc0.txSize ); 
-                    source_ssc0.status[ OUT ] = ( uint8_t )START; 
-                    
-//                    OSTimeDly( 1 );
-
-                    source_ssc0.buffer_read(   &source_ssc0,
-                                                ( uint8_t * )ssc0_PingPongIn,                                              
-                                                source_ssc0.rxSize );
-                    source_ssc0.status[ IN ]  = ( uint8_t )START;
-         
-                }
-           
-                
+                      counter = kfifo_get_free_space( pPath->pfifoOut ); 
+                      if(  counter > source_ssc0.txSize && restart_audio_0_bulk_out  )  {
+                            restart_audio_0_bulk_out = false ;
+                            // send ep0 data ---> pc
+                            CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
+                                                        source_ssc0.txSize,
+                                                        (TransferCallback)UsbAudio0DataReceived,
+                                                        0);  
+                        }
+                     //counter = kfifo_get_free_space( pPath->pfifoOut );
+                     else if( ( counter  <= source_ssc0.txSize )
+                        && ( source_ssc0.status[ OUT ] < ( uint8_t )START ) )    
+                      {                    
+                          source_ssc0.buffer_read(   &source_ssc0,
+                                                  ( uint8_t * )ssc0_PingPongIn,                                              
+                                                  source_ssc0.rxSize );
+                          source_ssc0.status[ IN ]  = ( uint8_t )START;
+                          
+                   
+                          source_ssc0.buffer_write(  &source_ssc0,
+                                                    ( uint8_t * )ssc0_PingPongOut,                                                
+                                                    source_ssc0.txSize ); 
+                          source_ssc0.status[ OUT ] = ( uint8_t )START;                              
+                      }  
+                  }
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->ep ) {   //SSC1 Play
-                counter = kfifo_get_free_space( pPath->pfifoIn );
-                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_1_bulk_out  )  {
-                    restart_audio_1_bulk_out = false ;
-                    APP_TRACE_INFO(("\r\nAudio 1 BulkOut start"));
-                    // send ep0 data ---> pc
-                    CDCDSerialDriver_ReadAudio_1( usbCacheBulkOut1,
-                                        USB_DATAEP_SIZE_64B,
-                                        (TransferCallback)UsbAudio1DataReceived,
-                                        0);  
-                }
-              
-                counter  = kfifo_get_data_size( pPath->pfifoIn );
-                counter2 = kfifo_get_free_space( pPath->pfifoOut );
-                //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
-                if( pPath->pSource->txSize <= counter && pPath->pSource->txSize <= counter2 ) {
-                    kfifo_get( pPath->pfifoIn,
-                             ( uint8_t * )tmpBuffer,
-                             pPath->pSource->txSize );
-                    kfifo_put( pPath->pfifoOut,
-                             ( uint8_t * )tmpBuffer,
-                             pPath->pSource->txSize );                 
-                }
-                
-                counter  = kfifo_get_free_space( pPath->pfifoOut );
-                if( ( counter  <= pPath->pSource->txSize )
-                  && ( source_ssc1.status[ OUT ] < ( uint8_t )START ) )    
+                if( source_ssc1.status[ OUT ] == ( uint8_t )CONFIGURED )
                 {
-                    source_ssc1.buffer_write(  &source_ssc1,
-                                               ( uint8_t * )ssc1_PingPongOut,                                                
-                                               source_ssc1.txSize ); 
-                    source_ssc1.status[ OUT ] = ( uint8_t )START; 
+                      counter = kfifo_get_free_space( pPath->pfifoOut ); 
+                      if(  counter > source_ssc1.txSize && restart_audio_1_bulk_out  )  {
+                            restart_audio_1_bulk_out = false ;
+                            // send ep0 data ---> pc
+                            CDCDSerialDriver_ReadAudio_1( usbCacheBulkOut1,
+                                                        source_ssc1.txSize,
+                                                        (TransferCallback)UsbAudio1DataReceived,
+                                                        0);  
+                        }
+                     else if( ( counter  <= source_ssc1.txSize )
+                        && ( source_ssc1.status[ OUT ] < ( uint8_t )START ) )    
+                      {                    
+                          source_ssc1.buffer_read(   &source_ssc1,
+                                                  ( uint8_t * )ssc1_PingPongIn,                                              
+                                                  source_ssc1.rxSize );
+                          source_ssc1.status[ IN ]  = ( uint8_t )START;
                     
-//                    OSTimeDly( 1 );
-
-                    source_ssc1.buffer_read(   &source_ssc1,
-                                                ( uint8_t * )ssc1_PingPongIn,                                              
-                                                source_ssc1.rxSize );
-                    source_ssc1.status[ IN ]  = ( uint8_t )START;
-         
-                }
-           
-                
+                          source_ssc1.buffer_write(  &source_ssc1,
+                                                    ( uint8_t * )ssc1_PingPongOut,                                                
+                                                    source_ssc1.txSize ); 
+                          source_ssc1.status[ OUT ] = ( uint8_t )START;                              
+                      }  
+                  }                           
             } else if( CDCDSerialDriverDescriptors_SPI_DATAOUT == pPath->ep ) { //SPI/GPIO Play
                 counter = kfifo_get_free_space( pPath->pfifoIn );
                 if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_2_bulk_out  )  {
@@ -316,16 +254,12 @@ void  App_TaskUSBService ( void *p_arg )
                 }               
                                       
             } else {
-                APP_TRACE_INFO(("\r\nPath not defined[EP%d] !",pPath->ep ));
-                
+                APP_TRACE_INFO(("\r\nPath not defined[EP%d] !",pPath->ep ));                
             }            
-            e = e -> next;
-            
-        }
-         
+            e = e -> next;            
+        }         
         OSTimeDly( 1 );
-//        OS_Sched();
-          
+//        OS_Sched();          
     } //for loop
     
 }

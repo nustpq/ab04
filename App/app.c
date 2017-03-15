@@ -148,14 +148,14 @@ kfifo_t  spi1_bulkIn_fifo;
 *Note: Maybe should move all of these defines to a standard-alone file? that read easier;
 *********************************************************************************************************
 */
-
+#pragma   pack(1)
 //Buffer Level 1:  USB data stream buffer : 64 B
-uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B] ;
-uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B] ;
-uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B] ;
-uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B] ;
-uint8_t usbCacheBulkOut2[USB_DATAEP_SIZE_64B] ;
-uint8_t usbCacheBulkIn2[USB_DATAEP_SIZE_64B] ;
+uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
+uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
+uint8_t usbCacheBulkOut1[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
+uint8_t usbCacheBulkIn1[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
+uint8_t usbCacheBulkOut2[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
+uint8_t usbCacheBulkIn2[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
 uint8_t usbCacheBulkIn3[USB_LOGEP_SIZE_256B] ;
 //Buffer Level 1:  USB Cmd data stream buffer : 64 B
 uint8_t usbCmdCacheBulkOut[ USB_CMDEP_SIZE_64B ] ;             //64B
@@ -179,29 +179,28 @@ uint8_t ssc0_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               //16384B
 uint8_t ssc1_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             //16384B
 uint8_t ssc1_RingBulkIn[ USB_RINGIN_SIZE_16K ] ;               //16384B
 
-uint16_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
-uint16_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_50K];
-uint16_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
-uint16_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_50K ];
+uint8_t spi0_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
+uint8_t spi0_RingBulkIn[ SPI_RINGIN_SIZE_50K];
+uint8_t spi1_RingBulkOut[ SPI_RINGOUT_SIZE_50K ];
+uint8_t spi1_RingBulkIn[ SPI_RINGIN_SIZE_50K ];
 
 //Buffer Level 4:  PingPong buffer for audio data : MAX 48*2*8*2*2 = 3072 B
 //these buffer is private
 uint8_t ssc0_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         // Play
 uint8_t ssc0_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          // Record
-uint16_t ssc1_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         // Play
-uint16_t ssc1_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          // Record
+uint8_t ssc1_PingPongOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];         // Play
+uint8_t ssc1_PingPongIn[2][ I2S_PINGPONG_IN_SIZE_3K ] ;          // Record
 
-uint16_t spi0_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
-uint16_t spi0_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
-uint16_t spi1_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
-uint16_t spi1_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
+uint8_t spi0_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
+uint8_t spi0_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
+uint8_t spi1_2MSOut[2][ I2S_PINGPONG_OUT_SIZE_3K ];
+uint8_t spi1_2MSIn[2][ I2S_PINGPONG_IN_SIZE_3K ];
 
 // gpio has no private ring buffer, it share with ssc0;
-uint16_t gpio_PingPong_bufferOut[2][I2S_PINGPONG_OUT_SIZE_3K];
-uint16_t gpio_PingPong_bufferIn[2][I2S_PINGPONG_IN_SIZE_3K];
+uint8_t gpio_PingPong_bufferOut[2][I2S_PINGPONG_OUT_SIZE_3K];
+uint8_t gpio_PingPong_bufferIn[2][I2S_PINGPONG_IN_SIZE_3K];
+#pragma   pack( )
 
-//uint16_t tmpInBuffer[ I2S_PINGPONG_IN_SIZE_3K ];   //48*2*8*4 = 3072
-//uint16_t tmpOutBuffer[ I2S_PINGPONG_OUT_SIZE_3K ];
 
 
 //--------------------------------twi  buffer --------------------------------//
@@ -813,44 +812,58 @@ void Init_Audio_Bulk_FIFO( void )
     kfifo_t *pfifo;
 
     //initialize ring buffer relavent ssc0;
+    memset( ssc0_RingBulkOut , 0 , sizeof(ssc0_RingBulkOut));
     pfifo = &ssc0_bulkout_fifo;
     kfifo_init_static(pfifo, ssc0_RingBulkOut, USB_RINGOUT_SIZE_16K );
+    memset( ssc0_RingBulkIn , 0 , sizeof(ssc0_RingBulkIn));
     pfifo = &ssc0_bulkin_fifo;
     kfifo_init_static(pfifo, ssc0_RingBulkIn, USB_RINGIN_SIZE_16K );
 
     //initialize ring buffer relavent ssc1,extend from old structure;
+    memset( ssc1_RingBulkOut , 0 , sizeof(ssc1_RingBulkOut));
     pfifo = &ssc1_bulkout_fifo;
     kfifo_init_static(pfifo, ssc1_RingBulkOut, USB_RINGOUT_SIZE_16K );
+    memset( ssc1_RingBulkIn , 0 , sizeof(ssc1_RingBulkIn));
     pfifo = &ssc1_bulkin_fifo;
     kfifo_init_static(pfifo, ssc1_RingBulkIn, USB_RINGIN_SIZE_16K );
 
     //initialize ring buffer relavent spi0;
+    memset( spi0_RingBulkOut , 0 , sizeof(spi0_RingBulkOut));    
     pfifo = &spi0_bulkOut_fifo;
     kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkOut, SPI_RINGOUT_SIZE_50K );
+    memset( spi0_RingBulkIn , 0 , sizeof(spi0_RingBulkIn));  
     pfifo = &spi0_bulkIn_fifo;
     kfifo_init_static(pfifo, ( uint8_t * )spi0_RingBulkIn, SPI_RINGIN_SIZE_50K );
 
     //initialize ring buffer relavent spi1;
+    memset( spi1_RingBulkOut , 0 , sizeof(spi1_RingBulkOut));     
     pfifo = &spi1_bulkOut_fifo;
     kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkOut, SPI_RINGOUT_SIZE_50K );
+    memset( spi1_RingBulkIn , 0 , sizeof(spi1_RingBulkIn));     
     pfifo = &spi1_bulkIn_fifo;
     kfifo_init_static(pfifo, ( uint8_t * )spi1_RingBulkIn, SPI_RINGIN_SIZE_50K );
 
     //initialize ring buffer relavent usb data ep0;
+    memset( usbRingBufferBulkOut0 , 0 , sizeof( usbRingBufferBulkOut0 ));
     pfifo = &ep0BulkOut_fifo;
     kfifo_init_static(pfifo, usbRingBufferBulkOut0, sizeof( usbRingBufferBulkOut0 ) );
+    memset( usbRingBufferBulkIn0 , 0 , sizeof( usbRingBufferBulkIn0 ) );
     pfifo = &ep0BulkIn_fifo;
     kfifo_init_static(pfifo, usbRingBufferBulkIn0, sizeof( usbRingBufferBulkIn0 ) );
 
     //initialize ring buffer relavent usb data ep1;
+    memset( usbRingBufferBulkOut1 , 0 , sizeof( usbRingBufferBulkOut1 ) );
     pfifo = &ep1BulkOut_fifo;
     kfifo_init_static(pfifo, usbRingBufferBulkOut1, sizeof( usbRingBufferBulkOut1 ) );
+    memset( usbRingBufferBulkIn1 , 0 , sizeof( usbRingBufferBulkIn1 ) );    
     pfifo = &ep1BulkIn_fifo;
     kfifo_init_static(pfifo, usbRingBufferBulkIn1, sizeof( usbRingBufferBulkIn1 ) );
 
     //initialize ring buffer relavent usb data ep1;
+    memset( usbRingBufferBulkOut2 , 0 , sizeof( usbRingBufferBulkOut2 ) );  
     pfifo = &ep2BulkOut_fifo;
     kfifo_init_static(pfifo, usbRingBufferBulkOut2, sizeof( usbRingBufferBulkOut2 ) );
+    memset( usbRingBufferBulkIn2 , 0 , sizeof( usbRingBufferBulkIn2 ) ); 
     pfifo = &ep2BulkIn_fifo;
     kfifo_init_static(pfifo, usbRingBufferBulkIn2, sizeof( usbRingBufferBulkIn2 ) );
 }
@@ -890,8 +903,8 @@ void Dma_configure( void )
     /* Driver initialize */
     DMAD_Initialize( pDmad, 0 );
     /* IRQ configure */
-    IRQ_ConfigureIT( ID_DMAC0, 2, ISR_HDMA ); //highest priority
-    IRQ_ConfigureIT( ID_DMAC1, 2, ISR_HDMA );
+    IRQ_ConfigureIT( ID_DMAC0, 4, ISR_HDMA ); //highest priority
+    IRQ_ConfigureIT( ID_DMAC1, 4, ISR_HDMA );
     IRQ_EnableIT(ID_DMAC0);
     IRQ_EnableIT(ID_DMAC1);
 

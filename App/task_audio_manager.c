@@ -159,9 +159,6 @@ void  App_AudioManager (void *p_arg)
             source_ssc1.status[ OUT ] = ( uint8_t )START;
         }
         
-          
-     
-
     }
 
 

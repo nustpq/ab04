@@ -43,7 +43,7 @@ AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
 extern void Init_Audio_Bulk_FIFO( void );
 
 unsigned char  audio_padding_byte;
-
+uint8_t     debug_cnt = 0;
 
 /*
 *********************************************************************************************************
@@ -59,6 +59,9 @@ unsigned char  audio_padding_byte;
 * Note(s)     :  None.
 *********************************************************************************************************
 */
+
+
+
 bool First_Pack_Check_BO( unsigned char *pData, unsigned int size )
 {    
     
@@ -69,10 +72,94 @@ bool First_Pack_Check_BO( unsigned char *pData, unsigned int size )
             return false;
         }
     }
-     //printf("\r\nSync\r\n");
+    APP_TRACE_INFO(("\r\nSync pos=%d...\r\n",i));  
     return true; 
 
 }
+
+
+/*
+*********************************************************************************************************
+*                                  First_Pack_Check_BO1()
+*
+* Description :  Check if first USB bulk out package is same as padding data.
+*
+* Argument(s) :  pData: data buffer will be checked
+*                size : buffer size
+*                pos  : padding data position in the buffer
+*       
+*Return(s)   :   true  - check ok.
+*                false - check failed.
+*
+* Note(s)     :  None.
+*********************************************************************************************************
+*/
+bool First_Pack_Check_BO1( unsigned char *pData, unsigned int size, uint32_t *pos )
+{    
+    
+    uint32_t i;
+    uint32_t cnt = 0;
+    
+    for( i = 0; i < size ; i++ )
+    {
+      if( audio_padding_byte == *pData++ )
+      {
+        cnt++;
+        if( cnt == 128 )
+        {
+          *pos = i;
+          break;
+        }
+      }
+      else
+        cnt = 0;
+    }
+
+    return !!cnt; 
+
+}
+
+/*
+*********************************************************************************************************
+*                                  First_Pack_Check_BO2()
+*
+* Description :  Check if first USB bulk out package is same as padding data.
+*
+* Argument(s) :  pData: data buffer will be checked
+*                size : buffer size
+*                pos  : padding data position in the buffer
+*       
+*Return(s)   :   true  - check ok.
+*                false - check failed.
+*
+* Note(s)     :  None.
+*********************************************************************************************************
+*/
+bool First_Pack_Check_BO2( unsigned char *pData, unsigned int size, uint32_t *pos )
+{
+    uint32_t i;
+    uint32_t cnt = 0;
+    
+    for( i = 0; size ; i ++ )
+    {
+        if( audio_padding_byte == *pData++ )
+            cnt++;
+        else
+        {
+            if( cnt >= 128 )
+            {
+                *pos = i;
+                break;
+            }
+            else
+                cnt = 0;
+        }
+    }
+     return !!cnt;
+}
+
+
+
 
 /*
 *********************************************************************************************************
@@ -80,21 +167,29 @@ bool First_Pack_Check_BO( unsigned char *pData, unsigned int size )
 *
 * Description :  Padding the first USB bulk in package.
 *
-* Argument(s) :  None.
+* Argument(s) :  pFifo:the fifo will be filled padding data.
 *
 * Return(s)   :  None.
 *
 * Note(s)     :  Must be called after reset FIFO and before start audio.
 *********************************************************************************************************
 */      
-void First_Pack_Padding_BI( void )
-{
-    unsigned char temp[ USB_DATAEP_SIZE_64B ];
-    
+void First_Pack_Padding_BI( kfifo_t *pFifo )
+{    
+#if 1  
+    uint8_t temp[ 128 ];
     APP_TRACE_INFO(("\r\nPadding USB data [0x%0x]...\r\n",audio_padding_byte));  
-    memset( temp, audio_padding_byte, USB_DATAEP_SIZE_64B );
-    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;
-    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;//2 package incase of PID error
+    memset( temp, audio_padding_byte, 128 );
+    //kfifo_put( &ep0BulkIn_fifo, temp, 128 ) ;
+    kfifo_put( pFifo , temp , 128 );
+#else
+    uint8_t temp[ 1024 ];
+    APP_TRACE_INFO(("\r\nPadding USB data [0x%0x]...\r\n",audio_padding_byte));  
+    memset( temp1, audio_padding_byte, 1024 );
+    kfifo_put( &ep0BulkIn_fifo, temp1, 1024 ) ;
+    kfifo_put( pFifo, temp1, 1024 ) ;    
+//    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;//2 package incase of PID error
+#endif
 }
 
 
@@ -117,16 +212,19 @@ void First_Pack_Padding_BI( void )
 void Audio_Start( void )
 {  
     
-    Hold_Task_for_Audio();                      
-                            
-    First_Pack_Padding_BI( ); 
+    Hold_Task_for_Audio(); 
+
+    Init_Audio_Bulk_FIFO( ); 
     
+    source_ssc0.status[ IN ] == ( uint8_t )CONFIGURED;
+    source_ssc0.status[ OUT ] == ( uint8_t )CONFIGURED;
+    source_ssc1.status[ IN ] == ( uint8_t )CONFIGURED;
+    source_ssc1.status[ OUT ] == ( uint8_t )CONFIGURED;
+    OSTimeDly( 2 );
     
-    //Audio_Manager( SSC0_IN | SSC0_OUT );  //start audio
-    
-    //OSTimeDly(1);    
     audio_play_buffer_ready  = false ;
     audio_run_control        = true ;
+//    padding_audio_0_bulk_out = false  ;
     
     restart_audio_0_bulk_out = true  ; 
     restart_audio_0_bulk_in  = true  ;
@@ -134,7 +232,9 @@ void Audio_Start( void )
     restart_audio_1_bulk_in  = true  ; 
     restart_audio_2_bulk_out = true  ;
     restart_audio_2_bulk_in  = true  ;
-
+    debug_cnt = 0;
+    
+//    OSTaskResume ( APP_CFG_TASK_USB_SEV_PRIO );
   
 }
 
@@ -156,49 +256,38 @@ void Audio_Stop( void )
 {  
         
     printf( "\r\nStop Play & Rec..."); 
-    
+    OSTimeDly( 8 );
     audio_run_control        = false  ; 
-    OSTimeDly(20);
-//    delay_ms(20); //wait until DMA interruption done
-//    
-// 
-//    
-//    SSC_Play_Stop();  
-//    SSC_Record_Stop(); 
-//    
-//    delay_ms(10);  
-//    
-//    printf( "\r\nEnd Audio Transfer..."); 
-//    //End_Audio_Transfer(); 
-//    delay_ms(10); 
-//    
-//    printf("\r\nReset USB EP...");
-//    if( audio_state_check != 0 ) { //in case of error from repeat Stop CMD 
-//        Toggle_PID_BI =  Check_Toggle_State();
-//    }
+//    OSTimeDly( 4 );
+//    OSTaskSuspend ( APP_CFG_TASK_USB_SEV_PRIO );
     
-    //Reset Endpoint Fifos
-    //AT91C_BASE_UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIODATAOUT;
-    //AT91C_BASE_UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIODATAIN; 
-    //delay_ms(50);
+    OSTimeDly(10);    
+    Destroy_Audio_Path(); 
+
+    OSTimeDly( 4 );
+    
+     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
+     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
+    
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
+    
+    OSTimeDly(2); 
+  
 
     
-    Destroy_Audio_Path();
-    
-    
-    
-    UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT;
-    UDPHS->UDPHS_EPTRST = 1<<CDCDSerialDriverDescriptors_AUDIO_0_DATAIN; 
-    OSTimeDly(10);
-    //SSC_Reset(); //I2S_Init();        
-     
-    Dma_configure();
-    
-    //LED_Clear( USBD_LEDDATA );
-    
-    
+    Init_Audio_Bulk_FIFO( ); 
+    memset( usbCacheBulkOut0 , 0 , sizeof( usbCacheBulkOut0 ));
+    memset( usbCacheBulkOut1 , 0 , sizeof( usbCacheBulkOut1 )); 
+    memset( usbCacheBulkIn0, 0 , sizeof( usbCacheBulkIn0 ) );
+    memset( usbCacheBulkIn1, 0 , sizeof( usbCacheBulkIn0 ) );
+    memset( ssc0_PingPongOut,0 , sizeof( ssc0_PingPongOut ) );        
+    memset( ssc0_PingPongIn, 0 , sizeof( ssc0_PingPongIn ) );        
+    memset( ssc1_PingPongOut,0 , sizeof( ssc1_PingPongOut ) );    
+    memset( ssc1_PingPongIn, 0 , sizeof( ssc1_PingPongIn ) );   
     
     padding_audio_0_bulk_out = false  ; 
+    padding_audio_1_bulk_out = false  ;
     
     restart_audio_0_bulk_out = false  ; 
     restart_audio_0_bulk_in  = false  ;
@@ -208,33 +297,9 @@ void Audio_Stop( void )
     restart_audio_2_bulk_in  = false  ;                       
  
     audio_play_buffer_ready  = false  ;         
-       
-    //Init_Audio_Bulk_FIFO(); 
     
-    Release_Task_for_Audio(); 
-    
-
-    
-    //End_Audio_Transfer();
-    
-    
-//    //reset debug counters
-//    BO_free_size_max      = 0 ;
-//    BI_free_size_min      = 100 ; 
-//    total_received        = 0 ;
-//    total_transmit        = 0 ;
-//    error_bulkout_full    = 0 ;
-//    error_bulkout_empt    = 0 ;
-//    error_bulkin_full     = 0 ;
-//    error_bulkin_empt     = 0 ;    
-//    debug_trans_counter1  = 0 ;
-//    debug_trans_counter2  = 0 ;
-//    debug_trans_counter3  = 0 ;
-//    debug_trans_counter4  = 0 ; 
-//    debug_usb_dma_IN      = 0 ;
-//    debug_usb_dma_OUT     = 0 ;    
-//    test_dump             = 0 ;
-
+    Release_Task_for_Audio();   
+   
 }
 
 /*

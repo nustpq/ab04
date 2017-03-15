@@ -30,7 +30,9 @@ void Audio_State_Control( uint8_t *msg );
 
 static void Get_Run_Time( unsigned int time );
 bool First_Pack_Check_BO( unsigned char *pData, unsigned int size );
-void First_Pack_Padding_BI( void );
+bool First_Pack_Check_BO1( unsigned char *pData, unsigned int size, uint32_t *pos );
+bool First_Pack_Check_BO2( unsigned char *pData, unsigned int size, uint32_t *pos );
+void First_Pack_Padding_BI( kfifo_t *pFifo );
 void Audio_Manager( unsigned char cfg_data );
 
 

@@ -403,7 +403,7 @@ unsigned char Update_Audio( unsigned char id )
     if( err != NO_ERR ) {
         return err;
     }
-    APP_TRACE_INFO(("\r\n\r\n############## BCLK POLARITY = %d\r\n\r\n", Codec_Set[id][index].bclk_polarity));
+    APP_TRACE_INFO(("\r\n\############## BCLK POLARITY = %d\r\n", Codec_Set[id][index].bclk_polarity));
     //I2C_Mixer(I2C_MIX_FM36_CODEC);
     err = Init_CODEC( &data_source[id], Codec_Set[id][index] );
     //I2C_Mixer(I2C_MIX_UIF_S);
@@ -481,7 +481,7 @@ unsigned char Start_Audio( START_AUDIO start_audio )
     }
      */
     
-    
+    //Audio_Manager();
     Audio_Start();
   
     

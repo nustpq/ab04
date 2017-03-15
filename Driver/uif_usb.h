@@ -83,6 +83,7 @@ extern volatile bool restart_cmd_bulk_out       ;
 extern volatile bool restart_cmd_bulk_in        ;
 extern volatile bool audio_run_control          ;
 extern volatile bool padding_audio_0_bulk_out   ;
+extern volatile bool padding_audio_1_bulk_out   ;
 extern volatile bool flag_stop                  ;
 extern bool volatile audio_play_buffer_ready    ;
 #endif

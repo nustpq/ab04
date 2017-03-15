@@ -835,8 +835,8 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         
         case PC_CMD_UPDATE_AUDIO :
           
-           temp = emb_get_attr_int(&root, 1, 0);  //default 0: SSC0
-           err = Update_Audio( temp ); 
+          temp = emb_get_attr_int(&root, 1, 0);  //0: SSC0 1 : SSC1,   default 0
+           err  = Update_Audio( temp ); 
          
         break ; 
         
