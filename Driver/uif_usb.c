@@ -48,7 +48,7 @@ bool volatile padding_audio_0_bulk_out  = false ;
 bool volatile padding_audio_1_bulk_out  = false ;
 bool volatile audio_play_buffer_ready   = false ; 
 
-
+//paly
 //paly
 #if 0
 void UsbAudio0DataReceived(  uint32_t unused,
@@ -69,6 +69,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
          if( true == padding_audio_0_bulk_out )
          {
             kfifo_put( &ssc0_bulkout_fifo, usbCacheBulkOut0 + 128, received-128 );
+     
          }
          else
          {
@@ -341,7 +342,7 @@ void UsbLogDataTransmit(      uint32_t unused,
         if ( USB_DATAEP_SIZE_64B <= kfifo_get_data_size(  &DBG_USB_Send_kFIFO )  ) 
         { 
           //enough data to send to PC          
-            kfifo_get(&DBG_USB_Send_kFIFO, usbCacheBulkIn3, USB_DATAEP_SIZE_64B); 
+            kfifo_get(&DBG_USB_Send_kFIFO, usbCacheBulkIn3, USB_LOGEP_SIZE_256B); 
         
             CDCDSerialDriver_WriteLog( usbCacheBulkIn3,
                                              USB_DATAEP_SIZE_64B,
@@ -357,7 +358,7 @@ void UsbLogDataTransmit(      uint32_t unused,
     else 
     {
         CDCDSerialDriver_WriteLog( usbCacheBulkIn3,
-                                         USB_DATAEP_SIZE_64B,
+                                         USB_LOGEP_SIZE_256B,
                                          (TransferCallback) UsbLogDataTransmit,
                                          0);  
         APP_TRACE_INFO(( "\r\nERROR : UsbLogDataTransmit: Rr-transfer hit\r\n" ));  
@@ -380,11 +381,11 @@ void UsbCmdDataReceived(  uint32_t unused,
 
         kfifo_put(&cmdEpBulkOut_fifo, usbCmdCacheBulkOut, received);         
         
-        if ( USB_DATAEP_SIZE_64B <= kfifo_get_free_space( &cmdEpBulkOut_fifo ) ) 
+        if ( USB_CMDEP_SIZE_64B <= kfifo_get_free_space( &cmdEpBulkOut_fifo ) ) 
         { 
             //enough free buffer                      
             CDCDSerialDriver_ReadCmd(  usbCmdCacheBulkOut,
-                                          USB_DATAEP_SIZE_64B,
+                                          USB_CMDEP_SIZE_64B,
                                           (TransferCallback) UsbCmdDataReceived,
                                           0);        
         } 
@@ -414,9 +415,9 @@ void UsbCmdDataTransmit(  uint32_t unused,
     if ( status == USBD_STATUS_SUCCESS  ) 
     {       
        
-        if ( USB_DATAEP_SIZE_64B <= kfifo_get_data_size(  &cmdEpBulkIn_fifo )  ) 
+        if ( USB_CMDEP_SIZE_64B <= kfifo_get_data_size(  &cmdEpBulkIn_fifo )  ) 
         {         
-            kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_DATAEP_SIZE_64B); 
+            kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_CMDEP_SIZE_64B); 
         
             CDCDSerialDriver_WriteCmd( usbCmdCacheBulkIn,
                                           USB_DATAEP_SIZE_64B,
@@ -433,7 +434,7 @@ void UsbCmdDataTransmit(  uint32_t unused,
     else 
     {
         CDCDSerialDriver_WriteCmd( usbCmdCacheBulkIn,
-                                      USB_DATAEP_SIZE_64B,
+                                      USB_CMDEP_SIZE_64B,
                                       (TransferCallback) UsbCmdDataTransmit,
                                       0);  
         TRACE_WARNING( "\r\nERROR : UsbCmdDataTransmit: Rr-transfer hit\r\n" );  
@@ -505,7 +506,7 @@ static void USBPower_Configure( void )
  */
 void USBDCallbacks_Initialized(void)
 {
-    IRQ_ConfigureIT(ID_UDPHS, 3, USBD_IrqHandler);
+    IRQ_ConfigureIT(ID_UDPHS, USB_PRIORITY, USBD_IrqHandler);
     IRQ_EnableIT(ID_UDPHS);
 }
 

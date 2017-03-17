@@ -261,10 +261,10 @@ void Audio_Stop( void )
 //    OSTimeDly( 4 );
 //    OSTaskSuspend ( APP_CFG_TASK_USB_SEV_PRIO );
     
-    OSTimeDly(10);    
+    OSTimeDly(50);    
     Destroy_Audio_Path(); 
 
-    OSTimeDly( 4 );
+    OSTimeDly( 50 );
     
      usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
      usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
@@ -272,7 +272,7 @@ void Audio_Stop( void )
     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
     
-    OSTimeDly(2); 
+    OSTimeDly(10); 
   
 
     

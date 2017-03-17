@@ -1790,7 +1790,7 @@ unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
     } else { //handset
        fpga_mask = 0x3F << ((pdata->ruler_id)<<3);
     }
-    Init_FPGA(fpga_mask);
+    //Init_FPGA(fpga_mask);
     return err;
 #endif
 }
@@ -1907,7 +1907,7 @@ unsigned char Reset_Mic_Mask(  unsigned int *pInt )
         }
     }
 
-    Init_FPGA(fpga_mask);
+    //Init_FPGA(fpga_mask);
     return err;
 }
 
@@ -1991,9 +1991,9 @@ unsigned char AB_POST( void )
 
 
     APP_TRACE_INFO(("\r\n1. FPGA... \r\n"));
-    err = FPGA_Setup();
+    err = FPGA_POST_Setup();
     if( err != NO_ERR ) {
-        Global_Bridge_POST = POST_ERR_FPGA;
+        Global_Bridge_POST = FPGA_CFG_ERR;
         APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
         return Global_Bridge_POST;
     } else {

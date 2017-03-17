@@ -92,9 +92,9 @@
 #include  <ruler.h>
 #include  <emb.h>
 #include  <mem_basic.h>
-//#include  <uif.h>
+#include  <uif.h>
 #include  <uif_dsp.h>
-#include  <noah_cmd.h>
+
 #include  <commands.h>
 #include  <codec.h>
 #include  <xmodem.h>
@@ -123,6 +123,9 @@
 #include "uif_list.h"
 #include "uif_audio_path.h"
 #include "uif_hardware_init.h"
+#include "uif_xc3s50an.h"
+
+#include  <noah_cmd.h>
 
 
 /*

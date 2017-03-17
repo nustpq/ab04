@@ -68,7 +68,6 @@ DataSource source_usart0;
 DataSource source_usart1;
 DataSource source_gpio;
 
-
 //port bitmap
 uint8_t g_portMap;
 
@@ -356,7 +355,7 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_USB_SEV_PRIO, "USB Service", &os_err);
 #endif
     
-/**/    
+/*   
     os_err = OSTaskCreateExt((void (*)(void *)) App_AudioManager,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE - 1],
@@ -372,7 +371,7 @@ static  void  App_TaskStart (void *p_arg)
 #endif
 
     
-/**/    
+*/    
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskCMDParse,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskCMDParseStk[APP_CFG_TASK_CMD_PARSE_STK_SIZE - 1],
@@ -903,8 +902,8 @@ void Dma_configure( void )
     /* Driver initialize */
     DMAD_Initialize( pDmad, 0 );
     /* IRQ configure */
-    IRQ_ConfigureIT( ID_DMAC0, 4, ISR_HDMA ); //highest priority
-    IRQ_ConfigureIT( ID_DMAC1, 4, ISR_HDMA );
+    IRQ_ConfigureIT( ID_DMAC0, DMA_PRIORITY, ISR_HDMA ); //highest priority
+    IRQ_ConfigureIT( ID_DMAC1, DMA_PRIORITY, ISR_HDMA );
     IRQ_EnableIT(ID_DMAC0);
     IRQ_EnableIT(ID_DMAC1);
 

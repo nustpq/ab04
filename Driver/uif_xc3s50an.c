@@ -39,18 +39,19 @@ List fpga_i2s_clk_valid_list;
 
 //All of i2s clock path in fpga that supported;
 const char fpga_i2s_clk_path[ MAX_I2S_CLK_PATH ][ MAX_PATH_NAME_LENGTH ] = { 
-  "codec0_port0_0",
-  "codec0_fm36_1",	
-  "codec0_ssc0_2",	
-  "codec0_port1_3",
-  "codec0_codec1_4",
-  "codec0_ssc1_5",	
-  "codec1_port0_6",
-  "codec1_port1_7",
+  "codec0_port0_0",  //0
+  "codec0_fm36_1",	 //1
+  "codec0_ssc0_2",	 //2
+  "codec0_port1_3",  //3
+  "codec0_codec1_4",  //4
+  "codec0_ssc1_5",    //5
   
+  "codec1_port0_6",
+  "codec1_port1_7",    
   "codec1_ssc0_8",
   "codec1_ssc1_9",
   "codec1_fm36_10",
+  
   "port0_port1_11",
   "port0_ssc0_12",
   "port0_ssc1_13",  
@@ -83,20 +84,26 @@ const char biNode[ MAXNODE ][ 8 ] = {
   };
 
 const char dataSwitch[ 14 ][ 32 ]= { 
-  "codec0_tx->fm36_i2s_rx",
-  "uif_i2s0_rx->fm36_i2s_rx",
-  "ssc0_tx->codec0_rx",
-  "uif_i2s0_tx->codec0_rx",
-  "codec1_tx->ssc1_rx",
-  "uif_i2s1_rx->ssc1_rx",
-  "ssc1_tx->codec1_rx",
-  "uif_i2s1_rx->codec1_rx",
-  "fm36_pdmo_data->uif_pdmo_data",
-  "hdmi_pdmi_data->uif_pdmo_data",
-  "uif_pdmi_data->fm36_pdmi_data",
-  "hdmi_pdmi_data->fm36_pdmi_data",
-  "fm36_pdmi_clk->hdmi_pdm_clk",
-  "uif_pdmo_clk->hdmi_pdm_clk"
+  "codec0_tx->fm36_i2s_rx",    //T0 = 0
+  "uif_i2s0_rx->fm36_i2s_rx",  //T0 = 1
+  
+  "ssc0_tx->codec0_rx",       //T1 = 0
+  "uif_i2s0_tx->codec0_rx",   //T1 = 1
+  
+  "codec1_tx->ssc1_rx",     //T2 = 0
+  "uif_i2s1_rx->ssc1_rx",   //T2 = 1
+  
+  "ssc1_tx->codec1_rx",       //T3 = 0
+  "uif_i2s1_rx->codec1_rx",   //T3 = 1
+  
+  "fm36_pdmo_data->uif_pdmo_data",   //T4 = 0
+  "hdmi_pdmi_data->uif_pdmo_data",   //T4 = 1
+  
+  "uif_pdmi_data->fm36_pdmi_data",   //T5 = 0
+  "hdmi_pdmi_data->fm36_pdmi_data",  //T5 = 1
+  
+  "fm36_pdmi_clk->hdmi_pdm_clk",     //T6 = 0
+  "uif_pdmo_clk->hdmi_pdm_clk"       //T6 = 1
 };
 	                          
 	                          
@@ -963,9 +970,8 @@ bool i2s_clk_path_check( void * pPath , List *validList )
       return 0;
     }
   }
-
-
-   APP_TRACE_INFO(("add path[ %s ]succeed!\r\n",clk->switch_name));
+     
+  APP_TRACE_INFO(("add path[ %s ]succeed!\r\n",clk->switch_name));
 
   return 1;
 }
@@ -1012,15 +1018,16 @@ int8_t add_clk_switch_cfg( FPGA_CLK_SWITCH *cfg , List *clkList )
 *********************************************************************************************************
 */
 
-void add_data_switch_cfg( FPGA_DATA_SWITCH *cfg,List *dataList )
+int8_t add_data_switch_cfg( FPGA_DATA_SWITCH *cfg,List *dataList )
 {
   assert( NULL != cfg );
-
+  int8_t ret = -1;
+  
   while( !match_data_path( dataList,cfg ) )
-    return;
+    return -1;
 
-  list_ins_next( dataList,dataList->tail,cfg );
-
+  ret = list_ins_next( dataList,dataList->tail,cfg );
+  return ret;
 
 }
 
@@ -1192,7 +1199,7 @@ void destroy_fpga_instance( void )
   list_destroy( &xc3s50an.clock_node_role );
   list_destroy( &fpga_i2s_clk_valid_list );
   //initialize public interface;
-  memset( ( void * )&xc3s50an, 0 ,sizeof( FpgaChip ) );
+  //memset( ( void * )&xc3s50an, 0 ,sizeof( FpgaChip ) );
   memset( ( void * )&xc3s50an.cmdWord, 0xff , sizeof( FPGA_COMMAND ) );
 
   reset_fpga( );
@@ -1255,15 +1262,15 @@ static int8_t Init_fpga_clock_path( unsigned char clock_dir, unsigned char clock
 * Note(s)       : none.
 *********************************************************************************************************
 */
-static void Init_fpga_data_path( const char *s_data_path )
+static int8_t Init_fpga_data_path( const char *s_data_path )
 {
-
+    int8_t ret = -1;
     FPGA_DATA_SWITCH *p_data_path_cfg;
     APP_TRACE_INFO(("set data path: %s \r\n",s_data_path));
 
     p_data_path_cfg =  map_name_to_path( s_data_path );
-    xc3s50an.add_data_switch_cfg( p_data_path_cfg, &xc3s50an.fpga_i2s_data_list );
-
+    ret = xc3s50an.add_data_switch_cfg( p_data_path_cfg, &xc3s50an.fpga_i2s_data_list );
+    return ret;
 }
 
 /*******************************************************
@@ -1300,11 +1307,11 @@ static void Init_fpga_data_path( const char *s_data_path )
   "fm36_pdmi_clk->hdmi_pdm_clk",
   "uif_pdmo_clk->hdmi_pdm_clk"
 ************************************************************/
-unsigned char FPGA_Setup( void )   //?????
+unsigned char FPGA_POST_Setup( void )    
 {
     unsigned char err;
   
-    FPGA_COMMAND cmd;
+    //FPGA_COMMAND cmd;
 
     init_fpga();
     
@@ -1315,9 +1322,7 @@ unsigned char FPGA_Setup( void )   //?????
     Init_fpga_clock_path( 0,0,"codec0_port1_3" );
     Init_fpga_clock_path( 0,0,"codec0_codec1_4" );
     Init_fpga_clock_path( 0,0,"codec0_ssc1_5" );
-   
-    
-    
+        
     Init_fpga_data_path( "uif_i2s0_rx->fm36_i2s_rx" );
     Init_fpga_data_path( "ssc0_tx->codec0_rx" );
     Init_fpga_data_path( "ssc1_tx->codec1_rx" );
@@ -1328,6 +1333,48 @@ unsigned char FPGA_Setup( void )   //?????
                        &xc3s50an.cmdWord , 
                        &xc3s50an.fpga_i2s_clk_list, 
                        &xc3s50an.fpga_i2s_data_list );
+    return err;
+
+}
+
+unsigned char Setup_FPGA( FPGA_CFG *p_cfg )   
+{
+    unsigned char err;
+    unsigned char i;
+    
+    destroy_fpga_instance();
+    
+    init_fpga();
+    
+    for( i = 0; i<= 7; i++ ) {
+      if( p_cfg->data_path_mask & (1<<i) ) {
+          if( p_cfg->data_path_value & (1<<i) ) {          
+            err = Init_fpga_data_path( dataSwitch[(i<<1)+1] );
+            if( err != 0 ){ return FPGA_CFG_ERR ; }
+          } else {              
+            err = Init_fpga_data_path( dataSwitch[(i<<1)] );
+            if( err != 0 ){ return FPGA_CFG_ERR ; }
+          }       
+      }      
+    }
+    
+    for(i = 0; i<= 17; i++) {
+      if( p_cfg->clock_path_mask & (1<<i) ) {    
+          err = Init_fpga_clock_path( 0,0,fpga_i2s_clk_path[i] );
+          if( err != 0 ){ 
+            return FPGA_CFG_ERR ; 
+          }
+      }      
+    }
+    
+    err = xc3s50an.set_path( &xc3s50an, 
+                       &xc3s50an.cmdWord , 
+                       &xc3s50an.fpga_i2s_clk_list, 
+                       &xc3s50an.fpga_i2s_data_list );
+    if( err != 0 ){ 
+      err = FPGA_CFG_ERR ; 
+    }
+    
     return err;
 
 }

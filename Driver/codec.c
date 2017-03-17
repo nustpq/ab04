@@ -497,12 +497,13 @@ uint8_t encode( int8_t value )
   }
 }
 
+
 uint8_t CODEC_Set_Volume( const DataSource *pSource,float vol_spk, float vol_lout, float vol_lin )
 {
     uint8_t err;
     float temp = 0;
     uint8_t flag=0;
-    uint8_t Mic_PGA=0,ADC_GAIN=0;
+    uint8_t Mic_PGA=0, ADC_GAIN=0;
 
     vol_spk= (vol_spk - (int)vol_spk%5)/10;
     vol_lout=(vol_lout - (int)vol_lout%5)/10;
@@ -551,7 +552,7 @@ uint8_t CODEC_Set_Volume( const DataSource *pSource,float vol_spk, float vol_lou
     I2CWrite_Codec_AIC3204(pSource,83,ADC_GAIN);
     I2CWrite_Codec_AIC3204(pSource,84,ADC_GAIN);
 
-        signed char DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
+    signed char DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
     unsigned char flag1=0,flag2=0;
     for(signed char k=0;k<48+1;k++){
       for(signed char m=-6;m<29+1;m++){
@@ -605,6 +606,15 @@ uint8_t CODEC_Set_Volume( const DataSource *pSource,float vol_spk, float vol_lou
     I2CWrite_Codec_AIC3204(pSource,18,LOL_GAIN);
     I2CWrite_Codec_AIC3204(pSource,19,LOL_GAIN);
 
+    
+//    if( vol_spk == SET_VOLUME_MUTE ) {
+//        temp += (3<<0);
+//    }
+//    if( vol_lin == SET_VOLUME_MUTE ) {
+//        temp += (3<<2);
+//    }
+//    err = I2CWrite_Codec_AIC3204(pSource,DAC_Mute,temp);
+    
     return err;
 
 }

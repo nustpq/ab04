@@ -534,7 +534,6 @@ void init_spi( void *pInstance,void *parameter )
     _ConfigureSpi( pSource,pSpi_Cfg->spi_mode ,pSpi_Cfg->spi_speed ) ;
 }
 
-
 /*
 *********************************************************************************************************
 *                                               ISR_SPI_DMA0()
@@ -853,7 +852,7 @@ static void spi_master_transfer( void *pInstance,
 * Note(s)     : 
 *********************************************************************************************************
 */
-uint8_t spi_register_set( void *instance,void *parameter )
+unsigned char spi_register_set( void *instance,void *parameter )
 {
    assert( NULL != instance );
    assert( NULL != parameter );

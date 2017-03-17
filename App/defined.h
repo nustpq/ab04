@@ -85,9 +85,9 @@
 #define I2S_PINGPONG_BUF_SIZE_MS           4  //4ms per ssc pingpong buffer
 #define I2S_PINGPONG_IN_SIZE_3K            ( 48*8*4*I2S_PINGPONG_BUF_SIZE_MS )    //Max size:   48k*8Slot*4B*4ms = 6144B
 #define I2S_PINGPONG_OUT_SIZE_3K           ( 48*8*4*I2S_PINGPONG_BUF_SIZE_MS )    // 
-#define USB_DATAEP_SIZE_64B                (    64    )            // force use 64Bytes
+#define USB_DATAEP_SIZE_64B                (    64*1    )            // force use 64Bytes
 #define USB_LOGEP_SIZE_256B                (    256   )            // force use 256Bytes
-#define USB_CMDEP_SIZE_64B                 USB_DATAEP_SIZE_64B
+#define USB_CMDEP_SIZE_64B                 ( 64 )
 
 #define USB_RINGOUT_SIZE_16K               ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
 #define USB_RINGIN_SIZE_16K                ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
@@ -101,6 +101,8 @@
 #define PLAY_BUF_DLY_CNT                    5
 
 
+    
+    
 /*
 *********************************************************************************************************
 *                                        define contant for fm36
@@ -252,6 +254,7 @@
 #define   ATTRI_SPI_FM1388_LOAD_CODE           31
 #define   ATTRI_I2C_FM1388_LOAD_EEPROM         21
 #define   ATTRI_I2C_IM205                      11
+#define   ATTRI_NORMAL                         0
 
 #define   ATTRI_SPI_IM501_CPHA0_CPOL0          0 //iM501_CPHA_CPOL
 #define   ATTRI_SPI_IM501_CPHA0_CPOL1          1

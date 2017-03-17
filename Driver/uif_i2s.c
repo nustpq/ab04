@@ -236,7 +236,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
     uint8_t padding[128];
     memset( padding, audio_padding_byte, 128 );
     DataSource *pSource = ( DataSource *)pArg;
-
+    if ( audio_run_control == false) {  return ;}
     //  UIF_LED_On( LED_HDMI );  
 	switch( pSource->status[ IN ] ) 
 
@@ -358,6 +358,8 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 
 		}
 	   pSource->rx_index = 1 - pSource->rx_index;
+    
+                
 }
 
 /*
@@ -382,7 +384,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
     uint8_t padding[128];
     memset( padding, audio_padding_byte, 128 );
     DataSource *pSource = ( DataSource *)pArg;
-
+    if ( audio_run_control == false) {  return ;}
 	switch( pSource->status[ IN ] ) 
 
 		{
@@ -493,7 +495,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     uint32_t temp = 0;
        
     assert( NULL != pArg );
-    
+    if ( audio_run_control == false) {  return ;}  
     DataSource *pSource = ( DataSource *)pArg;
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
@@ -545,6 +547,34 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     pSource->tx_index = 1 - pSource->tx_index;
 
     UIF_LED_Off( LED_RUN );  
+    
+    
+    ///////////////////////////////////////////
+//      unsigned int counter, counter2 ;
+//     counter = kfifo_get_free_space( &ep0BulkOut_fifo  );
+//                if(  counter >= USB_DATAEP_SIZE_64B && restart_audio_0_bulk_out  )  {
+//                    restart_audio_0_bulk_out = false ;
+//                    //APP_TRACE_INFO(("\r\nAudio 0 BulkOut start"));
+//                    // send ep0 data ---> pc
+//                    CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
+//                                        USB_DATAEP_SIZE_64B,
+//                                        (TransferCallback)UsbAudio0DataReceived,
+//                                        0);  
+//                }
+//              
+//                counter  = kfifo_get_data_size( &ep0BulkOut_fifo  );
+//                counter2 = kfifo_get_free_space( pSource->pRingBulkOut );
+//                //step2: get data from ssc0/spi0/gpio ring buffer to temp buffer.
+//                if( pSource->txSize <= counter && pSource->txSize <= counter2 ) {
+//                    kfifo_get( &ep0BulkOut_fifo ,
+//                             ( uint8_t * )tmpBuffer,
+//                             pSource->txSize );
+//                    kfifo_put( pSource->pRingBulkOut,
+//                             ( uint8_t * )tmpBuffer,
+//                             pSource->txSize );                 
+//                }               
+           
+                
 }
 
 /*
@@ -571,7 +601,7 @@ void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
     pSource->pBufferOut = ( uint8_t * )&ssc1_PingPongOut[ 1 - pSource->tx_index ];
-     
+    if ( audio_run_control == false) {  return ;}
 	switch( pSource->status[ OUT ] )
 		{ 
 			case START    :
@@ -863,6 +893,10 @@ uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 }
 
 #endif
+
+
+
+
 
 
 /*

@@ -140,10 +140,10 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
     
     APP_TRACE_INFO(("\r\nSetup_Interface: if_type=%d, speed=%dkHz, attribute=0x%X ",\
                          pInterface_Cfg->if_type,pInterface_Cfg->speed, pInterface_Cfg->attribute));
-#if 0   
     err   = NULL;
     temp  = pInterface_Cfg->speed ;
     temp2 = pInterface_Cfg->attribute ;
+      
     if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed) &&
          (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type) )  {
        
@@ -163,7 +163,9 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
                 break;
             }
             if( temp <= 1000 && temp >= 10) { //10k ~ 1M
-                TWI_Init( temp * 1000 );     
+                //TWI_Init( temp * 1000 );
+                temp = temp * 1000 ;
+                source_twi0.init_source( &source_twi0,&temp );
                 APP_TRACE_INFO(("\r\nI2C port is set to %d kHz\r\n",temp));        
             }  else {
                 APP_TRACE_INFO(("\r\nERROR: I2C speed not support %d kHz\r\n",temp));
@@ -176,7 +178,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
             sda_no = GET_I2C_GPIO_SDA(pInterface_Cfg->attribute);
             //if( temp <= 400 && temp >= 10) { 
                 I2C_GPIO_Init( temp * 1000, scl_no, sda_no  );     
-                APP_TRACE_INFO(("\r\nI2C port is set to GPIO simluated %d kHz\r\n",temp));        
+                APP_TRACE_INFO(("\r\nSet GPIO emluated I2C port :%d kHz\r\n",temp));        
             //}  else {
             //    APP_TRACE_INFO(("\r\nERROR: I2C speed not support %d kHz\r\n",temp));
             //    err = SET_I2C_ERR ;
@@ -193,7 +195,10 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
                 break;
             }            
             if( temp <= 48000 && temp >= 400) { 
-                SPI_Init( temp * 1000, temp2 ); 
+                //SPI_Init( temp * 1000, temp2 ); 
+                spi0_cfg.spi_speed = temp * 1000;
+                spi0_cfg.spi_mode  = temp2;
+                source_spi0.init_source( &source_spi0,&spi0_cfg ) ;
             }  else {
                 APP_TRACE_INFO(("\r\nERROR: SPI speed not support %d kHz\r\n",temp));
                 err= SET_SPI_ERR ;
@@ -228,7 +233,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
 //        break ;
         
         case UIF_TYPE_GPIO_CLK :       
-            CS_GPIO_Init( pInterface_Cfg->attribute );
+            //CS_GPIO_Init( pInterface_Cfg->attribute );
         break ;   
     
         case UIF_TYPE_DUT_ID:
@@ -239,7 +244,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         break;
         
     }
-#endif
+    
     
     if ( err == NULL ) {
         Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute;
@@ -450,7 +455,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
               if( Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute == ATTRI_SPI_FM1388_LOAD_CODE ) {
                   size = p_raw_write->data_len / FM1388_ALLOWED_DATA_PACK_SIZE ;                
                   for( i = 0 ; i < size ; i++ ) {
-                      state =  SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE ); 
+                      state =  1;//SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE ); 
                       if (state != SUCCESS) {
                           APP_TRACE_INFO(("\r\nUIF_TYPE_SPI 1388 error: %d",state));
                           err = SPI_BUS_ERR;
@@ -461,14 +466,14 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                   }
                   size = p_raw_write->data_len  % FM1388_ALLOWED_DATA_PACK_SIZE ;
                   if( size ) {
-                      state =  SPI_WriteBuffer_API( p_raw_write->pdata, size);              
+                      state = 1;// SPI_WriteBuffer_API( p_raw_write->pdata, size);              
                       if (state != SUCCESS) {
                           err = SPI_BUS_ERR;
                       }
                   }
                   
               } else {
-                  state =  SPI_WriteBuffer_API( p_raw_write->pdata, p_raw_write->data_len );              
+                  state = 1;// SPI_WriteBuffer_API( p_raw_write->pdata, p_raw_write->data_len );              
                   if (state != SUCCESS) {
                       err = SPI_BUS_ERR;
                   }
@@ -577,10 +582,10 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                 err = SPI_BUS_ERR;
                 return err;
             }
-            state =  SPI_WriteReadBuffer_API(  pbuf, 
-                                               p_raw_read->pdata_write, 
-                                               p_raw_read->data_len_read , 
-                                               p_raw_read->data_len_write);// +1 fix SPI bug
+            state =  1;//SPI_WriteReadBuffer_API(  pbuf, 
+//                                               p_raw_read->pdata_write, 
+//                                               p_raw_read->data_len_read , 
+//                                               p_raw_read->data_len_write);// +1 fix SPI bug
              
               if (state != SUCCESS) {
                   err = SPI_BUS_ERR;
@@ -627,14 +632,14 @@ unsigned char GPIO_Session( GPIO_SESSION *p_gpio_session )
    
    err = 0;
    
-   for( i=0; i<p_gpio_session->gpio_num; i++ )   {
-      GPIOPIN_Set( GET_BYTE_HIGH_4BIT(p_gpio_session->gpio_value[i]), GET_BYTE_LOW_4BIT(p_gpio_session->gpio_value[i]) );
-      if( p_gpio_session->delay_us[i] < 2000 ) {
-          delay_us( p_gpio_session->delay_us[i] );
-      }else{
-          OSTimeDly( p_gpio_session->delay_us[i] );
-      }
-   } 
+//   for( i=0; i<p_gpio_session->gpio_num; i++ )   {
+//      GPIOPIN_Set( GET_BYTE_HIGH_4BIT(p_gpio_session->gpio_value[i]), GET_BYTE_LOW_4BIT(p_gpio_session->gpio_value[i]) );
+//      if( p_gpio_session->delay_us[i] < 2000 ) {
+//          delay_us( p_gpio_session->delay_us[i] );
+//      }else{
+//          OSTimeDly( p_gpio_session->delay_us[i] );
+//      }
+//   } 
    
    return err;
    

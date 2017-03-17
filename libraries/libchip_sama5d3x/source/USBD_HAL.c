@@ -1138,11 +1138,12 @@ void USBD_IrqHandler(void)
 
     /* Handle all UDPHS interrupts */
     TRACE_DEBUG_WP("\n\r%c ", USBD_HAL_IsHighSpeed() ? 'H' : 'F');
-
-    LED_SET_USB_DATA;
+    
+    LED_SET_USB_DATA;        
     
     while( status )
-    {
+    {  
+       
         /* SOF */
         if (status & UDPHS_INTSTA_INT_SOF)
         {
@@ -1208,18 +1209,19 @@ void USBD_IrqHandler(void)
         }
         /* Endpoints */
         else
-        {
+        {  
           #ifdef DMA
             for (numIt = 0; numIt < NUM_IT_MAX; numIt ++)
-            {
+            {    
                 if (status & (1 << SHIFT_DMA << numIt))
-                {
-                    UDPHS_DmaHandler(numIt);
+                { 
+                    UDPHS_DmaHandler(numIt);             
                 }
                 else if (status & (UDPHS_INTSTA_EPT_0 << numIt))
                 {
                     UDPHS_EndpointHandler(numIt);
                 }
+                
             }
           #else
             for (numIt = 0; numIt < NUM_IT_MAX; numIt ++)
@@ -1236,7 +1238,7 @@ void USBD_IrqHandler(void)
         status  = pUdp->UDPHS_INTSTA;
         status &= pUdp->UDPHS_IEN;
                                        
-       
+        
        
         
         TRACE_DEBUG_WP("\n\r");

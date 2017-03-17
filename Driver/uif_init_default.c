@@ -579,9 +579,14 @@ unsigned char aic3204_init_default( void )
     codec_set.flag = 0;
     codec_set.delay = 0;
     err = Init_CODEC( &source_twi1,codec_set );//CODEC1 connetced to TWI1
+    
     return err;
 
 }
+
+
+
+
 
 
 /*

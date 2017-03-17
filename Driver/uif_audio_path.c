@@ -247,7 +247,7 @@ unsigned char  createPath( void *source,
               //step2:set initialize function;
               path->pSource->set_peripheral = ssc_rxRegister_set;
               //step3:install buffer;              
-              path->pfifoIn = &ssc0_bulkin_fifo;
+              path->pfifoIn  = &ssc0_bulkin_fifo;
               path->pfifoOut = &ep0BulkIn_fifo;
               //step4: install ep;
               path->ep = CDCDSerialDriverDescriptors_AUDIO_0_DATAIN;
@@ -282,7 +282,9 @@ unsigned char  createPath( void *source,
           break;
 
     
-    //down link usb<--ssc0/spi0/gpio
+          
+          
+          //down link usb<--ssc0/spi0/gpio             : Playing
         case 1:                            //ep2->ssc0
           {
               path->pSource = &source_ssc0;
@@ -442,11 +444,13 @@ void Init_Audio_Path( void )
 {
     g_audio_path.createAudioPath  = createPath;
     g_audio_path.destroyAudioPath = destroyAllPath;
-    g_audio_path.findPort         = findPort;    
+    g_audio_path.findPort         = findPort;   
     
     g_audio_path.destroyAudioPath( "any" );
   
 }
+
+
 
 void Destroy_Audio_Path( void )
 {

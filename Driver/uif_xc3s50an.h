@@ -80,6 +80,14 @@ typedef struct _fpga_clk_switch
 }FPGA_CLK_SWITCH;
 #pragma pack ( )
 
+typedef struct _fpga_cfg
+{	
+    uint32_t data_path_mask;
+    uint32_t data_path_value;
+    uint32_t clock_path_mask;
+
+}FPGA_CFG;
+ 
 
 //define a path include on i2s clock path and two data path switch. it is the max resource the path owned;
 typedef struct _fpga_path
@@ -205,7 +213,7 @@ typedef struct _fpga_chip
 
 //private interface of xc3s50an chip
    int8_t ( *add_clk_switch_cfg)( FPGA_CLK_SWITCH * cfg,List * clkList );
-   void ( *add_data_switch_cfg)( FPGA_DATA_SWITCH *cfg ,List *clkList );
+   int8_t ( *add_data_switch_cfg)( FPGA_DATA_SWITCH *cfg ,List *clkList );
    void ( *set_data_path )( FPGA_COMMAND *pCmd,uint8_t index,uint8_t value );
    void ( *set_clk_path )( uint8_t index,FPGA_COMMAND* cmd,uint8_t dir, uint8_t oe );
 //private member of this obj;
@@ -231,9 +239,12 @@ extern void set_data_path(  FPGA_COMMAND* cmd,uint8_t index,uint8_t value );
 extern int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataList);
 extern bool i2s_clk_path_check( void * pPath , List *validList );
 extern int8_t add_clk_switch_cfg( FPGA_CLK_SWITCH *cfg ,List *clkList );
-extern void add_data_switch_cfg( FPGA_DATA_SWITCH *cfg ,List *dataList );
+extern int8_t add_data_switch_cfg( FPGA_DATA_SWITCH *cfg ,List *dataList );
 extern void resset_fpga( void );
 extern void init_fpga( void );
 extern void init_fpga_instance( void );
-extern unsigned char FPGA_Setup( void ) ;
+extern unsigned char FPGA_POST_Setup( void ) ;
+extern unsigned char Setup_FPGA( FPGA_CFG *p_cfg ) ;
+
+
 #endif

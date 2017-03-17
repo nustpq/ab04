@@ -30,6 +30,8 @@
      
 #include <includes.h>     
 
+const Pin SSC_Sync_Pin = PIN_SSC_RF;
+const Pin SSC_Sync_Pin1 = PIN_SSC1_RF;
 
 uint8_t tmpBuffer[ USB_RINGOUT_SIZE_16K];
 //uint8_t tmpBuffer1[ I2S_PINGPONG_IN_SIZE_3K ];
@@ -85,13 +87,13 @@ void  App_TaskUSBService ( void *p_arg )
             }
         }
         
-//        if ( usb_state >= USBD_STATE_CONFIGURED ) {
+        if ( usb_state >= USBD_STATE_CONFIGURED ) {
           
-//            UIF_LED_On( LED_USB );    
-//        } else {
+            //UIF_LED_On( LED_USB );    
+        } else {
           
-//            UIF_LED_Off( LED_USB );             
-//        }
+            //UIF_LED_Off( LED_USB );             
+        }
         
         if ( usb_state < USBD_STATE_CONFIGURED ) {            
             OSTimeDly( 2 );
@@ -99,7 +101,7 @@ void  App_TaskUSBService ( void *p_arg )
         }
     
         if ( audio_run_control == false) {            
-            OSTimeDly( 2 );
+            OSTimeDly( 1 );
             continue;      
         }
        
@@ -174,7 +176,7 @@ void  App_TaskUSBService ( void *p_arg )
                              pPath->pSource->rxSize );                 
                 } 
         
-             ///////////////////////////////////////////////////////////////////                  
+ ///////////////////////////////////////////////////////////////////////////////  
             } else if( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT == pPath->ep ) { //SSC0 Play
                 if( source_ssc0.status[ OUT ] == ( uint8_t )CONFIGURED )
                 {
@@ -191,12 +193,14 @@ void  App_TaskUSBService ( void *p_arg )
                      else if( ( counter  <= source_ssc0.txSize )
                         && ( source_ssc0.status[ OUT ] < ( uint8_t )START ) )    
                       {                    
+                          while( !PIO_Get( &SSC_Sync_Pin ) ) ;
+                          while(  PIO_Get( &SSC_Sync_Pin ) ) ;
+                          
                           source_ssc0.buffer_read(   &source_ssc0,
                                                   ( uint8_t * )ssc0_PingPongIn,                                              
                                                   source_ssc0.rxSize );
                           source_ssc0.status[ IN ]  = ( uint8_t )START;
-                          
-                   
+   
                           source_ssc0.buffer_write(  &source_ssc0,
                                                     ( uint8_t * )ssc0_PingPongOut,                                                
                                                     source_ssc0.txSize ); 
@@ -215,8 +219,7 @@ void  App_TaskUSBService ( void *p_arg )
                                                         (TransferCallback)UsbAudio1DataReceived,
                                                         0);  
                         }
-                     else if( ( counter  <= source_ssc1.txSize )
-                        && ( source_ssc1.status[ OUT ] < ( uint8_t )START ) )    
+                     else if( ( counter  <= source_ssc1.txSize ) && ( source_ssc1.status[ OUT ] < ( uint8_t )START ) )    
                       {                    
                           source_ssc1.buffer_read(   &source_ssc1,
                                                   ( uint8_t * )ssc1_PingPongIn,                                              
@@ -258,6 +261,8 @@ void  App_TaskUSBService ( void *p_arg )
             }            
             e = e -> next;            
         }         
+        
+        
         OSTimeDly( 1 );
 //        OS_Sched();          
     } //for loop

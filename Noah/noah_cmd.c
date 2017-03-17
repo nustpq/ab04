@@ -651,7 +651,7 @@ void  Send_Report (uint8_t pkt_sn, uint8_t error_id)
 {
     
     if ( error_id != 0 ) {
-        APP_TRACE_DBG(("Error: %2x ",error_id)); 
+        APP_TRACE_DBG(("error id = %d ",error_id)); 
     }
     pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, (pPCCMDDAT)&error_id, pkt_sn, 0 ) ;
     
@@ -772,6 +772,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     uint8_t     pkt_sn;
   
     err          =  NO_ERR; 
+    pEBuf_Data  = &Emb_Buf_Data;  //Global var  
     
     cmd_index    = ( pNewCmd->cmd[ 0 ] << 8 ) + pNewCmd->cmd[ 1 ];
     pkt_sn       = pNewCmd->pkt_sn;
@@ -783,9 +784,8 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     {
         APP_TRACE_INFO(("\r\nWARN: CMD Index(%d) != EMB Element ID(%d)\r\n",cmd_index,cmd_type));
     }
-    
     Time_Stamp();
-    APP_TRACE_INFO(("\r\n::::: EMB_Data_Parse: cmd type=%d ",cmd_type));
+    APP_TRACE_INFO((" CMD[%d] Start ",cmd_type));
     
 
     switch( cmd_type )  {  
@@ -879,6 +879,8 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
   /*      
         ////////////////////////////////////////////////////////////////////////        
         
+        ////////////////////////////////////////////////////////////////////////        
+        
         case PC_CMD_SET_IF_CFG :
           
             temp = emb_get_attr_int(&root, 1, -1);
@@ -896,16 +898,24 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         
         case PC_CMD_UPDATE_FPGA_SWITCH :
           
-            temp = emb_get_attr_int(&root, 1, -1);
-            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
-            PCCmd.interface_cfg.if_type = (uint8_t)temp;             
-            temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
-            PCCmd.interface_cfg.speed = (uint16_t)temp;   
-            temp = emb_get_attr_int(&root, 3, -1);
-            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
-            PCCmd.interface_cfg.attribute = (uint16_t)temp; 
-            err = Setup_Interface( &PCCmd.interface_cfg );
+            PCCmd.fpga_cfg.data_path_mask   = 0;      
+            PCCmd.fpga_cfg.clock_path_mask  = 0;           
+            for (unsigned char i = 1; i < 7 ; i++ ){  //T0~T6                
+                temp = emb_get_attr_int(&root, i, -1);
+                if(temp != -1 ) { 
+                    PCCmd.fpga_cfg.data_path_mask  += 1<<(i-1);
+                    if( temp > 0 ) {
+                        PCCmd.fpga_cfg.data_path_value += 1<<(i-1);
+                    }                   
+                }
+            }  
+            for (unsigned char i = 8; i < 32 ; i++ ){  //clock path               
+                temp = emb_get_attr_int(&root, i, -1);
+                if(temp != -1 ) { 
+                    PCCmd.fpga_cfg.clock_path_mask  += 1<<(i-8);                
+                }
+            }             
+            err = Setup_FPGA( &PCCmd.fpga_cfg );
             
         break ;
         
@@ -1036,8 +1046,14 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
                                       DATA_AB_INFO ) ;           
         break ; 
         
- */       
+        case PC_CMD_READ_AB_STATUS :              
+            err = pcSendDateToBuffer( EVENT_MsgQ_Noah2PCUART, 
+                                      &PCCmd,
+                                      pkt_sn, 
+                                      DATA_AB_STATUS ) ;           
+        break ; 
         
+
 /*        
         case PC_CMD_REC_VOICE_BUFFER: 
             temp = emb_get_attr_int(&root, 1, -1); //irq gpio index
@@ -1124,7 +1140,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         break ;       
          
  */       
-/***************************************************************************
+        
         
 //        case PC_CMD_BURST_WRITE :
 //            Send_DACK(err);            
@@ -1271,35 +1287,10 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             Send_GACK(err);    
         break ;
   
-        case PC_CMD_SET_VOLUME :
-            Send_DACK(err);
-            temp = emb_get_attr_int(&root, 1, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.mic = (uint32_t)temp;
-            temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.lout = (uint32_t)temp;
-            temp = emb_get_attr_int(&root, 3, -1);
-            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR); break; }
-            PCCmd.set_volume.spk = (uint32_t)temp;      
-            err = Set_Volume( &PCCmd.set_volume ) ;
-            Send_GACK(err);    
-        break ;
         
-        case PC_CMD_READ_AB_STATUS : 
-             Send_DACK(err);             
-             err = EMB_Data_Build( pEBuf_Data, DATA_AB_STATUS, NULL );               
-             pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pEBuf_Data->data, pEBuf_Data->length, 0, NULL, 0 ) ; 
-             Send_GACK(err);            
-        break ;
   
-        case PC_CMD_RAED_AB_INFO :   
-             Send_DACK(err);             
-             err = EMB_Data_Build( pEBuf_Data, DATA_AB_INFO, NULL );             
-             pcSendDateToBuf( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pEBuf_Data->data, pEBuf_Data->length, 0, NULL, 0 ) ; 
-             Send_GACK(err);            
-        break ;      
         ////////////////////////////////////////////////////////////////////////
+        
         case PC_CMD_RAW_DATA_TRANS :   
              Send_DACK(err);  
              
@@ -1333,7 +1324,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
              
              Send_GACK(err);               
         break ;         
-*************************************************************************/  
+        
         
         default :            
             err = CMD_NOT_SUPPORT ;   
@@ -1342,6 +1333,12 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
        
     }
 
+    Time_Stamp();
+    if( err == 0 ) {
+        APP_TRACE_INFO((" CMD[%d] End ",cmd_type));
+    } else {
+        APP_TRACE_INFO((" CMD[%d] End: err = %d ",cmd_type, err));
+    }
     
     return err;
 

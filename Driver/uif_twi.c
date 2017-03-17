@@ -223,6 +223,7 @@ static void twi2_init_master( uint32_t freq )
 
 void twi_init_master( void *pInstance, void * pFreq )
 {
+  
     assert( ( NULL != pInstance ) && ( NULL != pFreq ) );
     
     DataSource *pSource = ( DataSource * )pInstance;

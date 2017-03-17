@@ -37,7 +37,6 @@
 */
 
 #include  <stdio.h>
-
 #include  <cpu.h>
 #include  <lib_def.h>
 
@@ -62,21 +61,21 @@
 */
 #define  DBG_UART_METHOD_TASK_EN  //this define enable the DBG UART in task for speed up, PQ
 //#define  DBG_USB_LOG_EN     //enable usb log info
+
+
 /*
 *********************************************************************************************************
 *                                        TASK PRIORITIES
 *********************************************************************************************************
 */
 
-#define TASKLEDPRIORITY                                    8
 
-#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       1
-#define  APP_CFG_TASK_USB_SEV_PRIO                         5//6
+
 #define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
 #define  APP_CFG_TASK_UART_TX_PRIO                         3
-#define  APP_CFG_TASK_NOAH_PRIO                            4
-#define  APP_CFG_TASK_UART_RX_PRIO                         6//5
-
+#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       1
+#define  APP_CFG_TASK_USB_SEV_PRIO                         6
+#define  APP_CFG_TASK_UART_RX_PRIO                         9 
 #define  APP_CFG_TASK_USER_IF_PRIO                         10
 #define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+1)
 
