@@ -67,7 +67,7 @@ void list_destroy(List * list)
 		if(list_rem_next(list,NULL,(void **)&data) == 0 
 			&& list->destroy != NULL)
 			{
-				list_destroy(data);
+				list->destroy(data);
 			}
 	}
 	//clear memory that list used

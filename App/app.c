@@ -148,7 +148,7 @@ kfifo_t  spi1_bulkIn_fifo;
 *Note: Maybe should move all of these defines to a standard-alone file? that read easier;
 *********************************************************************************************************
 */
-#pragma   pack(1)
+#pragma   pack( 4 )
 //Buffer Level 1:  USB data stream buffer : 64 B
 uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
 uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B * 16 * 3 ] ;

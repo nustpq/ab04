@@ -30,7 +30,8 @@
      
 #include <includes.h>     
 
-
+Pin SSC_Sync_Pin = PIN_SSC_RF;
+Pin SSC_Sync_Pin1 = PIN_SSC1_RF;
 uint8_t tmpBuffer[ USB_RINGOUT_SIZE_16K];
 //uint8_t tmpBuffer1[ I2S_PINGPONG_IN_SIZE_3K ];
 void Init_Audio_Path();
@@ -50,6 +51,8 @@ void Init_Audio_Path();
 *                   used.  The compiler should not generate any code for this statement.
 *********************************************************************************************************
 */
+void i2s0_isr_handler( void );
+void i2s1_isr_handler( void );
 void  App_TaskUSBService ( void *p_arg )
 {
     
@@ -189,18 +192,46 @@ void  App_TaskUSBService ( void *p_arg )
                         }
                      //counter = kfifo_get_free_space( pPath->pfifoOut );
                      else if( ( counter  <= source_ssc0.txSize )
-                        && ( source_ssc0.status[ OUT ] < ( uint8_t )START ) )    
-                      {                    
+                        && ( source_ssc0.status[ IN ] < ( uint8_t )START ) )    
+                      {   
+                          err = Init_CODEC( &source_twi2,48000, 16 );
+                          
+                          First_Pack_Padding_BI( &ep0BulkIn_fifo );
+                          First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
+
                           source_ssc0.buffer_read(   &source_ssc0,
                                                   ( uint8_t * )ssc0_PingPongIn,                                              
                                                   source_ssc0.rxSize );
                           source_ssc0.status[ IN ]  = ( uint8_t )START;
                           
-                   
-                          source_ssc0.buffer_write(  &source_ssc0,
-                                                    ( uint8_t * )ssc0_PingPongOut,                                                
-                                                    source_ssc0.txSize ); 
-                          source_ssc0.status[ OUT ] = ( uint8_t )START;                              
+
+                          source_ssc1.buffer_read(   &source_ssc1,
+                                                  ( uint8_t * )ssc1_PingPongIn,                                              
+                                                  source_ssc1.rxSize );
+                          source_ssc1.status[ IN ]  = ( uint8_t )START;
+ 
+                          while( !PIO_Get( &SSC_Sync_Pin ) );
+                           while( PIO_Get( &SSC_Sync_Pin ) );
+#if 1                         
+                          if( source_ssc0.buffer_write != NULL )
+                          {
+                              source_ssc0.buffer_write(  &source_ssc0,
+                                                        ( uint8_t * )ssc0_PingPongOut,                                                
+                                                        source_ssc0.txSize ); 
+                              source_ssc0.status[ OUT ] = ( uint8_t )START;
+
+                          }
+#endif
+                          
+#if 1                                                                       
+                          source_ssc1.buffer_write(  &source_ssc1,
+                                                    ( uint8_t * )ssc1_PingPongOut,                                                
+                                                    source_ssc1.txSize ); 
+                          source_ssc1.status[ OUT ] = ( uint8_t )START;  
+
+#endif                           
+ 
+                           
                       }  
                   }
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->ep ) {   //SSC1 Play
@@ -216,17 +247,25 @@ void  App_TaskUSBService ( void *p_arg )
                                                         0);  
                         }
                      else if( ( counter  <= source_ssc1.txSize )
-                        && ( source_ssc1.status[ OUT ] < ( uint8_t )START ) )    
-                      {                    
+                        && ( source_ssc1.status[ IN ] < ( uint8_t )START ) )    
+                      { 
+#if 0                        
+//                          err = Init_CODEC( &source_twi1,48000, 16 );
+                          First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
                           source_ssc1.buffer_read(   &source_ssc1,
                                                   ( uint8_t * )ssc1_PingPongIn,                                              
                                                   source_ssc1.rxSize );
                           source_ssc1.status[ IN ]  = ( uint8_t )START;
+ 
                     
+
+                          
                           source_ssc1.buffer_write(  &source_ssc1,
                                                     ( uint8_t * )ssc1_PingPongOut,                                                
                                                     source_ssc1.txSize ); 
-                          source_ssc1.status[ OUT ] = ( uint8_t )START;                              
+                          source_ssc1.status[ OUT ] = ( uint8_t )START;  
+
+#endif                          
                       }  
                   }                           
             } else if( CDCDSerialDriverDescriptors_SPI_DATAOUT == pPath->ep ) { //SPI/GPIO Play

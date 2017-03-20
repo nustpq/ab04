@@ -14,7 +14,7 @@ Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=-40988118
+Checksum=719488122
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -58,8 +58,7 @@ Fmt2={W}0:status	4	0
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_i2s.c}.449.33" 0 0 1 "" 0 "" 0
-Count=1
+Count=0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

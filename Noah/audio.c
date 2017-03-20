@@ -216,6 +216,8 @@ void Audio_Start( void )
 
     Init_Audio_Bulk_FIFO( ); 
     
+//    aic3204_init_default( );
+    
     source_ssc0.status[ IN ] == ( uint8_t )CONFIGURED;
     source_ssc0.status[ OUT ] == ( uint8_t )CONFIGURED;
     source_ssc1.status[ IN ] == ( uint8_t )CONFIGURED;
@@ -266,15 +268,17 @@ void Audio_Stop( void )
 
     OSTimeDly( 4 );
     
-     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
-     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
+//     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
+//     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
     
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
+//    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
+//    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
     
     OSTimeDly(2); 
   
-
+//    reset_fpga( );
+    Pin_Reset_Codec( 0 );
+    Pin_Reset_Codec( 1 );
     
     Init_Audio_Bulk_FIFO( ); 
     memset( usbCacheBulkOut0 , 0 , sizeof( usbCacheBulkOut0 ));

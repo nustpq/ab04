@@ -75,7 +75,8 @@ uint8_t Get_Codec(const DataSource *pSource,uint8_t codec_control_type, uint8_t 
 
 uint8_t Codec_Mixer(const DataSource *pSource,uint8_t i2c_channel );
 
-uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set ) ;
+//uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set ) ;
+unsigned char Init_CODEC( const DataSource *pSource,unsigned int sr, unsigned char sample_length ) ;
 
 uint8_t Set_AIC3204_DSP_Offset( uint8_t slot_index ) ;
 uint8_t Init_CODEC_AIC3204( uint32_t sample_rate ) ;
@@ -83,7 +84,7 @@ uint8_t Init_CODEC_AIC3204( uint32_t sample_rate ) ;
 uint8_t CODEC_LOUT_Small_Gain_En( bool small_gain );
 uint8_t CODEC_Set_Volume( const DataSource *pSource,float vol_spk, float vol_lout, float vol_lin );
 uint8_t Check_SR_Support( uint32_t sample_rate );
-
+void Pin_Reset_Codec( unsigned char id );
 void enable_PA( bool en );
 
 #endif

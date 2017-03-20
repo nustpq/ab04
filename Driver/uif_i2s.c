@@ -83,6 +83,121 @@ void ISR_HDMA( void )
 }
 #endif
 
+
+/*
+*********************************************************************************************************
+*                                               i2s_start_Interrupt()
+*
+* Description : DMA interrupt handle
+*
+* Arguments   : none.
+*
+* Returns     : none.
+*
+* Note(s)     : none.
+*********************************************************************************************************
+*/
+void i2s0_start_Interrupt( void *pPin, void (*isr_handler)( void ) )
+{
+    uint8_t per_id;
+    
+    assert( NULL != pPin );
+    Pin *pPins = ( Pin * )pPin;
+
+    per_id = ( uint8_t )pPins->id;
+    IRQ_DisableIT( per_id );
+
+    pPins->pio->PIO_ISR;
+    pPins->pio->PIO_AIMER =   pPins->mask;
+    pPins->pio->PIO_IER =     pPins->mask;       //enable int
+    pPins->pio->PIO_ESR =     pPins->mask;       //edge int
+//    pPins->pio->PIO_REHLSR =  pPins->mask;     //rising edge int
+    pPins->pio->PIO_FELLSR =  pPins->mask;       //falling edge int    
+    pPins->pio->PIO_IFER =    pPins->mask;       //enable input glitch filter
+
+    IRQ_ConfigureIT( per_id, GPIO_PRIORITY+2, isr_handler );
+    IRQ_EnableIT( per_id );
+
+}
+
+void i2s1_start_Interrupt( void *pPin, void (*isr_handler)( void ) )
+{
+    uint8_t per_id;
+    
+    assert( NULL != pPin );
+    Pin *pPins = ( Pin * )pPin;
+
+    per_id = ( uint8_t )pPins->id;
+    IRQ_DisableIT( per_id );
+
+    pPins->pio->PIO_ISR;
+    pPins->pio->PIO_AIMER =   pPins->mask;
+    pPins->pio->PIO_IER =     pPins->mask;       //enable int
+    pPins->pio->PIO_ESR =     pPins->mask;       //edge int
+//    pPins->pio->PIO_REHLSR =  pPins->mask;     //rising edge int
+    pPins->pio->PIO_FELLSR =  pPins->mask;       //falling edge int    
+    pPins->pio->PIO_IFER =    pPins->mask;       //enable input glitch filter
+
+    IRQ_ConfigureIT( per_id, GPIO_PRIORITY+1, isr_handler );
+    IRQ_EnableIT( per_id );
+
+}
+
+/*
+*********************************************************************************************************
+*                                    Disable_i2s_start_Interrupt()
+*
+* Description :  disable interrupt of special pin
+*
+* Argument(s) :  pin  : 
+*
+*
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void Disable_i2s_start_Interrupt( Pin *pin )
+{
+    assert( NULL != pin );
+
+    Pin *pPins = ( Pin * )pin;
+
+    pPins->pio->PIO_IDR = pPins->mask; //enable int
+
+}
+
+
+void i2s0_isr_handler( void )
+{
+  extern Pin SSC_Sync_Pin; 
+  source_ssc0.buffer_write(  &source_ssc0,
+                             ( uint8_t * )ssc0_PingPongOut,                                                
+                             source_ssc0.txSize ); 
+  source_ssc0.status[ OUT ] = ( uint8_t )START;  
+ 
+  Disable_i2s_start_Interrupt( &SSC_Sync_Pin ); 
+ 
+}
+
+void i2s1_isr_handler( void )
+{
+  extern Pin SSC_Sync_Pin1; 
+ 
+
+#if 1  
+  source_ssc1.buffer_write(  &source_ssc1,
+                             ( uint8_t * )ssc1_PingPongOut,                                                
+                             source_ssc1.txSize ); 
+  source_ssc1.status[ OUT ] = ( uint8_t )START; 
+#endif
+  
+  Disable_i2s_start_Interrupt( &SSC_Sync_Pin1 );  
+  
+}
+
+
 /*
 *********************************************************************************************************
 *                                               _get_ssc_instance()
@@ -308,13 +423,14 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
                                       }
                                       else if( pSource->status[ IN ] == ( uint8_t )START )
                                       {
-                                         First_Pack_Padding_BI( &ep0BulkIn_fifo ); 
-                                         pSource->status[ IN ] = ( uint8_t )RUNNING;
+//                                         First_Pack_Padding_BI( &ep0BulkIn_fifo ); 
+//                                         pSource->status[ IN ] = ( uint8_t )RUNNING;
+                                         
+                                    
 
                                          kfifo_put( &ep0BulkIn_fifo,//pSource->pRingBulkIn,
                   					( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
                   					pSource->rxSize );
-//                                         memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], 0, pSource->rxSize );
                                          
                                          uint32_t counter = kfifo_get_data_size( &ep0BulkIn_fifo  ); 
                                          
@@ -420,8 +536,8 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
                                       }
                                       else if( pSource->status[ IN ] == ( uint8_t )START )
                                       {
-                                         First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
-                                         pSource->status[ IN ] = ( uint8_t )RUNNING;
+//                                         First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
+//                                         pSource->status[ IN ] = ( uint8_t )RUNNING;
 
                                          kfifo_put( &ep1BulkIn_fifo,//pSource->pRingBulkIn,
                   					( uint8_t * )&(ssc1_PingPongIn[ pSource-> rx_index ][0]), 
@@ -1104,8 +1220,8 @@ static void _SSC_Init( uint32_t id,
     tcmr.start  = 4;    // 4: falling edge trigger for low left, 5: rising edge trigger for high left,
     rcmr.start  = 4;    // 0: continuous 1:transmit 2:RF_LOW 3:RF_HIGH 4:RF_FAILLING
     			       // 5: RF_RISING 6:RF_LEVEL 7:RF_EDGE 8:CMP_0
-    tcmr.sttdly = 1;
-    rcmr.sttdly = 1;   
+    tcmr.sttdly = 2;
+    rcmr.sttdly = 2;   
 	
     tcmr.period = 0;   // period ;  slave not use 0-->15
     rcmr.period = 0;   // period ;  slave not use

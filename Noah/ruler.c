@@ -405,7 +405,7 @@ unsigned char Update_Audio( unsigned char id )
     }
     APP_TRACE_INFO(("\r\n\############## BCLK POLARITY = %d\r\n", Codec_Set[id][index].bclk_polarity));
     //I2C_Mixer(I2C_MIX_FM36_CODEC);
-    err = Init_CODEC( &data_source[id], Codec_Set[id][index] );
+//    err = Init_CODEC( &data_source[id], Codec_Set[id][index] );
     //I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         APP_TRACE_INFO(("\r\nUpdate_Audio Init_CODEC ERROR: %d\r\n",err));

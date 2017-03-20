@@ -564,7 +564,11 @@ unsigned char aic3204_init_default( void )
     codec_set.bclk_polarity = 0;
     codec_set.flag = 0;
     codec_set.delay = 0;
+#if 0
     err = Init_CODEC( &source_twi2,codec_set ); //CODEC0 connetced to TWI2
+#else
+    err = Init_CODEC( &source_twi2,48000, 16 ); 
+#endif
     if(err != NO_ERR) {
         return err;
     }
@@ -578,7 +582,11 @@ unsigned char aic3204_init_default( void )
     codec_set.bclk_polarity = 0;
     codec_set.flag = 0;
     codec_set.delay = 0;
+#if 0
     err = Init_CODEC( &source_twi1,codec_set );//CODEC1 connetced to TWI1
+#else
+    err = Init_CODEC( &source_twi1,48000, 16 );
+#endif
     return err;
 
 }
@@ -645,6 +653,6 @@ void uif_miscPin_init_default( void )
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
     UIF_Misc_On ( FAST_PLUS_RST );
-    UIF_Misc_On ( LEVEL_SHIFT_OE );
+    UIF_Misc_Off ( LEVEL_SHIFT_OE );
     UIF_Misc_On ( FPGA_RST );
 }

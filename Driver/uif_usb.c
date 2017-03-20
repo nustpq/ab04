@@ -96,6 +96,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
 {   
     remaining = remaining;
     uint32_t pos = 0,offset = 0;
+    uint64_t total=0;
     uint8_t fillOffset[ 16 ] = { 0 };
     const uint8_t pos1 = 128;
     
@@ -117,7 +118,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
       }
       else
           kfifo_put(&ssc0_bulkout_fifo, usbCacheBulkOut0, received);
-
+      
       restart_audio_0_bulk_out  = true ; 
    
     }  
@@ -133,6 +134,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
     {
     case USBD_STATUS_SUCCESS:
       {
+#if 1
             if( false == padding_audio_0_bulk_out )
             {
                 padding_audio_0_bulk_out = First_Pack_Check_BO2( &usbCacheBulkOut0, received, &pos );
@@ -148,6 +150,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
                 }
             }
             else
+#endif              
                 kfifo_put(&ssc0_bulkout_fifo, usbCacheBulkOut0, received);
 
             restart_audio_0_bulk_out  = true ; 
@@ -156,6 +159,11 @@ void UsbAudio0DataReceived(  uint32_t unused,
     case USBD_STATUS_PARTIAL_DONE:
       assert( 0 );
       break;
+    case USBD_STATUS_CANCELED:
+    case 5:
+      ;
+      //memset( usbCacheBulkOut0 , 0 , sizeof( usbCacheBulkOut0 ) );
+      break;  
     default:
       assert( 0 );
       break;
@@ -175,6 +183,7 @@ void UsbAudio1DataReceived(  uint32_t unused,
 
    if ( status == USBD_STATUS_SUCCESS ) 
     { 
+#if 1      
       if( false == padding_audio_1_bulk_out )
       {
          padding_audio_1_bulk_out = First_Pack_Check_BO2( &usbCacheBulkOut1, received , &pos );
@@ -189,6 +198,7 @@ void UsbAudio1DataReceived(  uint32_t unused,
          }
       }
       else
+#endif
           kfifo_put(&ssc1_bulkout_fifo, usbCacheBulkOut1, received);
 
       restart_audio_1_bulk_out  = true ; 
