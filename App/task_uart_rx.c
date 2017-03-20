@@ -76,6 +76,8 @@ void App_TaskUART_Rx( void *p_arg )
     
     while (DEF_TRUE) {  
       
+
+        Check_CMD_BulkOut_Restart();
         counter  = kfifo_get_data_size(&cmdEpBulkOut_fifo); 
         //APP_TRACE_INFO((" %4d ",counter)) ;  
         

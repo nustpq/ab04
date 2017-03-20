@@ -874,13 +874,10 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         
             err = AB_POST();
             
-        break;                 
-
-  /*      
-        ////////////////////////////////////////////////////////////////////////        
+        break;       
         
         ////////////////////////////////////////////////////////////////////////        
-        
+                
         case PC_CMD_SET_IF_CFG :
           
             temp = emb_get_attr_int(&root, 1, -1);
@@ -1053,7 +1050,8 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
                                       DATA_AB_STATUS ) ;           
         break ; 
         
-
+      ////////////////////////////////////////////////////////////////////////     
+        
 /*        
         case PC_CMD_REC_VOICE_BUFFER: 
             temp = emb_get_attr_int(&root, 1, -1); //irq gpio index

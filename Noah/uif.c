@@ -132,8 +132,7 @@ void Dump_Data ( unsigned char *pdata, unsigned int size )
 *********************************************************************************************************
 */
 unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
-{  
-    
+{       
     unsigned char err; 
     unsigned int  temp, temp2;
     unsigned char scl_no, sda_no;
@@ -144,16 +143,22 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
     temp  = pInterface_Cfg->speed ;
     temp2 = pInterface_Cfg->attribute ;
       
-    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed) &&
-         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type) )  {
-       
-        if( Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute == pInterface_Cfg->attribute ) {
-            APP_TRACE_INFO(("\r\nNo need to set same interface\r\n"));
-        } else {
-            Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute;
-            APP_TRACE_INFO(("\r\nChanged the interface attribute!\r\n"));
-        }    
-        return err;
+//    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed) &&
+//         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type) )  {
+//       
+//        if( Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute == pInterface_Cfg->attribute ) {
+//            APP_TRACE_INFO(("\r\nNo need to set same interface\r\n"));
+//        } else {
+//            Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute;
+//            APP_TRACE_INFO(("\r\nChanged the interface attribute!\r\n"));
+//        }    
+//        return err;
+//    }
+    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed)  &&
+         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type)  &&
+         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute == pInterface_Cfg->attribute ) ) {        
+            APP_TRACE_INFO(("\r\nNo need to set same interface\r\n"));       
+            return err;
     }
 
     switch( pInterface_Cfg->if_type )  {

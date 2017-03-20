@@ -51,7 +51,7 @@
 *********************************************************************************************************
 */
 #define  DMA_PRIORITY       2
-#define  USB_PRIORITY       1
+#define  USB_PRIORITY       2
 #define  GPIO_PRIORITY      0
 #define  TWI_PRIORITY       0
 /*
@@ -73,8 +73,8 @@
 
 #define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
 #define  APP_CFG_TASK_UART_TX_PRIO                         3
-#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       1
-#define  APP_CFG_TASK_USB_SEV_PRIO                         6
+#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       4
+#define  APP_CFG_TASK_USB_SEV_PRIO                         1
 #define  APP_CFG_TASK_UART_RX_PRIO                         9 
 #define  APP_CFG_TASK_USER_IF_PRIO                         10
 #define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+1)

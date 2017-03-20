@@ -705,7 +705,7 @@ uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.rxDMAChannel, dmaTdSSC0Rx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.rxDMAChannel);
         
-        SSC_EnableReceiver(pSsc); 
+        //SSC_EnableReceiver(pSsc); 
         
         
         //memset( testbuf, 0x55, sizeof(testbuf)  ); 
@@ -829,7 +829,7 @@ uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC0Tx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
 
-        SSC_EnableTransmitter( pSsc );
+       // SSC_EnableTransmitter( pSsc );
         
         return 0;
 }

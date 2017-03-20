@@ -343,7 +343,7 @@ uint8_t twi0_uname_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         DataSource *pSource = ( DataSource * )pInstance;
         TWI_CFG *option = ( TWI_CFG * )pSource ->privateData;
 
-	Twid *pTwid = &twid[ UNAMED ];
+	Twid *pTwid = &twid[ UNAMED ];  //TWI 0
 	assert( NULL != pTwid->pTwi );		
         
         
@@ -394,7 +394,7 @@ uint8_t twi1_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         DataSource *pSource = ( DataSource * )pInstance;
         TWI_CFG *option = ( TWI_CFG * )pSource->privateData;         
 
-	Twid *pTwid = &twid[ CODEC1 ];
+	Twid *pTwid = &twid[ CODEC1 ];  // TWI 1
 	assert( NULL != pTwid->pTwi );		
        
         if( 0 == len ) return -1;
@@ -408,7 +408,7 @@ uint8_t twi1_write(void *pInstance, const uint8_t *buf,uint32_t len  )
 
 }
 
-
+ 
 /*
 *********************************************************************************************************
 *                                    twi2_write()
@@ -433,7 +433,7 @@ uint8_t twi2_write(void *pInstance, const uint8_t *buf,uint32_t len  )
         DataSource *pSource = ( DataSource * )pInstance;
         TWI_CFG *option = ( TWI_CFG * )pSource->privateData;
 
-	Twid *pTwid = &twid[ FM36 ];
+	Twid *pTwid = &twid[ FM36 ]; //TWI 2
 	assert( NULL != pTwid->pTwi );			
         
         if( 0 == len ) return -1;

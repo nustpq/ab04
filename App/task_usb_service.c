@@ -70,7 +70,7 @@ void  App_TaskUSBService ( void *p_arg )
     extern uint8_t debug_cnt;
     
     OS_CPU_SR cpu_sr;  
-
+    Ssc* pSsc = _get_ssc_instance( source_ssc0.dev.identify );
  
     for(;;) 
     {          
@@ -193,8 +193,7 @@ void  App_TaskUSBService ( void *p_arg )
                      else if( ( counter  <= source_ssc0.txSize )
                         && ( source_ssc0.status[ OUT ] < ( uint8_t )START ) )    
                       {                    
-                          while( !PIO_Get( &SSC_Sync_Pin ) ) ;
-                          while(  PIO_Get( &SSC_Sync_Pin ) ) ;
+                          
                           
                           source_ssc0.buffer_read(   &source_ssc0,
                                                   ( uint8_t * )ssc0_PingPongIn,                                              
@@ -204,7 +203,14 @@ void  App_TaskUSBService ( void *p_arg )
                           source_ssc0.buffer_write(  &source_ssc0,
                                                     ( uint8_t * )ssc0_PingPongOut,                                                
                                                     source_ssc0.txSize ); 
-                          source_ssc0.status[ OUT ] = ( uint8_t )START;                              
+                          source_ssc0.status[ OUT ] = ( uint8_t )START;
+                          
+                          while( !PIO_Get( &SSC_Sync_Pin ) ) ;
+                          while(  PIO_Get( &SSC_Sync_Pin ) ) ;
+                          
+                           SSC_EnableTransmitter( pSsc );
+                           SSC_EnableReceiver(pSsc); 
+                          
                       }  
                   }
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->ep ) {   //SSC1 Play

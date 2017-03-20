@@ -401,9 +401,19 @@ void UsbCmdDataReceived(  uint32_t unused,
     {      
         APP_TRACE_INFO(( "\r\nERROR : UsbCmdDataReceived: Transfer error\r\n" )); 
         
-    }
+    }      
     
-    
+}
+
+void Check_CMD_BulkOut_Restart( void )
+{
+    if ( restart_cmd_bulk_out && ( USB_CMDEP_SIZE_64B <= kfifo_get_free_space(&cmdEpBulkOut_fifo)) ) { //               
+         restart_cmd_bulk_out = false ;           
+          CDCDSerialDriver_ReadCmd(  usbCmdCacheBulkOut,
+                                          USB_CMDEP_SIZE_64B,
+                                          (TransferCallback) UsbCmdDataReceived,
+                                          0);  
+     } 
 }
 
 void UsbCmdDataTransmit(  uint32_t unused,
