@@ -576,8 +576,8 @@ void uif_ports_init_default( void )
 {
     ssc0_init( );
     ssc1_init( );  
-    spi0_init( DEFAULT_SPI_SPEED, 1 );
-    spi1_init( DEFAULT_SPI_SPEED, 1 );
+    spi0_init( DEFAULT_SPI_SPEED0, 1 );
+    spi1_init( DEFAULT_SPI_SPEED1, 1 );
     twi0_init( DEFAULT_TWI_SPEED );
     twi1_init( DEFAULT_TWI_SPEED );
     twi2_init( DEFAULT_TWI_SPEED );
