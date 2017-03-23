@@ -80,9 +80,30 @@ unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read,
                                         unsigned int   size_read, 
                                         unsigned int   size_write  )
 {
-    unsigned char err;
-    err =0;// _spiDmaRx( void *pInstance ,const uint8_t *buf,uint32_t len  );  
+    uint8_t err = 0;
+    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
+    
+    spi_clear_status( &source_spi0 );
+    
+    err = DMAD_IsTransferDone( &g_dmad , source_spi0.dev.txDMAChannel );
+    while( 0 != err )
+               return 1;
+    
+    err =   _spiDmaTx( &source_spi0 , pdata_write, size_write  );
+    
+    while( 0 != DMAD_IsTransferDone( &g_dmad , source_spi0.dev.txDMAChannel ) )
+         OSTimeDly( 1 );  
+  
+    err = _spiDmaRx( &source_spi0 , pdata_read, size_read  ); 
+    
+    while( 0 != DMAD_IsTransferDone( &g_dmad , source_spi0.dev.rxDMAChannel ) )
+         OSTimeDly( 1 );
+      
+    SPI_ReleaseCS( pSpi ); 
+    
     return err;
+  
+
   
 }
 
