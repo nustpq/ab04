@@ -27,7 +27,7 @@ extern sDmad g_dmad;
 
 sDmad spi_dmad;
 
-const Pin spi0_pins[] = { PINS_SPI0 };					 
+const Pin spi0_pins[] = { PINS_SPI0,PIN_SPI0_NPCS0 };					 
 const Pin spi1_pins[] = { PINS_SPI1,PIN_SPI1_NPCS0 };   
 
 
@@ -132,11 +132,12 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
     uint32_t temp = 0;
     
     DataSource *pSource = ( DataSource *)pArg;
-    
-    /*step 1:calculate buffer space */ 
+
+/*    
+    //step 1:calculate buffer space  
     temp = kfifo_get_free_space( pSource->pRingBulkIn );
 
-     /*step 2:insert data to RingBuffer from PingPong buffer */  
+     //step 2:insert data to RingBuffer from PingPong buffer   
      if( temp >= pSource->warmWaterLevel )
      {        
        kfifo_put( pSource->pRingBulkIn,
@@ -166,7 +167,7 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
          }
      }
    
-
+*/
 }
 
 /*
@@ -191,11 +192,11 @@ void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
     uint32_t temp = 0;
     
     DataSource *pSource = ( DataSource *)pArg;
-    
-     /*step 1:calculate buffer space */ 
+/*    
+     //step 1:calculate buffer space  
      temp = kfifo_get_data_size( pSource->pRingBulkOut );
 
-     /*step 2:get data from spi RingBuffer */  
+     //step 2:get data from spi RingBuffer   
      if( temp >= pSource->warmWaterLevel )
      {        
          kfifo_get( pSource->pRingBulkOut,
@@ -224,7 +225,7 @@ void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
              return;
          }
      }
-     
+*/     
  
 }
 
@@ -498,6 +499,7 @@ static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk 
     
     // configure SPI csr0
     SPI_ConfigureNPCS( pSpi, 0, csr0 ) ;
+    SPI_ConfigureCSMode( pSpi, 0, 1 ) ;
     SPI_Enable( pSpi ) ;
 
 }
@@ -593,6 +595,7 @@ uint8_t _spiDmaRx( void *pInstance ,const uint8_t *buf,uint32_t len  )
 {
     assert( NULL != pInstance );
     
+    uint8_t ret = 0;
     DataSource *pSource = ( DataSource * )pInstance;
     Spi *pSpi = _get_spi_instance( pSource->dev.identify );
     
@@ -614,10 +617,14 @@ uint8_t _spiDmaRx( void *pInstance ,const uint8_t *buf,uint32_t len  )
                    | DMAC_CTRLB_SRC_INCR_FIXED
                    | DMAC_CTRLB_DST_INCR_INCREMENTING;
     td.dwDscAddr = 0;
-    DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.rxDMAChannel, &td );
-    DMAD_StartTransfer( &g_dmad, pSource->dev.rxDMAChannel );
+    ret = DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.rxDMAChannel, &td );
     
-    return 0;
+    if( !ret )
+      ret = DMAD_StartTransfer( &g_dmad, pSource->dev.rxDMAChannel );
+    else
+      return ret;
+    
+    return ret;
 }
 
 
@@ -640,6 +647,7 @@ uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  )
 {  
     assert( NULL != pInstance );
     
+    uint8_t ret;
     DataSource *pSource = ( DataSource * )pInstance;
     Spi *pSpi = _get_spi_instance( pSource->dev.identify );
     
@@ -662,10 +670,14 @@ uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  )
                    | DMAC_CTRLB_SRC_INCR_INCREMENTING
                    | DMAC_CTRLB_DST_INCR_FIXED;
     td.dwDscAddr = 0;
-    DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.txDMAChannel, &td );
-    DMAD_StartTransfer( &g_dmad, pSource->dev.txDMAChannel );
     
-    return 0;
+    ret = DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.txDMAChannel, &td ); 
+    if( !ret )
+      ret = DMAD_StartTransfer( &g_dmad, pSource->dev.txDMAChannel );
+    else
+      return ret;
+    
+    return ret;
   
 }
 
