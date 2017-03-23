@@ -1220,8 +1220,8 @@ static void _SSC_Init( uint32_t id,
     tcmr.start  = 4;    // 4: falling edge trigger for low left, 5: rising edge trigger for high left,
     rcmr.start  = 4;    // 0: continuous 1:transmit 2:RF_LOW 3:RF_HIGH 4:RF_FAILLING
     			       // 5: RF_RISING 6:RF_LEVEL 7:RF_EDGE 8:CMP_0
-    tcmr.sttdly = 2;
-    rcmr.sttdly = 2;   
+    tcmr.sttdly = 1;    //rollback the key parameter
+    rcmr.sttdly = 1;   
 	
     tcmr.period = 0;   // period ;  slave not use 0-->15
     rcmr.period = 0;   // period ;  slave not use
