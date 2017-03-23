@@ -56,7 +56,6 @@
 *********************************************************************************************************
 */
 // all of data sources instance list
-DataSource source_usb;
 DataSource source_ssc0;
 DataSource source_ssc1;
 DataSource source_spi0;
@@ -261,8 +260,8 @@ static  void  App_TaskStart             (void        *p_arg);
 */
 
 int main() 
-{
-
+{   
+  
     CPU_INT08U  os_err;
 
     CPU_Init();
@@ -470,10 +469,10 @@ static  void  App_TaskStart (void *p_arg)
 
         counter++;
         if(counter&0xFF) {
-           // UIF_LED_On( LED_RUN );
+            UIF_LED_On( LED_RUN );
         }     
         if(counter&0x3F) {
-          //  UIF_LED_Off( LED_RUN );
+            UIF_LED_Off( LED_RUN );
         }   
         OSTimeDly(10);
         
@@ -902,7 +901,7 @@ void Dma_configure( void )
     /* Driver initialize */
     DMAD_Initialize( pDmad, 0 );
     /* IRQ configure */
-    IRQ_ConfigureIT( ID_DMAC0, DMA_PRIORITY, ISR_HDMA ); //highest priority
+    IRQ_ConfigureIT( ID_DMAC0, DMA_PRIORITY, ISR_HDMA );
     IRQ_ConfigureIT( ID_DMAC1, DMA_PRIORITY, ISR_HDMA );
     IRQ_EnableIT(ID_DMAC0);
     IRQ_EnableIT(ID_DMAC1);

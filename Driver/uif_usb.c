@@ -34,6 +34,9 @@ extern kfifo_t  cmdEpBulkIn_fifo;
 
 extern kfifo_t DBG_USB_Send_kFIFO;
 
+extern const USBDDriverDescriptors cdcdSerialDriverDescriptors;
+
+
 bool volatile restart_audio_0_bulk_out  = false ; 
 bool volatile restart_audio_0_bulk_in   = false ; 
 bool volatile restart_audio_1_bulk_out  = false ; 
@@ -531,15 +534,11 @@ void USBDCallbacks_RequestReceived( const USBGenericRequest *request )
     CDCDSerialDriver_RequestHandler( request );
 }
 
-void init_usb( void *pParameter,void *dParameter )
+void Init_USB( void )
 {
-    extern const USBDDriverDescriptors cdcdSerialDriverDescriptors;
-
-	pParameter = pParameter;
-	dParameter = dParameter;
 
 	/* If they are present, configure Vbus & Wake-up pins */
-    PIO_InitializeInterrupts(0);
+    PIO_InitializeInterrupts( GPIO_PRIORITY );
 
     /* Initialize all USB power (off) */
     USBPower_Configure();

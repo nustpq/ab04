@@ -69,7 +69,7 @@ void USBDCallbacks_Initialized( void );
 void USBDDriverCallbacks_ConfigurationChanged( uint8_t cfgnum );
 void USBDCallbacks_RequestReceived( const USBGenericRequest *request );
 
-void init_usb( void *pParameter,void *dParameter ); 
+void Init_USB( void ); 
 
 
 

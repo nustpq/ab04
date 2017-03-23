@@ -55,6 +55,8 @@
 
 #include  <app_cfg.h>
 
+#include  <board.h>
+
 #include  <bsp_int.h>
 //#include  <bsp_gpio.h>
 //#include  <bsp_pmc.h>
@@ -64,7 +66,7 @@
 #include  <lib_def.h>
 #include  <lib_ascii.h>
 
-//#include  <at91sam3u4.h>
+
 #include  <app_cfg.h>
 #include  <ucos_ii.h>
 #include  <stdarg.h>
@@ -80,7 +82,7 @@
 //#include  <uart.h>
 //#include  <pio.h>
 #include  <pio_it.h>
-//#include  <gpio.h>
+
 #include  <led.h>
 //#include  <timer.h>
 //#include  <eefc.h>
@@ -102,7 +104,7 @@
 //#include  <dmad.h>
 
 
-#include "board.h"
+
 #include "defined.h"
 #include "uif_object.h"
 #include "USBD_Config.h"

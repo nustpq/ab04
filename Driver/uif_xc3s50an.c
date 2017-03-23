@@ -1214,8 +1214,8 @@ void destroy_fpga_instance( void )
 *
 * Description : initialize a new clock path into link ;
 *
-* Arguments   : clock_dir       : signal direct
-*               clock_output_en : enable signal output
+* Arguments   : clock_dir       : signal direct   0: uif_portx -> others, 1: others -> uif_portx,
+*               clock_output_en : enable signal   output 0: enable port output,  1: high-z port output
 *               s_clock_path    £ºpath name
 * Returns       : success/fail: 0/-1
 *
@@ -1341,26 +1341,26 @@ unsigned char Setup_FPGA( FPGA_CFG *p_cfg )
 {
     unsigned char err;
     unsigned char i;
+    unsigned char dir;
     
     destroy_fpga_instance();
     
     init_fpga();
     
     for( i = 0; i<= 7; i++ ) {
-      if( p_cfg->data_path_mask & (1<<i) ) {
-          if( p_cfg->data_path_value & (1<<i) ) {          
-            err = Init_fpga_data_path( dataSwitch[(i<<1)+1] );
-            if( err != 0 ){ return FPGA_CFG_ERR ; }
-          } else {              
-            err = Init_fpga_data_path( dataSwitch[(i<<1)] );
-            if( err != 0 ){ return FPGA_CFG_ERR ; }
-          }       
+      if( p_cfg->data_path_mask & (1<<i) ) {           
+          dir =  ( p_cfg->data_path_value & (1<<i) ) ? 1 : 0 ;                 
+          err = Init_fpga_data_path( dataSwitch[(i<<1)+ dir] );
+          if( err != 0 ){ 
+            return FPGA_CFG_ERR ; 
+          }
       }      
     }
     
     for(i = 0; i<= 17; i++) {
-      if( p_cfg->clock_path_mask & (1<<i) ) {    
-          err = Init_fpga_clock_path( 0,0,fpga_i2s_clk_path[i] );
+      if( p_cfg->clock_path_mask & (1<<i) ) {   
+          dir =  ( p_cfg->clock_path_value & (1<<i) ) ? 1 : 0 ;  
+          err = Init_fpga_clock_path( dir,0,fpga_i2s_clk_path[i] );
           if( err != 0 ){ 
             return FPGA_CFG_ERR ; 
           }

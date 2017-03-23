@@ -23,39 +23,7 @@ SPI_PLAY_REC_CFG spi0_cfg;
 SPI_PLAY_REC_CFG spi1_cfg;
 
 extern CODEC_SETS Codec_Set[];
-/*
-*********************************************************************************************************
-*                                    usb_init_default()
-*
-* Description :  initialize usb device to default state;
-*
-* Argument(s) :  none
-*
-*
-*
-* Return(s)   :  None.
-*
-* Note(s)     : None.
-*********************************************************************************************************
-*/
-int usb_init( void )
-{
 
-    //initialize usb object and it's operation
-    source_usb.init_source  = init_usb;
-    source_usb.buffer_read  = NULL;
-    source_usb.buffer_write = NULL;
-    source_usb.get_direct   = NULL;
-
-    if(NULL != source_usb.init_source )
-        source_usb.init_source(NULL,NULL);
-    else
-    {
-        APP_TRACE_INFO(("this version isn't a release version \r\n"));
-        return -1;
-    }
-    return 0;
-}
 
 
 /*
@@ -606,11 +574,10 @@ unsigned char aic3204_init_default( void )
 */
 void uif_ports_init_default( void )
 {
-    usb_init( ); //init USB
     ssc0_init( );
     ssc1_init( );  
-    spi0_init( DEFAULT_SPI_SPEED, 0 );
-    spi1_init( DEFAULT_SPI_SPEED, 0 );
+    spi0_init( DEFAULT_SPI_SPEED, 1 );
+    spi1_init( DEFAULT_SPI_SPEED, 1 );
     twi0_init( DEFAULT_TWI_SPEED );
     twi1_init( DEFAULT_TWI_SPEED );
     twi2_init( DEFAULT_TWI_SPEED );

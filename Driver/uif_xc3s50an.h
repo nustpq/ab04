@@ -85,6 +85,7 @@ typedef struct _fpga_cfg
     uint32_t data_path_mask;
     uint32_t data_path_value;
     uint32_t clock_path_mask;
+    uint32_t clock_path_value;
 
 }FPGA_CFG;
  

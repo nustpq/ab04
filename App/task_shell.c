@@ -138,7 +138,7 @@ void App_TaskGenieShell( void *p_arg )
                         }
                         index = 0;
                         CommandBuf[index] = '\0';
-//                        UIF_LED_Toggle(LED_RUN);
+                        UIF_LED_Toggle(LED_RUN);
                         Time_Stamp();
                         UART_SHELL_SEND_STR((">"));
 

@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.992]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.993]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
@@ -197,7 +197,9 @@ void  BSP_Init (void)
 
     uif_miscPin_init_default( );
     uif_ports_init_default( );
-
+    GPIO_Init();
+    Init_USB( ); //init USB
+    
     list_init( &portsList , NULL );
     portsList.match = matchPath;
 
@@ -218,7 +220,7 @@ void  BSP_Init (void)
 //    BSP_PostInit();                                             /* Initialize BSP functions    BSP_IntInit();                             */
 //    BSP_OS_TmrTickInit(OS_TICKS_PER_SEC);                       /* Initialize the uC/OS-II ticker                       */
 //
-//    GPIO_Init();
+
 //
 //    BSP_ResetInit();                                     /* Enable the hardware reset button  used interrupt         */
 //
@@ -646,12 +648,12 @@ void Beep( INT32U beep_cycles)
    for( INT32U i = 0; i< beep_cycles; i++)  {
 
         UIF_Beep_On(); //beep on
-//        UIF_LED_On(LED_RUN);
+        UIF_LED_On(LED_RUN);
         UIF_LED_On(LED_USB);
         UIF_LED_On(LED_HDMI);
         OSTimeDly(250);
         UIF_Beep_Off(); //beep off
-//        UIF_LED_Off(LED_RUN);
+        UIF_LED_Off(LED_RUN);
         UIF_LED_Off(LED_USB);
         UIF_LED_Off(LED_HDMI);
         OSTimeDly(250); //delay_ms(250);

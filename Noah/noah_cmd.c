@@ -896,7 +896,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
         case PC_CMD_UPDATE_FPGA_SWITCH :
           
             PCCmd.fpga_cfg.data_path_mask   = 0;      
-            PCCmd.fpga_cfg.clock_path_mask  = 0;           
+            PCCmd.fpga_cfg.data_path_value  = 0;           
             for (unsigned char i = 1; i < 7 ; i++ ){  //T0~T6                
                 temp = emb_get_attr_int(&root, i, -1);
                 if(temp != -1 ) { 
@@ -906,10 +906,15 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
                     }                   
                 }
             }  
+            PCCmd.fpga_cfg.clock_path_mask   = 0;      
+            PCCmd.fpga_cfg.clock_path_value  = 0; 
             for (unsigned char i = 8; i < 32 ; i++ ){  //clock path               
                 temp = emb_get_attr_int(&root, i, -1);
                 if(temp != -1 ) { 
-                    PCCmd.fpga_cfg.clock_path_mask  += 1<<(i-8);                
+                    PCCmd.fpga_cfg.clock_path_mask  += 1<<(i-8);  
+                    if( temp > 0 ) {
+                        PCCmd.fpga_cfg.clock_path_value += 1<<(i-8);
+                    } 
                 }
             }             
             err = Setup_FPGA( &PCCmd.fpga_cfg );

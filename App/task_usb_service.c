@@ -89,10 +89,10 @@ void  App_TaskUSBService ( void *p_arg )
         
         if ( usb_state >= USBD_STATE_CONFIGURED ) {
           
-            //UIF_LED_On( LED_USB );    
+            UIF_LED_On( LED_USB );    
         } else {
           
-            //UIF_LED_Off( LED_USB );             
+            UIF_LED_Off( LED_USB );             
         }
         
         if ( usb_state < USBD_STATE_CONFIGURED ) {            

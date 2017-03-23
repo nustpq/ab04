@@ -76,7 +76,7 @@ void  App_TaskUserIF (void *p_arg)
     //iM401_Ctrl_Enable = 1;
     OSTimeDly(100);
     if( AB_POST() )  {
-        //Buzzer_Error();
+        Buzzer_Error();
     }
         
 
@@ -87,9 +87,9 @@ void  App_TaskUserIF (void *p_arg)
     while ( DEF_TRUE ) {                                          /* Task body, always written as an infinite loop.           */
         
         OSTimeDly( 10 );
-//        msg = (CPU_INT32U *)(OSMboxPend(App_UserIF_Mbox, 0, &err)); //pending, no timeout
+        msg = (CPU_INT32U *)(OSMboxPend(App_UserIF_Mbox, 0, &err)); //pending, no timeout
    
-/*
+
         if (msg != NULL) {
             key_state = *msg ;
             //APP_TRACE_INFO(("\r\n\r\n"));
@@ -163,17 +163,16 @@ void  App_TaskUserIF (void *p_arg)
 
                 case MSG_TYPE_PORT_DET :
                     if( port_enable == false ) {
-                        //APP_TRACE_INFO(("Ruler port disabled !\r\n"));
+                        APP_TRACE_INFO(("Ruler port disabled !\r\n"));
                         break;
                     }
-                    //APP_TRACE_INFO(("GPIO[0x%x].\r\n", key_state ));
+                    APP_TRACE_INFO(("GPIO[0x%x].\r\n", key_state ));
 //                    APP_TRACE_INFO(("GPIO port status changed:  Port[7..0] = [%1d%1d%1d%1d%1d%1d%1d%1d]\r\n",\
 //                                    (key_state>>0)&(0x01),(key_state>>1)&(0x01),(key_state>>2)&(0x01),(key_state>>3)&(0x01),\
 //                                    (key_state>>4)&(0x01),(key_state>>5)&(0x01),(key_state>>6)&(0x01),(key_state>>7)&(0x01) ));
 
-                    for( ruler_id = 0 ; ruler_id < 8 ; ruler_id++ ) {
-                        if( (key_state>>( 8 + 7 - ruler_id)) & 0x01) {  //check if Ruler Port[0] switch status changed
-                            if( ( (key_state>>(7 - ruler_id)) & 0x01 ) == 0 ) { // ruler attached, setup ruler
+                    if( (key_state>>( 16 + 11) & 0x01)) {  //check if Ruler Port[0] switch status changed
+                            if( ( (key_state>>11) & 0x01 ) == 0 ) { // ruler attached, setup ruler
                                 //LED_Clear( LED_P0 + ruler_id );
                                 //APP_TRACE_INFO(("GPIO[%d] is Low Level.\r\n", ruler_id ));
 //
@@ -186,12 +185,12 @@ void  App_TaskUserIF (void *p_arg)
                                 //if( (ruler_id == 0) && (iM401_Ctrl_Enable == 1) ) {
 //                                if( (ruler_id == Global_VEC_Cfg.gpio) && (Global_VEC_Cfg.trigger_en) ) {
 //                                    MCU_Load_Vec( 0 );
-                                }
+                             }
 
-                            }
+                     }
 
 
-                        }
+
                 }
                 break;
             }

@@ -21,10 +21,11 @@
 
 extern DataSource source_gpio;
 
-Pin gpio_pins[ ] = {
-                        /*-----------------------------------------------------*/
-                            BOARD_REC_GPIO,
-                        /*-----------------------------------------------------
+Pin gpio_pins[ ] = {                      
+                        PIN_GPIO_0,PIN_GPIO_1,PIN_GPIO_2,PIN_GPIO_3,PIN_GPIO_4,
+                        PIN_GPIO_5,PIN_GPIO_6,PIN_GPIO_7,PIN_GPIO_8,PIN_GPIO_9, 
+                        PIN_HDMI_PORT_DET0
+                         /*
                             PIN_FPGA_OE,
                             PIN_FPGA_RST,
                             PIN_CODEC1_RST,
@@ -42,9 +43,7 @@ Pin gpio_pins[ ] = {
                             PIN_FPGA_GPO0,
                             PIN_FPGA_GPO1,
                             PIN_LED_PORT0,
-                         -----------------------------------------------------
-                            PINS_PUSHBUTTONS,
-                        -----------------------------------------------------*/
+                          */              
 
                           };
 
@@ -60,7 +59,7 @@ static const unsigned int numGpios = PIO_LISTSIZE( gpio_pins );
 
 void GPIO_Init(void)
 {
-
+    PIO_InitializeInterrupts( GPIO_PRIORITY );
     PIO_Configure( pinsSwitches,  PIO_LISTSIZE(pinsSwitches) );
     PIO_Configure( gpio_pins,     PIO_LISTSIZE(gpio_pins)     );
 
@@ -386,7 +385,7 @@ unsigned int Get_Port_Detect( void )
     unsigned char i;
     unsigned int  value =   0 ;
 
-    for( i=0; i<8; i++ ) {
+    for( i=0; i<11; i++ ) {
         value <<= 1;
         value +=PIO_Get( &gpio_pins[ i ] );
     }

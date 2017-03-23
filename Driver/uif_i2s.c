@@ -499,7 +499,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
     DataSource *pSource = ( DataSource *)pArg;
     Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
 
-    UIF_LED_On( LED_RUN ); 
+    //UIF_LED_On( LED_RUN ); 
     pSource->pBufferOut = ( uint8_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
      
 	switch( pSource->status[ OUT ] )
@@ -546,7 +546,7 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
       }
     pSource->tx_index = 1 - pSource->tx_index;
 
-    UIF_LED_Off( LED_RUN );  
+    //UIF_LED_Off( LED_RUN );  
     
     
     ///////////////////////////////////////////

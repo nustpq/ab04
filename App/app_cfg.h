@@ -50,7 +50,7 @@
 *                                        Interrupt PRIORITIES
 *********************************************************************************************************
 */
-#define  DMA_PRIORITY       2
+#define  DMA_PRIORITY       2       //highest priority
 #define  USB_PRIORITY       2
 #define  GPIO_PRIORITY      0
 #define  TWI_PRIORITY       0
@@ -60,7 +60,7 @@
 *********************************************************************************************************
 */
 #define  DBG_UART_METHOD_TASK_EN  //this define enable the DBG UART in task for speed up, PQ
-//#define  DBG_USB_LOG_EN     //enable usb log info
+//#define  DBG_USB_LOG_EN           //enable usb log info
 
 
 /*

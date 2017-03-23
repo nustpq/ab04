@@ -601,7 +601,6 @@ extern kfifo_t  spi1_bulkIn_fifo;
 
 //------------------------port list instance export for other-----------------//
 extern sDmad g_dmad;
-extern DataSource source_usb;
 extern DataSource source_ssc0;
 extern DataSource source_ssc1;
 extern DataSource source_spi0;

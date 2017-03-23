@@ -341,8 +341,7 @@ void  _SPI1_DmaTxCallback( uint8_t status, void* pArg )
              return;
          }
      }
-     
-     
+          
 }
 
 
@@ -412,7 +411,6 @@ void start_spi( void * pInstance )
 {
      assert( NULL != pInstance );
 }
-
 
 
 /*
