@@ -62,6 +62,9 @@ void  App_TaskUSBService ( void *p_arg )
     uint8_t  usb_state;
     uint8_t  usb_state_saved ;
     uint32_t counter, counter2;
+    uint8_t temp[ 256 ] = { 0 };
+    uint8_t temp1[ 256 ] = { 0 };
+    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
     
     ListElmt  *e ;
     AUDIOPATH *pPath;      
@@ -72,7 +75,8 @@ void  App_TaskUSBService ( void *p_arg )
     
     OS_CPU_SR cpu_sr;  
 
- 
+    memset( temp , 0x56 , 256 );
+    memset( temp1 , 0x59 , 256 );    
     for(;;) 
     {          
         usb_state =   USBD_GetState();         
@@ -100,6 +104,20 @@ void  App_TaskUSBService ( void *p_arg )
             OSTimeDly( 2 );
             continue;      
         }
+#if 0
+        OSTimeDly( 2 );
+        _spiDmaTx( &source_spi0 ,temp ,2460  );
+
+        DMAD_IsTransferDone( &g_dmad, source_spi0.dev.txDMAChannel );
+        SPI_ReleaseCS( pSpi );
+#else
+//        SPI_WriteBuffer_API( temp, sizeof( temp ) );
+        
+//        SPI_WriteReadBuffer_API(  temp, 
+//                                  temp1,
+//                                  256, 
+//                                  256  );
+#endif
     
         if ( audio_run_control == false) {            
             OSTimeDly( 2 );
@@ -198,17 +216,22 @@ void  App_TaskUSBService ( void *p_arg )
                           
                           First_Pack_Padding_BI( &ep0BulkIn_fifo );
                           First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
-
-                          source_ssc0.buffer_read(   &source_ssc0,
-                                                  ( uint8_t * )ssc0_PingPongIn,                                              
-                                                  source_ssc0.rxSize );
-                          source_ssc0.status[ IN ]  = ( uint8_t )START;
                           
-
-                          source_ssc1.buffer_read(   &source_ssc1,
-                                                  ( uint8_t * )ssc1_PingPongIn,                                              
-                                                  source_ssc1.rxSize );
-                          source_ssc1.status[ IN ]  = ( uint8_t )START;
+                          if( source_ssc0.buffer_read != NULL )
+                          {
+                              source_ssc0.buffer_read(   &source_ssc0,
+                                                      ( uint8_t * )ssc0_PingPongIn,                                              
+                                                      source_ssc0.rxSize );
+                              source_ssc0.status[ IN ]  = ( uint8_t )START;
+                          }
+                          
+                          if( source_ssc1.buffer_read != NULL )
+                          {
+                              source_ssc1.buffer_read(   &source_ssc1,
+                                                      ( uint8_t * )ssc1_PingPongIn,                                              
+                                                      source_ssc1.rxSize );
+                              source_ssc1.status[ IN ]  = ( uint8_t )START;
+                          }
  
                           while( !PIO_Get( &SSC_Sync_Pin ) );
                            while( PIO_Get( &SSC_Sync_Pin ) );
@@ -223,11 +246,15 @@ void  App_TaskUSBService ( void *p_arg )
                           }
 #endif
                           
-#if 1                                                                       
-                          source_ssc1.buffer_write(  &source_ssc1,
-                                                    ( uint8_t * )ssc1_PingPongOut,                                                
-                                                    source_ssc1.txSize ); 
-                          source_ssc1.status[ OUT ] = ( uint8_t )START;  
+#if 1
+                          if( source_ssc1.buffer_write != NULL )
+                          {                          
+                            source_ssc1.buffer_write(  &source_ssc1,
+                                                      ( uint8_t * )ssc1_PingPongOut,                                                
+                                                      source_ssc1.txSize ); 
+                            source_ssc1.status[ OUT ] = ( uint8_t )START;  
+                          
+                          }
 
 #endif                           
  

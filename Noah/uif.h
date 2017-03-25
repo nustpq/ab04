@@ -70,6 +70,11 @@ unsigned char Raw_Read( RAW_READ *p_raw_read );
 unsigned char Write_Burst( BURST_WRITE nurst_write );
 void Dump_Data ( unsigned char *pdata, unsigned int size );
 unsigned char GPIO_Session( GPIO_SESSION *p_gpio_session );
+unsigned char SPI_WriteBuffer_API( unsigned char *pdata, unsigned int size );
+unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read, 
+                                        unsigned char *pdata_write,
+                                        unsigned int   size_read, 
+                                        unsigned int   size_write  );
 
 unsigned char TWID_Write_UIF( 
     uint8_t address,

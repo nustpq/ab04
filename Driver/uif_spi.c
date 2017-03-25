@@ -27,7 +27,7 @@ extern sDmad g_dmad;
 
 sDmad spi_dmad;
 
-const Pin spi0_pins[] = { PINS_SPI0 };					 
+const Pin spi0_pins[] = { PINS_SPI0,PIN_SPI0_NPCS0 };					 
 const Pin spi1_pins[] = { PINS_SPI1,PIN_SPI1_NPCS0 };   
 
 
@@ -500,6 +500,7 @@ static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk 
     
     // configure SPI csr0
     SPI_ConfigureNPCS( pSpi, 0, csr0 ) ;
+    SPI_ConfigureCSMode( pSpi, 0, 1 );
     SPI_Enable( pSpi ) ;
 
 }

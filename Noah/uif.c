@@ -82,6 +82,65 @@ void Reverse_Endian( unsigned char *pdata, unsigned char size )
     
 }
 
+unsigned char SPI_WriteBuffer_API( unsigned char *pdata, unsigned int size )
+{
+    uint8_t err = 0;
+    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
+    
+    while( 0 != DMAD_IsTransferDone( &g_dmad, source_spi0.dev.txDMAChannel ) );
+    
+    err = _spiDmaTx( &source_spi0 ,pdata ,size  );
+    if( 0 != err )
+    {            
+      SPI_ReleaseCS( pSpi );
+      return err;
+    }
+    
+    SPI_ReleaseCS( pSpi ); 
+    return 0;   
+}
+
+
+
+unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read, 
+                                        unsigned char *pdata_write,
+                                        unsigned int   size_read, 
+                                        unsigned int   size_write  )
+{
+    uint8_t err = 0;
+    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
+    
+    spi_clear_status( &source_spi0 );
+    
+    err = DMAD_IsTransferDone( &g_dmad , source_spi0.dev.txDMAChannel );
+    if( 0 != err )
+    {            
+      SPI_ReleaseCS( pSpi );
+      return err;
+    }
+
+    err =   _spiDmaTx( &source_spi0 , pdata_write, size_write  );
+    if( 0 != err )
+    {            
+      SPI_ReleaseCS( pSpi );
+      return err;
+    }
+        
+    err = _spiDmaRx( &source_spi0 , pdata_read, size_read  );
+    if( 0 != err )
+    {            
+      SPI_ReleaseCS( pSpi );
+      return err;
+    }
+      
+    SPI_ReleaseCS( pSpi ); 
+    
+    return err;
+  
+
+  
+}
+
 /*
 *********************************************************************************************************
 *                                           Dump_Data()
