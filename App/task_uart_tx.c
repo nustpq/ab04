@@ -33,6 +33,7 @@
 //Mem
 CPU_INT08U    MemPartition_MsgUART[MsgUARTQueue_SIZE][MsgUARTBody_SIZE];
 OS_MEM      * pMEM_Part_MsgUART; //global
+
 //Queue
 void        * MsgQ_PCUART2Noah[MsgUARTQueue_SIZE];
 void        * MsgQ_Noah2PCUART[MsgUARTQueue_SIZE];
@@ -41,8 +42,10 @@ OS_EVENT    * EVENT_MsgQ_PCUART2Noah;
 OS_EVENT    * EVENT_MsgQ_Noah2PCUART;
 
 
+
+
 CPU_INT32U  Tx_ReSend_Happens = 0;   // debug use, resend happen times, NOTE: only writable in this task
-CPU_INT08U PcCmdTxID          = 0;   // Frame TXD ID
+CPU_INT08U  PcCmdTxID         = 0;   // Frame TXD ID
    
 
 /*

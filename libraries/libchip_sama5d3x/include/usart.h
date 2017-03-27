@@ -123,6 +123,13 @@ extern uint32_t USART_IsRxReady( Usart *usart ) ;
 
 extern uint8_t USART_GetChar( Usart *usart ) ;
 
+extern void USART_SetReceivedTimeout( Usart *usart,uint16_t clockNumber );
+
+extern void USART_EnableReceivedTimeout( Usart *usart,uint8_t en );
+
+extern int16_t Custom_USART_Read( Usart *usart, volatile uint32_t timeOut);
+
+extern int16_t Custom_USART_Write( Usart *usart, uint16_t data, volatile uint32_t timeOut);
 #ifdef __cplusplus
 }
 #endif

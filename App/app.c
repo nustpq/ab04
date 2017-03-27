@@ -133,6 +133,11 @@ kfifo_t  ep2BulkIn_fifo;
 kfifo_t  cmdEpBulkOut_fifo;
 kfifo_t  cmdEpBulkIn_fifo;
 
+//Ring for Ruler cmd endpoint
+kfifo_t  cmd_ruler_rece_fifo;
+kfifo_t  cmd_ruler_send_fifo;
+
+
 //Ring for spi
 kfifo_t  spi0_bulkOut_fifo;
 kfifo_t  spi0_bulkIn_fifo;
@@ -167,9 +172,12 @@ uint8_t usbRingBufferBulkIn1[ USB_RINGIN_SIZE_16K ] ;          //16384B
 uint8_t usbRingBufferBulkOut2[ USB_RINGOUT_SIZE_16K ] ;        //16384B
 uint8_t usbRingBufferBulkIn2[ USB_RINGIN_SIZE_16K ] ;          //16384B
 uint8_t usbRingBufferBulkIn3[ USB_RINGIN_SIZE_16K ] ;          //16384B
-//Buffer Level 2:  Ring CMD Buffer : 1024 B
+//Buffer Level 2:  To PC Ring CMD Buffer : 1024 B
 uint8_t usbCmdRingBulkOut[ USB_CMD_RINGOUT_SIZE_1K ] ;         //1024B
 uint8_t usbCmdRingBulkIn[ USB_CMD_RINGIN_SIZE_1k ]  ;          //1024B
+//Buffer Level 2:  To RULER Ring CMD Buffer : 1024 B
+uint8_t rulerCmdRingBulkOut[ USART_BUFFER_SIZE_1K ] ;          
+uint8_t rulerCmdRingBulkIn[ USART_BUFFER_SIZE_1K ]  ;          
 
 //Buffer Level 3:  Ring  Data Buffer for audio port include ssc and spi: 16384 B
 uint8_t ssc0_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             //16384B
@@ -467,14 +475,32 @@ static  void  App_TaskStart (void *p_arg)
 
     for (;;) {
 
-        counter++;
-        if(counter&0xFF) {
-            UIF_LED_On( LED_RUN );
-        }     
-        if(counter&0x3F) {
-            UIF_LED_Off( LED_RUN );
-        }   
-        OSTimeDly(10);
+//        counter++;
+//        if(counter&0xFF) {
+//            UIF_LED_On( LED_RUN );
+//        }     
+//        if(counter&0x3F) {
+//            UIF_LED_Off( LED_RUN );
+//        }   
+//        OSTimeDly(10);
+      
+        for ( unsigned int i = 0; i< 20; i++ ) {
+            for ( unsigned int j = 0; j< 5; j++ ) {
+                UIF_LED_On( LED_RUN );
+                OSTimeDly(i%20);
+                UIF_LED_Off( LED_RUN );
+                OSTimeDly(20-i%20);
+            }
+        }
+        for ( unsigned int i = 0; i< 20; i++ ) {
+            for ( unsigned int j = 0; j< 5; j++ ) {
+                UIF_LED_Off( LED_RUN );
+                OSTimeDly(i%20);
+                UIF_LED_On( LED_RUN );
+                OSTimeDly(20-i%20);
+            }
+        }
+ 
         
     }
 
@@ -749,17 +775,19 @@ static void  App_EventCreate (void)
       
 //    App_Noah_Ruler_Mbox = OSMboxCreate((void *)0);   /* Create MBOX for comm App_TaskUserIF()to App_TaskNoah_Ruler()       */
 //    ACK_Sem_PCUART      = OSSemCreate(0);            /* Create Sem for the ACK from PC, after UART data sent               */
-//    ACK_Sem_RulerUART   = OSSemCreate(0);            /* Create Sem for the ACK from Ruler, after UART data sent            */
-//    Done_Sem_RulerUART  = OSSemCreate(0);            /* Create Sem for the Ruler operation caller, after operation done    */
+    ACK_Sem_RulerUART   = OSSemCreate(0);            /* Create Sem for the ACK from Ruler, after UART data sent            */
+    Done_Sem_RulerUART  = OSSemCreate(0);            /* Create Sem for the Ruler operation caller, after operation done    */
     EVENT_MsgQ_PCUART2Noah     = OSQCreate(&MsgQ_PCUART2Noah[0],MsgUARTQueue_SIZE);             /* Message queue from PC   */
     EVENT_MsgQ_Noah2PCUART     = OSQCreate(&MsgQ_Noah2PCUART[0],MsgUARTQueue_SIZE);             /* Message queue to PC     */
-//    EVENT_MsgQ_RulerUART2Noah  = OSQCreate(&MsgQ_RulerUART2Noah[0],MsgUARTQueue_SIZE);          /* Message queue from Ruler*/
-//    EVENT_MsgQ_Noah2RulerUART  = OSQCreate(&MsgQ_Noah2RulerUART[0],MsgUARTQueue_SIZE);          /* Message queue to Ruler  */
+    EVENT_MsgQ_RulerUART2Noah  = OSQCreate(&MsgQ_RulerUART2Noah[0],MsgUARTQueue_SIZE);          /* Message queue from Ruler*/
+    EVENT_MsgQ_Noah2RulerUART  = OSQCreate(&MsgQ_Noah2RulerUART[0],MsgUARTQueue_SIZE);          /* Message queue to Ruler  */
     EVENT_MsgQ_Noah2CMDParse   = OSQCreate(&MsgQ_Noah2CMDParse[0],MsgUARTQueue_SIZE);   /* Message queue to Task CMD Prase */
+    
     Bsp_Ser_Tx_Sem_lock = OSSemCreate(1);
-    Bsp_Ser_Rx_Sem_lock = OSSemCreate(1);
-//    DBGU_Tx_Sem_lock    = OSSemCreate(1);
-//    DBGU_Tx_Sem_lock    = OSSemCreate(1);
+    Bsp_Ser_Rx_Sem_lock = OSSemCreate(1);    
+    DBGU_UART_Tx_Sem_lock    = OSSemCreate(1);
+    DBGU_USB_Tx_Sem_lock     = OSSemCreate(1);
+    
 //    GPIO_Sem_I2C_Mixer  = OSSemCreate(1);  //sem for I2C mixer
 //    UART_MUX_Sem_lock   = OSSemCreate(1);
 //    Load_Vec_Sem_lock   = OSSemCreate(1); //sem for MCU_Load_Vec() in im501_comm.c
@@ -778,13 +806,13 @@ static void  App_EventCreate (void)
 //   OSEventNameSet(Done_Sem_RulerUART,   "Done_Sem_RulerUART",   &err);
    OSEventNameSet(EVENT_MsgQ_PCUART2Noah,      "EVENT_MsgQ_PCUART2Noah",      &err);
    OSEventNameSet(EVENT_MsgQ_Noah2PCUART,      "EVENT_MsgQ_Noah2PCUART",      &err);
-//   OSEventNameSet(EVENT_MsgQ_RulerUART2Noah,   "EVENT_MsgQ_RulerUART2Noah",   &err);
-//   OSEventNameSet(EVENT_MsgQ_Noah2RulerUART,   "EVENT_MsgQ_Noah2RulerUART",   &err);
+   OSEventNameSet(EVENT_MsgQ_RulerUART2Noah,   "EVENT_MsgQ_RulerUART2Noah",   &err);
+   OSEventNameSet(EVENT_MsgQ_Noah2RulerUART,   "EVENT_MsgQ_Noah2RulerUART",   &err);
    OSEventNameSet(EVENT_MsgQ_Noah2CMDParse,    "EVENT_MsgQ_Noah2CMDParse",    &err);
    OSEventNameSet(Bsp_Ser_Tx_Sem_lock,  "Bsp_Ser_Tx_Sem_lock",  &err);
    OSEventNameSet(Bsp_Ser_Rx_Sem_lock,  "Bsp_Ser_Rx_Sem_lock",  &err);
-//   OSEventNameSet(DBGU_Tx_Sem_lock,     "DBGU_Tx_Sem_lock",     &err);
-//   OSEventNameSet(DBGU_Rx_Sem_lock,     "DBGU_Rx_Sem_lock",     &err);
+   OSEventNameSet(DBGU_UART_Tx_Sem_lock,     "DBGU_Tx_Sem_lock",     &err);
+   OSEventNameSet(DBGU_USB_Tx_Sem_lock,      "DBGU_Rx_Sem_lock",     &err);
 //   OSEventNameSet(UART_MUX_Sem_lock,    "UART_MUX_Sem_lock",    &err);
 
 #endif
@@ -875,6 +903,19 @@ void Init_CMD_Bulk_FIFO( void )
     kfifo_init_static(pfifo, usbCmdRingBulkOut, USB_CMD_RINGOUT_SIZE_1K );
     pfifo = &cmdEpBulkIn_fifo;
     kfifo_init_static(pfifo, usbCmdRingBulkIn, USB_CMD_RINGIN_SIZE_1k );
+
+
+}
+
+void Init_Ruler_CMD_FIFO( void )
+{
+    kfifo_t *pfifo;
+
+    //initialize ring buffer relavent ruler cmd;
+    pfifo = &cmd_ruler_rece_fifo;
+    kfifo_init_static(pfifo, rulerCmdRingBulkOut, USART_BUFFER_SIZE_1K );
+    pfifo = &cmd_ruler_send_fifo;
+    kfifo_init_static(pfifo, rulerCmdRingBulkIn, USART_BUFFER_SIZE_1K );
 
 
 }
@@ -1055,6 +1096,7 @@ void Dma_configure( void )
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_spi1.dev.txDMAChannel, dwCfg );
 /*----------------------------------------------------------------------------*/
+
     // Allocate DMA channels for USART1
     source_usart1.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
                                               DMAD_TRANSFER_MEMORY, ID_USART1);
@@ -1089,7 +1131,9 @@ void Dma_configure( void )
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( &g_dmad, source_usart1.dev.txDMAChannel, dwCfg );
+	
 /*----------------------------------------------------------------------------*/
+    /*
     // Allocate DMA channels for USART0
     source_usart0.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
                                               DMAD_TRANSFER_MEMORY, ID_USART0);
@@ -1124,6 +1168,7 @@ void Dma_configure( void )
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( &g_dmad, source_usart0.dev.txDMAChannel, dwCfg );
+	*/
 /*----------------------------------------------------------------------------*/
 #endif
 }

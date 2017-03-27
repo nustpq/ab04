@@ -66,11 +66,24 @@ unsigned char TWID_Read_UIF(
  
 }
 
-unsigned char SPI_WriteBuffer_API( unsigned char *pdata, unsigned int size)
+unsigned char SPI_WriteBuffer_API( unsigned char *pdata, unsigned int size )
 {
-    unsigned char err;      
-    err = _spiDmaTx( &source_spi0 , (const unsigned char *)pdata, size );  
-    return err;   
+    uint8_t err = 0;
+
+    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
+
+    while( 0 != DMAD_IsTransferDone( &g_dmad, source_spi0.dev.txDMAChannel ) ) { 
+        OSTimeDly(1);   
+    }
+    err = _spiDmaTx( &source_spi0 ,pdata ,size  );
+    if( 0 != err )
+    {            
+      SPI_ReleaseCS( pSpi );
+      return err;
+    }
+    
+    SPI_ReleaseCS( pSpi ); 
+    return 0;   
 }
 
 
@@ -81,30 +94,36 @@ unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read,
                                         unsigned int   size_write  )
 {
     uint8_t err = 0;
+    
     Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
     
     spi_clear_status( &source_spi0 );
     
     err = DMAD_IsTransferDone( &g_dmad , source_spi0.dev.txDMAChannel );
-    while( 0 != err )
-               return 1;
-    
+    if( 0 != err )
+    {            
+      SPI_ReleaseCS( pSpi );
+      return err;
+    }
+
     err =   _spiDmaTx( &source_spi0 , pdata_write, size_write  );
-    
-    while( 0 != DMAD_IsTransferDone( &g_dmad , source_spi0.dev.txDMAChannel ) )
-         OSTimeDly( 1 );  
-  
-    err = _spiDmaRx( &source_spi0 , pdata_read, size_read  ); 
-    
-    while( 0 != DMAD_IsTransferDone( &g_dmad , source_spi0.dev.rxDMAChannel ) )
-         OSTimeDly( 1 );
+    if( 0 != err )
+    {            
+      SPI_ReleaseCS( pSpi );
+      return err;
+    }
+        
+    err = _spiDmaRx( &source_spi0 , pdata_read, size_read  );
+    if( 0 != err )
+    {            
+      SPI_ReleaseCS( pSpi );
+      return err;
+    }
       
     SPI_ReleaseCS( pSpi ); 
     
     return err;
-  
-
-  
+                   
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,6 +254,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         break ;
         
         case UIF_TYPE_SPI :
+            
             if( Global_SPI_Rec_Start == 1 ) { //in case last SPI record not ended normally 
                 err = SET_SPI_ERR ;               
                 break;//in case audio not stopped normally                         
@@ -244,10 +264,12 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
                 break;
             }            
             if( temp <= 48000 && temp >= 400) { 
-                //SPI_Init( temp * 1000, temp2 ); 
-                spi0_cfg.spi_speed = temp * 1000;
-                spi0_cfg.spi_mode  = temp2;
-                source_spi0.init_source( &source_spi0,&spi0_cfg ) ;
+          
+                spi0_cfg.spi_speed   = temp * 1000;
+                spi0_cfg.spi_format  = temp2;                        
+                source_spi0.init_source( &source_spi0, &spi0_cfg ) ;
+                APP_TRACE_INFO(("\r\nSet SPI interface\r\n"));  
+                
             }  else {
                 APP_TRACE_INFO(("\r\nERROR: SPI speed not support %d kHz\r\n",temp));
                 err= SET_SPI_ERR ;
@@ -551,8 +573,10 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                   return err;
               }
               if( Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute == ATTRI_SPI_FM1388_LOAD_CODE ) {
-                  size = p_raw_write->data_len / FM1388_ALLOWED_DATA_PACK_SIZE ;                
+                  size = p_raw_write->data_len / FM1388_ALLOWED_DATA_PACK_SIZE ; 
+                  APP_TRACE_INFO(("\r\nUIF_TYPE_SPI 1388 Load code:[ %d ] ",i));
                   for( i = 0 ; i < size ; i++ ) {
+                      APP_TRACE_INFO((">"));
                       state =  SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE ); 
                       if (state != SUCCESS) {
                           APP_TRACE_INFO(("\r\nUIF_TYPE_SPI 1388 error: %d",state));
@@ -560,7 +584,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                           return err;
                       }
                       p_raw_write->pdata += FM1388_ALLOWED_DATA_PACK_SIZE;                      
-                      //OSTimeDly(1); 
+                      //OSTimeDly(5); 
                   }
                   size = p_raw_write->data_len  % FM1388_ALLOWED_DATA_PACK_SIZE ;
                   if( size ) {

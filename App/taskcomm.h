@@ -34,10 +34,11 @@
 #define _TASKCOMM_H_
 
 
-#define  MSG_TYPE_MASK          0xFF000000
-#define  MSG_TYPE_RESET         0xA0000000
-#define  MSG_TYPE_SWITCH        0xB0000000
-#define  MSG_TYPE_PORT_DET      0xC0000000
+#define  MSG_TYPE_MASK          0xF0000000
+#define  MSG_TYPE_RESET         0x10000000
+#define  MSG_TYPE_SWITCH        0x20000000
+#define  MSG_TYPE_PORT_DET      0x30000000
+
 #define  MCU_SW_RESET_PATTERN   0xA500000D
 
 
@@ -62,6 +63,7 @@ extern OS_EVENT * EVENT_MsgQ_PCUART2Noah;
 //Msg from Noah to PC Uart
 extern void     * MsgQ_Noah2PCUART[MsgUARTQueue_SIZE];
 extern OS_EVENT * EVENT_MsgQ_Noah2PCUART;
+
 
 //Msg from Ruler Uart to Noah
 extern void     * MsgQ_RulerUART2Noah[MsgUARTQueue_SIZE];

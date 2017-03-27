@@ -26,7 +26,7 @@
 
 #define   DEFAULT_SPI_SPEED     ( 10 * 1000 * 1000 )
 #define   DEFAULT_TWI_SPEED     ( 100 * 1000 )
-
+#define   UART_BAUD             ( 115200 )
 /*
 *********************************************************************************************************
 *                                        global macro switch
@@ -93,7 +93,7 @@
 #define USB_RINGIN_SIZE_16K                ( 16384 * 8 )              //USB audio data, size MUST be 2^n .2^14=16384
 #define USB_CMD_RINGOUT_SIZE_1K            ( 1024  )                  //USB cmd data, size MUST be 2^n .
 #define USB_CMD_RINGIN_SIZE_1k             ( 1024  )                  //USB cmd data, size MUST be 2^n .
-#define USART_BUFFER_SIZE_1K               ( 1024UL  )                //buffer size of usart
+#define USART_BUFFER_SIZE_1K               ( 1024  )                //buffer size of usart
 
 #define SPI_RINGOUT_SIZE_50K               ( 3072 * 16 )              //3072B/2ms * 16 > ( 3072B * 5 )
 #define SPI_RINGIN_SIZE_50K                ( 3072 * 16 )              //3072B/2ms * 16 > ( 3072B * 5 )
@@ -311,7 +311,7 @@ typedef struct {
 //typedef struct _spi_parameter
 //{
 //    uint32_t   spi_speed;
-//    uint8_t    spi_mode;  
+//    uint8_t    spi_format;  
 //    uint8_t    gpio_irq;
 //    uint8_t    slave;
 //    uint8_t    chip_id;
@@ -495,8 +495,8 @@ typedef struct {
 extern SET_VEC_CFG  Global_VEC_Cfg;
 
 extern INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];
-extern AUDIO_CFG  Audio_Configure_Instance0[ 2 ];
-extern AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
+extern AUDIO_CFG  Audio_Configure_Instance[ 2 ];
+
 
 /*
 *********************************************************************************************************
@@ -534,10 +534,12 @@ extern uint8_t usbRingBufferBulkIn2[ USB_RINGIN_SIZE_16K ] ;
 
 extern uint8_t usbRingBufferBulkIn3[ USB_RINGIN_SIZE_16K ] ;
 
-//Buffer Level 2:  Ring CMD Buffer : 1024 B
+//Buffer Level 2:  To PC Ring CMD Buffer : 1024 B
 extern uint8_t usbCmdRingBulkOut[ USB_CMD_RINGOUT_SIZE_1K ] ;         
 extern uint8_t usbCmdRingBulkIn[ USB_CMD_RINGIN_SIZE_1k ]  ;          
-
+//Buffer Level 2:  To RULER Ring CMD Buffer : 1024 B
+extern uint8_t rulerCmdRingBulkOut[ USART_BUFFER_SIZE_1K ] ;        
+extern uint8_t rulerCmdRingBulkIn[ USART_BUFFER_SIZE_1K ]  ;        
 
 //Buffer Level 3:  Ring Data Buffer for audio port include ssc and spi: 16384 B
 extern uint8_t ssc0_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             
@@ -590,6 +592,10 @@ extern kfifo_t  ep2BulkIn_fifo;
 //Ring for USB cmd endpoint
 extern kfifo_t  cmdEpBulkOut_fifo;
 extern kfifo_t  cmdEpBulkIn_fifo;
+
+//Ring for ruler cmd endpoint
+extern kfifo_t  cmd_ruler_rece_fifo;
+extern kfifo_t  cmd_ruler_send_fifo;
 
 //Ring for spi 
 extern kfifo_t  spi0_bulkOut_fifo;

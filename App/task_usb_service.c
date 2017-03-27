@@ -61,7 +61,7 @@ void  App_TaskUSBService ( void *p_arg )
     uint8_t  usb_state;
     uint8_t  usb_state_saved ;
     uint32_t counter, counter2;
-    
+    //uint8_t temp[ 256 ] = { 0 };
     ListElmt  *e ;
     AUDIOPATH *pPath;      
     
@@ -70,6 +70,7 @@ void  App_TaskUSBService ( void *p_arg )
     extern uint8_t debug_cnt;
     
     OS_CPU_SR cpu_sr;  
+    
     Ssc* pSsc = _get_ssc_instance( source_ssc0.dev.identify );
  
     for(;;) 
@@ -99,9 +100,11 @@ void  App_TaskUSBService ( void *p_arg )
             OSTimeDly( 2 );
             continue;      
         }
-    
+        
+        //SPI_WriteBuffer_API(temp ,256  );
+        
         if ( audio_run_control == false) {            
-            OSTimeDly( 1 );
+            OSTimeDly( 2 );
             continue;      
         }
        

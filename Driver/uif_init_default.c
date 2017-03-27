@@ -55,7 +55,7 @@ void ssc0_init( void )
     source_ssc0.status[ OUT ] = ( uint8_t )FREE;
     source_ssc0.tx_index = 0;
     source_ssc0.rx_index = 0;
-    source_ssc0.peripheralParameter = ( void * )Audio_Configure_Instance0;
+    source_ssc0.peripheralParameter = ( void * )&Audio_Configure_Instance[0];
     
     source_ssc0.txSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PINGPONG_BUF_SIZE_MS );
     source_ssc0.rxSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PINGPONG_BUF_SIZE_MS );
@@ -104,7 +104,7 @@ void ssc1_init( void )
     source_ssc1.status[ OUT ] = ( uint8_t )FREE;
     source_ssc1.tx_index = 0;
     source_ssc1.rx_index = 0;
-    source_ssc1.peripheralParameter = ( void * )Audio_Configure_Instance1;
+    source_ssc1.peripheralParameter = ( void * )&Audio_Configure_Instance[1];
     source_ssc1.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 ) * 4;
     source_ssc1.txSize = (( SAMPLE_RATE_DEFAULT/ 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
     source_ssc1.rxSize = (( SAMPLE_RATE_DEFAULT/ 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 )* SLOT_NUM_DEFAULT * 2 );
@@ -139,7 +139,7 @@ void ssc1_init( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void spi0_init( unsigned int speed_hz, unsigned int mode )
+void spi0_init( unsigned int speed_hz, unsigned int format )
 {
       //initialize spi0 object and it's operation
     memset( ( void * )&source_spi0, 0 , sizeof( DataSource ) );
@@ -155,7 +155,7 @@ void spi0_init( unsigned int speed_hz, unsigned int mode )
 	source_spi0.peripheralParameter = ( void * )&spi0_cfg;
     source_spi0.privateData    = spi0_RingBulkIn;
     spi0_cfg.spi_speed = speed_hz;
-    spi0_cfg.spi_mode  = mode;
+    spi0_cfg.spi_format  = format;
     source_spi0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
     source_spi0.txSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
     source_spi0.rxSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 )* SLOT_NUM_DEFAULT * 2 );
@@ -164,7 +164,7 @@ void spi0_init( unsigned int speed_hz, unsigned int mode )
     source_spi0.peripheral_stop = stop_spi;
     source_spi0.buffer_write = _spiDmaTx;
     source_spi0.buffer_read  = _spiDmaRx;
-    source_spi0.set_peripheral = spi_register_set;
+//    source_spi0.set_peripheral = spi_register_set;
 
     source_spi0.pRingBulkOut = &spi0_bulkOut_fifo;
     source_spi0.pRingBulkIn = &spi0_bulkIn_fifo;
@@ -190,7 +190,7 @@ void spi0_init( unsigned int speed_hz, unsigned int mode )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void spi1_init( unsigned int speed_hz, unsigned int mode )
+void spi1_init( unsigned int speed_hz, unsigned int format )
 {
       //initialize spi1 object and it's operation
     memset( ( void * )&source_spi1, 0 , sizeof( DataSource ) );
@@ -207,7 +207,7 @@ void spi1_init( unsigned int speed_hz, unsigned int mode )
     source_spi1.privateData = spi1_RingBulkIn;
     source_spi1.buffer = ( uint8_t * )spi1_2MSOut;
     spi1_cfg.spi_speed = speed_hz;
-    spi1_cfg.spi_mode  = mode;
+    spi1_cfg.spi_format  = format;
     source_spi1.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 ) * 2;
     source_spi1.txSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 ) * 2;
     source_spi1.rxSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 )* SLOT_NUM_DEFAULT * 2 ) * 2;
@@ -217,7 +217,7 @@ void spi1_init( unsigned int speed_hz, unsigned int mode )
     source_spi1.peripheral_stop = stop_spi;
     source_spi1.buffer_write = _spiDmaTx;
     source_spi1.buffer_read = _spiDmaRx;
-    source_spi1.set_peripheral = spi_register_set;
+    //source_spi1.set_peripheral = spi_register_set;
 
     source_spi1.pRingBulkOut = &spi1_bulkOut_fifo;
     source_spi1.pRingBulkIn = &spi1_bulkIn_fifo;
@@ -380,7 +380,7 @@ void twi2_init( unsigned int speed_hz )
 *
 * Return(s)   :  None.
 *
-* Note(s)     : None.
+* Note(s)     : UART0 is used for Ruler communication @115200bps.
 *********************************************************************************************************
 */
 void usart0_init( void )
@@ -576,8 +576,8 @@ void uif_ports_init_default( void )
 {
     ssc0_init( );
     ssc1_init( );  
-    spi0_init( DEFAULT_SPI_SPEED0, 1 );
-    spi1_init( DEFAULT_SPI_SPEED1, 1 );
+    spi0_init( DEFAULT_SPI_SPEED, 0 );
+    spi1_init( DEFAULT_SPI_SPEED, 0 );
     twi0_init( DEFAULT_TWI_SPEED );
     twi1_init( DEFAULT_TWI_SPEED );
     twi2_init( DEFAULT_TWI_SPEED );

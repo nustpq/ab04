@@ -122,7 +122,7 @@ void  App_TaskJoy (void *p_arg)
         
         ruler_port_value = Get_Port_Detect() & 0x7FF; //mask  0~11        
         if( ruler_port_value != ruler_port_value_prev ) {
-            OSTimeDly(1); //for gpio detect, no need delay
+            OSTimeDly(100); //for gpio detect, no need delay
             if( ruler_port_value == Get_Port_Detect() & 0x7FF ) {  //jitter immune
                 data = ruler_port_value ^ ruler_port_value_prev ;   
                 ruler_port_value_prev = ruler_port_value ;

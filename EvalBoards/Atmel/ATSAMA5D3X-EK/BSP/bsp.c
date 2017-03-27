@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.993]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.994]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
@@ -55,6 +55,8 @@ const CPU_CHAR hw_model[]    = "[AB04]";
 
 OS_EVENT *Bsp_Ser_Tx_Sem_lock;
 OS_EVENT *Bsp_Ser_Rx_Sem_lock;
+OS_EVENT *DBGU_UART_Tx_Sem_lock;
+OS_EVENT *DBGU_USB_Tx_Sem_lock;
 
 
 CPU_INT08U Debug_COM_Sel = 0 ; //debug uart use:    0: DBGUART, 1: UART1, >1: debug muted
@@ -189,16 +191,18 @@ CPU_INT32U  BSP_MCK_ClkFreq (void)
 void  BSP_Init (void)
 {
 
-    BSP_OS_TmrTickInit(1000u);
+    BSP_OS_TmrTickInit( TICK_PER_SECOND );
 
-    Init_Debug_FIFO( );
-    Init_CMD_Bulk_FIFO( );
-    Init_Audio_Bulk_FIFO( );
+    Init_Debug_FIFO();
+    Init_CMD_Bulk_FIFO();
+    Init_Ruler_CMD_FIFO();
+    Init_Audio_Bulk_FIFO();
 
-    uif_miscPin_init_default( );
-    uif_ports_init_default( );
+    uif_miscPin_init_default();
+    uif_ports_init_default();
     GPIO_Init();
-    Init_USB( ); //init USB
+    Init_USB(); //init USB
+    usart0_init();
     
     list_init( &portsList , NULL );
     portsList.match = matchPath;
@@ -943,8 +947,7 @@ void  BSP_Ser_Printf (CPU_CHAR *format, ...)
 {
     static  CPU_CHAR  buffer[200 + 1];
             va_list   vArgs;
-
-
+    
     va_start(vArgs, format);
     vsprintf((char *)buffer, (char const *)format, vArgs);
     va_end(vArgs);
@@ -1163,8 +1166,8 @@ void Head_Info ( void )
     //APP_TRACE_INFO(("Tx_ReSend_Happens_Ruler:   %7d   times happened\r\n", Tx_ReSend_Happens_Ruler ));
     //APP_TRACE_INFO(("TWI_Sem_lock:              %7d   ( default 1 )\r\n", TWI_Sem_lock->OSEventCnt ));
     //APP_TRACE_INFO(("TWI_Sem_done:              %7d   ( default 0 )\r\n", TWI_Sem_done->OSEventCnt ));
-    //APP_TRACE_INFO(("UART_MUX_Sem_lock:         %7d   ( default 1 )\r\n", UART_MUX_Sem_lock->OSEventCnt ));
-    //APP_TRACE_INFO(("Done_Sem_RulerUART:        %7d   ( default 0 )\r\n", Done_Sem_RulerUART->OSEventCnt ));
+    APP_TRACE_INFO(("UART_MUX_Sem_lock:         %7d   ( default 1 )\r\n", UART_MUX_Sem_lock->OSEventCnt ));
+    APP_TRACE_INFO(("Done_Sem_RulerUART:        %7d   ( default 0 )\r\n", Done_Sem_RulerUART->OSEventCnt ));
     APP_TRACE_INFO(("Global_Ruler_State[3..0]:        [%d - %d - %d - %d]\r\n", Global_Ruler_State[3],Global_Ruler_State[2],Global_Ruler_State[1],Global_Ruler_State[0] ));
     APP_TRACE_INFO(("Global_Ruler_Type[3..0] :        [%X - %X - %X - %X]\r\n", Global_Ruler_Type[3],Global_Ruler_Type[2],Global_Ruler_Type[1],Global_Ruler_Type[0] ));
     APP_TRACE_INFO(("Global_Mic_Mask[3..0][] :        [%X - %X - %X - %X]\r\n", Global_Mic_Mask[3],Global_Mic_Mask[2],Global_Mic_Mask[1],Global_Mic_Mask[0] ));

@@ -45,12 +45,13 @@
 #define  __APP_CFG_H__
 
 
+#define  TICK_PER_SECOND    1000u
 /*
 *********************************************************************************************************
 *                                        Interrupt PRIORITIES
 *********************************************************************************************************
 */
-#define  DMA_PRIORITY       2       //highest priority
+#define  DMA_PRIORITY       3       //highest priority
 #define  USB_PRIORITY       2
 #define  GPIO_PRIORITY      0
 #define  TWI_PRIORITY       0
@@ -73,8 +74,8 @@
 
 #define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
 #define  APP_CFG_TASK_UART_TX_PRIO                         3
-#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       4
-#define  APP_CFG_TASK_USB_SEV_PRIO                         1
+//#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       4
+#define  APP_CFG_TASK_USB_SEV_PRIO                         5
 #define  APP_CFG_TASK_UART_RX_PRIO                         9 
 #define  APP_CFG_TASK_USER_IF_PRIO                         10
 #define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+1)
@@ -134,13 +135,13 @@
 
 void  BSP_Ser_Printf (CPU_CHAR  *format, ...);
 
-//#define  APP_CFG_TRACE                              printf
-#define  APP_CFG_TRACE                              BSP_Ser_Printf
-
+//#define  APP_CFG_TRACE                     printf
+#define  APP_CFG_TRACE                     BSP_Ser_Printf  
 #define  APP_TRACE_INFO(x)               ((APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_INFO)  ? (void)(APP_CFG_TRACE x) : (void)0)
 #define  APP_TRACE_DBG(x)                ((APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_DBG)   ? (void)(APP_CFG_TRACE x) : (void)0)
-
-
+//#define  APP_TRACE_INFO_T(x)             {(APP_CFG_TRACE_LEVEL  >= TRACE_LEVEL_INFO) ?  Time_Stamp() : (void)0 ;   APP_TRACE_INFO(x) ; }
+#define  APP_TRACE_INFO_T(x)             { Time_Stamp();   APP_TRACE_INFO(x) ; }
+//#define  APP_TRACE_INFO_T(x)               APP_TRACE_INFO(x)
 // for shell uart
 #define  UART_SHELL_SEND_STR(x)                (void)( BSP_Ser_Printf x )
 #define  UART_SHELL_GET_BYTE(x)                      ( BSP_Ser_RdByte x )

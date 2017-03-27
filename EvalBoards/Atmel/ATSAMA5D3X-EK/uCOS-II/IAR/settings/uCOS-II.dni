@@ -14,7 +14,7 @@ Watch0=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
 Watch1=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=-225960948
+Checksum=509675435
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -73,9 +73,7 @@ Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_spi.c}.193.17" 0 0 1 "" 0 "" 0
-Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_spi.c}.254.18" 0 0 1 "" 0 "" 0
-Count=2
+Count=0
 [Aliases]
 A0=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c"
 A1=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c"

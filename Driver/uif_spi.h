@@ -27,7 +27,7 @@ void _SPI0_DmaTxCallback( uint8_t status, void* pArg );
 void _SPI1_DmaRxCallback( uint8_t status, void* pArg );
 void _SPI1_DmaTxCallback( uint8_t status, void* pArg );
 #endif
-static void _ConfigureSpi( DataSource *pInstance,uint32_t mode,uint32_t clk );
+static void _ConfigureSpi( DataSource *pInstance,uint32_t mode,uint32_t clk, uint32_t format );
 
 #if 0
 static void spi_slave_transfer(void *p_tbuf,uint32_t tsize, 

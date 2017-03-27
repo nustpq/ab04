@@ -988,7 +988,7 @@ uint8_t ssc_txRegister_set( void *instance,void *parameter )
 //        DMA_CtrA_Len_Shift = 2;  
 //    }
     
-    return err;
+      return 0;// err;  //PQ  
          
 }
 
@@ -1037,7 +1037,8 @@ uint8_t ssc_rxRegister_set( void *instance,void *parameter )
              id,counter_rec++,channels_rec ,sample_rate,bit_length,cki,(cki==0)?"Fall" :"Rise",delay,start,(start==4)?"Low":"High" ));  
     
     if( (channels_rec == 0) || (channels_rec > 8) ) {        
-        err = ERR_TDM_FORMAT ; 
+        err = ERR_TDM_FORMAT ;
+        return 0;
     }  
     if( (bit_length != 16) && (bit_length != 32)  ) {        
         err = ERR_TDM_FORMAT ; 
@@ -1082,7 +1083,7 @@ uint8_t ssc_rxRegister_set( void *instance,void *parameter )
 //        DMA_CtrA_Len_Shift = 2;  
 //    }
     
-    return err;    
+    return 0;// err;  //PQ   
           
 }
 

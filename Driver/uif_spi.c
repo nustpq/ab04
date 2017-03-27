@@ -19,7 +19,7 @@
 #include "kfifo.h"
 #include  <ucos_ii.h>
 
-#define STATE_SLAVE 0
+#define STATE_SLAVE   0
 #define STATE_MASTER ( !STATE_SLAVE )
 
 extern sDmad g_dmad;
@@ -132,7 +132,7 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
     uint32_t temp = 0;
     
     DataSource *pSource = ( DataSource *)pArg;
-
+	
 /*    
     //step 1:calculate buffer space  
     temp = kfifo_get_free_space( pSource->pRingBulkIn );
@@ -192,6 +192,7 @@ void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
     uint32_t temp = 0;
     
     DataSource *pSource = ( DataSource *)pArg;
+
 /*    
      //step 1:calculate buffer space  
      temp = kfifo_get_data_size( pSource->pRingBulkOut );
@@ -469,29 +470,74 @@ void stop_spi( void * pInstance )
 * Note(s)     : none
 *********************************************************************************************************
 */
-static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk )
+static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk, uint32_t format )
 {
     assert( NULL != pInstance );
     assert( clk > 0 );
-  
+   
     uint32_t mode = SPI_MR_MSTR ;
     uint32_t csr0 ;
+    uint32_t clk_div ;
+     
+    clk_div = BOARD_MCK / clk ;    
+    if( clk_div > 255 ){      
+        clk_div = 255;
+    }  
+    
+    static unsigned int spi_clk_save ;
+    static unsigned int format_save ;
     
     DataSource *pSource = ( DataSource * )pInstance;
     Spi *pSpi = _get_spi_instance( pSource->dev.identify );
+        
+    if( format > 3 ) {
+       format = 0;
+    }
+    if( (clk == spi_clk_save) && (format == format_save) ) {
+       APP_TRACE_INFO(("\r\nNo need re-init same SPI mode and clock."));
+       return;
+    }    
+    spi_clk_save = clk ;
+    format_save  = format ;
+   
+    APP_TRACE_INFO(("\r\nSet SPI: Speed=%d kHz, [CPHA..CPOL]=%d",clk/1000, format ));
 
+    switch( format ) {
+              
+        case 0 :  //keep SPCK Low, Rising edge latch data   // =0 for iM501   .MCU[NCPHA:CPOL]= 1:0, iM501[CPHA:CPOL]=0:0
+            format = 0 | SPI_CSR_BITS_8_BIT | SPI_CSR_NCPHA; 
+        break;  
+       
+        case 1 :  //keep SPCK High, Falling edge latch data // =1 for iM501    .MCU[NCPHA:CPOL]= 1:1, iM501[CPHA:CPOL]=0:1
+            format = 0 | SPI_CSR_BITS_8_BIT | SPI_CSR_CPOL | SPI_CSR_NCPHA; 
+        break; 
+       
+        case 2 :  //keep SPCK Low,  Falling edge latch data // =2 for iM501  .MCU[NCPHA:CPOL]= 0:0, iM501[CPHA:CPOL]=1:0
+            format = 0 | SPI_CSR_BITS_8_BIT ; 
+        break; 
+       
+        case 3 :  //keep SPCK High, Rising edge latch data  // = 3 for iM501    .MCU[NCPHA:CPOL]= 0:1, iM501[CPHA:CPOL]=1:1
+            format = 0 | SPI_CSR_BITS_8_BIT | SPI_CSR_CPOL; 
+        break;
+       
+        default: //keep SPCK Low, Rising edge latch data   // =0 for iM501
+            format = 0 | SPI_CSR_BITS_8_BIT | SPI_CSR_NCPHA; 
+        break;
+       
+    }
+    
     // spix in slave mode 
     if ( spiState == STATE_SLAVE )
     {
         mode &= ( uint32_t ) ( ~( SPI_MR_MSTR ) ) ;
     }
     
-    csr0 = SPI_CSR_BITS_8_BIT|SPI_CSR_DLYBS( 0x0 ) ;
+    csr0 = format|SPI_CSR_DLYBS( 0x0 ) ;
     
     // spi clock 
     if ( spiState == STATE_MASTER )
     {
-        csr0 |= ( ( BOARD_MCK / clk ) << 8 ) ;
+        csr0 |= ( clk_div << 8 ) ;
     }
     
     // configure SPI mode 
@@ -523,15 +569,20 @@ void init_spi( void *pInstance,void *parameter )
     
     parameter = parameter;
     DataSource *pSource = ( DataSource * )pInstance;
-    SPI_PLAY_REC_CFG *pSpi_Cfg = ( SPI_PLAY_REC_CFG * )parameter;
     
+    SPI_PLAY_REC_CFG *pSpi_Cfg = ( SPI_PLAY_REC_CFG * )parameter;
+
     if( ID_SPI0 == pSource->dev.identify )
-      PIO_Configure( spi0_pins, PIO_LISTSIZE( spi0_pins ) ) ;                                              //fill code initialize spi0 pins
+      PIO_Configure( spi0_pins, PIO_LISTSIZE( spi0_pins ) ) ;     //fill code initialize spi0 pins
     else if( ID_SPI1 == pSource->dev.identify )
       PIO_Configure( spi1_pins, PIO_LISTSIZE( spi1_pins ) ) ;
-     
+    else
+      assert(0) ;
+        
     PMC_EnablePeripheral( pSource->dev.identify );    
-    _ConfigureSpi( pSource,pSpi_Cfg->spi_mode ,pSpi_Cfg->spi_speed ) ;
+   
+    _ConfigureSpi( pSource, STATE_MASTER, pSpi_Cfg->spi_speed, pSpi_Cfg->spi_format ) ;
+    //_ConfigureSpi( pSource, STATE_MASTER, 24000000, 0) ;
 }
 
 /*
@@ -876,7 +927,7 @@ unsigned char spi_register_set( void *instance,void *parameter )
    
    SPI_PLAY_REC_CFG *cfg = ( SPI_PLAY_REC_CFG * )parameter;
       
-   uint32_t mode = cfg->spi_mode ;
+   uint32_t mode = cfg->spi_format ;
    
     // spix in slave mode 
     if ( cfg->slave == STATE_SLAVE )

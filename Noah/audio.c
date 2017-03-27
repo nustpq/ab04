@@ -37,8 +37,8 @@
 *********************************************************************************************************
 */
 //because AB04 has two ssc port,so extend to 4 sturct;
-AUDIO_CFG  Audio_Configure_Instance0[ 2 ];
-AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
+AUDIO_CFG  Audio_Configure_Instance[ 2 ];
+
 
 extern void Init_Audio_Bulk_FIFO( void );
 

@@ -39,12 +39,16 @@ extern DataSource source_usart1;
 * Note(s)     : none
 *********************************************************************************************************
 */
-#if UNUSED
-static void USART_ISR_DMA( void )
+
+static void USART0_IrqHandler( void )
 {
-  
+  printf( "here, usart1 interrupted\r\n" );
 }
-#endif
+  
+static void USART1_IrqHandler( void )
+{
+  printf( "here, usart1 interrupted\r\n" );
+}
 
 /*
 *********************************************************************************************************
@@ -104,6 +108,7 @@ void _USART1_DmaRxCallback( uint8_t status, void* pArg )
 {
     status = status;
     pArg = pArg;
+    printf( "here, usart1 interrupted\r\n" );
 }
 
 /*
@@ -151,7 +156,7 @@ uint8_t usart1_DmaTx( void *pInstance, const uint8_t *buf, uint32_t len )
     
     td.dwSrcAddr = (uint32_t) usart1Buffer[ 1 ];;
     td.dwDstAddr = (uint32_t)&pUsart->US_THR;
-    td.dwCtrlA   = USART_BUFFER_SIZE_1K 
+    td.dwCtrlA   = len 
                    | DMAC_CTRLA_SRC_WIDTH_BYTE 
                    | DMAC_CTRLA_DST_WIDTH_BYTE;
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR | DMAC_CTRLB_DST_DSCR
@@ -193,7 +198,7 @@ uint8_t usart0_DmaTx( void *pInstance, const uint8_t *buf, uint32_t len )
     
     td.dwSrcAddr = (uint32_t) usart0Buffer[ 1 ];;
     td.dwDstAddr = (uint32_t)&pUsart->US_THR;
-    td.dwCtrlA   = USART_BUFFER_SIZE_1K 
+    td.dwCtrlA   = len 
                    | DMAC_CTRLA_SRC_WIDTH_BYTE 
                    | DMAC_CTRLA_DST_WIDTH_BYTE;
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR | DMAC_CTRLB_DST_DSCR
@@ -208,6 +213,79 @@ uint8_t usart0_DmaTx( void *pInstance, const uint8_t *buf, uint32_t len )
     return 0;
 }
 
+/*
+*********************************************************************************************************
+*                                               usartx_Read()
+*
+* Description : read data via polling method
+*
+* Arguments   : pInstance    : data source handle
+*               
+* Returns     : none
+*
+* Note(s)     : none
+*********************************************************************************************************
+*/
+uint16_t usartx_Read( void *pInstance,const uint8_t *buf, uint32_t len )
+{  
+    assert( NULL != pInstance );
+    assert( NULL != buf );
+    
+    uint32_t cnt = 0;
+    const uint32_t timeout = 500;
+    uint16_t data = 0;
+    
+    uint8_t *pBuf = ( uint8_t * )buf;
+    DataSource *pSource = ( DataSource * )pInstance;
+    Usart *pUsart = ( Usart * )pSource->dev.instanceHandle;
+
+    for( cnt = 0 ; cnt < len ; cnt ++ )
+    {
+        data = Custom_USART_Read( pUsart, timeout );     
+        
+        if( -1 != data )                               //if not timeout
+          *pBuf++ = data && 0xff;                      //send data to buffer
+        else
+        {
+          //cnt--;                                       // 
+          break;                                       //otherwise,break
+        }                                              //and return bytes
+    }        
+    return cnt;
+}
+
+/*
+*********************************************************************************************************
+*                                               usartx_Read()
+*
+* Description : read data via polling method
+*
+* Arguments   : pInstance    : data source handle
+*               
+* Returns     : none
+*
+* Note(s)     : none
+*********************************************************************************************************
+*/
+uint16_t usartx_Write( void *pInstance,const uint8_t *buf, uint32_t len )
+{  
+    assert( NULL != pInstance );
+    assert( NULL != buf );
+    
+    uint32_t cnt = 0;
+    const uint32_t timeout = 500;
+    uint16_t ret = 0;
+
+    DataSource *pSource = ( DataSource * )pInstance;
+    Usart *pUsart = ( Usart * )pSource->dev.instanceHandle;
+
+    for( cnt = 0 ; cnt < len ; cnt ++ )
+    {
+        if( -1 != Custom_USART_Write( pUsart, *buf++, timeout )  )
+           break;
+    }        
+    return cnt;
+}
 /*
 *********************************************************************************************************
 *                                               usart1_DmaRx()
@@ -226,15 +304,13 @@ uint8_t usart1_DmaRx( void *pInstance,const uint8_t *buf, uint32_t len )
     sDmaTransferDescriptor td;
     
     assert( NULL != pInstance );
-    buf = buf;
-    len = len;
     
     DataSource *pSource = ( DataSource * )pInstance;
     Usart *pUsart = ( Usart * )pSource->dev.instanceHandle;
 
     td.dwSrcAddr = (uint32_t)&pUsart->US_RHR;
-    td.dwDstAddr = (uint32_t) usart1Buffer[ 0 ];
-    td.dwCtrlA   = USART_BUFFER_SIZE_1K 
+    td.dwDstAddr = ( uint32_t )buf;
+    td.dwCtrlA   = len 
                    | DMAC_CTRLA_SRC_WIDTH_BYTE 
                    | DMAC_CTRLA_DST_WIDTH_BYTE;
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR 
@@ -269,15 +345,13 @@ uint8_t usart0_DmaRx( void *pInstance,const uint8_t *buf, uint32_t len )
     sDmaTransferDescriptor td;
     
     assert( NULL != pInstance );
-    buf = buf;
-    len = len;
     
     DataSource *pSource = ( DataSource * )pInstance;
     Usart *pUsart = ( Usart * )pSource->dev.instanceHandle;
 
     td.dwSrcAddr = (uint32_t)&pUsart->US_RHR;
-    td.dwDstAddr = (uint32_t) usart0Buffer[ 0 ];
-    td.dwCtrlA   = USART_BUFFER_SIZE_1K 
+    td.dwDstAddr = ( uint32_t )buf;
+    td.dwCtrlA   = len 
                    | DMAC_CTRLA_SRC_WIDTH_BYTE 
                    | DMAC_CTRLA_DST_WIDTH_BYTE;
     td.dwCtrlB   = DMAC_CTRLB_SRC_DSCR 
@@ -294,68 +368,7 @@ uint8_t usart0_DmaRx( void *pInstance,const uint8_t *buf, uint32_t len )
     return 0;
 }
 
-/*
-*********************************************************************************************************
-*                                               _usart1_ConfigureDma()
-*
-* Description : usart1 dma configure
-*
-* Arguments   : pInstance    : data source handle
-*               
-* Returns     : none
-*
-* Note(s)     : Don't use this interface,it is hard to intergrate
-*********************************************************************************************************
-*/
 
-#if UNUSED
-static void _ConfigureDma( void* pInstance )
-{
-    uint32_t dwCfg;
-    uint8_t iController;
-    
-    assert( NULL != pInstance );
-    
-    DataSource *pSource = ( DataSource * )pInstance;
-    
-    /* Driver initialize */
-    DMAD_Initialize( &g_dmad, 0 );
-    /* IRQ configure */
-    IRQ_ConfigureIT( ID_DMAC0, 0, USART_ISR_DMA );
-    IRQ_EnableIT( ID_DMAC0 );
-
-    /* Allocate DMA channels for USART */
-    pSource->dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad, DMAD_TRANSFER_MEMORY, pSource->dev.identify );
-    pSource->dev.rxDMAChannel = DMAD_AllocateChannel( &g_dmad, pSource->dev.identify, DMAD_TRANSFER_MEMORY);
-    if (   pSource->dev.txDMAChannel == DMAD_ALLOC_FAILED || pSource->dev.rxDMAChannel == DMAD_ALLOC_FAILED )
-    {
-        printf("DMA channel allocat error\n\r");
-        while(1);
-    }
-    /* Set RX callback */
-    DMAD_SetCallback(&g_dmad, pSource->dev.rxDMAChannel,(DmadTransferCallback)_USART1_DmaRxCallback, 0);
-
-    /* Configure DMA RX channel */
-    iController = ( pSource->dev.rxDMAChannel >> 8);
-    dwCfg = 0
-           | DMAC_CFG_SRC_PER(
-              DMAIF_Get_ChannelNumber( iController, pSource->dev.identify, DMAD_TRANSFER_RX ))
-           | DMAC_CFG_SRC_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, pSource->dev.rxDMAChannel, dwCfg );
-
-    /* Configure DMA TX channel */
-    iController = ( pSource->dev.txDMAChannel >> 8 );
-    dwCfg = 0 
-           | DMAC_CFG_DST_PER(
-              DMAIF_Get_ChannelNumber( iController, pSource->dev.identify, DMAD_TRANSFER_TX ))
-           | DMAC_CFG_DST_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, pSource->dev.txDMAChannel, dwCfg );
-}
-#endif
 
 /*
 *********************************************************************************************************
@@ -372,12 +385,14 @@ static void _ConfigureDma( void* pInstance )
 */
 static void _configureUsart( void *pInstance )
 {  
+    const uint16_t receivedTimeOut = 5;
     assert( NULL != pInstance );
     
     DataSource *pSource = ( DataSource * )pInstance;
     Usart *pUsart = ( Usart * )pSource->dev.instanceHandle;
     
     uint32_t mode =     US_MR_USART_MODE_NORMAL
+//    uint32_t mode =     US_MR_USART_MODE_HW_HANDSHAKING
                         | US_MR_USCLKS_MCK
                         | US_MR_CHRL_8_BIT
                         | US_MR_PAR_NO
@@ -391,8 +406,17 @@ static void _configureUsart( void *pInstance )
     USART_Configure( pUsart, mode, 115200, BOARD_MCK ) ;
 
     /* Configure the interrupt */
-    /* Processed in DMA callback, no USART interrupt */
-
+    USART_SetReceivedTimeout( pUsart,receivedTimeOut );    
+    USART_EnableReceivedTimeout( pUsart,1 );
+    USART_EnableIt(pUsart,( 1 << 8 ) );
+    
+    if( pSource->dev.identify == ID_USART0 )
+          IRQ_ConfigureIT( ID_USART0, 0, USART0_IrqHandler );
+    else if( pSource->dev.identify == ID_USART1 )
+         IRQ_ConfigureIT( ID_USART1, 0, USART1_IrqHandler );  
+    else
+      ;
+    
     /* Enable receiver & transmitter*/
     USART_SetTransmitterEnabled( pUsart, 1 ) ;
     USART_SetReceiverEnabled( pUsart, 1 ) ;

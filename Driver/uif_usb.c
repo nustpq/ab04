@@ -21,7 +21,7 @@
 #include "defined.h"
 
 
-
+/*
 //Ring for USB data endpoint
 extern kfifo_t  ep0BulkOut_fifo;
 extern kfifo_t  ep0BulkIn_fifo;
@@ -31,7 +31,7 @@ extern kfifo_t  ep1BulkIn_fifo;
 //Ring for USB cmd endpoint
 extern kfifo_t  cmdEpBulkOut_fifo;
 extern kfifo_t  cmdEpBulkIn_fifo;
-
+*/
 extern kfifo_t DBG_USB_Send_kFIFO;
 
 extern const USBDDriverDescriptors cdcdSerialDriverDescriptors;

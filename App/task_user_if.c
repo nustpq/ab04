@@ -78,18 +78,15 @@ void  App_TaskUserIF (void *p_arg)
     if( AB_POST() )  {
         Buzzer_Error();
     }
-        
+    ruler_id = 0;    
 
 //#ifndef BOARD_TYPE_AB01
 //    APP_TRACE_INFO(( "\r\nWARNING: NOT AB01, NO MCU Ctrl UART SWITCH\r\n"));
 //#endif
 
     while ( DEF_TRUE ) {                                          /* Task body, always written as an infinite loop.           */
-        
-        OSTimeDly( 10 );
-        msg = (CPU_INT32U *)(OSMboxPend(App_UserIF_Mbox, 0, &err)); //pending, no timeout
-   
 
+        msg = (CPU_INT32U *)(OSMboxPend(App_UserIF_Mbox, 0, &err)); //pending, no timeout    
         if (msg != NULL) {
             key_state = *msg ;
             //APP_TRACE_INFO(("\r\n\r\n"));
@@ -101,8 +98,8 @@ void  App_TaskUserIF (void *p_arg)
                 break;
 
                 case MSG_TYPE_SWITCH ://Switch
-                    APP_TRACE_INFO(("Switch status updated: \r\n  SW1,  SW0 \r\n"));
-                    APP_TRACE_INFO((" %4d, %4d\r\n", (key_state>>0)&(0x01),(key_state>>1)&(0x01) ));
+                  //  APP_TRACE_INFO(("Switch status updated: \r\n  SW1,  SW0 \r\n"));
+                  //  APP_TRACE_INFO((" %4d, %4d\r\n", (key_state>>0)&(0x01),(key_state>>1)&(0x01) ));
 
                     //To do something to do with Switch selection...
 
@@ -166,33 +163,71 @@ void  App_TaskUserIF (void *p_arg)
                         APP_TRACE_INFO(("Ruler port disabled !\r\n"));
                         break;
                     }
-                    APP_TRACE_INFO(("GPIO[0x%x].\r\n", key_state ));
+                    APP_TRACE_INFO_T(("GPIO[0x%x].\r\n", key_state ));
 //                    APP_TRACE_INFO(("GPIO port status changed:  Port[7..0] = [%1d%1d%1d%1d%1d%1d%1d%1d]\r\n",\
 //                                    (key_state>>0)&(0x01),(key_state>>1)&(0x01),(key_state>>2)&(0x01),(key_state>>3)&(0x01),\
 //                                    (key_state>>4)&(0x01),(key_state>>5)&(0x01),(key_state>>6)&(0x01),(key_state>>7)&(0x01) ));
 
-                    if( (key_state>>( 16 + 11) & 0x01)) {  //check if Ruler Port[0] switch status changed
-                            if( ( (key_state>>11) & 0x01 ) == 0 ) { // ruler attached, setup ruler
-                                //LED_Clear( LED_P0 + ruler_id );
-                                //APP_TRACE_INFO(("GPIO[%d] is Low Level.\r\n", ruler_id ));
-//
-                            } else { // ruler detached
+                    if( (key_state>>( 16 + 0) & 0x01) )   {  //check if Ruler Port[0] switch status changed
+                        if( ( (key_state>>0) & 0x01 ) == 0 ) { // ruler attached, setup ruler
+                            UIF_LED_On( LED_HDMI );
+                            APP_TRACE_INFO_T(("Ruler[%d] Attached.\r\n", ruler_id ));                            
+                            Global_Ruler_State[ruler_id] = RULER_STATE_ATTACHED; 
+                            err = Init_Ruler( ruler_id ); 
+                            if( OS_ERR_NONE != err ) {
+                                    UIF_LED_Off( LED_HDMI );
+                                    continue;
+                            }                         
+                            err = Setup_Ruler( ruler_id ); 
+                            if( OS_ERR_NONE != err ) {
+                                    UIF_LED_Off( LED_HDMI );
+                                    continue;
+                            }
+////                                err = Ruler_Setup_Sync(  ruler_id );
+////                                if( OS_ERR_NONE != err ) {
+////                                    //LED_Clear( LED_P0 + ruler_id );
+////                                    continue;
+////                                }                                
+                            err = Get_Ruler_Type( ruler_id ); 
+                            if( OS_ERR_NONE != err ) {
+                                    UIF_LED_Off( LED_HDMI );
+                                    continue;
+                            }
+                            err = Get_Ruler_Version( ruler_id ); 
+                            if( OS_ERR_NONE != err ) {
+                                    UIF_LED_Off( LED_HDMI );
+                                    continue;
+                            }                                  
+                            err = Ruler_POST( ruler_id ); 
+                            if( OS_ERR_NONE != err ) {
+                                    UIF_LED_Off( LED_HDMI );
+                                    continue;
+                            }                     
+                            Global_Ruler_State[ruler_id] = RULER_STATE_CONFIGURED ;                              
+//                                mic_mask = Global_Mic_Mask[ruler_id];
+//                                err = Update_Mic_Mask( ruler_id, mic_mask );
+//                                if( OS_ERR_NONE != err ) {                              
+//                                    continue;
+//                                }   
+//                                if( mic_mask ) {
+//                                    Global_Ruler_State[ruler_id]= RULER_STATE_SELECTED;                                   
+//                                } 
+                                //OSTimeDly(500);
+                                //simple_test_use();//test for Dr.Yang and use USBApp0815.exe
+                                                                           
+                        } else { // ruler detached
+                            UIF_LED_Off( LED_HDMI );
+                            APP_TRACE_INFO_T(("Ruler[%d] Detached.\r\n", ruler_id )); 
+                            Global_Ruler_State[ruler_id] = RULER_STATE_DETACHED ;
+                            Global_Ruler_Type[ruler_id]  = 0 ;
+                            Global_Mic_Mask[ruler_id]    = 0 ; 
+                        } 
 
-                                //LED_Set( LED_P0 + ruler_id );
-                                //APP_TRACE_INFO(("GPIO[%d] is High Level.\r\n", ruler_id ));
-//                                Global_Ruler_State[ruler_id] = RULER_STATE_DETACHED ;
-//                                Global_Mic_Mask[ruler_id]    = 0 ;
-                                //if( (ruler_id == 0) && (iM401_Ctrl_Enable == 1) ) {
-//                                if( (ruler_id == Global_VEC_Cfg.gpio) && (Global_VEC_Cfg.trigger_en) ) {
-//                                    MCU_Load_Vec( 0 );
-                             }
-
-                     }
-
-
-
-                }
+                    }
                 break;
+                
+                }
+               
             }
             Buzzer_OnOff(1); //buzzer on
             OSTimeDly(5);
@@ -201,11 +236,10 @@ void  App_TaskUserIF (void *p_arg)
             Buzzer_OnOff(1); //buzzer on
             OSTimeDly(5);
             Buzzer_OnOff(0); //buzzer off
+            
         }
 
 
-
-//*/    }
 }
 
 
