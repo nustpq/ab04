@@ -124,6 +124,24 @@ void USART_Configure(Usart *usart,
     }
     /* TODO other modes*/
 }
+
+/**
+ * \brief Setting usart receive timeout measured with clock number.
+ * \It is a custom interface for AB04
+ *
+ * \param usart  Pointer to an USART peripheral
+ * \param clockNumber  receive timeout duration with clock number
+ *                
+ */
+void USART_SetReceivedTimeout( Usart *usart,uint16_t clockNumber )
+{
+  assert( usart != NULL );
+  assert( clockNumber <= 65535 );
+  
+  if( clockNumber == 0 ) return;
+  
+  usart->US_RTOR = clockNumber;    
+}
 /**
  * \brief Enables or disables the transmitter of an USART peripheral.
  *

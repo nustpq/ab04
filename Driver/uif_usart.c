@@ -7,11 +7,13 @@
 *                                                   on the
 *                                      Audio Bridge 04 Board (AB04 V1.0)
 *
-* Filename          :  uif_spi.c
-* Version           :  V0.0.1
+* Filename          :  uif_usart.c
+* Version           :  V0.0.2
 * Programmer(s)     :  Leo
 *********************************************************************************************************
-* Note(s)           : usart1 communicate implement
+* Note(s)           : usartx communicate implement
+*********************************************************************************************************
+* History           : 2017-03-28 : add usart receiving timeout parameter;
 *********************************************************************************************************
 */
 
@@ -371,7 +373,8 @@ static void _ConfigureDma( void* pInstance )
 *********************************************************************************************************
 */
 static void _configureUsart( void *pInstance )
-{  
+{ 
+    const uint16_t receivedTimeOut = 500;
     assert( NULL != pInstance );
     
     DataSource *pSource = ( DataSource * )pInstance;
@@ -392,7 +395,7 @@ static void _configureUsart( void *pInstance )
 
     /* Configure the interrupt */
     /* Processed in DMA callback, no USART interrupt */
-
+    USART_SetReceivedTimeout( pUsart,receivedTimeOut );
     /* Enable receiver & transmitter*/
     USART_SetTransmitterEnabled( pUsart, 1 ) ;
     USART_SetReceiverEnabled( pUsart, 1 ) ;
