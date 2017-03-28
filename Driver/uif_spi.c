@@ -30,7 +30,7 @@ sDmad spi_dmad;
 const Pin spi0_pins[] = { PINS_SPI0,PIN_SPI0_NPCS0 };					 
 const Pin spi1_pins[] = { PINS_SPI1,PIN_SPI1_NPCS0 };   
 
-
+volatile uint8_t spi0_trans_done = 0;
 
 
 
@@ -191,7 +191,9 @@ void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
     uint32_t temp = 0;
     
     DataSource *pSource = ( DataSource *)pArg;
-    
+
+    spi0_trans_done = 1;
+#if 0    
      /*step 1:calculate buffer space */ 
      temp = kfifo_get_data_size( pSource->pRingBulkOut );
 
@@ -224,7 +226,7 @@ void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
              return;
          }
      }
-     
+#endif     
  
 }
 

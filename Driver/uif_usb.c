@@ -219,7 +219,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
                               uint32_t transmit,
                               uint32_t remaining )
 {          
-    UIF_LED_On( 3 ); 
+//    UIF_LED_On( 3 ); 
     if ( status == USBD_STATUS_SUCCESS  ) 
     {              
         restart_audio_0_bulk_in  = true ;               
@@ -234,7 +234,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
         APP_TRACE_INFO(( "\r\nERROR : UsbAudio0DataTransmit: Rr-transfer hit\r\n" ));  
         assert( 0 );
     } 
-    UIF_LED_Off( 3 ); 
+//    UIF_LED_Off( 3 ); 
     
 }
 

@@ -87,7 +87,7 @@ void ssc0_init( void )
     source_ssc0.status[ OUT ] = ( uint8_t )FREE;
     source_ssc0.tx_index = 0;
     source_ssc0.rx_index = 0;
-    source_ssc0.peripheralParameter = ( void * )Audio_Configure_Instance0;
+    source_ssc0.peripheralParameter = ( void * )&Audio_Configure_Instance[ 0 ];
     
     source_ssc0.txSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PINGPONG_BUF_SIZE_MS );
     source_ssc0.rxSize         = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * I2S_PINGPONG_BUF_SIZE_MS );
@@ -136,7 +136,7 @@ void ssc1_init( void )
     source_ssc1.status[ OUT ] = ( uint8_t )FREE;
     source_ssc1.tx_index = 0;
     source_ssc1.rx_index = 0;
-    source_ssc1.peripheralParameter = ( void * )Audio_Configure_Instance1;
+    source_ssc1.peripheralParameter = ( void * )&Audio_Configure_Instance[ 1 ];
     source_ssc1.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 ) * 4;
     source_ssc1.txSize = (( SAMPLE_RATE_DEFAULT/ 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
     source_ssc1.rxSize = (( SAMPLE_RATE_DEFAULT/ 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 )* SLOT_NUM_DEFAULT * 2 );
@@ -612,8 +612,8 @@ void uif_ports_init_default( void )
     usb_init( ); //init USB
     ssc0_init( );
     ssc1_init( );  
-    spi0_init( DEFAULT_SPI_SPEED, 1 );
-    spi1_init( DEFAULT_SPI_SPEED, 1 );
+    spi0_init( DEFAULT_SPI_SPEED, 0 );
+    spi1_init( DEFAULT_SPI_SPEED, 0 );
     twi0_init( DEFAULT_TWI_SPEED );
     twi1_init( DEFAULT_TWI_SPEED );
     twi2_init( DEFAULT_TWI_SPEED );

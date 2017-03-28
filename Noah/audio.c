@@ -37,13 +37,16 @@
 *********************************************************************************************************
 */
 //because AB04 has two ssc port,so extend to 4 sturct;
-AUDIO_CFG  Audio_Configure_Instance0[ 2 ];
-AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
+AUDIO_CFG  Audio_Configure_Instance[ 2 ];
+
 
 extern void Init_Audio_Bulk_FIFO( void );
 
 unsigned char  audio_padding_byte;
 uint8_t     debug_cnt = 0;
+
+
+
 
 /*
 *********************************************************************************************************
@@ -461,9 +464,226 @@ void Get_Run_Time( uint32_t time )
     
 }
 
+/*
+*********************************************************************************************************
+*                                    peripheral_ssc0_recoder()
+*
+* Description : starting ssc0 recorder alone
+*
+* Argument(s) : instance  -  keeping align
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_ssc0_recoder( void *instance )
+{
+ 
+    uint8_t  err = 0; 
+    err = Init_CODEC( &source_twi2,
+                      Audio_Configure_Instance[0].sample_rate,
+                      Audio_Configure_Instance[0].bit_length );    
+    
+    First_Pack_Padding_BI( &ep0BulkIn_fifo );
+    
+    if( source_ssc0.buffer_read != NULL )
+    {
+        source_ssc0.buffer_read(  &source_ssc0,
+                                  ( uint8_t * )ssc0_PingPongIn,                                              
+                                  source_ssc1.rxSize );
+        source_ssc0.status[ IN ]  = ( uint8_t )START;
+    }
+    
+}
 
+/*
+*********************************************************************************************************
+*                                    peripheral_ssc1_recorder()
+*
+* Description : starting ssc1 recorder alone
+*
+* Argument(s) : instance  -  keeping align
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_ssc1_recorder( void *instance )
+{
+ 
+    uint8_t err = Init_CODEC( &source_twi1,
+                      Audio_Configure_Instance[1].sample_rate,
+                      Audio_Configure_Instance[1].bit_length );
+    
+    First_Pack_Padding_BI( &ep1BulkIn_fifo );
+    
+    if( source_ssc1.buffer_read != NULL )
+    {
+        source_ssc1.buffer_read(  &source_ssc1,
+                                  ( uint8_t * )ssc1_PingPongIn,                                              
+                                  source_ssc1.rxSize );
+        source_ssc1.status[ IN ]  = ( uint8_t )START;
+    }
+    
+}
 
-      
+/*
+*********************************************************************************************************
+*                                    peripheral_ssc0_start()
+*
+* Description : starting ssc0 playing and recording.
+*
+* Argument(s) : instance  -  keeping align.
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_ssc0_start( void *instance )
+{
+extern Pin SSC_Sync_Pin;  
+    uint8_t  err = 0; 
+    err = Init_CODEC( &source_twi2,
+                      Audio_Configure_Instance[0].sample_rate,
+                      Audio_Configure_Instance[0].bit_length );    
+    
+    First_Pack_Padding_BI( &ep0BulkIn_fifo );
+    
+    if( source_ssc0.buffer_read != NULL )
+    {
+        source_ssc0.buffer_read(  &source_ssc0,
+                                  ( uint8_t * )ssc0_PingPongIn,                                              
+                                  source_ssc1.rxSize );
+        source_ssc0.status[ IN ]  = ( uint8_t )START;
+    }
+ 
+    while( !PIO_Get( &SSC_Sync_Pin ) );
+    while( PIO_Get( &SSC_Sync_Pin ) );
+    
+    if( source_ssc0.buffer_write != NULL )
+    {                          
+        source_ssc0.buffer_write(  &source_ssc0,
+                                   ( uint8_t * )ssc0_PingPongOut,                                                
+                                   source_ssc0.txSize ); 
+        source_ssc0.status[ OUT ] = ( uint8_t )START;  
+                          
+    } 
+    
+}
+
+/*
+*********************************************************************************************************
+*                                    peripheral_ssc1_start()
+*
+* Description : starting ssc1 playing and recording.
+*
+* Argument(s) : instance  -  keeping align .
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_ssc1_start( void *instance )
+{
+extern Pin SSC_Sync_Pin1;  
+ 
+    uint8_t err = Init_CODEC( &source_twi1,
+                      Audio_Configure_Instance[1].sample_rate,
+                      Audio_Configure_Instance[1].bit_length );
+    
+    First_Pack_Padding_BI( &ep1BulkIn_fifo );
+    
+    if( source_ssc1.buffer_read != NULL )
+    {
+        source_ssc1.buffer_read(  &source_ssc1,
+                                  ( uint8_t * )ssc1_PingPongIn,                                              
+                                  source_ssc1.rxSize );
+        source_ssc1.status[ IN ]  = ( uint8_t )START;
+    }
+ 
+    while( !PIO_Get( &SSC_Sync_Pin1 ) );
+    while( PIO_Get( &SSC_Sync_Pin1 ) );
+    
+    if( source_ssc1.buffer_write != NULL )
+    {                          
+        source_ssc1.buffer_write(  &source_ssc1,
+                                   ( uint8_t * )ssc1_PingPongOut,                                                
+                                   source_ssc1.txSize ); 
+        source_ssc1.status[ OUT ] = ( uint8_t )START;  
+                          
+    } 
+    
+}
+
+/*
+*********************************************************************************************************
+*                                    peripheral_sync_start()
+*
+* Description : starting ssc0 and ssc1 playing and recording at same time.
+*
+* Argument(s) : instance  -  keeping align.
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_sync_start( void *instance )
+{
+    extern Pin SSC_Sync_Pin;
+    uint8_t err = 0;
+
+//    err = Init_CODEC( &source_twi2,
+//                      Audio_Configure_Instance[0].sample_rate,
+//                      Audio_Configure_Instance[0].bit_length );
+//                      
+                      
+    err = Init_CODEC( &source_twi2,48000, 16 );                 
+                          
+    First_Pack_Padding_BI( &ep0BulkIn_fifo );
+    First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
+                          
+    if( source_ssc0.buffer_read != NULL )
+    {
+        source_ssc0.buffer_read(   &source_ssc0,
+                                   ( uint8_t * )ssc0_PingPongIn,                                              
+                                   source_ssc0.rxSize );
+        source_ssc0.status[ IN ]  = ( uint8_t )START;
+    }
+                          
+    if( source_ssc1.buffer_read != NULL )
+    {
+        source_ssc1.buffer_read(  &source_ssc1,
+                                  ( uint8_t * )ssc1_PingPongIn,                                              
+                                  source_ssc1.rxSize );
+        source_ssc1.status[ IN ]  = ( uint8_t )START;
+    }
+ 
+    while( !PIO_Get( &SSC_Sync_Pin ) );
+    while( PIO_Get( &SSC_Sync_Pin ) );
+                        
+    if( source_ssc0.buffer_write != NULL )
+    {
+        source_ssc0.buffer_write(  &source_ssc0,
+                                   ( uint8_t * )ssc0_PingPongOut,                                                
+                                   source_ssc0.txSize ); 
+        source_ssc0.status[ OUT ] = ( uint8_t )START;
+
+    }
+                          
+    if( source_ssc1.buffer_write != NULL )
+    {                          
+        source_ssc1.buffer_write(  &source_ssc1,
+                                   ( uint8_t * )ssc1_PingPongOut,                                                
+                                   source_ssc1.txSize ); 
+        source_ssc1.status[ OUT ] = ( uint8_t )START;  
+                          
+    }    
+}
 
 /*
 *********************************************************************************************************
@@ -475,46 +695,52 @@ void Get_Run_Time( uint32_t time )
 *
 * Return(s)   : None.
 *
-* Note(s)     : None.
+* Note(s)     :    bit7    |bit6   |bit5     |bit4     |bit3   |bit2   |bit1     | bit0 
+*                  SYNC    | X     |ssc0_P   |ssc0_R   |  X    |X      |ssc0_P   | ssc0_R
+*
+*                  Here, just install function according sence not starting peripheral really.
 *********************************************************************************************************
 */
 void Audio_Manager( unsigned char cfg_data )
 {
 
     APP_TRACE_INFO(( "\r\nAudio Manager: config data = 0X%0X ]", cfg_data ));
+    
+    const uint8_t ssc0_recorder_bit = cfg_data & ( 1 << 0 );
+    const uint8_t ssc0_play_bit = cfg_data & ( 1 << 1 );
+    const uint8_t ssc1_recorder_bit = cfg_data & ( 1 << 4 );
+    const uint8_t ssc1_play_bit = cfg_data & ( 1 << 5 );
+//    const uint8_t ssc_sync_bit = cfg_data & ( 1 << 7 ); 
+    
+    const uint8_t ssc_sync_bit =  1;
 
-        
-        if( (cfg_data & SSC0_IN) && ( source_ssc0.status[IN] >= CONFIGURED ) ) {
-
-            source_ssc0.buffer_read(   &source_ssc0,
-                                      ( uint8_t * )ssc0_PingPongIn,                                              
-                                      source_ssc0.rxSize );
-            source_ssc0.status[ IN ]  = ( uint8_t )START;
-        } 
-        if( (cfg_data & SSC1_IN) && ( source_ssc1.status[IN] >= CONFIGURED ) ) {
-
-            source_ssc1.buffer_read(   &source_ssc1,
-                                     ( uint8_t * )ssc1_PingPongIn,                                              
-                                      source_ssc1.rxSize );
-            source_ssc1.status[ IN ]  = ( uint8_t )START;
-        } 
-        
-        OSTimeDly(2); 
-        
-        if ( (cfg_data & SSC0_OUT) && ( source_ssc0.status[OUT] >= CONFIGURED ) ){
-            source_ssc0.buffer_write(  &source_ssc0,
-                                       ( uint8_t * )ssc0_PingPongOut,                                                
-                                       source_ssc0.txSize ); 
-            source_ssc0.status[ OUT ] = ( uint8_t )START;
-        }      
-        if ( (cfg_data & SSC1_OUT) && ( source_ssc1.status[OUT] >= CONFIGURED ) ){
-            source_ssc1.buffer_write(  &source_ssc1,
-                                       ( uint8_t * )ssc1_PingPongOut,                                                
-                                       source_ssc1.txSize ); 
-            source_ssc1.status[ OUT ] = ( uint8_t )START;
+        if( ssc_sync_bit )                          // play and record sync
+        {
+          source_ssc0.peripheral_start = peripheral_sync_start;
+          source_ssc1.peripheral_start = NULL;
         }
-               
-      
+        else                                       // asynchronous
+        {
+           if( ssc0_recorder_bit && ssc0_play_bit )
+           {
+              source_ssc0.peripheral_start = peripheral_ssc0_start;
+           }
+           else if( ssc0_recorder_bit && ( !ssc0_play_bit ) )
+           {
+             source_ssc0.peripheral_record_alone = peripheral_ssc0_recorder;
+           }
+          
+           if( ssc1_recoder_bit && ssc1_play_bit )
+           {
+              source_ssc1.peripheral_start = peripheral_ssc1_start;
+           }
+           else
+           {
+             source_ssc1.peripheral_record_alone = peripheral_ssc1_recorder;
+           }         
+          
+        }
+     
 }
     
 

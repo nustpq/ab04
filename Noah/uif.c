@@ -82,12 +82,14 @@ void Reverse_Endian( unsigned char *pdata, unsigned char size )
     
 }
 
+extern uint8_t spi0_trans_done;
 unsigned char SPI_WriteBuffer_API( unsigned char *pdata, unsigned int size )
 {
     uint8_t err = 0;
     Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
     
     while( 0 != DMAD_IsTransferDone( &g_dmad, source_spi0.dev.txDMAChannel ) );
+//    while( !spi0_trans_done );
     
     err = _spiDmaTx( &source_spi0 ,pdata ,size  );
     if( 0 != err )
@@ -111,7 +113,7 @@ unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read,
     Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
     
     spi_clear_status( &source_spi0 );
-    
+    UIF_LED_On( 3 ); 
     err = DMAD_IsTransferDone( &g_dmad , source_spi0.dev.txDMAChannel );
     if( 0 != err )
     {            
@@ -134,7 +136,7 @@ unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read,
     }
       
     SPI_ReleaseCS( pSpi ); 
-    
+    UIF_LED_Off( 3 ); 
     return err;
   
 

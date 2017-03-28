@@ -492,8 +492,8 @@ typedef struct {
 extern SET_VEC_CFG  Global_VEC_Cfg;
 
 extern INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];
-extern AUDIO_CFG  Audio_Configure_Instance0[ 2 ];
-extern AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
+extern AUDIO_CFG  Audio_Configure_Instance[ 2 ];
+//extern AUDIO_CFG  Audio_Configure_Instance1[ 2 ];
 
 /*
 *********************************************************************************************************

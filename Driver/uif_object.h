@@ -100,7 +100,7 @@ typedef struct _DataSource
 	uint8_t ( *set_peripheral )( void *instance,void *parameter );    //set register;
 	void ( *peripheral_start )( void *instance );                  //starting peripheral
 	void ( *peripheral_stop )( void *instance );		       //stoping peripheral
-  
+        void ( *peripheral_recod_alone )( void *instance );
         uint8_t ( *buffer_read )( void *pInstance,
                                   const uint8_t *buf,
                                   uint32_t len);
