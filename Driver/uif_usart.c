@@ -7,11 +7,13 @@
 *                                                   on the
 *                                      Audio Bridge 04 Board (AB04 V1.0)
 *
-* Filename          :  uif_spi.c
-* Version           :  V0.0.1
+* Filename          :  uif_usart.c
+* Version           :  V0.0.2
 * Programmer(s)     :  Leo
 *********************************************************************************************************
-* Note(s)           : usart1 communicate implement
+* Note(s)           : usartx communicate implement
+*********************************************************************************************************
+* History           : 2017-03-28 : add usart receiving timeout parameter;
 *********************************************************************************************************
 */
 
@@ -409,7 +411,7 @@ static void _configureUsart( void *pInstance )
     USART_SetReceivedTimeout( pUsart,receivedTimeOut );    
     USART_EnableReceivedTimeout( pUsart,1 );
     USART_EnableIt(pUsart,( 1 << 8 ) );
-    
+    USART_SetReceivedTimeout( pUsart,receivedTimeOut );
     if( pSource->dev.identify == ID_USART0 )
           IRQ_ConfigureIT( ID_USART0, 0, USART0_IrqHandler );
     else if( pSource->dev.identify == ID_USART1 )
