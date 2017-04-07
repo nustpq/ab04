@@ -37,7 +37,6 @@
 */
 
 #include  <stdio.h>
-
 #include  <cpu.h>
 #include  <lib_def.h>
 
@@ -46,6 +45,7 @@
 #define  __APP_CFG_H__
 
 
+#define  TICK_PER_SECOND    1000u
 /*
 *********************************************************************************************************
 *                                        Interrupt PRIORITIES
@@ -141,7 +141,7 @@ void  BSP_Ser_Printf (CPU_CHAR  *format, ...);
 #define  APP_TRACE_INFO(x)               ((APP_CFG_TRACE_LEVEL >= UCOSII_LEVEL_INFO)  ? (void)(APP_CFG_TRACE x) : (void)0)
 #define  APP_TRACE_DBG(x)                ((APP_CFG_TRACE_LEVEL >= UCOSII_LEVEL_DBG)   ? (void)(APP_CFG_TRACE x) : (void)0)
 
-
+#define  APP_TRACE_INFO_T(x)             { Time_Stamp();   APP_TRACE_INFO(x) ; }
 // for shell uart
 #define  UART_SHELL_SEND_STR(x)                (void)( BSP_Ser_Printf x )
 #define  UART_SHELL_GET_BYTE(x)                      ( BSP_Ser_RdByte x )

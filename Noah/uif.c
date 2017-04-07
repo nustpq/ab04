@@ -50,8 +50,7 @@ unsigned char TWID_Write_UIF(
     return TWID_Write(  &twid[0], address, iaddress, isize, pData, num, pAsync);
       
 }
-
-
+   
 unsigned char TWID_Read_UIF(
     uint8_t address,
     uint32_t iaddress,
@@ -81,16 +80,14 @@ void Reverse_Endian( unsigned char *pdata, unsigned char size )
     }     
     
 }
-
-extern uint8_t spi0_trans_done;
 unsigned char SPI_WriteBuffer_API( unsigned char *pdata, unsigned int size )
 {
     uint8_t err = 0;
     Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
-    
-    while( 0 != DMAD_IsTransferDone( &g_dmad, source_spi0.dev.txDMAChannel ) );
-//    while( !spi0_trans_done );
-    
+
+    while( 0 != DMAD_IsTransferDone( &g_dmad, source_spi0.dev.txDMAChannel ) ) { 
+        OSTimeDly(1);   
+    }
     err = _spiDmaTx( &source_spi0 ,pdata ,size  );
     if( 0 != err )
     {            
@@ -110,10 +107,11 @@ unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read,
                                         unsigned int   size_write  )
 {
     uint8_t err = 0;
+    
     Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
     
     spi_clear_status( &source_spi0 );
-    UIF_LED_On( 3 ); 
+    
     err = DMAD_IsTransferDone( &g_dmad , source_spi0.dev.txDMAChannel );
     if( 0 != err )
     {            
@@ -136,11 +134,9 @@ unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read,
     }
       
     SPI_ReleaseCS( pSpi ); 
-    UIF_LED_Off( 3 ); 
+    
     return err;
-  
-
-  
+                   
 }
 
 /*
@@ -193,28 +189,33 @@ void Dump_Data ( unsigned char *pdata, unsigned int size )
 *********************************************************************************************************
 */
 unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
-{  
-    
+{       
     unsigned char err; 
     unsigned int  temp, temp2;
     unsigned char scl_no, sda_no;
     
     APP_TRACE_INFO(("\r\nSetup_Interface: if_type=%d, speed=%dkHz, attribute=0x%X ",\
                          pInterface_Cfg->if_type,pInterface_Cfg->speed, pInterface_Cfg->attribute));
-#if 0   
     err   = NULL;
     temp  = pInterface_Cfg->speed ;
     temp2 = pInterface_Cfg->attribute ;
-    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed) &&
-         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type) )  {
-       
-        if( Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute == pInterface_Cfg->attribute ) {
-            APP_TRACE_INFO(("\r\nNo need to set same interface\r\n"));
-        } else {
-            Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute;
-            APP_TRACE_INFO(("\r\nChanged the interface attribute!\r\n"));
-        }    
-        return err;
+      
+//    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed) &&
+//         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type) )  {
+//       
+//        if( Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute == pInterface_Cfg->attribute ) {
+//            APP_TRACE_INFO(("\r\nNo need to set same interface\r\n"));
+//        } else {
+//            Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute;
+//            APP_TRACE_INFO(("\r\nChanged the interface attribute!\r\n"));
+//        }    
+//        return err;
+//    }
+    if(  (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].speed   == pInterface_Cfg->speed)  &&
+         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].if_type == pInterface_Cfg->if_type)  &&
+         (Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute == pInterface_Cfg->attribute ) ) {        
+            APP_TRACE_INFO(("\r\nNo need to set same interface\r\n"));       
+            return err;
     }
 
     switch( pInterface_Cfg->if_type )  {
@@ -224,7 +225,9 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
                 break;
             }
             if( temp <= 1000 && temp >= 10) { //10k ~ 1M
-                TWI_Init( temp * 1000 );     
+                //TWI_Init( temp * 1000 );
+                temp = temp * 1000 ;
+                source_twi0.init_source( &source_twi0,&temp );
                 APP_TRACE_INFO(("\r\nI2C port is set to %d kHz\r\n",temp));        
             }  else {
                 APP_TRACE_INFO(("\r\nERROR: I2C speed not support %d kHz\r\n",temp));
@@ -237,7 +240,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
             sda_no = GET_I2C_GPIO_SDA(pInterface_Cfg->attribute);
             //if( temp <= 400 && temp >= 10) { 
                 I2C_GPIO_Init( temp * 1000, scl_no, sda_no  );     
-                APP_TRACE_INFO(("\r\nI2C port is set to GPIO simluated %d kHz\r\n",temp));        
+                APP_TRACE_INFO(("\r\nSet GPIO emluated I2C port :%d kHz\r\n",temp));        
             //}  else {
             //    APP_TRACE_INFO(("\r\nERROR: I2C speed not support %d kHz\r\n",temp));
             //    err = SET_I2C_ERR ;
@@ -254,7 +257,12 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
                 break;
             }            
             if( temp <= 48000 && temp >= 400) { 
-                SPI_Init( temp * 1000, temp2 ); 
+          
+                spi0_cfg.spi_speed   = temp * 1000;
+                spi0_cfg.spi_format  = temp2;                        
+                source_spi0.init_source( &source_spi0, &spi0_cfg ) ;
+                APP_TRACE_INFO(("\r\nSet SPI interface\r\n"));  
+                
             }  else {
                 APP_TRACE_INFO(("\r\nERROR: SPI speed not support %d kHz\r\n",temp));
                 err= SET_SPI_ERR ;
@@ -289,7 +297,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
 //        break ;
         
         case UIF_TYPE_GPIO_CLK :       
-            CS_GPIO_Init( pInterface_Cfg->attribute );
+            //CS_GPIO_Init( pInterface_Cfg->attribute );
         break ;   
     
         case UIF_TYPE_DUT_ID:
@@ -300,7 +308,7 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         break;
         
     }
-#endif
+    
     
     if ( err == NULL ) {
         Global_UIF_Setting[ pInterface_Cfg->if_type - 1 ].attribute = pInterface_Cfg->attribute;
@@ -332,6 +340,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
     
     unsigned char  state, err;
     unsigned char  buf[8] ; 
+    unsigned int   mem_addr;   
     unsigned char *pChar;
     unsigned int   i, size;
     
@@ -400,6 +409,54 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      }
                 break;
             
+                case ATTRI_I2C_FM1388_LOAD_CODE :                      
+                    //I2C_Mixer( I2C_MIX_UIF_M );
+                    size = p_raw_write->data_len % FM1388_I2C_DATA_PACK_SIZE ; 
+                    if( size ) {                       
+                        return I2C_BUS_ERR;                      
+                    }
+                    size = p_raw_write->data_len / FM1388_I2C_DATA_PACK_SIZE - 1;
+                    mem_addr = *(unsigned int*)pChar ;
+                    pChar+= 4;
+                    for( i = 0 ; i < size ; i++ ) {                         
+                        buf[0] = 1;
+                        buf[1] =  (unsigned char)(mem_addr>>8);
+                        buf[2] =  (unsigned char)(mem_addr>>0);
+                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        }
+                        buf[0] = 2;
+                        buf[1] =  (unsigned char)(mem_addr>>24);
+                        buf[2] =  (unsigned char)(mem_addr>>16);
+                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        } 
+                        buf[0] = 3;
+                        buf[2] = *pChar++;
+                        buf[1] = *pChar++;
+                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        } 
+                        buf[0] = 4;
+                        buf[2] = *pChar++;
+                        buf[1] = *pChar++;
+                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        } 
+                        buf[0] = 0;
+                        buf[1] = 0;
+                        buf[2] = 3; //32bit write
+                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        if ( state != SUCCESS ) {
+                            return I2C_BUS_ERR;                  
+                        } 
+                        mem_addr += 4 ;
+                    }   
+                break;
                 case ATTRI_I2C_IM205 :  //iM205                         
                     state =  I2C_GPIO_Write_iM205 ( p_raw_write->dev_addr>>1, *pChar, *(pChar+1) );                                
                     if ( state != SUCCESS ) {
@@ -509,8 +566,10 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                   return err;
               }
               if( Global_UIF_Setting[ UIF_TYPE_SPI - 1 ].attribute == ATTRI_SPI_FM1388_LOAD_CODE ) {
-                  size = p_raw_write->data_len / FM1388_ALLOWED_DATA_PACK_SIZE ;                
+                  size = p_raw_write->data_len / FM1388_ALLOWED_DATA_PACK_SIZE ; 
+                  APP_TRACE_INFO(("\r\nUIF_TYPE_SPI 1388 Load code:[ %d ] ",i));
                   for( i = 0 ; i < size ; i++ ) {
+                      APP_TRACE_INFO((">"));
                       state =  SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE ); 
                       if (state != SUCCESS) {
                           APP_TRACE_INFO(("\r\nUIF_TYPE_SPI 1388 error: %d",state));
@@ -688,14 +747,14 @@ unsigned char GPIO_Session( GPIO_SESSION *p_gpio_session )
    
    err = 0;
    
-   for( i=0; i<p_gpio_session->gpio_num; i++ )   {
-      GPIOPIN_Set( GET_BYTE_HIGH_4BIT(p_gpio_session->gpio_value[i]), GET_BYTE_LOW_4BIT(p_gpio_session->gpio_value[i]) );
-      if( p_gpio_session->delay_us[i] < 2000 ) {
-          delay_us( p_gpio_session->delay_us[i] );
-      }else{
-          OSTimeDly( p_gpio_session->delay_us[i] );
-      }
-   } 
+//   for( i=0; i<p_gpio_session->gpio_num; i++ )   {
+//      GPIOPIN_Set( GET_BYTE_HIGH_4BIT(p_gpio_session->gpio_value[i]), GET_BYTE_LOW_4BIT(p_gpio_session->gpio_value[i]) );
+//      if( p_gpio_session->delay_us[i] < 2000 ) {
+//          delay_us( p_gpio_session->delay_us[i] );
+//      }else{
+//          OSTimeDly( p_gpio_session->delay_us[i] );
+//      }
+//   } 
    
    return err;
    
