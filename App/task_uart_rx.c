@@ -69,7 +69,7 @@ void App_TaskUART_Rx( void *p_arg )
          
     //Init_CMD_Read( &CMD_Read_PC, EVENT_MsgQ_PCUART2Noah ) ;    
     Init_CMD_Read( &CMD_Read_PC, EVENT_MsgQ_Noah2CMDParse ) ;
-    //Init_CMD_Read( &CMD_Read_Ruler, EVENT_MsgQ_RulerUART2Noah ) ;
+    Init_CMD_Read( &CMD_Read_Ruler, EVENT_MsgQ_RulerUART2Noah ) ;
     idle_counter  = 0;
     total_counter = 0;
     
@@ -115,27 +115,46 @@ void App_TaskUART_Rx( void *p_arg )
             
             //Restart UART Rx if fifo free space enough
             //UART_Rx_ReStart( PC_UART ); 
-             
-             
-//          while( counter-- ) {              
-//            Queue_Read( &temp, pUART_Rece_Buf[PC_UART] );            
-//            Noah_CMD_Read( &CMD_Read_PC, temp ) ;
-//            
-//		}  
+             Check_CMD_BulkOut_Restart();             
           
 //             Time_Stamp();
 //             APP_TRACE_INFO(("\r\n:App_TaskUART_Rx check: end "));
 //         
              
         }
+        
+        ////////////////////////////////////////////////////////////////////////
+        
+        counter  = kfifo_get_data_size(&cmd_ruler_rece_fifo); 
+        //APP_TRACE_INFO((" %4d ",counter)) ;  
 
         
-//        counter = Queue_NData( (void*) pUART_Rece_Buf[RULER_UART] ) ;         
-//        while( counter-- ) {              
-//            Queue_Read( &temp, pUART_Rece_Buf[RULER_UART] );            
-//            Noah_CMD_Read( &CMD_Read_Ruler, temp ) ;
-//        } 
+        if( counter ) {
+//             Time_Stamp();
+//             APP_TRACE_INFO(("."));
+//             APP_TRACE_INFO(("\r\n:App_TaskUART_Rx check: [%d]start",counter));   
+            
+             counter = counter < RX_DATA_LEN ? counter : RX_DATA_LEN;
+             kfifo_get(&cmd_ruler_rece_fifo, (unsigned char *)rx_data, counter) ; 
 
+       
+             
+            for(i = 0; i< counter; i++ ){                 
+                 Noah_CMD_Unpacking( &CMD_Read_Ruler, rx_data[i] ) ;                   
+            }  
+            
+            //Restart UART Rx if fifo free space enough
+            //UART_Rx_ReStart( PC_UART ); 
+                 
+          
+//             Time_Stamp();
+//             APP_TRACE_INFO(("\r\n:App_TaskUART_Rx check: end "));
+//         
+             
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        
         OSTimeDly(1); // note : UART1_RECE_QUEUE_LENGTH = 1024B; 115200/10/1000 =  11.52;
   
                     
