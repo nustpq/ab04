@@ -55,6 +55,8 @@ const CPU_CHAR hw_model[]    = "[AB04]";
 
 OS_EVENT *Bsp_Ser_Tx_Sem_lock;
 OS_EVENT *Bsp_Ser_Rx_Sem_lock;
+OS_EVENT *DBGU_UART_Tx_Sem_lock;
+OS_EVENT *DBGU_USB_Tx_Sem_lock;
 
 
 CPU_INT08U Debug_COM_Sel = 0 ; //debug uart use:    0: DBGUART, 1: UART1, >1: debug muted
