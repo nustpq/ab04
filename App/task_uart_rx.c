@@ -110,7 +110,7 @@ void App_TaskUART_Rx( void *p_arg )
 #endif            
              
             for(i = 0; i< counter; i++ ){                 
-                 Noah_CMD_Read( &CMD_Read_PC, rx_data[i] ) ;                   
+                 Noah_CMD_Unpacking_New( &CMD_Read_PC, rx_data[i] ) ;                   
             }  
             
             //Restart UART Rx if fifo free space enough

@@ -1791,7 +1791,7 @@ unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
     } else { //handset
        fpga_mask = 0x3F << ((pdata->ruler_id)<<3);
     }
-    Init_FPGA(fpga_mask);
+//    Init_FPGA(fpga_mask);
     return err;
 #endif
 }
@@ -1908,7 +1908,7 @@ unsigned char Reset_Mic_Mask(  unsigned int *pInt )
         }
     }
 
-    Init_FPGA(fpga_mask);
+//    Init_FPGA(fpga_mask);
     return err;
 }
 
@@ -2129,7 +2129,7 @@ void simple_test_use( void )
 
 //H01
     Update_Mic_Mask( 0, 0x3f);
-    Init_FPGA(0x3F);
+//    Init_FPGA(0x3F);
     Global_Ruler_State[0] = RULER_STATE_RUN;
 
     AUDIO_CFG audio_config_play = {SAMPLE_RATE_DEFAULT, AUDIO_TYPE_PLAY, 6 };
