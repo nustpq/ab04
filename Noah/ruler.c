@@ -405,8 +405,8 @@ unsigned char Update_Audio( unsigned char id )
     }
     APP_TRACE_INFO(("\r\n\############## BCLK POLARITY = %d\r\n", Codec_Set[id][index].bclk_polarity));
     //I2C_Mixer(I2C_MIX_FM36_CODEC);
-//    err = Init_CODEC( &data_source[id], Codec_Set[id][index] );
-//    memcpy((void*)&Audio_Configure_Instance[id], (void*)&Codec_Set[id][index], sizeof(AUDIO_CFG) );
+    err = Init_CODEC( &data_source[id], Codec_Set[id][index] );
+    memcpy((void*)&Audio_Configure_Instance[id], (void*)&Codec_Set[id][index], sizeof(AUDIO_CFG) );
     //I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
         APP_TRACE_INFO(("\r\nUpdate_Audio Init_CODEC ERROR: %d\r\n",err));
@@ -699,7 +699,7 @@ unsigned char Init_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
         UART1_Mixer( ruler_slot_id );
     }
 
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_EST, NULL, 0, 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_EST, NULL, 0, 0, NULL, 0 ) ;
     if( OS_ERR_NONE == err ) {
         OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
         if( OS_ERR_TIMEOUT == err ) {
@@ -712,10 +712,10 @@ unsigned char Init_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
-    */
+*/   
     return err ;
 }
 
@@ -758,7 +758,7 @@ unsigned char Setup_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
         UART1_Mixer( ruler_slot_id );
     }
 
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
     if( OS_ERR_NONE == err ) {
         OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
         if( OS_ERR_TIMEOUT == err ) {
@@ -773,7 +773,7 @@ unsigned char Setup_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
     */
@@ -818,7 +818,7 @@ unsigned char Get_Ruler_Type(  unsigned char ruler_slot_id )
         //OS_EXIT_CRITICAL();
         UART1_Mixer( ruler_slot_id );
     }
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
     if( OS_ERR_NONE == err ) {
         OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
         if( OS_ERR_TIMEOUT == err ) {
@@ -832,7 +832,7 @@ unsigned char Get_Ruler_Type(  unsigned char ruler_slot_id )
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
     */
@@ -878,7 +878,7 @@ unsigned char Read_Ruler_Status( unsigned char ruler_slot_id, unsigned short *st
         UART1_Mixer( ruler_slot_id );
     }
 
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
     if( OS_ERR_NONE == err ) {
         OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
         if( OS_ERR_TIMEOUT == err ) {
@@ -892,7 +892,7 @@ unsigned char Read_Ruler_Status( unsigned char ruler_slot_id, unsigned short *st
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
     */
@@ -935,7 +935,7 @@ unsigned char Read_Ruler_Info( unsigned char ruler_slot_id )
         UART1_Mixer( ruler_slot_id );
     }
 
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
     if( OS_ERR_NONE == err ) {
         OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
         if( OS_ERR_TIMEOUT == err ) {
@@ -948,7 +948,7 @@ unsigned char Read_Ruler_Info( unsigned char ruler_slot_id )
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
     */
@@ -1001,13 +1001,13 @@ unsigned char Write_Ruler_Info( unsigned char ruler_slot_id )
         UART1_Mixer( ruler_slot_id );
     }
 
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
     if( OS_ERR_NONE != err ) { return err ; }
     pdata = pEBuf_Cmd->data;
     data_length = pEBuf_Cmd->length;
     while( data_length > 0 ){
         temp = data_length > (NOAH_CMD_DATA_MLEN-1) ? (NOAH_CMD_DATA_MLEN-1) : data_length ;
-        err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, pdata, temp, 0, buf, 1 ) ;
+        err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, pdata, temp, 0, buf, 1 ) ;
         if( OS_ERR_NONE != err ) { break;}
         OSTimeDly(50); //wait for ruler operation
         data_length -= temp;
@@ -1025,7 +1025,7 @@ unsigned char Write_Ruler_Info( unsigned char ruler_slot_id )
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
     */
@@ -1071,7 +1071,7 @@ unsigned char Read_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_
         UART1_Mixer( ruler_slot_id );
     }
 
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
     if( OS_ERR_NONE == err ) {
         OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
         if( OS_ERR_TIMEOUT == err ) {
@@ -1084,7 +1084,7 @@ unsigned char Read_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
     */
@@ -1139,13 +1139,13 @@ unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic
         UART1_Mixer( ruler_slot_id );
     }
 
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
     if( OS_ERR_NONE != err ) { return err ; }
     pdata = pEBuf_Cmd->data;
     data_length = pEBuf_Cmd->length;
     while( data_length > 0 ){
         temp = data_length > (NOAH_CMD_DATA_MLEN-2) ? (NOAH_CMD_DATA_MLEN-2) : data_length ;
-        err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, pdata, temp, 0, buf, 2 ) ;
+        err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, pdata, temp, 0, buf, 2 ) ;
         if( OS_ERR_NONE != err ) { break;}
         OSTimeDly(50); //wait for ruler operation
         data_length -= temp;
@@ -1162,7 +1162,7 @@ unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic
             }
         }
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
     **/
@@ -1214,7 +1214,7 @@ unsigned char Update_Mic_Mask( unsigned char ruler_slot_id, unsigned int mic_mas
     } else {
         buf_size_send = 3; //Default cmd data size = 1+2 for <16 mic
     }
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, buf_size_send, 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, buf_size_send, 0, NULL, 0 ) ;
     if( OS_ERR_NONE == err ) {
         OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
         if( OS_ERR_TIMEOUT == err ) {
@@ -1222,7 +1222,7 @@ unsigned char Update_Mic_Mask( unsigned char ruler_slot_id, unsigned int mic_mas
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
     */
@@ -1270,7 +1270,7 @@ unsigned char Ruler_Active_Control( unsigned char active_state )
             //OS_EXIT_CRITICAL();
             UART1_Mixer( ruler_id );
         }
-        err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+        err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
         if( OS_ERR_NONE == err ) {
             OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
             if( OS_ERR_TIMEOUT == err ) {
@@ -1283,7 +1283,7 @@ unsigned char Ruler_Active_Control( unsigned char active_state )
             }
 
         } else {
-            APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_id,err));
+            APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_id,err));
         }
         OSSemPost( UART_MUX_Sem_lock );
         if( err != NO_ERR ) {
@@ -1333,7 +1333,7 @@ unsigned char Get_Ruler_Version( unsigned char ruler_slot_id )
         UART1_Mixer( ruler_slot_id );
     }
 
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
     if( OS_ERR_NONE == err ) {
         OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
         if( OS_ERR_TIMEOUT == err ) {
@@ -1349,7 +1349,7 @@ unsigned char Get_Ruler_Version( unsigned char ruler_slot_id )
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
     */
@@ -1792,7 +1792,7 @@ unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
     } else { //handset
        fpga_mask = 0x3F << ((pdata->ruler_id)<<3);
     }
-//    Init_FPGA(fpga_mask);
+    //Init_FPGA(fpga_mask);
     return err;
 #endif
 }
@@ -1888,6 +1888,7 @@ unsigned char Reset_Mic_Mask(  unsigned int *pInt )
     pChar     = (unsigned char *)pInt;
     err       = 0;
 
+    /*
     for( id = 0; id < 4; id++ ) {
         if( *(pChar+id) == 0 ) {
             continue;
@@ -1908,8 +1909,9 @@ unsigned char Reset_Mic_Mask(  unsigned int *pInt )
             fpga_mask += 0x3F << (id<<3); //handset choose the lowest slot H01
         }
     }
-
-//    Init_FPGA(fpga_mask);
+    */
+    
+    //Init_FPGA(fpga_mask);
     return err;
 }
 
@@ -2075,7 +2077,7 @@ unsigned char Ruler_POST( unsigned char ruler_id )
 {
     unsigned char  err = 0;
     unsigned short result;
-
+/*
     APP_TRACE_INFO(("\r\nRuler[%d] POST status check... \r\n",ruler_id));
 
     err = Read_Ruler_Status( ruler_id, &result);
@@ -2094,7 +2096,7 @@ unsigned char Ruler_POST( unsigned char ruler_id )
         }
     }
     APP_TRACE_INFO(("\r\n---OK\r\n"));
-
+ */
     return err;
 }
 
@@ -2167,7 +2169,7 @@ unsigned char Ruler_Setup_Sync( unsigned char ruler_slot_id )
         UART1_Mixer( ruler_slot_id );
     }
 
-    err = pcSendDateToBuf( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
+    err = Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;
     if( OS_ERR_NONE == err ) {
         OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
         if( OS_ERR_TIMEOUT == err ) {
@@ -2180,7 +2182,7 @@ unsigned char Ruler_Setup_Sync( unsigned char ruler_slot_id )
         }
 
     } else {
-        APP_TRACE_INFO(("Ruler[%d] pcSendDateToBuf failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Packing failed: %d\r\n",ruler_slot_id,err));
     }
     OSSemPost( UART_MUX_Sem_lock );
 */
