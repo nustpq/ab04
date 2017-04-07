@@ -39,6 +39,7 @@
 #include "uif_object.h"
 
 static const DataSource *pSource;
+CODEC_SETS Codec_Set_Saved[2];   //for 2 CODEC
 
 void Pin_Reset_Codec( unsigned char id )
 {
@@ -502,7 +503,7 @@ uint8_t CODEC_Set_Volume( const DataSource *pSource,float vol_spk, float vol_lou
     uint8_t err;
     float temp = 0;
     uint8_t flag=0;
-    uint8_t Mic_PGA=0,ADC_GAIN=0;
+    uint8_t Mic_PGA=0, ADC_GAIN=0;
 
     vol_spk= (vol_spk - (int)vol_spk%5)/10;
     vol_lout=(vol_lout - (int)vol_lout%5)/10;
@@ -551,7 +552,7 @@ uint8_t CODEC_Set_Volume( const DataSource *pSource,float vol_spk, float vol_lou
     I2CWrite_Codec_AIC3204(pSource,83,ADC_GAIN);
     I2CWrite_Codec_AIC3204(pSource,84,ADC_GAIN);
 
-        signed char DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
+    signed char DAC_GAIN=0 ,HPL_GAIN=0 ,LOL_GAIN=0;
     unsigned char flag1=0,flag2=0;
     for(signed char k=0;k<48+1;k++){
       for(signed char m=-6;m<29+1;m++){
@@ -644,7 +645,7 @@ uint8_t Check_SR_Support( uint32_t sample_rate )
 }
 
 
-/**/
+/*
 //CODEC PLL setting based on 24.576MHz MCLK
 unsigned short CODEC_PLL_PARA_TABLE[][14][7] = {
 
@@ -778,116 +779,42 @@ unsigned short BCLK_SOURCE[] = { //reg29 0:DAC_CLK  1: DAC_MOD_CLK , D3 = 1 for 
           0x8, //I2S 32bit format
           0x8  //TDM 32bit 4slot format
 };
+*/
 
-/*-----------------------------------------------------------------------------*/
 
-unsigned short CODEC_PARA_TABLE[][14][7] = {
-    { //mode 0
-          //I2S format
-          //BCLK = 16 * 2 * FCLK = 32 * FCLK
-	  //parameter for MCLK = 24.576MHz 
-          {48000, 44100, 32000, 24000, 22050, 16000, 8000 }, //SR	      
-	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NDAC    =
-	  {0x82,  0x84,  0x82,  0x84,  0x84,  0x84,  0x81 }, //  REG_MDAC    = --R12
-	  {0x80,  0x40,  0x80,  0x80,  0x80,  0x80,  0x00 }, //  REG_DOSR    = --R13-14
-	  {0x84,  0x82,  0x84,  0x84,  0x84,  0x84,  0xA0 }, //  REG_BCLK_DIV=  --R30   
-	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x86 }, //  REG_NADC    = 
-	  {0x84,  0x82,  0x84,  0x84,  0x82,  0x84,  0x84 }, //  REG_MADC    = 
-	  {0x00,  0x80,  0x40,  0x80,  0x00,  0x80,  0x80 }, //REG_AOSR    =  --R20
-	  //{3.072M, 2.8224M, 2.048M, 3.072M, 2.8224M, 2.048M, 1.024M},//     --PDMCLK   :       
-	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //CLK_MUX     =  --Select CODEC_CLKIN
-	  {0,     1,     0,     0,     1,    0,     0}, //PLL_EN      = 
-	  {0, 	  1,     0,     0,     1,    0,     0}, //PLL_R       = 
-	  {0,     2,     0,     0,     2,    0,     0}, //PLL_P       = 
-	  {0,     7,     0,     0,     7,    0,     0}, //PLL_J       = 
-	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
-             
-    
-    },     
-
-    { //mode 1
-          //TDM16 format
-          //BCLK = 16 * 8 * FCLK = 128 * FCLK
-	  //parameter for MCLK = 24.576MHz 
-          {48000, 44100, 32000, 24000, 22050, 16000, 8000 }, //SR	      
-	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NDAC    =
-	  {0x82,  0x84,  0x82,  0x84,  0x84,  0x84,  0x81 }, //  REG_MDAC    = --R12
-	  {0x80,  0x40,  0x80,  0x80,  0x80,  0x80,  0x00 }, //  REG_DOSR    = --R13-14
-	  {0x82 , 0x82,  0x82,  0x84,  0x84,  0x84,  0x88 }, //  REG_BCLK_DIV=  --R30   
-	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x86 }, //  REG_NADC    = 
-	  {0x84,  0x82,  0x84 , 0x84,  0x82,  0x84,  0x84 }, //  REG_MADC    = 
-	  {0x00,  0x80,  0x40,  0x80,  0x00,  0x80,  0x80 }, //REG_AOSR    =  --R20
-	  //{3.072M, 2.8224M, 2.048M, 3.072M, 2.8224M, 2.048M, 1.024M},//     --PDMCLK   :       
-	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //CLK_MUX     =  --Select CODEC_CLKIN
-	  {0,     1,     0,     0,     1,    0,     0}, //PLL_EN      = 
-	  {0, 	  1,     0,     0,     1,    0,     0}, //PLL_R       = 
-	  {0,     2,     0,     0,     2,    0,     0}, //PLL_P       = 
-	  {0,     7,     0,     0,     7,    0,     0}, //PLL_J       = 
-	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
-             
-    
-    },
-    
-    { //mode 2
-          //TDM32 format
-          //BCLK = 32 * 8 * FCLK = 256 * FCLK
-	  //parameter for MCLK = 24.576MHz 
-          {48000, 44100, 32000, 24000, 22050, 16000, 8000 }, //SR	      
-	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x83 }, //  REG_NDAC    =
-	  {0x82,  0x84,  0x82,  0x84,  0x84,  0x84,  0x81 }, //  REG_MDAC    = --R12
-	  {0x80,  0x40,  0x80,  0x80,  0x80,  0x80,  0x00 }, //  REG_DOSR    = --R13-14
-	  {0x81,  0x81,  0x81,  0x82,  0x82,  0x82,  0x84 }, //  REG_BCLK_DIV=  --R30   
-	  {0x82,  0x88,  0x83,  0x82,  0x88,  0x83,  0x86 }, //  REG_NADC    = 
-	  {0x84,  0x82,  0x84,  0x84,  0x82,  0x84,  0x84 }, //  REG_MADC    = 
-	  {0x00,  0x80,  0x40,  0x80,  0x00,  0x80,  0x80 }, //REG_AOSR    =  --R20
-	  //{3.072M, 2.8224M, 2.048M, 3.072M, 2.8224M, 2.048M, 1.024M},//     --PDMCLK   :       
-	  {0x00,  0x03,  0x00,  0x00,  0x03,  0x00,  0x00 }, //CLK_MUX     =  --Select CODEC_CLKIN
-	  {0,     1,     0,     0,     1,    0,     0}, //PLL_EN      = 
-	  {0, 	  1,     0,     0,     1,    0,     0}, //PLL_R       = 
-	  {0,     2,     0,     0,     2,    0,     0}, //PLL_P       = 
-	  {0,     7,     0,     0,     7,    0,     0}, //PLL_J       = 
-	  {0,     3500,  0,     0,     3500, 0,     0}  //PLL_D       = 
-             
-    
-    }    
-    
-};
-/*-----------------------------------------------------------------------------*/
-
-/*
 uint8_t config_aic3204[][2] = {
 
 		      0,0x00, //page0
 
 		      //Software reset codec
 		      1,0X01,
-#if 1
-		      //SET PLL == MCLK*R*J.D/P   mclk == 12.288MHz;
-		      4,CLK_MUX[SR_Index],
-		      5,PLL_EN[SR_Index]*128 +PLL_P[SR_Index]*16 + PLL_R[SR_Index],
-		      6,PLL_J[SR_Index],
-		      7,math.floor( PLL_D[SR_Index]/256),
-		      8,PLL_D[SR_Index]%256,
 
-		      //Set DAC_fs == PLL/NDAC*MDAC*DOSR
-		      11,REG_NDAC[SR_Index],  //NDAC=3
-		      12,REG_MDAC[SR_Index],  //MDAC=4
-		      //DOSR=128
-		      13,math.floor(REG_DOSR[SR_Index]/256),
-		      14,REG_DOSR[SR_Index]%256,
+//		      //SET PLL == MCLK*R*J.D/P   mclk == 12.288MHz;
+//		      4,CLK_MUX[SR_Index],
+//		      5,PLL_EN[SR_Index]*128 +PLL_P[SR_Index]*16 + PLL_R[SR_Index],
+//		      6,PLL_J[SR_Index],
+//		      7,math.floor( PLL_D[SR_Index]/256),
+//		      8,PLL_D[SR_Index]%256,
+//
+//		      //Set DAC_fs == PLL/NDAC*MDAC*DOSR
+//		      11,REG_NDAC[SR_Index],  //NDAC=3
+//		      12,REG_MDAC[SR_Index],  //MDAC=4
+//		      //DOSR=128
+//		      13,math.floor(REG_DOSR[SR_Index]/256),
+//		      14,REG_DOSR[SR_Index]%256,
+//
+//		      //Set ADC_fs == PLL/NADC*MADC*AOSR   SET PDMCLK=ADC_MOD_CLK = 2.048MHz
+//		      18,REG_NADC[SR_Index],  //NADC=3
+//		      19,REG_MADC[SR_Index],  //MADC=4
+//		      //AOSR=128
+//		      20,REG_AOSR[SR_Index],
+//		      //if master mode,reg20,reg30 is needed.
+//
+//		      //BDIV_CLKIN Multiplexer Control
+//		      29,BCLK_SOURCE,           // ADC2DAC_ROUTED is not rounted  ;
+////		      29,0X10+BCLK_SOURCE,    // ADC2DAC_ROUTED
+//		      30,REG_BCLK_DIV[SR_Index], //0X84,  //bclk=bdiv_clkin/4
 
-		      //Set ADC_fs == PLL/NADC*MADC*AOSR   SET PDMCLK=ADC_MOD_CLK = 2.048MHz
-		      18,REG_NADC[SR_Index],  //NADC=3
-		      19,REG_MADC[SR_Index],  //MADC=4
-		      //AOSR=128
-		      20,REG_AOSR[SR_Index],
-		      //if master mode,reg20,reg30 is needed.
-
-		      //BDIV_CLKIN Multiplexer Control
-		      29,BCLK_SOURCE,           // ADC2DAC_ROUTED is not rounted  ;
-//		      29,0X10+BCLK_SOURCE,    // ADC2DAC_ROUTED
-		      30,REG_BCLK_DIV[SR_Index], //0X84,  //bclk=bdiv_clkin/4
-#endif
 
 		      //SET interface mode(I2S,PCM,Left,right)
 		      27,0X0c,   //I2S mode,16bit,master
@@ -957,114 +884,6 @@ uint8_t config_aic3204[][2] = {
 
 
 };
-*/
-
-unsigned char config_aic3204[][2] = {
-    
-       
-		      0,0x00, //page0 
-
-		      //Software reset codec
-		      1,0X01, 
-		      
-//		      //SET PLL == MCLK*R*J.D/P   mclk == 12.288MHz;
-//		      4,CLK_MUX[SR_Index], 
-//		      5,PLL_EN[SR_Index]*128 +PLL_P[SR_Index]*16 + PLL_R[SR_Index],
-//		      6,PLL_J[SR_Index],
-//		      7,math.floor( PLL_D[SR_Index]/256),
-//		      8,PLL_D[SR_Index]%256,		      
-//		   
-//		      //Set DAC_fs == PLL/NDAC*MDAC*DOSR		  
-//		      11,REG_NDAC[SR_Index],  //NDAC=3    
-//		      12,REG_MDAC[SR_Index],  //MDAC=4
-//		      //DOSR=128
-//		      13,math.floor(REG_DOSR[SR_Index]/256), 
-//		      14,REG_DOSR[SR_Index]%256,  
-//		      
-//		      //Set ADC_fs == PLL/NADC*MADC*AOSR   SET PDMCLK=ADC_MOD_CLK = 2.048MHz
-//		      18,REG_NADC[SR_Index],  //NADC=3
-//		      19,REG_MADC[SR_Index],  //MADC=4
-//		      //AOSR=128
-//		      20,REG_AOSR[SR_Index],  
-//		      //if master mode,reg20,reg30 is needed.
-//
-//		      //BDIV_CLKIN Multiplexer Control			      	
-//		      29,BCLK_SOURCE,           // ADC2DAC_ROUTED is not rounted  ; 
-//		      //29,0X10+BCLK_SOURCE,    // ADC2DAC_ROUTED	
-//		      30,REG_BCLK_DIV[SR_Index], //0X84,  //bclk=bdiv_clkin/4
-
-
-		      //SET interface mode(I2S,PCM,Left,right)
-		      27,0X0c,   //I2S mode,16bit,master
-		      //27,0X00,   //I2S mode,16bit,Slave
-		      //27,0X4c,   //DSP mode,16bit,master
-		      //27,0Xcc,   //LJF mode,16bit,master
-		      //27,0X8c,   //RJF mode,16bit,master
-//		      27, HS,
-//		      //Data offset
-		      28,0X00,    //data offset == 0'bclk for I2S Mode, there have a cyale delay in I2S mode itself
-//		      //28,0X01,    //data offset == 1'bclk for DSP Mode
-		      32,0X00, 
-		      33,0X4d, 
-		      34,0X20, 
-		      53,0X02,  	//Dout is pin5
-		      54,0X02,  	//pin4 is i2s data input   	 	
-		         
-			  //-set DAC channels
-		      63,0xE8, //DAC Channel Setup :  0xD4: L2L, R2R; 0xE8: L2R, R2L
-		      64,0X00, // 	 
-		      65,( 0X100+2*( -8 ) )%0x100, //DAC Volume L set -8dB  : [-63.5,+24] @ 0.5dB
-		      66,( 0X100+2*( -8 ) )%0x100, //DAC Volume R set -8dB  : [-63.5,+24] @ 0.5dB
-		      
-		      //-set dmic data pin setting
-		      55,0X0e,   // Set MISO as PDM CLK ouput pin
-		      56,0X02,   // SCLK pin is enabled		
-		      
-		      81,0xD0,   // enable ADC and set SCLK as PDM DATA input pin//////-	    
-		      //Dmic clock output(=adc_mod_clk), PDM CLK = ADC_MOD_CLK	        
-		      82,0X00,   //ADC Fine gain adjust, 0dB, unmute
-		      83,2*( 0 ),   //ADC Volume L set 0dB  : [-12,+20] @ 0.5dB   D?¨®¨²0dB¦Ì?¨¦¨¨??2?¡ã¡ä?a??¨¤¡ä¡ê?¡À¨¨???¨¦¡¤3
-		      84,2*( 0 ),   //ADC Volume R set 0dB  : [-12,+20] @ 0.5dB   D?¨®¨²0dB¦Ì?¨¦¨¨??2?¡ã¡ä?a??¨¤¡ä¡ê?¡À¨¨???¨¦¡¤3
-
-
-		      0,0X01,  //page1//////////////////////////
-//		          
-//		      //-set power
-		      1, 0x08,  //disconnect AVDD and DVDD		 
-		      2, 0X01,  //enable Master Analog Power Control		
-		      3, 0X00,  //Set the DAC L PTM mode to PTM_P3/4
-		      4, 0X00,  //Set the DAC R PTM mode to PTM_P3/4		      
-		      9, 0XFF,  //All HPOUT,LOUT and Mixer Amplifier are Power up  
-		      //9, 0x3C,
-		      10,0X00,  //Set the Input Common Mode to 0.9V and Output Common Modefor Headphone to Input Common Mode
-	              20,0X00,  //headphone driver startup
-
-		      //-set route settings
-		      //CODEC LO to FL124 LIN, single ended
-	              12,0X08, //HPL route on
-		      13,0X08, //HPR route on
-		      14,0X08, //LOL route on
-		      15,0X08, //LOR route on
-		      
-		      //Analog input mixer settings
-		      52,0X40, // IN1L to L_MICPGA 
-		      54,0X40, // CM1L to L_MICPGA 
-		      55,0X40, // IN1R to R_MICPGA 
-		      57,0X40, // CM1R to R_MICPGA 	      
-		         
-		      //-set DAC output gains
-		      16,( 0X40+( 12 ) )% 0x50 ,  //HPL +12db gain :  [-6,+29] @ 1dB
-		      17,( 0X40+( 12 ) )% 0x50 ,  //HPR +12db gain :  [-6,+29] @ 1dB
-		      18,( 0X40+( -6 ) )% 0x50 ,  //LOL -6db gain   :  [-6,+29] @ 1dB
-		      19,( 0X40+( -6 ) )% 0x50 ,  //LOR -6db gain   :  [-6,+29] @ 1dB
-		      		       
-		      //-set MIC PGA Gain
-		      59,0X00,  //L_MICPGA 0db gain
-		      60,0X00,  //R_MICPGA 0db gain	
-
-		     	    
-};
-
 
 
 
@@ -1288,7 +1107,7 @@ uint8_t Set_Codec_PLL( const DataSource *pSource,uint32_t sr, uint8_t sample_len
 
 
 CODEC_SETS Codec_Set_Saved[2];   //for 2 CODEC
-#if 0
+
 uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
 
 {
@@ -1296,7 +1115,7 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
     uint8_t i, if_set;
 
     APP_TRACE_INFO(("\r\nInit CODEC[%d]",codec_set.id));
-    //if( memcmp(&codec_set_saved,&codec_set_saved,sizeof(CODEC_SETS){
+#if 0
     if( (Codec_Set_Saved[codec_set.id].sr == codec_set.sr)  &&\
         (Codec_Set_Saved[codec_set.id].sample_len == codec_set.sample_len) &&\
         (Codec_Set_Saved[codec_set.id].format == codec_set.format) &&\
@@ -1309,8 +1128,11 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
     } else {
         Codec_Set_Saved[codec_set.id] = codec_set;
     }
+#else
+    Codec_Set_Saved[codec_set.id] = codec_set;    //here, force to initialize codec every time;
+#endif    
     Pin_Reset_Codec( codec_set.id );
-//    OSTimeDly(2000); //test
+
     err = Check_SR_Support( codec_set.sr );
     if( OS_ERR_NONE != err ){
         return err;
@@ -1387,79 +1209,9 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
         return err;
     }
 
-    //err = Set_Codec_PLL( pSource,codec_set.sr, codec_set.sample_len, codec_set.slot_num, codec_set.bclk_polarity );
+    err = Set_Codec_PLL( pSource,codec_set.sr, codec_set.sample_len, codec_set.slot_num, codec_set.bclk_polarity );
 
     return err;
 
 }
-#else
-#define CFG_PARA_NUM  14
 
-unsigned char Init_CODEC( const DataSource *pSource,unsigned int sr, unsigned char sample_length ) 
-{
-    unsigned char err;
-    unsigned char mode;
-    unsigned char reg_data[CFG_PARA_NUM];
-    unsigned char sr_index = 255; 
-    unsigned char reg_index[CFG_PARA_NUM] = {
-        4, 5, 6, 7, 8, 11, 12, 13, 14, 18, 19, 20, 29, 30
-    };
-
-    for( unsigned char i = 0; i<sizeof(CODEC_PARA_TABLE[0][0])>>1; i++ ) {
-        if(CODEC_PARA_TABLE[0][0][i] == sr ) {
-            sr_index = i;
-            break;
-        }
-    }
-    if(sr_index == 255) {
-        return CODEC_SR_NOT_SUPPORT_ERR;
-    }
-    
-    if( sample_length == 16 ) {
-        mode = 1;
-        //mode = 0; //for iM401
-    } else {//if(sample_length == 32 ) {
-        mode = 2;
-    } //else {
-        //return CODEC_SR_LEN_NOT_SUPPORT_ERR;
-    //}
-    
-    reg_data[0] = CODEC_PARA_TABLE[mode][8][sr_index];
-    reg_data[1] = CODEC_PARA_TABLE[mode][10][sr_index]*128+CODEC_PARA_TABLE[mode][12][sr_index]*16+ CODEC_PARA_TABLE[mode][11][sr_index];
-    reg_data[2] = CODEC_PARA_TABLE[mode][13][sr_index];
-    reg_data[3] = CODEC_PARA_TABLE[mode][14][sr_index]>>8;
-    reg_data[4] = CODEC_PARA_TABLE[mode][14][sr_index];    
-    reg_data[5] = CODEC_PARA_TABLE[mode][1][sr_index];
-    reg_data[6] = CODEC_PARA_TABLE[mode][2][sr_index];    
-    reg_data[7] = CODEC_PARA_TABLE[mode][3][sr_index]>>8;
-    reg_data[8] = CODEC_PARA_TABLE[mode][3][sr_index];    
-    reg_data[9] = CODEC_PARA_TABLE[mode][5][sr_index];
-    reg_data[10] = CODEC_PARA_TABLE[mode][6][sr_index];
-    reg_data[11] = CODEC_PARA_TABLE[mode][7][sr_index]; 
-    reg_data[12] = BCLK_SOURCE[mode];
-    reg_data[13] = CODEC_PARA_TABLE[mode][4][sr_index];
-        
-    for( unsigned char i = 0 ; i< sizeof(config_aic3204)>>1 ; i++ ) {    
-        err = I2CWrite_Codec_AIC3204(pSource,config_aic3204[i][0],config_aic3204[i][1]);
-        if( OS_ERR_NONE != err ){
-          return err;
-        }
-    }
-    
-    err = I2CWrite_Codec_AIC3204(pSource,0,0);
-    if( OS_ERR_NONE != err ){
-       return err;
-    }
-    
-    for( unsigned char i = 0 ; i< CFG_PARA_NUM ; i++ ) {    
-        err = I2CWrite_Codec_AIC3204(pSource,reg_index[i],reg_data[i]);
-        if( OS_ERR_NONE != err ){
-          return err;
-        }
-    }
-    
-    return err;    
-    
-}
-
-#endif

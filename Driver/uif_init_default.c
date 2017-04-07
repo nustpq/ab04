@@ -564,7 +564,7 @@ unsigned char aic3204_init_default( void )
     codec_set.bclk_polarity = 0;
     codec_set.flag = 0;
     codec_set.delay = 0;
-#if 0
+#if 1
     err = Init_CODEC( &source_twi2,codec_set ); //CODEC0 connetced to TWI2
 #else
     err = Init_CODEC( &source_twi2,48000, 16 ); 
@@ -573,6 +573,7 @@ unsigned char aic3204_init_default( void )
         return err;
     }
 
+#if 0    
     codec_set.id = 1;  //CODEC 1
     codec_set.sr = SAMPLE_RATE_DEFAULT;
     codec_set.sample_len = SAMPLE_LENGTH_DEFAULT;
@@ -587,6 +588,7 @@ unsigned char aic3204_init_default( void )
 #else
     err = Init_CODEC( &source_twi1,48000, 16 );
 #endif
+#endif    
     return err;
 
 }

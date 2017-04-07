@@ -277,8 +277,8 @@ typedef struct _sys_info
 
 
 //copy these struct from uif1.0 for compatiblity and will delete if don't need
-typedef  uint8_t VERSION_DATA[ DEF_VERSION_STR_LEN ] ;  
-typedef  uint8_t MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
+//typedef  uint8_t VERSION_DATA[ DEF_VERSION_STR_LEN ] ;  
+//typedef  uint8_t MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
 
 /*
 typedef struct {    

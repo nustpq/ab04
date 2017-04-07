@@ -190,59 +190,14 @@ void  App_TaskUSBService ( void *p_arg )
                      //counter = kfifo_get_free_space( pPath->pfifoOut );
                      else if( ( counter  <= source_ssc0.txSize )
                         && ( source_ssc0.status[ IN ] < ( uint8_t )START ) )    
-                      {
-#if 0                         
-                          err = Init_CODEC( &source_twi2,48000, 16 );
-                          
-                          First_Pack_Padding_BI( &ep0BulkIn_fifo );
-                          First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
-                          
-                          if( source_ssc0.buffer_read != NULL )
-                          {
-                              source_ssc0.buffer_read(   &source_ssc0,
-                                                      ( uint8_t * )ssc0_PingPongIn,                                              
-                                                      source_ssc0.rxSize );
-                              source_ssc0.status[ IN ]  = ( uint8_t )START;
-                          }
-                          
-                          if( source_ssc1.buffer_read != NULL )
-                          {
-                              source_ssc1.buffer_read(   &source_ssc1,
-                                                      ( uint8_t * )ssc1_PingPongIn,                                              
-                                                      source_ssc1.rxSize );
-                              source_ssc1.status[ IN ]  = ( uint8_t )START;
-                          }
- 
-                          while( !PIO_Get( &SSC_Sync_Pin ) );
-                           while( PIO_Get( &SSC_Sync_Pin ) );
-                        
-                          if( source_ssc0.buffer_write != NULL )
-                          {
-                              source_ssc0.buffer_write(  &source_ssc0,
-                                                        ( uint8_t * )ssc0_PingPongOut,                                                
-                                                        source_ssc0.txSize ); 
-                              source_ssc0.status[ OUT ] = ( uint8_t )START;
-
-                          }
-
-                          
-                          if( source_ssc1.buffer_write != NULL )
-                          {                          
-                            source_ssc1.buffer_write(  &source_ssc1,
-                                                      ( uint8_t * )ssc1_PingPongOut,                                                
-                                                      source_ssc1.txSize ); 
-                            source_ssc1.status[ OUT ] = ( uint8_t )START;  
-                          
-                          }
-#else                          
+                      {                        
                           
                           if( source_ssc0.peripheral_start != NULL )
                           {
-                            OS_ENTER_CRITICAL();
+//                            OS_ENTER_CRITICAL();
                             source_ssc0.peripheral_start( NULL );
-                            OS_EXIT_CRITICAL();
-                          }
-#endif                            
+//                            OS_EXIT_CRITICAL();
+                          }                          
                       }  
                   }
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->ep ) {   //SSC1 Play

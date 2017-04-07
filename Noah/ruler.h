@@ -43,7 +43,7 @@
 #define RULER_ID_DEFAULT                  0xFF
 
 #define SAMPLE_LENGTH_DEFAULT             16
-#define SAMPLE_RATE_DEFAULT               8000
+#define SAMPLE_RATE_DEFAULT               48000
 #define SLOT_NUM_DEFAULT                  8
 #define SET_VOLUME_MUTE                   1000
 //ruler state defines

@@ -38,7 +38,7 @@
 */
 //because AB04 has two ssc port,so extend to 4 sturct;
 AUDIO_CFG  Audio_Configure_Instance[ 2 ];
-
+extern CODEC_SETS Codec_Set_Saved[2];
 
 extern void Init_Audio_Bulk_FIFO( void );
 
@@ -221,10 +221,10 @@ void Audio_Start( void )
     
 //    aic3204_init_default( );
     
-    source_ssc0.status[ IN ] == ( uint8_t )CONFIGURED;
-    source_ssc0.status[ OUT ] == ( uint8_t )CONFIGURED;
-    source_ssc1.status[ IN ] == ( uint8_t )CONFIGURED;
-    source_ssc1.status[ OUT ] == ( uint8_t )CONFIGURED;
+    source_ssc0.status[ IN ] = ( uint8_t )CONFIGURED;
+    source_ssc0.status[ OUT ] = ( uint8_t )CONFIGURED;
+    source_ssc1.status[ IN ] = ( uint8_t )CONFIGURED;
+    source_ssc1.status[ OUT ] = ( uint8_t )CONFIGURED;
     OSTimeDly( 2 );
     
     audio_play_buffer_ready  = false ;
@@ -480,10 +480,14 @@ void Get_Run_Time( uint32_t time )
 void peripheral_ssc0_recorder( void *instance )
 {
  
-    uint8_t  err = 0; 
+    uint8_t  err = 0;
+#if 0
     err = Init_CODEC( &source_twi2,
                       Audio_Configure_Instance[0].sample_rate,
-                      Audio_Configure_Instance[0].bit_length );    
+                      Audio_Configure_Instance[0].bit_length ); 
+#else
+    err = Init_CODEC( &source_twi2,Codec_Set_Saved[ 0 ] );
+#endif
     
     First_Pack_Padding_BI( &ep0BulkIn_fifo );
     
@@ -512,10 +516,13 @@ void peripheral_ssc0_recorder( void *instance )
 */
 void peripheral_ssc1_recorder( void *instance )
 {
- 
+#if 0 
     uint8_t err = Init_CODEC( &source_twi1,
                       Audio_Configure_Instance[1].sample_rate,
                       Audio_Configure_Instance[1].bit_length );
+#else    
+    uint8_t err = Init_CODEC( &source_twi1,Codec_Set_Saved[ 1 ] );
+#endif
     
     First_Pack_Padding_BI( &ep1BulkIn_fifo );
     
@@ -546,9 +553,14 @@ void peripheral_ssc0_start( void *instance )
 {
 extern Pin SSC_Sync_Pin;  
     uint8_t  err = 0; 
+
+#if 0    
     err = Init_CODEC( &source_twi2,
                       Audio_Configure_Instance[0].sample_rate,
-                      Audio_Configure_Instance[0].bit_length );    
+                      Audio_Configure_Instance[0].bit_length ); 
+#else
+    err = Init_CODEC( &source_twi2,Codec_Set_Saved[ 0 ] );
+#endif    
     
     First_Pack_Padding_BI( &ep0BulkIn_fifo );
     
@@ -590,10 +602,14 @@ extern Pin SSC_Sync_Pin;
 void peripheral_ssc1_start( void *instance )
 {
 extern Pin SSC_Sync_Pin1;  
- 
+
+#if 0
     uint8_t err = Init_CODEC( &source_twi1,
                       Audio_Configure_Instance[1].sample_rate,
                       Audio_Configure_Instance[1].bit_length );
+#else
+    uint8_t err = Init_CODEC( &source_twi1,Codec_Set_Saved[ 1 ] );    
+#endif
     
     First_Pack_Padding_BI( &ep1BulkIn_fifo );
     
@@ -641,8 +657,11 @@ void peripheral_sync_start( void *instance )
 //                      Audio_Configure_Instance[0].sample_rate,
 //                      Audio_Configure_Instance[0].bit_length );
 //                      
-                      
-    err = Init_CODEC( &source_twi2,48000, 16 );                 
+#if 0
+    err = Init_CODEC( &source_twi2,48000, 16 );
+#else
+    err = Init_CODEC( &source_twi2,Codec_Set_Saved[ 0 ] );
+#endif    
                           
     First_Pack_Padding_BI( &ep0BulkIn_fifo );
     First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
