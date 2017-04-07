@@ -477,7 +477,7 @@ void Get_Run_Time( uint32_t time )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void peripheral_ssc0_recoder( void *instance )
+void peripheral_ssc0_recorder( void *instance )
 {
  
     uint8_t  err = 0; 
@@ -730,7 +730,7 @@ void Audio_Manager( unsigned char cfg_data )
              source_ssc0.peripheral_record_alone = peripheral_ssc0_recorder;
            }
           
-           if( ssc1_recoder_bit && ssc1_play_bit )
+           if( ssc1_recorder_bit && ssc1_play_bit )
            {
               source_ssc1.peripheral_start = peripheral_ssc1_start;
            }

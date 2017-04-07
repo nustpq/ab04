@@ -133,15 +133,15 @@ void  App_TaskUSBService ( void *p_arg )
             
             if( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN == pPath->ep ) {  //SSC0 Rec  
           
-                if( source_ssc0.peripheral_recod_alone!= NULL )
+                if( source_ssc0.peripheral_record_alone!= NULL )
                 {
-                            source_ssc0.peripheral_recod_alone( NULL );
+                            source_ssc0.peripheral_record_alone( NULL );
                 }
               
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->ep ) {  //SSC1 Rec 
-                if( source_ssc0.peripheral_recod_alone!= NULL )
+                if( source_ssc0.peripheral_record_alone!= NULL )
                   {
-                      source_ssc0.peripheral_recod_alone( NULL );
+                      source_ssc0.peripheral_record_alone( NULL );
                   }
               
             } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->ep ) {  //SPI Rec       
