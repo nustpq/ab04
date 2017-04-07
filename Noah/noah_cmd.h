@@ -363,7 +363,7 @@ extern void Noah_CMD_Unpack_New( CMDREAD* pCMD_Read, CPU_INT08U data_byte ) ;
 //extern CPU_INT08U Noah_CMD_Parse(   CPU_INT08U  *pCmdDat, 
 //                                    CPU_INT32U datalen
 //                                );
-extern CPU_INT08U Noah_CMD_Packing(  OS_EVENT   *pOS_EVENT, 
+extern CPU_INT08U Noah_CMD_Pack_Ruler(  OS_EVENT   *pOS_EVENT, 
                                     CPU_INT08U  frame_head, 
                                     CPU_INT08U *pdat, 
                                     CPU_INT08U  data_length, 
@@ -371,7 +371,7 @@ extern CPU_INT08U Noah_CMD_Packing(  OS_EVENT   *pOS_EVENT,
                                     CPU_INT08U  *pex_dat,
                                     CPU_INT08U   ex_data_length 
                                  ) ;
-extern CPU_INT08U  Noah_CMD_Packing_New ( OS_EVENT    *pOS_EVENT,                               
+extern CPU_INT08U  Noah_CMD_Pack_PC ( OS_EVENT    *pOS_EVENT,                               
                                  PCCMDDAT    *pPcCmdData,
                                  CPU_INT08U   pkt_index,
                                  CPU_INT16U   cmd_id                                 

@@ -77,7 +77,7 @@ void App_TaskUART_Tx_Ruler( void *p_arg )
        
         // Noah to Uart transmit
         pTaskMsgIN   = (INT8U *)OSQPend( EVENT_MsgQ_Noah2RulerUART, 0, &errCode );        
- /*   
+    
         if( pTaskMsgIN != NULL && OS_ERR_NONE == errCode )   {      
             
             pPcCmd  = (NOAH_CMD *)pTaskMsgIN ;             
@@ -90,18 +90,7 @@ void App_TaskUART_Tx_Ruler( void *p_arg )
                         APP_TRACE_DBG((" %2X", *(unsigned char*)(pPcCmd->Data+i) )); 
                     }
                     APP_TRACE_DBG((" ]")); 
-                    
-                    Queue_Write( (void*)pUART_Send_Buf[RULER_UART] , CMD_DATA_SYNC1   ); //Sync1
-                    Queue_Write( (void*)pUART_Send_Buf[RULER_UART] , CMD_DATA_SYNC2_1 ); //Sync2                  
-                    ////Queue_Write( (void*)pUART_Send_Buf[RULER_UART] , ((pPcCmd->Data[0] == RULER_CMD_SET_RULER)|| (pPcCmd->Data[0] == RULER_CMD_SETUP_SYNC)) ? RULER_ID_DEFAULT : Global_Ruler_Index ); //ruler_id 
-                    
-                    pPcCmd->head  = SET_FRAME_HEAD( PcCmdTxID_Ruler[Global_Ruler_Index], FRAM_TYPE_DATA ) ; //set frame ID for data transmit                                
-                    sum  =  CheckSum( pPcCmd->head, &(pPcCmd->DataLen), pPcCmd->DataLen + 1); //calculate checksum   
-                    
-                    Queue_WriteBuf( pTaskMsgIN,  (void*)pUART_Send_Buf[RULER_UART], pPcCmd->DataLen + 2 ); //3Bytes = head(1Bytes) + len(1Bytes)
-                    Queue_Write( (void*)pUART_Send_Buf[RULER_UART], sum   ); //  check sum(1Bytes)
-                    UART_WriteStart( RULER_UART ); //send data  
-                    
+                    UART0_WriteBuffer_API((unsigned char *)pPcCmd,(pPcCmd->DataLen)+2+2+1 );
                     OSSemPend(ACK_Sem_RulerUART, 500, &errCode);//pending 500ms for ACK back                     
                     if( OS_ERR_NONE == errCode )   {               
                         OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );    //release mem 
@@ -113,7 +102,7 @@ void App_TaskUART_Tx_Ruler( void *p_arg )
                 
                 if(  resend_index >= MAX_RESEND_TIMES ) {   // reach max send times                    
                     OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );    //release mem a space at least
-                    Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, SET_FRAME_HEAD(PcCmdTxID_Ruler[Global_Ruler_Index]+1,FRAM_TYPE_EST), NULL, 0, 1, NULL, 0) ;   //insert EST  package 
+                    Noah_CMD_Pack_Ruler( EVENT_MsgQ_Noah2RulerUART, SET_FRAME_HEAD(PcCmdTxID_Ruler[Global_Ruler_Index]+1,FRAM_TYPE_EST), NULL, 0, 1, NULL, 0) ;   //insert EST  package 
                     
                 } 
                 
@@ -121,15 +110,9 @@ void App_TaskUART_Tx_Ruler( void *p_arg )
                     Tx_ReSend_Happens_Ruler ++ ;
                 }
                 
-            } else { //ACK / NAK  frame, no resend action  
-              
-                    Queue_Write( (void*)pUART_Send_Buf[RULER_UART], CMD_DATA_SYNC1   ); //Sync1
-                    Queue_Write( (void*)pUART_Send_Buf[RULER_UART], CMD_DATA_SYNC2_1 ); //Sync2  
-                    //Queue_Write( (void*)pUART_Send_Buf[RULER_UART] , (pPcCmd->head == FRAM_TYPE_EST) ? RULER_ID_DEFAULT : Global_Ruler_Index ); //ruler_id 
-                    ////Queue_Write( (void*)pUART_Send_Buf[RULER_UART] ,  RULER_ID_DEFAULT); //ruler_id 
-                    Queue_WriteBuf( pTaskMsgIN,(void*)pUART_Send_Buf[RULER_UART], 2 );
-                    //OSQAccept( EVENT_MsgQ_Noah2RulerUART, &errCode ); //delete message from queue                    
-                    UART_WriteStart( RULER_UART ); //send data   
+            } else { //ACK / NAK  frame, no resend action 
+                
+                    UART0_WriteBuffer_API((unsigned char *)pPcCmd,4 );  
 //                    if( GET_FRAME_TYPE(pPcCmd->head) == FRAM_TYPE_ACK ) {
 //                        APP_TRACE_INFO(("\r\n>>ACK"));
 //                    } else if ( GET_FRAME_TYPE(pPcCmd->head) == FRAM_TYPE_NAK ) {
@@ -153,7 +136,7 @@ void App_TaskUART_Tx_Ruler( void *p_arg )
             }                       
          
         }  
-       */ 
+        
         ////OSTimeDly(5);		                                     	
 	}
     

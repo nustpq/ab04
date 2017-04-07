@@ -156,7 +156,7 @@ uint8_t usart1_DmaTx( void *pInstance, const uint8_t *buf, uint32_t len )
     DataSource *pSource = ( DataSource * )pInstance;
     Usart *pUsart = ( Usart * )pSource->dev.instanceHandle;
     
-    td.dwSrcAddr = (uint32_t) usart1Buffer[ 1 ];;
+    td.dwSrcAddr = (uint32_t) buf;
     td.dwDstAddr = (uint32_t)&pUsart->US_THR;
     td.dwCtrlA   = len 
                    | DMAC_CTRLA_SRC_WIDTH_BYTE 
@@ -198,7 +198,7 @@ uint8_t usart0_DmaTx( void *pInstance, const uint8_t *buf, uint32_t len )
     DataSource *pSource = ( DataSource * )pInstance;
     Usart *pUsart = ( Usart * )pSource->dev.instanceHandle;
     
-    td.dwSrcAddr = (uint32_t) usart0Buffer[ 1 ];;
+    td.dwSrcAddr = (uint32_t) buf;
     td.dwDstAddr = (uint32_t)&pUsart->US_THR;
     td.dwCtrlA   = len 
                    | DMAC_CTRLA_SRC_WIDTH_BYTE 
@@ -213,6 +213,17 @@ uint8_t usart0_DmaTx( void *pInstance, const uint8_t *buf, uint32_t len )
     DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
     
     return 0;
+}
+
+
+unsigned char UART0_WriteBuffer_API( unsigned char *pdata, unsigned int size )
+{
+    unsigned char err;
+
+    err = usart0_DmaTx( &source_usart0, (const uint8_t *)pdata, size );
+
+    return err;
+
 }
 
 /*

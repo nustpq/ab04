@@ -414,7 +414,7 @@ void usart0_init( void )
 *
 * Return(s)   :  None.
 *
-* Note(s)     : None.
+* Note(s)     :  UART1 is used for LPC1313 communication @115200bps.
 *********************************************************************************************************
 */
 void usart1_init( void )

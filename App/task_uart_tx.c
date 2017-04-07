@@ -92,9 +92,8 @@ void App_TaskUART_Tx( void *p_arg )
             pPcCmd   =  (pNEW_CMD)pTaskMsgIN ; 
             pChar    =  (unsigned char *)pTaskMsgIN ; 
             counter  =  (pPcCmd->data_len[0]<<16) + (pPcCmd->data_len[1]<<8) + pPcCmd->data_len[2];
-            counter +=  8;
-            
-#if( false )  
+            counter +=  8;//[EB][LEN1][LEN2][LEN3][90][SYNC][CMD1][CMD2] = 8 bytes          
+#if 0  
             APP_TRACE_INFO(("\r\n========== send data counter: %d =============\r\n",counter));             
             for(unsigned int i = 0; i< counter; i++ ){                            
                 APP_TRACE_INFO(("%0X ", *(pChar+i) ));

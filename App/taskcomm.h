@@ -43,7 +43,7 @@
 
 
 /////////  UART Message Storage Area  //////////////////
-#define MsgUARTQueue_SIZE       5//10   //memory partition block numbers
+#define MsgUARTQueue_SIZE       10   //memory partition block numbers
 #define MsgUARTBody_SIZE        4200//4096 // package header(8B) + data(4096) + EMB Ext data
 #define EMB_BUF_SIZE            (MsgUARTBody_SIZE-8)// 8 bytes are for package header reserved
 #define MAX_DATA_SIZE           4096 //suggest maximum data size
@@ -80,8 +80,7 @@ extern OS_EVENT *App_UserIF_Mbox;
 extern OS_EVENT *ACK_Sem_PCUART;
 extern OS_EVENT *ACK_Sem_RulerUART;
 extern OS_EVENT *Done_Sem_RulerUART;
-extern OS_EVENT *UART_MUX_Sem_lock;
-extern OS_EVENT *UART_MUX_Sem_lock;
+//extern OS_EVENT *UART_MUX_Sem_lock;
 extern OS_EVENT *Load_Vec_Sem_lock;
 
 extern OS_EVENT *App_AudioManager_Mbox;

@@ -560,3 +560,29 @@ uint8_t twi2_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+unsigned char TWID_WriteBuffer_API( 
+    uint8_t address,
+    uint32_t iaddress,
+    uint8_t isize,
+    uint8_t *pData,
+    uint32_t num,
+    Async *pAsync)
+{
+  
+    return TWID_Write(  &twid[0], address, iaddress, isize, pData, num, pAsync);
+      
+}
+   
+unsigned char TWID_ReadBuffer_API(
+    uint8_t address,
+    uint32_t iaddress,
+    uint8_t isize,
+    uint8_t *pData,
+    uint32_t num,
+    Async *pAsync)
+{
+    
+    return TWID_Read(  &twid[0], address, iaddress, isize, pData, num, pAsync);
+ 
+}

@@ -69,12 +69,13 @@ void  App_TaskUserIF (void *p_arg)
     OSTimeDly(100); //wait for other tasks be ready , and time for power stable for ruler    
     Head_Info(); //Send header 
     Buzzer_OnOff(0);  
-//    
-//    //Ruler_Power_Switch(1);
+    
+    //Ruler_Power_Switch(1);
     Init_Global_Var();
     Init_Audio_Path();
     //iM401_Ctrl_Enable = 1;
     OSTimeDly(100);
+    
     if( AB_POST() )  {
         Buzzer_Error();
     }

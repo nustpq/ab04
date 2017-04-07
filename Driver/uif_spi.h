@@ -26,6 +26,7 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg );
 void _SPI0_DmaTxCallback( uint8_t status, void* pArg );
 void _SPI1_DmaRxCallback( uint8_t status, void* pArg );
 void _SPI1_DmaTxCallback( uint8_t status, void* pArg );
+
 #endif
 static void _ConfigureSpi( DataSource *pInstance,uint32_t mode,uint32_t clk, uint32_t format );
 
@@ -39,9 +40,16 @@ static void spi_master_transfer( void *p_tbuf,uint32_t tsize,
 
 
 static void spi_slave_initialize( void );
-
 static void spi_master_initialize( void );
 
 //static void spi_set_clock_configuration( uint8_t configuration );
 uint8_t spi_register_set( void *instance,void *parameter );
+
+
+unsigned char SPI_WriteBuffer_API( unsigned char *pdata, unsigned int size );
+unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read, 
+                                        unsigned char *pdata_write,
+                                        unsigned int   size_read, 
+                                        unsigned int   size_write  );
+
 #endif

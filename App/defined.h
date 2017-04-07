@@ -21,7 +21,8 @@
 #include <ucos_ii.h>
 
 #include "uif_object.h"
-#include "ruler.h"
+#include "uif.h"
+#include "audio.h"
 
 
 #define   DEFAULT_SPI_SPEED     ( 10 * 1000 * 1000 )

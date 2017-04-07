@@ -286,6 +286,8 @@ int main()
                     (void           *) 0,
                     (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
+    
+
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet(APP_CFG_TASK_START_PRIO, "Start", &os_err);
 #endif
@@ -475,15 +477,18 @@ static  void  App_TaskStart (void *p_arg)
 
     for (;;) {
 
-//        counter++;
-//        if(counter&0xFF) {
-//            UIF_LED_On( LED_RUN );
-//        }     
-//        if(counter&0x3F) {
-//            UIF_LED_Off( LED_RUN );
-//        }   
-//        OSTimeDly(10);
-      
+#if 1
+        counter++;
+        if(counter&0xFF) {
+            UIF_LED_On( LED_RUN );
+        }     
+        if(counter&0x3F) {
+            UIF_LED_Off( LED_RUN );
+        }
+        Ruler_Port_LED_Service();
+        OSTimeDly(10);
+
+#else      
         for ( unsigned int i = 0; i< 20; i++ ) {
             for ( unsigned int j = 0; j< 5; j++ ) {
                 UIF_LED_On( LED_RUN );
@@ -500,7 +505,7 @@ static  void  App_TaskStart (void *p_arg)
                 OSTimeDly(20-i%20);
             }
         }
- 
+#endif
         
     }
 

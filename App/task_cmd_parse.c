@@ -36,9 +36,6 @@ void       * MsgQ_Noah2CMDParse[MsgUARTQueue_SIZE];
 //Event
 OS_EVENT   * EVENT_MsgQ_Noah2CMDParse;
 
-EMB_BUF   Emb_Buf_Cmd;
-EMB_BUF   Emb_Buf_Data;
-
 
 /*
 *********************************************************************************************************
@@ -64,15 +61,9 @@ void App_TaskCMDParse( void *p_arg )
     CPU_INT08U   err ;
     CPU_INT08U  *pTaskMsgIN ;
     pNEW_CMD     pNewCmd ; 
-    //EMB_BUF      *pEBuf;
     
     pTaskMsgIN  = NULL;
-    
-//    pEBuf         = &Emb_Buf_Data;    
-//    Init_EMB_BUF( pEBuf ); //need reset this when Noah connection reset
-//    pEBuf         = &Emb_Buf_Cmd;    
-//    Init_EMB_BUF( pEBuf ); //need reset this when Noah connection reset
-    
+  
 
     while( DEF_TRUE ) {     
         

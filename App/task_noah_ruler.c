@@ -32,7 +32,7 @@
 
 
 //OS_EVENT  *App_Noah_Ruler_Mbox ; //???
-OS_EVENT  *UART_MUX_Sem_lock ;
+//OS_EVENT  *UART_MUX_Sem_lock ;
 
 OS_EVENT  *ACK_Sem_RulerUART ;
 OS_EVENT  *Done_Sem_RulerUART ;
@@ -104,16 +104,16 @@ void App_TaskNoah_Ruler( void *p_arg )
 //                            APP_TRACE_INFO((" %2X", *(unsigned char*)(pPcCmd->Data+i) )); 
 //                        }
 //                        APP_TRACE_INFO((" ]\r\n")); 
-                        Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, SET_FRAME_HEAD(rxID,FRAM_TYPE_ACK), NULL, 0, 0, NULL, 0 ) ;  // ACK                                               
+                        Noah_CMD_Pack_Ruler( EVENT_MsgQ_Noah2RulerUART, SET_FRAME_HEAD(rxID,FRAM_TYPE_ACK), NULL, 0, 0, NULL, 0 ) ;  // ACK                                               
                         if( (CPU_INT08U)(PcCmdRxID_Ruler[Global_Ruler_Index]+0x40) == rxID ) { // chweck if frameID repeat  
                             PcCmdRxID_Ruler[Global_Ruler_Index] = rxID ; //save this frameID 
                          
                             err = Noah_CMD_Parse_Ruler( pPcCmd, &SessionDone); // jump to CMD parse 
                             if( (err != OS_ERR_NONE) || (SessionDone == 1) ) {
                                 SessionDone = 0;
-                                Ruler_CMD_Result = err ;
+                                Global_Ruler_CMD_Result = err ;
                                 OSTimeDly(2); //wait enough time for ACK to be sent
-                                APP_TRACE_DBG((" Res[0x%2x]", Ruler_CMD_Result));
+                                APP_TRACE_DBG((" Res[0x%2x]", Global_Ruler_CMD_Result));
                                 OSSemPost( Done_Sem_RulerUART );                                     
                             }
           
@@ -122,7 +122,7 @@ void App_TaskNoah_Ruler( void *p_arg )
                         }
                         
                     } else {                
-                        Noah_CMD_Packing( EVENT_MsgQ_Noah2RulerUART, SET_FRAME_HEAD(rxID,FRAM_TYPE_NAK), NULL, 0, 0, NULL, 0 ) ;  // NAK   
+                        Noah_CMD_Pack_Ruler( EVENT_MsgQ_Noah2RulerUART, SET_FRAME_HEAD(rxID,FRAM_TYPE_NAK), NULL, 0, 0, NULL, 0 ) ;  // NAK   
                     
                     }                 
                 break ;                

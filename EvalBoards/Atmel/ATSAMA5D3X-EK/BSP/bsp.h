@@ -91,10 +91,10 @@
 #include  <spi.h>
 //#include  <i2c_gpio.h>
 //#include  <im501_comm.h>
+#include  <uif.h>
 #include  <ruler.h>
 #include  <emb.h>
 #include  <mem_basic.h>
-#include  <uif.h>
 #include  <uif_dsp.h>
 
 #include  <commands.h>
