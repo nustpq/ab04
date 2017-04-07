@@ -80,18 +80,14 @@ void App_TaskUART_Rx( void *p_arg )
         //APP_TRACE_INFO((" %4d ",counter)) ;  
         
         if( counter ) {
-            idle_counter = 0 ;
-            
-        } else { 
-            
+            idle_counter = 0 ;             
+        } else {                
             if( idle_counter++ >= 100 ) { // 100*5ms = 500ms
                 Global_Idle_Ready = 1 ;                
                 idle_counter = 0 ;
                 //LED_Clear(LED_DS2); //mute communication LED when >500ms free
-            }  
-            
-        }
-    
+            }           
+        }      
         total_counter += counter;
         
         if( counter ) {

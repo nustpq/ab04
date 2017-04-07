@@ -42,7 +42,7 @@ OS_EVENT    * EVENT_MsgQ_Noah2PCUART;
 
 
 CPU_INT32U  Tx_ReSend_Happens = 0;   // debug use, resend happen times, NOTE: only writable in this task
-CPU_INT08U PcCmdTxID          = 0;   // Frame TXD ID
+CPU_INT08U  PcCmdTxID         = 0;   // Frame TXD ID
    
 
 /*
@@ -114,7 +114,7 @@ void App_TaskUART_Tx( void *p_arg )
                         }
                         OSTimeDly(1);
                     }                       
-                    size = kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_DATAEP_SIZE_64B);  
+                    size = kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_CMDEP_SIZE_64B);  
                     CDCDSerialDriver_WriteCmd( usbCmdCacheBulkIn,
                                                   size,
                                                   (TransferCallback) UsbCmdDataTransmit,
@@ -133,7 +133,7 @@ void App_TaskUART_Tx( void *p_arg )
                     APP_TRACE_INFO(("\r\nOSMemGet Timeout2"));
                     OSTimeDly(1);
                 }
-                size = kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_DATAEP_SIZE_64B);  
+                size = kfifo_get(&cmdEpBulkIn_fifo, usbCmdCacheBulkIn, USB_CMDEP_SIZE_64B);  
                 CDCDSerialDriver_WriteCmd( usbCmdCacheBulkIn,
                                               size,
                                               (TransferCallback) UsbCmdDataTransmit,

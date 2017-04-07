@@ -35,7 +35,7 @@ Pin SSC_Sync_Pin1 = PIN_SSC1_RF;
 uint8_t tmpBuffer[ USB_RINGOUT_SIZE_16K];
 //uint8_t tmpBuffer1[ I2S_PINGPONG_IN_SIZE_3K ];
 void Init_Audio_Path();
-OS_CPU_SR cpu_sr;
+
 /*
 *********************************************************************************************************
 *                                    App_TaskUSBService()
@@ -51,8 +51,6 @@ OS_CPU_SR cpu_sr;
 *                   used.  The compiler should not generate any code for this statement.
 *********************************************************************************************************
 */
-void i2s0_isr_handler( void );
-void i2s1_isr_handler( void );
 void  App_TaskUSBService ( void *p_arg )
 {
     
@@ -62,10 +60,7 @@ void  App_TaskUSBService ( void *p_arg )
     uint8_t  usb_state;
     uint8_t  usb_state_saved ;
     uint32_t counter, counter2;
-    uint8_t temp[ 256 ] = { 0 };
-    uint8_t temp1[ 256 ] = { 0 };
-    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
-    
+
     ListElmt  *e ;
     AUDIOPATH *pPath;      
     
@@ -74,9 +69,9 @@ void  App_TaskUSBService ( void *p_arg )
     extern uint8_t debug_cnt;
     
     OS_CPU_SR cpu_sr;  
+    
 
-    memset( temp , 0x56 , 256 );
-    memset( temp1 , 0x59 , 256 );    
+ 
     for(;;) 
     {          
         usb_state =   USBD_GetState();         
@@ -92,34 +87,19 @@ void  App_TaskUSBService ( void *p_arg )
             }
         }
         
-//        if ( usb_state >= USBD_STATE_CONFIGURED ) {
+        if ( usb_state >= USBD_STATE_CONFIGURED ) {
           
-//            UIF_LED_On( LED_USB );    
-//        } else {
+            UIF_LED_On( LED_USB );    
+        } else {
           
-//            UIF_LED_Off( LED_USB );             
-//        }
+            UIF_LED_Off( LED_USB );             
+        }
         
         if ( usb_state < USBD_STATE_CONFIGURED ) {            
             OSTimeDly( 2 );
             continue;      
         }
-#if 0        
-#if 1
-        OSTimeDly( 2 );
-        _spiDmaTx( &source_spi0 ,temp ,246  );
 
-//        DMAD_IsTransferDone( &g_dmad, source_spi0.dev.txDMAChannel );
-        SPI_ReleaseCS( pSpi );
-#else
-//        SPI_WriteBuffer_API( temp, sizeof( temp ) );
-        
-        SPI_WriteReadBuffer_API(  temp, 
-                                  temp1,
-                                  256, 
-                                  256  );
-#endif
-#endif
         
         if ( audio_run_control == false) {            
             OSTimeDly( 2 );
