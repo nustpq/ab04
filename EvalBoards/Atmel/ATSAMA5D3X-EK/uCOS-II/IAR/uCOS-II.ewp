@@ -1951,6 +1951,9 @@
       <name>$PROJ_DIR$\..\..\..\..\..\App\task_joy.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\task_noah_ruler.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\App\task_shell.c</name>
     </file>
     <file>

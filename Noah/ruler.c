@@ -680,8 +680,8 @@ unsigned char SPI_Rec_Start( SPI_PLAY_REC_CFG *pSpi_rec_cfg )
 */
 unsigned char Init_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 {
-    unsigned char err ;
-   /*
+    unsigned char err = 0 ;
+ /*  
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -735,7 +735,7 @@ unsigned char Init_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 */
 unsigned char Setup_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 {
-    unsigned char err ;
+    unsigned char err = 0;
     EMB_BUF        *pEBuf_Data;
     unsigned char buf[] = { RULER_CMD_SET_RULER, ruler_slot_id };
    /*
@@ -796,7 +796,7 @@ unsigned char Setup_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 */
 unsigned char Get_Ruler_Type(  unsigned char ruler_slot_id )
 {
-    unsigned char err ;
+    unsigned char err =0 ;
     EMB_BUF        *pEBuf_Data;
     unsigned char buf[] = { RULER_CMD_GET_RULER_TYPE };
     /*
@@ -856,7 +856,7 @@ unsigned char Get_Ruler_Type(  unsigned char ruler_slot_id )
 */
 unsigned char Read_Ruler_Status( unsigned char ruler_slot_id, unsigned short *status_data )
 {
-    unsigned char err ;
+    unsigned char err =0 ;
     EMB_BUF        *pEBuf_Data;
     unsigned char buf[] = { RULER_CMD_RAED_RULER_STATUS };
     /*
@@ -915,7 +915,7 @@ unsigned char Read_Ruler_Status( unsigned char ruler_slot_id, unsigned short *st
 */
 unsigned char Read_Ruler_Info( unsigned char ruler_slot_id )
 {
-    unsigned char  err ;
+    unsigned char  err =0;
     unsigned char  buf[] = { RULER_CMD_RAED_RULER_INFO };
      /*
 #if OS_CRITICAL_METHOD == 3u
@@ -1188,7 +1188,7 @@ unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic
 */
 unsigned char Update_Mic_Mask( unsigned char ruler_slot_id, unsigned int mic_mask )
 {
-    unsigned char err ;
+    unsigned char err =0;
     unsigned char buf_size_send ;
     unsigned char buf[] = { RULER_CMD_TOGGLE_MIC, mic_mask&0xFF, (mic_mask>>8)&0xFF,
                             (mic_mask>>16)&0xFF,  (mic_mask>>24)&0xFF };
@@ -1244,7 +1244,7 @@ unsigned char Update_Mic_Mask( unsigned char ruler_slot_id, unsigned int mic_mas
 */
 unsigned char Ruler_Active_Control( unsigned char active_state )
 {
-    unsigned char err ;
+    unsigned char err = 0;
     unsigned char ruler_id;
     unsigned char buf[] = { RULER_CMD_ACTIVE_CTR, active_state };
      /*
@@ -1310,7 +1310,7 @@ unsigned char Ruler_Active_Control( unsigned char active_state )
 */
 unsigned char Get_Ruler_Version( unsigned char ruler_slot_id )
 {
-    unsigned char err ;
+    unsigned char err = 0 ;
     unsigned char buf[] = { RULER_CMD_GET_RULER_VERSION };
     EMB_BUF      *pEBuf_Data;
     /*
@@ -1747,6 +1747,7 @@ unsigned char Update_Ruler_FW( unsigned char ruler_slot_id )
 */
 unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
 {
+    return 0;
 #ifdef BOARD_TYPE_UIF
     return 0;
 #else
@@ -1812,7 +1813,7 @@ unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
 */
 unsigned char Set_Volume(  SET_VOLUME *pdata )
 {
-    unsigned char  err ;
+    unsigned char  err = 0 ;
     /*
     APP_TRACE_INFO(( "Set Volume :: " ));
     if( pdata->mic == SET_VOLUME_MUTE ) {
@@ -2072,7 +2073,7 @@ unsigned char AB_POST( void )
 */
 unsigned char Ruler_POST( unsigned char ruler_id )
 {
-    unsigned char  err;
+    unsigned char  err = 0;
     unsigned short result;
 
     APP_TRACE_INFO(("\r\nRuler[%d] POST status check... \r\n",ruler_id));

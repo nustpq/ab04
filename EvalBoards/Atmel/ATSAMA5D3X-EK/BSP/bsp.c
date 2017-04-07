@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.98]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.994]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
@@ -193,14 +193,17 @@ void  BSP_Init (void)
 
     BSP_OS_TmrTickInit(1000u);
 
-    Init_Debug_FIFO( );
-    Init_CMD_Bulk_FIFO( );
-    Init_Audio_Bulk_FIFO( );
+    Init_Debug_FIFO();
+    Init_CMD_Bulk_FIFO();
+    Init_Ruler_CMD_FIFO();
+    Init_Audio_Bulk_FIFO();
 
-    uif_miscPin_init_default( );
-    uif_ports_init_default( );
+    uif_miscPin_init_default();
+    uif_ports_init_default();
+    GPIO_Init();
     Init_USB(); //init USB
-
+    usart0_init();
+    
     list_init( &portsList , NULL );
     portsList.match = matchPath;
 
@@ -221,7 +224,7 @@ void  BSP_Init (void)
 //    BSP_PostInit();                                             /* Initialize BSP functions    BSP_IntInit();                             */
 //    BSP_OS_TmrTickInit(OS_TICKS_PER_SEC);                       /* Initialize the uC/OS-II ticker                       */
 //
-//    GPIO_Init();
+
 //
 //    BSP_ResetInit();                                     /* Enable the hardware reset button  used interrupt         */
 //
@@ -649,12 +652,12 @@ void Beep( INT32U beep_cycles)
    for( INT32U i = 0; i< beep_cycles; i++)  {
 
         UIF_Beep_On(); //beep on
-//        UIF_LED_On(LED_RUN);
+        UIF_LED_On(LED_RUN);
         UIF_LED_On(LED_USB);
         UIF_LED_On(LED_HDMI);
         OSTimeDly(250);
         UIF_Beep_Off(); //beep off
-//        UIF_LED_Off(LED_RUN);
+        UIF_LED_Off(LED_RUN);
         UIF_LED_Off(LED_USB);
         UIF_LED_Off(LED_HDMI);
         OSTimeDly(250); //delay_ms(250);
@@ -944,8 +947,7 @@ void  BSP_Ser_Printf (CPU_CHAR *format, ...)
 {
     static  CPU_CHAR  buffer[200 + 1];
             va_list   vArgs;
-
-
+    
     va_start(vArgs, format);
     vsprintf((char *)buffer, (char const *)format, vArgs);
     va_end(vArgs);
@@ -1164,8 +1166,8 @@ void Head_Info ( void )
     //APP_TRACE_INFO(("Tx_ReSend_Happens_Ruler:   %7d   times happened\r\n", Tx_ReSend_Happens_Ruler ));
     //APP_TRACE_INFO(("TWI_Sem_lock:              %7d   ( default 1 )\r\n", TWI_Sem_lock->OSEventCnt ));
     //APP_TRACE_INFO(("TWI_Sem_done:              %7d   ( default 0 )\r\n", TWI_Sem_done->OSEventCnt ));
-    //APP_TRACE_INFO(("UART_MUX_Sem_lock:         %7d   ( default 1 )\r\n", UART_MUX_Sem_lock->OSEventCnt ));
-    //APP_TRACE_INFO(("Done_Sem_RulerUART:        %7d   ( default 0 )\r\n", Done_Sem_RulerUART->OSEventCnt ));
+    APP_TRACE_INFO(("UART_MUX_Sem_lock:         %7d   ( default 1 )\r\n", UART_MUX_Sem_lock->OSEventCnt ));
+    APP_TRACE_INFO(("Done_Sem_RulerUART:        %7d   ( default 0 )\r\n", Done_Sem_RulerUART->OSEventCnt ));
     APP_TRACE_INFO(("Global_Ruler_State[3..0]:        [%d - %d - %d - %d]\r\n", Global_Ruler_State[3],Global_Ruler_State[2],Global_Ruler_State[1],Global_Ruler_State[0] ));
     APP_TRACE_INFO(("Global_Ruler_Type[3..0] :        [%X - %X - %X - %X]\r\n", Global_Ruler_Type[3],Global_Ruler_Type[2],Global_Ruler_Type[1],Global_Ruler_Type[0] ));
     APP_TRACE_INFO(("Global_Mic_Mask[3..0][] :        [%X - %X - %X - %X]\r\n", Global_Mic_Mask[3],Global_Mic_Mask[2],Global_Mic_Mask[1],Global_Mic_Mask[0] ));

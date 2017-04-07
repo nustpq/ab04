@@ -56,7 +56,6 @@
 *********************************************************************************************************
 */
 // all of data sources instance list
-DataSource source_usb;
 DataSource source_ssc0;
 DataSource source_ssc1;
 DataSource source_spi0;
@@ -67,7 +66,6 @@ DataSource source_twi2;
 DataSource source_usart0;
 DataSource source_usart1;
 DataSource source_gpio;
-
 
 //port bitmap
 uint8_t g_portMap;
@@ -135,6 +133,11 @@ kfifo_t  ep2BulkIn_fifo;
 kfifo_t  cmdEpBulkOut_fifo;
 kfifo_t  cmdEpBulkIn_fifo;
 
+//Ring for Ruler cmd endpoint
+kfifo_t  cmd_ruler_rece_fifo;
+kfifo_t  cmd_ruler_send_fifo;
+
+
 //Ring for spi
 kfifo_t  spi0_bulkOut_fifo;
 kfifo_t  spi0_bulkIn_fifo;
@@ -172,6 +175,9 @@ uint8_t usbRingBufferBulkIn3[ USB_RINGIN_SIZE_16K ] ;          //16384B
 //Buffer Level 2:  Ring CMD Buffer : 1024 B
 uint8_t usbCmdRingBulkOut[ USB_CMD_RINGOUT_SIZE_1K ] ;         //1024B
 uint8_t usbCmdRingBulkIn[ USB_CMD_RINGIN_SIZE_1k ]  ;          //1024B
+//Buffer Level 2:  To RULER Ring CMD Buffer : 1024 B
+uint8_t rulerCmdRingBulkOut[ USART_BUFFER_SIZE_1K ] ;          
+uint8_t rulerCmdRingBulkIn[ USART_BUFFER_SIZE_1K ]  ;          
 
 //Buffer Level 3:  Ring  Data Buffer for audio port include ssc and spi: 16384 B
 uint8_t ssc0_RingBulkOut[ USB_RINGOUT_SIZE_16K ] ;             //16384B
@@ -877,6 +883,19 @@ void Init_CMD_Bulk_FIFO( void )
     kfifo_init_static(pfifo, usbCmdRingBulkOut, USB_CMD_RINGOUT_SIZE_1K );
     pfifo = &cmdEpBulkIn_fifo;
     kfifo_init_static(pfifo, usbCmdRingBulkIn, USB_CMD_RINGIN_SIZE_1k );
+
+
+}
+
+void Init_Ruler_CMD_FIFO( void )
+{
+    kfifo_t *pfifo;
+
+    //initialize ring buffer relavent ruler cmd;
+    pfifo = &cmd_ruler_rece_fifo;
+    kfifo_init_static(pfifo, rulerCmdRingBulkOut, USART_BUFFER_SIZE_1K );
+    pfifo = &cmd_ruler_send_fifo;
+    kfifo_init_static(pfifo, rulerCmdRingBulkIn, USART_BUFFER_SIZE_1K );
 
 
 }
