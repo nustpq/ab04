@@ -535,12 +535,9 @@ void USBDCallbacks_RequestReceived( const USBGenericRequest *request )
     CDCDSerialDriver_RequestHandler( request );
 }
 
-void init_usb( void *pParameter,void *dParameter )
+void Init_USB( void )
 {
     extern const USBDDriverDescriptors cdcdSerialDriverDescriptors;
-
-	pParameter = pParameter;
-	dParameter = dParameter;
 
 	/* If they are present, configure Vbus & Wake-up pins */
     PIO_InitializeInterrupts(0);

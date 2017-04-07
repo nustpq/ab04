@@ -199,6 +199,7 @@ void  BSP_Init (void)
 
     uif_miscPin_init_default( );
     uif_ports_init_default( );
+    Init_USB(); //init USB
 
     list_init( &portsList , NULL );
     portsList.match = matchPath;
