@@ -1992,9 +1992,9 @@ unsigned char AB_POST( void )
 
 
     APP_TRACE_INFO(("\r\n1. FPGA... \r\n"));
-    err = FPGA_Setup();
+    err = FPGA_POST_Setup();
     if( err != NO_ERR ) {
-        Global_Bridge_POST = POST_ERR_FPGA;
+        Global_Bridge_POST = FPGA_CFG_ERR;
         APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
         return Global_Bridge_POST;
     } else {
