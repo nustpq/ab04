@@ -48,9 +48,15 @@ unsigned char GPIO_SDA  = 3 ;                         //GPIO pin for I2C SDA
 unsigned char GPIO_SCL  = 4 ;                         //GPIO pin for I2C SCL  
 unsigned char GPIO_CS   = 5 ;                         //GPIO pin for FL204 CS pin toggle
                
+ static void delay(void )
+{
+    
+    //unsigned int i = GPIO_I2C_DELAY;
+    //while(i--);
+    
+}
 
-
-static void delay( void )
+static void delay_us( unsigned int delay )
 {
     
     //unsigned int i = GPIO_I2C_DELAY;
