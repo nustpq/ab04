@@ -45,9 +45,6 @@ extern void Init_Audio_Bulk_FIFO( void );
 unsigned char  audio_padding_byte;
 uint8_t     debug_cnt = 0;
 
-
-
-
 /*
 *********************************************************************************************************
 *                                  First_Pack_Check_BO()
@@ -218,8 +215,6 @@ void Audio_Start( void )
     Hold_Task_for_Audio(); 
 
     Init_Audio_Bulk_FIFO( ); 
-    
-//    aic3204_init_default( );
     
     source_ssc0.status[ IN ] = ( uint8_t )CONFIGURED;
     source_ssc0.status[ OUT ] = ( uint8_t )CONFIGURED;

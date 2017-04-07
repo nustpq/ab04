@@ -37,6 +37,7 @@
 #define   ATTRI_I2C_IM501_LOAD_CODE_DRAM       51
 #define   ATTRI_I2C_IM401_LOAD_CODE            41
 #define   ATTRI_SPI_FM1388_LOAD_CODE           31
+#define   ATTRI_I2C_FM1388_LOAD_CODE           30
 #define   ATTRI_I2C_FM1388_LOAD_EEPROM         21
 #define   ATTRI_I2C_IM205                      11
 
@@ -47,6 +48,7 @@
 
 #define   FM1388_ALLOWED_DATA_PACK_SIZE        (240+6)
 #define   EEPROM_ALLOWED_DATA_PACK_SIZE        (128+2)
+#define   FM1388_I2C_DATA_PACK_SIZE            (4) //4bytes
 
 #define   ATTRI_FM36_PATH_NORMAL           0 //normal mode: PDM path 
 #define   ATTRI_FM36_PATH_PWD_BP           1 //bypass mode : I2S/TDM/PCM path

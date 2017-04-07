@@ -36,6 +36,7 @@ void UsbCmdDataReceived(  uint32_t unused,
                           uint8_t status,
                           uint32_t received,
                           uint32_t remaining );
+void Check_CMD_BulkOut_Restart( void );
 
 
 void UsbAudio0DataTransmit(  uint32_t unused,

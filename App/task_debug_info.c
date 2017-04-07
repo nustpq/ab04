@@ -70,11 +70,8 @@ void  App_TaskDebugInfo (void *p_arg)
     debug_uart_fifo_data_max = 0;
     debug_usb_fifo_data_max  = 0;
     debug_uart_fifo_oveflow_counter = 0;
-    debug_usb_fifo_oveflow_counter  = 0;
+    debug_usb_fifo_oveflow_counter  = 0; 
 
-    kfifo_init_static( &DBG_UART_Send_kFIFO, (unsigned char *)DBG_UART_Send_Buffer, DBG_UART_Send_Buf_Size);
-    kfifo_init_static( &DBG_USB_Send_kFIFO, (unsigned char *)DBG_USB_Send_Buffer, DBG_USB_Send_Buf_Size);
-    //OSTimeDly(10000);
     while ( DEF_TRUE ) {                   /* Task body, always written as an infinite loop.           */
 
         size  = kfifo_get_data_size( &DBG_UART_Send_kFIFO );
@@ -124,18 +121,25 @@ void  App_TaskDebugInfo (void *p_arg)
 void Init_Debug_FIFO( void )
 {
     kfifo_t *pfifo;
+    
+    pfifo = &DBG_UART_Send_kFIFO ;     
+    kfifo_init_static( pfifo, (unsigned char *)&DBG_UART_Send_Buffer, DBG_UART_Send_Buf_Size);
+    pfifo = &DBG_USB_Send_kFIFO ;
+    kfifo_init_static( pfifo, (unsigned char *)&DBG_USB_Send_Buffer, DBG_USB_Send_Buf_Size);     
 
-    kfifo_init_static( &DBG_UART_Send_kFIFO, (unsigned char *)DBG_UART_Send_Buffer, DBG_UART_Send_Buf_Size);
-    kfifo_init_static( &DBG_USB_Send_kFIFO, (unsigned char *)DBG_USB_Send_Buffer, DBG_USB_Send_Buf_Size);
 }
 
 
 void BSP_Ser_WrStr_To_Buffer( char *p_str )
 {    
+    CPU_INT08U err;
     CPU_INT16U len;
     CPU_INT16U temp;
 
     len  = strlen( p_str );
+    
+    OSSemPend( DBGU_UART_Tx_Sem_lock, 0, &err );
+    
     temp = kfifo_get_free_space( &DBG_UART_Send_kFIFO );
 
     if( temp < len ) {
@@ -143,15 +147,19 @@ void BSP_Ser_WrStr_To_Buffer( char *p_str )
         debug_uart_fifo_oveflow_counter++ ;
     }
     kfifo_put( &DBG_UART_Send_kFIFO, (unsigned char *)p_str,  len);
-
+    
+    OSSemPost(DBGU_UART_Tx_Sem_lock);
 }
 
 void BSP_Ser_WrStr_To_Buffer_USB( char *p_str )
 {    
+    CPU_INT08U err;
     CPU_INT16U len;
     CPU_INT16U temp;
 
     len  = strlen( p_str );
+    
+    OSSemPend( DBGU_USB_Tx_Sem_lock, 0, &err );
     temp = kfifo_get_free_space( &DBG_USB_Send_kFIFO );
 
     if( temp < len ) {
@@ -159,7 +167,7 @@ void BSP_Ser_WrStr_To_Buffer_USB( char *p_str )
         debug_usb_fifo_oveflow_counter++ ;
     }
     kfifo_put( &DBG_USB_Send_kFIFO, (unsigned char *)p_str,  len);
-
+    OSSemPost(DBGU_USB_Tx_Sem_lock);
 }
 
 
