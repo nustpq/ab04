@@ -19,7 +19,7 @@
 #include "kfifo.h"
 #include  <ucos_ii.h>
 
-#define STATE_SLAVE 0
+#define STATE_SLAVE   0
 #define STATE_MASTER ( !STATE_SLAVE )
 
 extern sDmad g_dmad;
@@ -30,7 +30,7 @@ sDmad spi_dmad;
 const Pin spi0_pins[] = { PINS_SPI0,PIN_SPI0_NPCS0 };					 
 const Pin spi1_pins[] = { PINS_SPI1,PIN_SPI1_NPCS0 };   
 
-volatile uint8_t spi0_trans_done = 0;
+
 
 
 
@@ -132,11 +132,12 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
     uint32_t temp = 0;
     
     DataSource *pSource = ( DataSource *)pArg;
-    
-    /*step 1:calculate buffer space */ 
+	
+/*    
+    //step 1:calculate buffer space  
     temp = kfifo_get_free_space( pSource->pRingBulkIn );
 
-     /*step 2:insert data to RingBuffer from PingPong buffer */  
+     //step 2:insert data to RingBuffer from PingPong buffer   
      if( temp >= pSource->warmWaterLevel )
      {        
        kfifo_put( pSource->pRingBulkIn,
@@ -166,7 +167,7 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
          }
      }
    
-
+*/
 }
 
 /*
@@ -192,12 +193,11 @@ void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
     
     DataSource *pSource = ( DataSource *)pArg;
 
-    spi0_trans_done = 1;
-#if 0    
-     /*step 1:calculate buffer space */ 
+/*    
+     //step 1:calculate buffer space  
      temp = kfifo_get_data_size( pSource->pRingBulkOut );
 
-     /*step 2:get data from spi RingBuffer */  
+     //step 2:get data from spi RingBuffer   
      if( temp >= pSource->warmWaterLevel )
      {        
          kfifo_get( pSource->pRingBulkOut,
@@ -226,7 +226,7 @@ void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
              return;
          }
      }
-#endif     
+*/     
  
 }
 
@@ -343,8 +343,7 @@ void  _SPI1_DmaTxCallback( uint8_t status, void* pArg )
              return;
          }
      }
-     
-     
+          
 }
 
 
@@ -416,7 +415,6 @@ void start_spi( void * pInstance )
 }
 
 
-
 /*
 *********************************************************************************************************
 *                                               stop_spi()
@@ -472,29 +470,74 @@ void stop_spi( void * pInstance )
 * Note(s)     : none
 *********************************************************************************************************
 */
-static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk )
+static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk, uint32_t format )
 {
     assert( NULL != pInstance );
     assert( clk > 0 );
-  
+   
     uint32_t mode = SPI_MR_MSTR ;
     uint32_t csr0 ;
+    uint32_t clk_div ;
+     
+    clk_div = BOARD_MCK / clk ;    
+    if( clk_div > 255 ){      
+        clk_div = 255;
+    }  
+    
+    static unsigned int spi_clk_save ;
+    static unsigned int format_save ;
     
     DataSource *pSource = ( DataSource * )pInstance;
     Spi *pSpi = _get_spi_instance( pSource->dev.identify );
+        
+    if( format > 3 ) {
+       format = 0;
+    }
+    if( (clk == spi_clk_save) && (format == format_save) ) {
+       APP_TRACE_INFO(("\r\nNo need re-init same SPI mode and clock."));
+       return;
+    }    
+    spi_clk_save = clk ;
+    format_save  = format ;
+   
+    APP_TRACE_INFO(("\r\nSet SPI: Speed=%d kHz, [CPHA..CPOL]=%d",clk/1000, format ));
 
+    switch( format ) {
+              
+        case 0 :  //keep SPCK Low, Rising edge latch data   // =0 for iM501   .MCU[NCPHA:CPOL]= 1:0, iM501[CPHA:CPOL]=0:0
+            format = 0 | SPI_CSR_BITS_8_BIT | SPI_CSR_NCPHA; 
+        break;  
+       
+        case 1 :  //keep SPCK High, Falling edge latch data // =1 for iM501    .MCU[NCPHA:CPOL]= 1:1, iM501[CPHA:CPOL]=0:1
+            format = 0 | SPI_CSR_BITS_8_BIT | SPI_CSR_CPOL | SPI_CSR_NCPHA; 
+        break; 
+       
+        case 2 :  //keep SPCK Low,  Falling edge latch data // =2 for iM501  .MCU[NCPHA:CPOL]= 0:0, iM501[CPHA:CPOL]=1:0
+            format = 0 | SPI_CSR_BITS_8_BIT ; 
+        break; 
+       
+        case 3 :  //keep SPCK High, Rising edge latch data  // = 3 for iM501    .MCU[NCPHA:CPOL]= 0:1, iM501[CPHA:CPOL]=1:1
+            format = 0 | SPI_CSR_BITS_8_BIT | SPI_CSR_CPOL; 
+        break;
+       
+        default: //keep SPCK Low, Rising edge latch data   // =0 for iM501
+            format = 0 | SPI_CSR_BITS_8_BIT | SPI_CSR_NCPHA; 
+        break;
+       
+    }
+    
     // spix in slave mode 
     if ( spiState == STATE_SLAVE )
     {
         mode &= ( uint32_t ) ( ~( SPI_MR_MSTR ) ) ;
     }
     
-    csr0 = SPI_CSR_BITS_8_BIT|SPI_CSR_DLYBS( 0x0 ) ;
+    csr0 = format|SPI_CSR_DLYBS( 0x0 ) ;
     
     // spi clock 
     if ( spiState == STATE_MASTER )
     {
-        csr0 |= ( ( BOARD_MCK / clk ) << 8 ) ;
+        csr0 |= ( clk_div << 8 ) ;
     }
     
     // configure SPI mode 
@@ -502,7 +545,7 @@ static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk 
     
     // configure SPI csr0
     SPI_ConfigureNPCS( pSpi, 0, csr0 ) ;
-    SPI_ConfigureCSMode( pSpi, 0, 1 );
+    SPI_ConfigureCSMode( pSpi, 0, 1 ) ;
     SPI_Enable( pSpi ) ;
 
 }
@@ -526,17 +569,21 @@ void init_spi( void *pInstance,void *parameter )
     
     parameter = parameter;
     DataSource *pSource = ( DataSource * )pInstance;
-    SPI_PLAY_REC_CFG *pSpi_Cfg = ( SPI_PLAY_REC_CFG * )parameter;
     
+    SPI_PLAY_REC_CFG *pSpi_Cfg = ( SPI_PLAY_REC_CFG * )parameter;
+
     if( ID_SPI0 == pSource->dev.identify )
-      PIO_Configure( spi0_pins, PIO_LISTSIZE( spi0_pins ) ) ;                                              //fill code initialize spi0 pins
+      PIO_Configure( spi0_pins, PIO_LISTSIZE( spi0_pins ) ) ;     //fill code initialize spi0 pins
     else if( ID_SPI1 == pSource->dev.identify )
       PIO_Configure( spi1_pins, PIO_LISTSIZE( spi1_pins ) ) ;
-     
+    else
+      assert(0) ;
+        
     PMC_EnablePeripheral( pSource->dev.identify );    
-    _ConfigureSpi( pSource,pSpi_Cfg->spi_mode ,pSpi_Cfg->spi_speed ) ;
+   
+    _ConfigureSpi( pSource, STATE_MASTER, pSpi_Cfg->spi_speed, pSpi_Cfg->spi_format ) ;
+    //_ConfigureSpi( pSource, STATE_MASTER, 24000000, 0) ;
 }
-
 
 /*
 *********************************************************************************************************
@@ -599,6 +646,7 @@ uint8_t _spiDmaRx( void *pInstance ,const uint8_t *buf,uint32_t len  )
 {
     assert( NULL != pInstance );
     
+    uint8_t ret = 0;
     DataSource *pSource = ( DataSource * )pInstance;
     Spi *pSpi = _get_spi_instance( pSource->dev.identify );
     
@@ -620,10 +668,14 @@ uint8_t _spiDmaRx( void *pInstance ,const uint8_t *buf,uint32_t len  )
                    | DMAC_CTRLB_SRC_INCR_FIXED
                    | DMAC_CTRLB_DST_INCR_INCREMENTING;
     td.dwDscAddr = 0;
-    DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.rxDMAChannel, &td );
-    DMAD_StartTransfer( &g_dmad, pSource->dev.rxDMAChannel );
+    ret = DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.rxDMAChannel, &td );
     
-    return 0;
+    if( !ret )
+      ret = DMAD_StartTransfer( &g_dmad, pSource->dev.rxDMAChannel );
+    else
+      return ret;
+    
+    return ret;
 }
 
 
@@ -646,6 +698,7 @@ uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  )
 {  
     assert( NULL != pInstance );
     
+    uint8_t ret;
     DataSource *pSource = ( DataSource * )pInstance;
     Spi *pSpi = _get_spi_instance( pSource->dev.identify );
     
@@ -668,10 +721,14 @@ uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  )
                    | DMAC_CTRLB_SRC_INCR_INCREMENTING
                    | DMAC_CTRLB_DST_INCR_FIXED;
     td.dwDscAddr = 0;
-    DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.txDMAChannel, &td );
-    DMAD_StartTransfer( &g_dmad, pSource->dev.txDMAChannel );
     
-    return 0;
+    ret = DMAD_PrepareSingleTransfer( &g_dmad, pSource->dev.txDMAChannel, &td ); 
+    if( !ret )
+      ret = DMAD_StartTransfer( &g_dmad, pSource->dev.txDMAChannel );
+    else
+      return ret;
+    
+    return ret;
   
 }
 
@@ -870,7 +927,7 @@ uint8_t spi_register_set( void *instance,void *parameter )
    
    SPI_PLAY_REC_CFG *cfg = ( SPI_PLAY_REC_CFG * )parameter;
       
-   uint32_t mode = cfg->spi_mode ;
+   uint32_t mode = cfg->spi_format ;
    
     // spix in slave mode 
     if ( cfg->slave == STATE_SLAVE )

@@ -171,7 +171,7 @@ void ssc1_init( void )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void spi0_init( unsigned int speed_hz, unsigned int mode )
+void spi0_init( unsigned int speed_hz, unsigned int format )
 {
       //initialize spi0 object and it's operation
     memset( ( void * )&source_spi0, 0 , sizeof( DataSource ) );
@@ -187,7 +187,7 @@ void spi0_init( unsigned int speed_hz, unsigned int mode )
 	source_spi0.peripheralParameter = ( void * )&spi0_cfg;
     source_spi0.privateData    = spi0_RingBulkIn;
     spi0_cfg.spi_speed = speed_hz;
-    spi0_cfg.spi_mode  = mode;
+    spi0_cfg.spi_format  = format;
     source_spi0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
     source_spi0.txSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
     source_spi0.rxSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 )* SLOT_NUM_DEFAULT * 2 );
@@ -196,7 +196,7 @@ void spi0_init( unsigned int speed_hz, unsigned int mode )
     source_spi0.peripheral_stop = stop_spi;
     source_spi0.buffer_write = _spiDmaTx;
     source_spi0.buffer_read  = _spiDmaRx;
-    source_spi0.set_peripheral = spi_register_set;
+//    source_spi0.set_peripheral = spi_register_set;
 
     source_spi0.pRingBulkOut = &spi0_bulkOut_fifo;
     source_spi0.pRingBulkIn = &spi0_bulkIn_fifo;
@@ -222,7 +222,7 @@ void spi0_init( unsigned int speed_hz, unsigned int mode )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void spi1_init( unsigned int speed_hz, unsigned int mode )
+void spi1_init( unsigned int speed_hz, unsigned int format )
 {
       //initialize spi1 object and it's operation
     memset( ( void * )&source_spi1, 0 , sizeof( DataSource ) );
@@ -239,7 +239,7 @@ void spi1_init( unsigned int speed_hz, unsigned int mode )
     source_spi1.privateData = spi1_RingBulkIn;
     source_spi1.buffer = ( uint8_t * )spi1_2MSOut;
     spi1_cfg.spi_speed = speed_hz;
-    spi1_cfg.spi_mode  = mode;
+    spi1_cfg.spi_format  = format;
     source_spi1.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 ) * 2;
     source_spi1.txSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 ) * 2;
     source_spi1.rxSize = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 )* SLOT_NUM_DEFAULT * 2 ) * 2;
@@ -249,7 +249,7 @@ void spi1_init( unsigned int speed_hz, unsigned int mode )
     source_spi1.peripheral_stop = stop_spi;
     source_spi1.buffer_write = _spiDmaTx;
     source_spi1.buffer_read = _spiDmaRx;
-    source_spi1.set_peripheral = spi_register_set;
+    //source_spi1.set_peripheral = spi_register_set;
 
     source_spi1.pRingBulkOut = &spi1_bulkOut_fifo;
     source_spi1.pRingBulkIn = &spi1_bulkIn_fifo;
@@ -655,6 +655,6 @@ void uif_miscPin_init_default( void )
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
     UIF_Misc_On ( FAST_PLUS_RST );
-    UIF_Misc_Off ( LEVEL_SHIFT_OE );
+    UIF_Misc_Off ( LEVEL_SHIFT_OE );   //UIF_Misc_On ( LEVEL_SHIFT_OE );  bug!!!
     UIF_Misc_On ( FPGA_RST );
 }

@@ -200,7 +200,7 @@ typedef struct {
   unsigned short  play_ch_mask;
 
   unsigned short  chip_id;
-  unsigned char   spi_mode;
+  unsigned char   spi_format;
   unsigned char   gpio_irq;
 
   unsigned char   time_dly;
