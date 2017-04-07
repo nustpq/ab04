@@ -138,8 +138,8 @@ void  BSP_Ser_Printf (CPU_CHAR  *format, ...);
 //#define  APP_CFG_TRACE                              printf
 #define  APP_CFG_TRACE                              BSP_Ser_Printf
 
-#define  APP_TRACE_INFO(x)               ((APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_INFO)  ? (void)(APP_CFG_TRACE x) : (void)0)
-#define  APP_TRACE_DBG(x)                ((APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_DBG)   ? (void)(APP_CFG_TRACE x) : (void)0)
+#define  APP_TRACE_INFO(x)               ((APP_CFG_TRACE_LEVEL >= UCOSII_LEVEL_INFO)  ? (void)(APP_CFG_TRACE x) : (void)0)
+#define  APP_TRACE_DBG(x)                ((APP_CFG_TRACE_LEVEL >= UCOSII_LEVEL_DBG)   ? (void)(APP_CFG_TRACE x) : (void)0)
 
 
 // for shell uart
