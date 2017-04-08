@@ -185,7 +185,7 @@ void Check_UART_Mixer_Ready( void )
 unsigned char Init_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 {
     unsigned char err;
-   
+    return 0;
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -239,7 +239,7 @@ unsigned char Init_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 */
 unsigned char Setup_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 {
-    unsigned char err;
+    unsigned char err;return 0;
     EMB_BUF      *pEBuf_Data;
     unsigned char buf[] = { RULER_CMD_SET_RULER, ruler_slot_id };
    
@@ -300,7 +300,7 @@ unsigned char Setup_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 */
 unsigned char Get_Ruler_Type(  unsigned char ruler_slot_id )
 {
-    unsigned char err;
+    unsigned char err;return 0;
     EMB_BUF      *pEBuf_Data;
     unsigned char buf[] = { RULER_CMD_GET_RULER_TYPE };
     
@@ -360,7 +360,7 @@ unsigned char Get_Ruler_Type(  unsigned char ruler_slot_id )
 */
 unsigned char Read_Ruler_Status( unsigned char ruler_slot_id, unsigned short *status_data )
 {
-    unsigned char err ;
+    unsigned char err ;return 0;
     EMB_BUF      *pEBuf_Data;
     unsigned char buf[] = { RULER_CMD_RAED_RULER_STATUS };
     
@@ -419,7 +419,7 @@ unsigned char Read_Ruler_Status( unsigned char ruler_slot_id, unsigned short *st
 */
 unsigned char Read_Ruler_Info( unsigned char ruler_slot_id )
 {
-    unsigned char  err;
+    unsigned char  err;return 0;
     unsigned char  buf[] = { RULER_CMD_RAED_RULER_INFO };
      
 #if OS_CRITICAL_METHOD == 3u
@@ -475,7 +475,7 @@ unsigned char Read_Ruler_Info( unsigned char ruler_slot_id )
 */
 unsigned char Write_Ruler_Info( unsigned char ruler_slot_id )
 {
-    unsigned char   err;
+    unsigned char   err;return 0;
     unsigned short  data_length;
     unsigned char   temp;
     unsigned char  *pdata;
@@ -692,7 +692,7 @@ unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic
 */
 unsigned char Update_Mic_Mask( unsigned char ruler_slot_id, unsigned int mic_mask )
 {
-    unsigned char err;
+    unsigned char err;return 0;
     unsigned char buf_size_send ;
     unsigned char buf[] = { RULER_CMD_TOGGLE_MIC, mic_mask&0xFF, (mic_mask>>8)&0xFF,
                             (mic_mask>>16)&0xFF,  (mic_mask>>24)&0xFF };
@@ -748,7 +748,7 @@ unsigned char Update_Mic_Mask( unsigned char ruler_slot_id, unsigned int mic_mas
 */
 unsigned char Ruler_Active_Control( unsigned char active_state )
 {
-    unsigned char err ;
+    unsigned char err ;return 0;
     unsigned char ruler_id;
     unsigned char buf[] = { RULER_CMD_ACTIVE_CTR, active_state };
      
@@ -812,7 +812,7 @@ unsigned char Ruler_Active_Control( unsigned char active_state )
 */
 unsigned char Get_Ruler_Version( unsigned char ruler_slot_id )
 {
-    unsigned char err = 0 ;
+    unsigned char err = 0 ;return 0;
     unsigned char buf[] = { RULER_CMD_GET_RULER_VERSION };
     EMB_BUF      *pEBuf_Data;
     
@@ -877,7 +877,7 @@ unsigned char Get_Ruler_Version( unsigned char ruler_slot_id )
 */
 unsigned char Reset_Mic_Mask(  unsigned int *pInt )
 {
-    unsigned char  err ;
+    unsigned char  err ;return 0;
     unsigned char  id;
     unsigned char  *pChar;
     unsigned int   fpga_mask;
@@ -929,7 +929,7 @@ unsigned char Reset_Mic_Mask(  unsigned int *pInt )
 */
 unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
 {
-    unsigned char  err ;
+    unsigned char  err ;return 0;
     unsigned char  id;
     unsigned int   mic_mask;
     unsigned int   fpga_mask;
