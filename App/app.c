@@ -263,7 +263,8 @@ static  void  App_TaskStart             (void        *p_arg);
 *
 * Returns     : none.
 *
-* Note(s)     : none.
+* Note(s)     : 2017-4-08 This version merged between master and duali2s branch and verify >3000 play/record
+*               cycle. so,flaged it as a baseline version.
 *********************************************************************************************************
 */
 
