@@ -28,6 +28,7 @@ extern sDmad g_dmad;
 extern DataSource source_usart0;
 extern DataSource source_usart1;
 
+static unsigned char flag_uart0_dma_tx_lock;
 /*
 *********************************************************************************************************
 *                                               USART_ISR_DMA()
@@ -91,6 +92,8 @@ void _USART0_DmaTxCallback( uint8_t status, void* pArg )
 {
     status = status;
     pArg = pArg;
+
+    flag_uart0_dma_tx_lock = 0;
 }
 
 /*
@@ -212,19 +215,11 @@ uint8_t usart0_DmaTx( void *pInstance, const uint8_t *buf, uint32_t len )
     DMAD_PrepareSingleTransfer(&g_dmad, pSource->dev.txDMAChannel, &td);
     DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
     
+    flag_uart0_dma_tx_lock = 1;
+
     return 0;
 }
 
-
-unsigned char UART0_WriteBuffer_API( unsigned char *pdata, unsigned int size )
-{
-    unsigned char err;
-
-    err = usart0_DmaTx( &source_usart0, (const uint8_t *)pdata, size );
-
-    return err;
-
-}
 
 /*
 *********************************************************************************************************
@@ -465,6 +460,7 @@ void usart_init( void *pInstance , void *parameter )
       {
           /* Configure pins*/
           PIO_Configure( pins0, PIO_LISTSIZE( pins0 ) ) ;
+          flag_uart0_dma_tx_lock = 0;
       }
       else
       {
@@ -472,4 +468,38 @@ void usart_init( void *pInstance , void *parameter )
       } 
       
       _configureUsart( pInstance );           
+}
+
+
+/*
+*********************************************************************************************************
+*                                               UART0_WriteBuffer_API()
+*
+* Description : usart0 send data buffer
+*
+* Arguments   : pdata    : point to data buffer
+*               szie     : data length in bytes
+*               
+* Returns     : error no.
+*
+* Note(s)     : none
+*********************************************************************************************************
+*/
+#define TIMEOUT_UART_LOCK     500
+#define UART_ERROR_TIMEOUT    2
+unsigned char UART0_WriteBuffer_API( unsigned char *pdata, unsigned int size )
+{
+    unsigned char err;
+    unsigned int  timeout = 0;
+
+    while(flag_uart0_dma_tx_lock ==1){
+        OSTimeDly(1);
+        if(timeout++ >= TIMEOUT_UART_LOCK) {
+            return UART_ERROR_TIMEOUT;
+        }
+    }
+    err = usart0_DmaTx( &source_usart0, (const uint8_t *)pdata, size );
+
+    return err;
+
 }
