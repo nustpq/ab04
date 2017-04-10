@@ -1,3 +1,24 @@
+/*
+*********************************************************************************************************
+*
+*                                          APP PACKAGE
+*
+*                                         Atmel  AT91SAMA5D3
+*                                             on the
+*                                      Audio Bridge 04 Board (AB04 V1.0) 2.0
+*
+* Filename      : uif_spi.h
+* Version       : V0.0.2
+* Programmer(s) : Leo
+* Modifie       : Leo
+*********************************************************************************************************
+* History(s)    : reconstruct this code for FM1388
+*
+*********************************************************************************************************
+* Note(s)       :
+*********************************************************************************************************
+*/
+
 #ifndef _UIF_SPI_H_
 #define _UIF_SPI_H_
 
@@ -5,8 +26,21 @@
 #include "uif_object.h"
 #include "defined.h"
 
-void SPI_Handler( void );
 
+/** An unspecified error has occured.*/
+#define SPID_ERROR          1
+
+/** SPI driver is currently in use.*/
+#define SPID_ERROR_LOCK     2
+
+/** SPI clock frequency used in Hz. */
+#define SPCK            1000000
+
+/*----------------------------------------------------------------------------
+ *        Macros
+ *----------------------------------------------------------------------------*/
+void SPI_Handler( void );
+extern sDmad g_dmad;
 /*--------------public interface ----------------*/
 uint32_t register_spi( uint32_t mask, UIFPORT *type );
 Spi * _get_spi_instance( uint32_t id );
@@ -29,19 +63,5 @@ void _SPI1_DmaTxCallback( uint8_t status, void* pArg );
 #endif
 static void _ConfigureSpi( DataSource *pInstance,uint32_t mode,uint32_t clk, uint32_t format );
 
-#if 0
-static void spi_slave_transfer(void *p_tbuf,uint32_t tsize, 
-                               void *p_rbuf,uint32_t rsize );
-							   
-static void spi_master_transfer( void *p_tbuf,uint32_t tsize,
-				 void *p_rbuf,uint32_t rsize);
-#endif
 
-
-static void spi_slave_initialize( void );
-
-static void spi_master_initialize( void );
-
-//static void spi_set_clock_configuration( uint8_t configuration );
-uint8_t spi_register_set( void *instance,void *parameter );
 #endif

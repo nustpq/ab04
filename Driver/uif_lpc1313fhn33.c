@@ -258,7 +258,8 @@ uint8_t lpc_read( DataSource *pControl,
 {
   uint32_t tick;
   uint32_t delay;
-  tick = GetTc1TickCount();
+//  tick = GetTc1TickCount();
+  tick = GetTickCount( );
   
   const uint32_t timeout = 2000;
   lpc_chip.errCode = NO_UART_ERR;
@@ -278,7 +279,8 @@ uint8_t lpc_read( DataSource *pControl,
   
   while( lpc_chip.state != DATA_READY ) 
   {
-    delay = GetTc1DelayInTicks(tick, GetTc1TickCount( ) );
+//    delay = GetTc1DelayInTicks(tick, GetTc1TickCount( ) );
+    delay = GetDelayInTicks( tick, GetTickCount( ) );
     if ( delay > timeout )
     {
       lpc_chip.state = IDLE;
@@ -314,7 +316,8 @@ uint8_t lpc_write( DataSource *pControl,
 {
   uint32_t tick;
   uint32_t delay;
-  tick = GetTc1TickCount();
+//  tick = GetTc1TickCount();
+  tick = GetTickCount( );
   
   const uint32_t timeout = 2000;
   lpc_chip.errCode = NO_UART_ERR;
@@ -334,7 +337,8 @@ uint8_t lpc_write( DataSource *pControl,
   
   while( lpc_chip.state != DATA_READY ) 
   {
-    delay = GetTc1DelayInTicks(tick, GetTc1TickCount( ) );
+//    delay = GetTc1DelayInTicks(tick, GetTc1TickCount( ) );
+    delay = GetDelayInTicks( tick, GetTickCount( ) );    
     if ( delay > timeout )
     {
       lpc_chip.state = IDLE;

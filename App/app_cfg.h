@@ -76,9 +76,9 @@
 #define  APP_CFG_TASK_UART_TX_PRIO                         3//3
 #define  APP_CFG_TASK_NOAH_PRIO                            5//4
 #define  APP_CFG_TASK_UART_RX_PRIO                         6//6//5
-
+#define  APP_CFG_TASK_SPI_PRIO                             (APP_CFG_TASK_USER_IF_PRIO+1)// it is a temporay priority
 #define  APP_CFG_TASK_USER_IF_PRIO                         10
-#define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+1)
+#define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+2)
 
 #define  APP_CFG_TASK_UART_TX_RULER_PRIO                   13
 #define  APP_CFG_TASK_NOAH_RULER_PRIO                      16
@@ -121,7 +121,7 @@
 #define  APP_CFG_TASK_USB_SEV_STK_SIZE                  4096
 #define  APP_CFG_TASK_AUDIO_MGR_STK_SIZE                4096
 
-
+#define  APP_CFG_TASK_SPI_STK_SIZE                      16384
 
 /*
 *********************************************************************************************************

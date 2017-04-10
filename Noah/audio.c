@@ -19,6 +19,7 @@
 #include "uif_i2s.h"
 #include "noah_cmd.h"
 #include "codec.h"
+#include "fm1388_comm.h"
 
 /*
 *********************************************************************************************************
@@ -43,7 +44,8 @@ extern CODEC_SETS Codec_Set_Saved[2];
 extern void Init_Audio_Bulk_FIFO( void );
 
 unsigned char  audio_padding_byte;
-uint8_t     debug_cnt = 0;
+extern unsigned int  global_rec_spi_en ;
+extern unsigned int  global_play_spi_en ;
 
 /*
 *********************************************************************************************************
@@ -192,6 +194,66 @@ void First_Pack_Padding_BI( kfifo_t *pFifo )
 #endif
 }
 
+/*
+*********************************************************************************************************
+*                                    Play_Voice_Buf_Start()
+*
+* Description :   Start SPI data playing procedure.
+*
+* Argument(s) :  None.
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void Play_Voice_Buf_Start( void )
+{
+extern unsigned char SPI_Rec_flag;
+    if( global_play_spi_en == 0) {
+        
+
+//        Enable_SPI_Port(Voice_Buf_Cfg.spi_speed, Voice_Buf_Cfg.spi_mode);
+
+        global_play_spi_en = 1;
+        spi_rec_get_addr();   
+        SPI_Rec_flag=0;      
+    }
+}
+
+
+
+/*
+*********************************************************************************************************
+*                                    Rec_Voice_Buf_Start()
+*
+* Description :  Start SPI data recording procedure.
+*
+* Argument(s) :  None.
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void Rec_Voice_Buf_Start( void )
+{
+    
+    if( global_rec_spi_en == 0) 
+    {
+        
+//        Init_SPI_FIFO();
+        global_rec_spi_en = 1;
+
+        spi_rec_get_addr();        
+        spi_rec_enable();          
+    }
+    
+}
+
+
+
+
 
 
 
@@ -224,7 +286,6 @@ void Audio_Start( void )
     
     audio_play_buffer_ready  = false ;
     audio_run_control        = true ;
-//    padding_audio_0_bulk_out = false  ;
     
     restart_audio_0_bulk_out = true  ; 
     restart_audio_0_bulk_in  = true  ;
@@ -232,10 +293,42 @@ void Audio_Start( void )
     restart_audio_1_bulk_in  = true  ; 
     restart_audio_2_bulk_out = true  ;
     restart_audio_2_bulk_in  = true  ;
-    debug_cnt = 0;
+
+//    global_rec_spi_en = 1 ;
+//    global_play_spi_en = 1 ;
+
+#if 0    
+    Play_Voice_Buf_Start( );
+    Rec_Voice_Buf_Start( );
+#endif  
+}
+
+/*
+*********************************************************************************************************
+*                                    Rec_Voice_Buf_Stop()
+*
+* Description :  Stop SPI data recordin.
+*
+* Argument(s) :  None.
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void Rec_Voice_Buf_Stop( void )
+{
     
-//    OSTaskResume ( APP_CFG_TASK_USB_SEV_PRIO );
-  
+    if( global_rec_spi_en == 1 ) {       
+        spi_rec_stop_cmd();
+//        Disable_GPIO_Interrupt( Voice_Buf_Cfg.gpio_irq );
+        global_rec_spi_en = 0;
+        global_play_spi_en = 0;//add for spi play and record 
+//        memset( (unsigned char *)I2SBuffersIn[0], usb_data_padding, USBDATAEPSIZE ); 
+//        kfifo_put(&spi_rec_fifo, (unsigned char *)I2SBuffersIn[0], USBDATAEPSIZE) ; 
+//        kfifo_put(&spi_rec_fifo, (unsigned char *)I2SBuffersIn[0], USBDATAEPSIZE) ;//2 package incase of PID error       
+    }
+    
 }
 
 
@@ -258,8 +351,6 @@ void Audio_Stop( void )
     printf( "\r\nStop Play & Rec..."); 
     OSTimeDly( 8 );
     audio_run_control        = false  ; 
-//    OSTimeDly( 4 );
-//    OSTaskSuspend ( APP_CFG_TASK_USB_SEV_PRIO );
     
     OSTimeDly(10);    
     Destroy_Audio_Path(); 
@@ -298,7 +389,11 @@ void Audio_Stop( void )
     restart_audio_2_bulk_out = false  ;
     restart_audio_2_bulk_in  = false  ;                       
  
-    audio_play_buffer_ready  = false  ;         
+    audio_play_buffer_ready  = false  ; 
+    
+    global_rec_spi_en = 0 ;
+    global_play_spi_en = 0 ;
+    Rec_Voice_Buf_Stop( );
     
     Release_Task_for_Audio();   
    

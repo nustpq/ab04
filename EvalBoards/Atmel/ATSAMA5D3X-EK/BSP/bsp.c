@@ -191,7 +191,7 @@ CPU_INT32U  BSP_MCK_ClkFreq (void)
 void  BSP_Init (void)
 {
 
-    BSP_OS_TmrTickInit(1000u);
+    BSP_OS_TmrTickInit( TICK_PER_SECOND );
 
     Init_Debug_FIFO();
     Init_CMD_Bulk_FIFO();
@@ -214,41 +214,11 @@ void  BSP_Init (void)
 
     //config port dma
     Dma_configure( );
+    
+    init_spi0( NULL , NULL );
 
     //initialize Tc1 interval = 1ms
     _ConfigureTc1( 1000u );  
-
-
-//    AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;       /* Disable the Watchdog Timer                               */
-//
-//    BSP_PostInit();                                             /* Initialize BSP functions    BSP_IntInit();                             */
-//    BSP_OS_TmrTickInit(OS_TICKS_PER_SEC);                       /* Initialize the uC/OS-II ticker                       */
-//
-
-//
-//    BSP_ResetInit();                                     /* Enable the hardware reset button  used interrupt         */
-//
-//    // Configure IIC
-//    TWI_Init( TWCK ); //It seems that the TWI will auto desrease SCK if loading increase
-//    //Init_CODEC_5620();
-//
-//    SPI_Init( SPI_CLK, 0);
-//
-//
-//
-//    // Config USART
-//    UART_Init(PC_UART,       ISR_PC_UART,  3000000 );    //To PC (via Audio MCU)
-//    //UART_Init(SIGNAL_POWER_UART, NULL,         9600   );    //To Power Supply  & Signal Generator
-//    UART_Init(AUDIO_UART,    NULL,         115200 );    //To Audio_DP and Audio_DC
-//
-//    //Config Timer
-//    Timer_Init();
-//
-//    //Init ADCs
-//    //Init_ADC_Voltage() ;
-//    //Init_ADC_Current() ;
-//
-//                            /* Initialize uC/OS-II's Tick Rate and DEBUG UART                          */
 
 }
 

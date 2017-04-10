@@ -37,6 +37,9 @@
 
 #include "uif_twi.h"
 #include "uif_object.h"
+#include "fm1388_spi.h"
+
+extern Fm1388 fm1388;
 
 static const DataSource *pSource;
 CODEC_SETS Codec_Set_Saved[2];   //for 2 CODEC
@@ -108,7 +111,7 @@ uint8_t Codec_Write_SPI(uint8_t dev_addr,uint8_t reg,uint8_t data)
     uint8_t buf[] = { dev_addr<<1, reg, data };
     uint8_t state;
 
-    state = SPI_WriteBuffer_API( buf, 3);
+    state = SPI_WriteBuffer_API( &fm1388 ,buf , 3 );
 
 
     return state ;

@@ -489,8 +489,6 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 
 void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 {
-  
-    const uint8_t nDelay = 16;
     uint32_t temp = 0;
        
     assert( NULL != pArg );

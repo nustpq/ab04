@@ -95,9 +95,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
                               uint32_t remaining )
 {   
     remaining = remaining;
-    uint32_t pos = 0,offset = 0;
-    uint8_t fillOffset[ 16 ] = { 0 };
-    const uint8_t pos1 = 128;
+    uint32_t pos = 0;
     
 #if 0
     if ( status == USBD_STATUS_SUCCESS ) 
@@ -175,8 +173,7 @@ void UsbAudio1DataReceived(  uint32_t unused,
                               uint32_t remaining )
 {   
     remaining = remaining;
-    uint32_t pos = 0,offset = 0;
-    uint8_t fillOffset[ 16 ] = { 0 };
+    uint32_t pos = 0;
 
    if ( status == USBD_STATUS_SUCCESS ) 
     { 

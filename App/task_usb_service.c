@@ -68,7 +68,6 @@ void  App_TaskUSBService ( void *p_arg )
     usb_state_saved = 0;
     extern uint8_t debug_cnt;
     
-    OS_CPU_SR cpu_sr;  
     
 
  

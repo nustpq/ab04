@@ -124,6 +124,43 @@ void USART_Configure(Usart *usart,
     }
     /* TODO other modes*/
 }
+
+/**
+ * \brief Setting usart receive timeout measured with clock number.
+ * \It is a custom interface for AB04
+ *
+ * \param usart  Pointer to an USART peripheral
+ * \param clockNumber  receive timeout duration with clock number
+ *                
+ */
+void USART_SetReceivedTimeout( Usart *usart,uint16_t clockNumber )
+{
+  assert( usart != NULL );
+  assert( clockNumber <= 65535 );
+  
+  if( clockNumber == 0 ) return;
+  
+  usart->US_RTOR = clockNumber;    
+}
+
+
+/**
+ * \brief Setting usart receive timeout measured with clock number.
+ * \It is a custom interface for AB04
+ *
+ * \param usart  Pointer to an USART peripheral
+ * \param clockNumber  receive timeout duration with clock number
+ *                
+ */
+void USART_EnableReceivedTimeout( Usart *usart,uint8_t en )
+{
+  assert( usart != NULL );
+  if( en )  
+      usart->US_IER |= US_IER_TIMEOUT;   
+  else
+      usart->US_IER &= ~US_IER_TIMEOUT;
+}
+
 /**
  * \brief Enables or disables the transmitter of an USART peripheral.
  *
@@ -217,6 +254,42 @@ void USART_Write( Usart *usart, uint16_t data, volatile uint32_t timeOut)
 
 
 /**
+ * \brief Sends one packet of data through the specified USART peripheral. This
+ * function operates synchronously, so it only returns when the data has been
+ * actually sent.
+ *
+ *
+ * \param usart  Pointer to an USART peripheral.
+ * \param data  Data to send including 9nth bit and sync field if necessary (in
+ *        the same format as the US_THR register in the datasheet).
+ * \param timeOut  Time out value (0 = no timeout).
+ */
+int16_t Custom_USART_Write( Usart *usart, uint16_t data, volatile uint32_t timeOut)
+{
+    if (timeOut == 0) {
+
+        while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
+    }
+    else {
+
+        while ((usart->US_CSR & US_CSR_TXEMPTY) == 0) {
+
+            if (timeOut == 0) {
+
+                TRACE_ERROR("USART_Write: Timed out.\n\r");
+                return -1;
+            }
+            timeOut--;
+        }
+    }
+
+    usart->US_THR = data;
+    
+    return 0;
+}
+
+
+/**
  * \brief  Reads and return a packet of data on the specified USART peripheral. This
  * function operates asynchronously, so it waits until some data has been
  * received.
@@ -238,6 +311,28 @@ uint16_t USART_Read( Usart *usart, volatile uint32_t timeOut)
 
                 TRACE_ERROR( "USART_Read: Timed out.\n\r" ) ;
                 return 0;
+            }
+            timeOut--;
+        }
+    }
+
+    return usart->US_RHR;
+}
+
+int16_t Custom_USART_Read( Usart *usart, volatile uint32_t timeOut)
+{
+    if (timeOut == 0) {
+
+        while ((usart->US_CSR & US_CSR_RXRDY) == 0);
+    }
+    else {
+
+        while ((usart->US_CSR & US_CSR_RXRDY) == 0) {
+
+            if (timeOut == 0) {
+
+                TRACE_ERROR( "USART_Read: Timed out.\n\r" ) ;
+                return -1;
             }
             timeOut--;
         }

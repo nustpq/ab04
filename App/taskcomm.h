@@ -113,6 +113,7 @@ void App_TaskDebugInfo    ( void *p_arg ) ;
 void App_TaskUSBService   ( void *p_arg ) ;
 void App_TaskGenieShell   ( void *p_arg ) ;
 void App_AudioManager     ( void *p_arg ) ;
+void App_TaskSpiAudio     ( void *p_arg ) ;
  
 
 void Task_ReCreate_Shell( void );

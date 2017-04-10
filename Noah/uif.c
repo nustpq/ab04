@@ -30,39 +30,14 @@
 
 
 #include <includes.h>
+#include "fm1388_spi.h"
+#include "fm1388d.h"
 
-
+extern Fm1388 fm1388;
 INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];     //ruler type = 3
 unsigned char   Reg_RW_Data[ EMB_BUF_SIZE ];
 
-/** TWI driver instance.*/
-extern Twid twid[ PMIC ];
-
-unsigned char TWID_Write_UIF( 
-    uint8_t address,
-    uint32_t iaddress,
-    uint8_t isize,
-    uint8_t *pData,
-    uint32_t num,
-    Async *pAsync)
-{
-  
-    return TWID_Write(  &twid[0], address, iaddress, isize, pData, num, pAsync);
-      
-}
-   
-unsigned char TWID_Read_UIF(
-    uint8_t address,
-    uint32_t iaddress,
-    uint8_t isize,
-    uint8_t *pData,
-    uint32_t num,
-    Async *pAsync)
-{
-    
-    return TWID_Read(  &twid[0], address, iaddress, isize, pData, num, pAsync);
- 
-}
+////////////////////////////////////////////////////////////////////////////////
 
 //disabled endian reverse, as PC scripts will do it!
 void Reverse_Endian( unsigned char *pdata, unsigned char size ) 
@@ -79,64 +54,6 @@ void Reverse_Endian( unsigned char *pdata, unsigned char size )
       
     }     
     
-}
-unsigned char SPI_WriteBuffer_API( unsigned char *pdata, unsigned int size )
-{
-    uint8_t err = 0;
-    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
-
-    while( 0 != DMAD_IsTransferDone( &g_dmad, source_spi0.dev.txDMAChannel ) ) { 
-        OSTimeDly(1);   
-    }
-    err = _spiDmaTx( &source_spi0 ,pdata ,size  );
-    if( 0 != err )
-    {            
-      SPI_ReleaseCS( pSpi );
-      return err;
-    }
-    
-    SPI_ReleaseCS( pSpi ); 
-    return 0;   
-}
-
-
-
-unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read, 
-                                        unsigned char *pdata_write,
-                                        unsigned int   size_read, 
-                                        unsigned int   size_write  )
-{
-    uint8_t err = 0;
-    
-    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
-    
-    spi_clear_status( &source_spi0 );
-    
-    err = DMAD_IsTransferDone( &g_dmad , source_spi0.dev.txDMAChannel );
-    if( 0 != err )
-    {            
-      SPI_ReleaseCS( pSpi );
-      return err;
-    }
-
-    err =   _spiDmaTx( &source_spi0 , pdata_write, size_write  );
-    if( 0 != err )
-    {            
-      SPI_ReleaseCS( pSpi );
-      return err;
-    }
-        
-    err = _spiDmaRx( &source_spi0 , pdata_read, size_read  );
-    if( 0 != err )
-    {            
-      SPI_ReleaseCS( pSpi );
-      return err;
-    }
-      
-    SPI_ReleaseCS( pSpi ); 
-    
-    return err;
-                   
 }
 
 /*
@@ -260,7 +177,8 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
           
                 spi0_cfg.spi_speed   = temp * 1000;
                 spi0_cfg.spi_format  = temp2;                        
-                source_spi0.init_source( &source_spi0, &spi0_cfg ) ;
+//                source_spi0.init_source( &source_spi0, &spi0_cfg ) ;
+                init_spi0( NULL , NULL );
                 APP_TRACE_INFO(("\r\nSet SPI interface\r\n"));  
                 
             }  else {
@@ -363,14 +281,14 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                     buf[0] = 0xF0;
                     buf[1] = *pChar++;
                     buf[2] = *pChar++;
-                    state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                    state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                     if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;                 
                     }
                     buf[0] = 0xF1;
                     buf[1] = *pChar++;
                     buf[2] = *pChar++;
-                    state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                  
+                    state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                  
                     if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                     }                    
@@ -381,7 +299,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                         buf[2] = *pChar++;
                         buf[3] = *pChar++;
                         buf[4] = *pChar++;
-                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 5,  NULL );               
+                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 5,  NULL );               
                         if (state != SUCCESS) {
                             return I2C_BUS_ERR;                   
                         }                      
@@ -393,7 +311,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                     //I2C_Mixer( I2C_MIX_UIF_M );
                     size = p_raw_write->data_len / EEPROM_ALLOWED_DATA_PACK_SIZE ;       
                     for( i = 0 ; i < size ; i++ ) { 
-                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, EEPROM_ALLOWED_DATA_PACK_SIZE, NULL );       
+                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, EEPROM_ALLOWED_DATA_PACK_SIZE, NULL );       
                         if (state != SUCCESS) {
                             return I2C_BUS_ERR;                  
                         } 
@@ -402,7 +320,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                     }
                     size = p_raw_write->data_len % EEPROM_ALLOWED_DATA_PACK_SIZE ; 
                     if( size ) {
-                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, size, NULL );       
+                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, size, NULL );       
                         if (state != SUCCESS) {
                             return I2C_BUS_ERR;
                         }
@@ -422,35 +340,35 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                         buf[0] = 1;
                         buf[1] =  (unsigned char)(mem_addr>>8);
                         buf[2] =  (unsigned char)(mem_addr>>0);
-                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         }
                         buf[0] = 2;
                         buf[1] =  (unsigned char)(mem_addr>>24);
                         buf[2] =  (unsigned char)(mem_addr>>16);
-                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         } 
                         buf[0] = 3;
                         buf[2] = *pChar++;
                         buf[1] = *pChar++;
-                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         } 
                         buf[0] = 4;
                         buf[2] = *pChar++;
                         buf[1] = *pChar++;
-                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         } 
                         buf[0] = 0;
                         buf[1] = 0;
                         buf[2] = 3; //32bit write
-                        state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         } 
@@ -471,7 +389,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      buf[1] = 0x08;  //address, byte counter                 
                      buf[2] = (p_raw_write->data_len - 3 - 4) & 0xFF;
                      buf[3] = ((p_raw_write->data_len - 3 - 4) >> 8) & 0xFF; 
-                     state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 4,  NULL );                 
+                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 4,  NULL );                 
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;                  
                      }
@@ -486,16 +404,16 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      buf[6] = *pChar++;
                      buf[7] = *pChar++; //data MSB
                      
-                     state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 8,  NULL );                  
+                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 8,  NULL );                  
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                      }                    
                      buf[0] = 0x88; //data only        
-                     state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 1,  NULL );                 
+                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 1,  NULL );                 
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                      }
-                     state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, pChar, p_raw_write->data_len - 3 - 4,  NULL );               
+                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, pChar, p_raw_write->data_len - 3 - 4,  NULL );               
                      if (state != SUCCESS) {
                         return I2C_BUS_ERR;                  
                      }                      
@@ -509,7 +427,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      buf[1] = 0x08;  //address, byte counter                 
                      buf[2] = (p_raw_write->data_len - 3 - 2 ) & 0xFF;
                      buf[3] = ((p_raw_write->data_len - 3 - 2 ) >> 8) & 0xFF;
-                     state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 4,  NULL );                 
+                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 4,  NULL );                 
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                      }
@@ -522,16 +440,16 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      buf[4] = *pChar++; //data LSB
                      buf[5] = *pChar++; //data MSB 
                      
-                     state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 6,  NULL );                  
+                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 6,  NULL );                  
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;   
                      }                    
                      buf[0] = 0xA8; //data only        
-                     state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, buf, 1,  NULL );                 
+                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 1,  NULL );                 
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                      }
-                     state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, pChar, p_raw_write->data_len - 3 - 2,  NULL );               
+                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, pChar, p_raw_write->data_len - 3 - 2,  NULL );               
                      if (state != SUCCESS) {
                         return I2C_BUS_ERR;                   
                      }                      
@@ -540,7 +458,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                  
                  default:// Normal case  
                     //I2C_Mixer( I2C_MIX_UIF_S );
-                    state =  TWID_Write_UIF( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, p_raw_write->data_len, NULL );       
+                    state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, p_raw_write->data_len, NULL );       
                     if (state != SUCCESS) {
                         return I2C_BUS_ERR;                  
                     }
@@ -570,25 +488,29 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                   APP_TRACE_INFO(("\r\nUIF_TYPE_SPI 1388 Load code:[ %d ] ",i));
                   for( i = 0 ; i < size ; i++ ) {
                       APP_TRACE_INFO((">"));
-                      state =  SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE ); 
+//                      state =  SPI_WriteBuffer_API( p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE ); 
+                      state = SPI_WriteBuffer_API( &fm1388,p_raw_write->pdata, FM1388_ALLOWED_DATA_PACK_SIZE );
                       if (state != SUCCESS) {
                           APP_TRACE_INFO(("\r\nUIF_TYPE_SPI 1388 error: %d",state));
                           err = SPI_BUS_ERR;
                           return err;
                       }
                       p_raw_write->pdata += FM1388_ALLOWED_DATA_PACK_SIZE;                      
-                      //OSTimeDly(1); 
+                      //OSTimeDly(5); 
                   }
                   size = p_raw_write->data_len  % FM1388_ALLOWED_DATA_PACK_SIZE ;
                   if( size ) {
-                      state =  SPI_WriteBuffer_API( p_raw_write->pdata, size);              
+                      //state = SPI_WriteBuffer_API( p_raw_write->pdata, size); 
+                      state = SPI_WriteBuffer_API( &fm1388,p_raw_write->pdata, size );
                       if (state != SUCCESS) {
                           err = SPI_BUS_ERR;
+//                          assert( 0 );
                       }
                   }
                   
               } else {
-                  state =  SPI_WriteBuffer_API( p_raw_write->pdata, p_raw_write->data_len );              
+                  //state = SPI_WriteBuffer_API( p_raw_write->pdata, p_raw_write->data_len ); 
+                  state = SPI_WriteBuffer_API( &fm1388,p_raw_write->pdata, p_raw_write->data_len ); 
                   if (state != SUCCESS) {
                       err = SPI_BUS_ERR;
                   }
@@ -637,6 +559,8 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
     err  = NO_ERR;
     pbuf = (unsigned char *)Reg_RW_Data; //global usage
     
+    memset( ( void * )Reg_RW_Data , 0xff , sizeof( Reg_RW_Data ) );
+    
 //    APP_TRACE_INFO(("\r\nRaw_Read:  if_type=%d, dev_addr=0x%02X, data_len_read=%d, data_len_write=%d ",\
 //                         p_raw_read->if_type,p_raw_read->dev_addr,p_raw_read->data_len_read,p_raw_read->data_len_write ));
 //    
@@ -654,7 +578,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                   }
                   
               } else {
-                  state =  TWID_Write_UIF( p_raw_read->dev_addr>>1,
+                  state =  TWID_Write_API( p_raw_read->dev_addr>>1,
                                        0, 
                                        0, 
                                        p_raw_read->pdata_write, 
@@ -665,7 +589,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                       break;
                   } 
               
-                  state =  TWID_Read_UIF( p_raw_read->dev_addr>>1,
+                  state =  TWID_Read_API( p_raw_read->dev_addr>>1,
                                       0, 
                                       0, 
                                       pbuf, 
@@ -697,7 +621,9 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                 err = SPI_BUS_ERR;
                 return err;
             }
-            state =  SPI_WriteReadBuffer_API(  pbuf, 
+
+            state =  SPI_WriteReadBuffer_API(  &fm1388,
+                                               pbuf, 
                                                p_raw_read->pdata_write, 
                                                p_raw_read->data_len_read , 
                                                p_raw_read->data_len_write);// +1 fix SPI bug
@@ -707,8 +633,10 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                   APP_TRACE_INFO(("\r\nSPI_ReadBuffer_API err = %d",state));
                   break;
               }    
-   
-              pbuf = pbuf + 1; //fix bug             
+#if 0   
+              pbuf = pbuf + 1; //fix bug  --no this bug in AB04
+#endif
+            
 //              for(unsigned int i=0; i<p_raw_read->data_len_read;i++){
 //                  *(pbuf+i)= i/64;
 //              }

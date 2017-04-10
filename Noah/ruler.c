@@ -1108,7 +1108,7 @@ unsigned char Read_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_
 */
 unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_id)
 {
-    unsigned char   err;
+    unsigned char   err = 0;
     unsigned short  data_length;
     unsigned char   temp;
     unsigned char  *pdata;
@@ -1545,7 +1545,7 @@ unsigned char Save_Ruler_FW( unsigned int cmd, unsigned char *pBin, unsigned cha
 */
 unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
 {
-    unsigned char err;
+    unsigned char err = 0;
     unsigned int flash_addr;
     unsigned int index;
     FLASH_INFO   flash_info;
@@ -1612,7 +1612,7 @@ unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
 
 unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
 {
-    unsigned char err;
+    unsigned char err = 0;
     OS_SEM_DATA  sem_data;
     /*
     err = NO_ERR;
@@ -1667,7 +1667,7 @@ unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
 */
 unsigned char Update_Ruler_FW( unsigned char ruler_slot_id )
 {
-    unsigned char err;
+    unsigned char err = 0;
     unsigned int  flash_addr;
     FLASH_INFO   *pFlash_Info;
     unsigned char Buf[9];

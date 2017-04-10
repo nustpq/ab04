@@ -23,6 +23,8 @@ static uint8_t Init_Rec_Setting( void *pInstance );
 static uint8_t Audio_Start_Rec( void );
 static uint8_t Audio_Start_Play( void );
 
+void Play_Voice_Buf_Start( void );
+
 void Audio_Stop( void );
 void Audio_Start( void );
 
