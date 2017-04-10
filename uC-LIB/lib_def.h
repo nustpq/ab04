@@ -511,20 +511,20 @@ typedef enum lib_err {
 */
 
                                                                 /* Trace level, default to TRACE_LEVEL_OFF.             */
-#ifndef  TRACE_LEVEL_OFF
-#define  TRACE_LEVEL_OFF                                   0u
+#ifndef  UCOSII_LEVEL_OFF
+#define  UCOSII_LEVEL_OFF                                   0u
 #endif
 
-#ifndef  TRACE_LEVEL_INFO
-#define  TRACE_LEVEL_INFO                                  1u
+#ifndef  UCOSII_LEVEL_INFO
+#define  UCOSII_LEVEL_INFO                                  1u
 #endif
 
-#ifndef  TRACE_LEVEL_DBG
-#define  TRACE_LEVEL_DBG                                   2u
+#ifndef  UCOSII_LEVEL_DBG
+#define  UCOSII_LEVEL_DBG                                   2u
 #endif
 
-#ifndef  TRACE_LEVEL_LOG
-#define  TRACE_LEVEL_LOG                                   3u
+#ifndef  UCOSII_LEVEL_LOG
+#define  UCOSII_LEVEL_LOG                                   3u
 #endif
 
 

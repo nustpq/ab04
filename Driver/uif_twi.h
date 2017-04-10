@@ -54,7 +54,7 @@ uint8_t twi0_uname_read(void *pInstance, const uint8_t *buf,uint32_t len  );
 uint8_t twi1_read(void *pInstance, const uint8_t *buf,uint32_t len  );
 uint8_t twi2_read(void *pInstance, const uint8_t *buf,uint32_t len   );
 
-unsigned char TWID_WriteBuffer_API( 
+unsigned char TWID_Write_API( 
     uint8_t address,
     uint32_t iaddress,
     uint8_t isize,
@@ -62,7 +62,7 @@ unsigned char TWID_WriteBuffer_API(
     uint32_t num,
     Async *pAsync);
 
-unsigned char TWID_ReadBuffer_API(
+unsigned char TWID_Read_API(
     uint8_t address,
     uint32_t iaddress,
     uint8_t isize,

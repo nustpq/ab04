@@ -47,7 +47,8 @@
 
 #include <includes.h>
 
-
+#include "fm1388_comm.h"
+#include "fm1388_spi.h"
 
 
 /*
@@ -81,6 +82,11 @@ extern Twid twid[ 3 ];
 OS_EVENT *g_pStartUSBTransfer_Spi0;
 //List portsList;
 //List ssc0_data;
+
+
+//reference for spi0
+extern SpiDamon spid;
+extern Fm1388 fm1388;
 
 /*
 *********************************************************************************************************
@@ -151,7 +157,7 @@ kfifo_t  spi1_bulkIn_fifo;
 *Note: Maybe should move all of these defines to a standard-alone file? that read easier;
 *********************************************************************************************************
 */
-#pragma   pack(1)
+#pragma   pack( 4 )
 //Buffer Level 1:  USB data stream buffer : 64 B
 uint8_t usbCacheBulkOut0[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
 uint8_t usbCacheBulkIn0[USB_DATAEP_SIZE_64B * 16 * 3 ] ;
@@ -241,14 +247,12 @@ static  OS_STK       App_TaskUART_TxStk[APP_CFG_TASK_UART_TX_STK_SIZE];
 static  OS_STK       App_TaskCMDParseStk[APP_CFG_TASK_CMD_PARSE_STK_SIZE];
 static  OS_STK       App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE];
 
+static  OS_STK       App_TaskSpiAudioStk[APP_CFG_TASK_SPI_STK_SIZE];
 /*
 *********************************************************************************************************
 *                                      LOCAL FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
-
-static  void  AppTaskLED                (void        *p_arg);
-
 
 static  void  App_BufferCreate (void);
 static  void  App_EventCreate (void);
@@ -263,7 +267,8 @@ static  void  App_TaskStart             (void        *p_arg);
 *
 * Returns     : none.
 *
-* Note(s)     : none.
+* Note(s)     : 2017-4-08 This version merged between master and duali2s branch and verify >3000 play/record
+*               cycle. so,flaged it as a baseline version.
 *********************************************************************************************************
 */
 
@@ -285,8 +290,6 @@ int main()
                     (INT32U          ) APP_CFG_TASK_START_STK_SIZE,
                     (void           *) 0,
                     (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-
-    
 
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet(APP_CFG_TASK_START_PRIO, "Start", &os_err);
@@ -319,7 +322,6 @@ int main()
 static  void  App_TaskStart (void *p_arg)
 {
     (void)p_arg;
-    CPU_INT32U  counter;
     CPU_INT08U  os_err;
 
     BSP_Init();
@@ -473,22 +475,27 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_JOY_PRIO, "Keyboard", &os_err);
 #endif
     
+    
+     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskSpiAudio,
+                    (void           *) 0,
+                    (OS_STK         *)&App_TaskSpiAudioStk[APP_CFG_TASK_SPI_STK_SIZE - 1],
+                    (INT8U           ) APP_CFG_TASK_SPI_PRIO,
+                    (INT16U          ) APP_CFG_TASK_SPI_PRIO,
+                    (OS_STK         *)&App_TaskSpiAudioStk[0],
+                    (INT32U          ) APP_CFG_TASK_SPI_STK_SIZE,
+                    (void *)0,
+                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+
+#if (OS_TASK_NAME_EN > 0)
+    OSTaskNameSet( APP_CFG_TASK_SPI_PRIO, "spiAudio", &os_err);
+#endif    
+    
 ////////////////////////////////////////////////////////////////////////////////
 
     for (;;) {
 
-#if 1
-        counter++;
-        if(counter&0xFF) {
-            UIF_LED_On( LED_RUN );
-        }     
-        if(counter&0x3F) {
-            UIF_LED_Off( LED_RUN );
-        }
-        Ruler_Port_LED_Service();
-        OSTimeDly(10);
-
-#else      
+       OSTimeDly(10);
+      
         for ( unsigned int i = 0; i< 20; i++ ) {
             for ( unsigned int j = 0; j< 5; j++ ) {
                 UIF_LED_On( LED_RUN );
@@ -505,7 +512,7 @@ static  void  App_TaskStart (void *p_arg)
                 OSTimeDly(20-i%20);
             }
         }
-#endif
+ 
         
     }
 
@@ -514,9 +521,9 @@ static  void  App_TaskStart (void *p_arg)
 
 /*
 *********************************************************************************************************
-*                                             AppTaskLED()
+*                                             App_TaskSpiAudio()
 *
-* Description : led flash task.
+* Description : spi audio process task.
 *
 * Arguments   : none.
 *
@@ -526,60 +533,39 @@ static  void  App_TaskStart (void *p_arg)
 *********************************************************************************************************
 */
 
-#if UIF_LED
-static  void  AppTaskLED ( void *p_arg )
+static  void  App_TaskSpiAudio ( void *p_arg )
 {
+    CPU_INT08U    err ;
+    CPU_INT32U   *msg ;    
+    CPU_INT32U    cfg_data;
+    
+    (void)p_arg;
 
-
-    memset( spi1_RingBulkIn, 0x55, sizeof( spi1_RingBulkIn ));
-    memset( spi1_2MSOut, 0x38, sizeof( spi1_2MSOut ));
-    memset( twi_ring_buffer[ 0 ],0x55,sizeof( twi_ring_buffer[ 0 ] ));
-    memset( usart1Buffer[ 0 ], 0x77 , 1024 );
-    memset( usart1Buffer[ 1 ], 0x99 , 1024 );
-    memset( spi0_RingBulkOut, 0x55, sizeof( spi0_RingBulkOut ) );
-
-    for(;;)
-    {
-        OSTimeDlyHMSM(0, 0, 0, 10);  //change this interval about 10ms to fit fm1388
-
+    err   = 0 ;
+    msg   = NULL ;
+    
+    global_rec_spi_en = 0 ;
+    global_play_spi_en = 0 ;
+    
+    while ( DEF_TRUE ) 
+    {  
 #if 0
-        spi_clear_status( &source_spi1 );
-        memset( spi1_RingBulkOut, 0x55, sizeof( spi1_RingBulkOut ) );
-        _spiDmaRx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_RingBulkIn ));
-        _spiDmaTx( &source_spi1 ,source_spi1.privateData,sizeof( spi1_RingBulkOut ));
-#endif
-        uint32_t size = kfifo_get_free_space( &spi0_bulkOut_fifo );
-        if( size >= sizeof( spi1_2MSOut ) )
+        msg = ( uint32_t *)OSMboxPend( App_AudioManager_Mbox,  0,  &err );
+        if( msg == NULL ) 
         {
-           kfifo_put( &spi0_bulkOut_fifo,
-                      ( uint8_t * )spi1_2MSOut,
-                      size );
-           kfifo_put( &spi0_bulkOut_fifo,
-                      ( uint8_t * )spi1_2MSOut,
-                      size );
-           kfifo_put( &spi0_bulkOut_fifo,
-                      ( uint8_t * )spi1_2MSOut,
-                      size );
-           kfifo_put( &spi0_bulkOut_fifo,
-                      ( uint8_t * )spi1_2MSOut,
-                      size );
+            continue;
         }
-
-        spi_clear_status( &source_spi0 );
-
-        _spiDmaRx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_RingBulkOut ));
-        _spiDmaTx( &source_spi0 ,source_spi0.privateData,sizeof( spi0_RingBulkOut ));
-
-        usart1_DmaTx( &source_usart1 , NULL , 0 );
-
-//        twi0_uname_write( &source_twi0,twi_ring_buffer[0],sizeof( twi_ring_buffer[ 0 ] ) >> 10 );
-//        OSTaskSuspend( OS_PRIO_SELF );
-    }
-
-}
+        cfg_data = *msg ; 
+        APP_TRACE_INFO(( "\r\n[App_AudioManager_Mbox - cfg_data = 0X%0X ]", cfg_data ));
 #endif
 
+        SPI_Play_Service();      
+        SPI_Rec_Service();
 
+
+        OSTimeDly( 2 ); 
+    }   
+}
 
 
 /*
@@ -938,7 +924,6 @@ void Init_Ruler_CMD_FIFO( void )
 *********************************************************************************************************
 */
 
-
 void Dma_configure( void )
 {
     sDmad *pDmad = &g_dmad;
@@ -947,8 +932,8 @@ void Dma_configure( void )
     /* Driver initialize */
     DMAD_Initialize( pDmad, 0 );
     /* IRQ configure */
-    IRQ_ConfigureIT( ID_DMAC0, DMA_PRIORITY, ISR_HDMA );
-    IRQ_ConfigureIT( ID_DMAC1, DMA_PRIORITY, ISR_HDMA );
+    IRQ_ConfigureIT( ID_DMAC0, 4, ISR_HDMA ); //highest priority
+    IRQ_ConfigureIT( ID_DMAC1, 4, ISR_HDMA );
     IRQ_EnableIT(ID_DMAC0);
     IRQ_EnableIT(ID_DMAC1);
 
@@ -1019,7 +1004,7 @@ void Dma_configure( void )
             | DMAC_CFG_DST_H2SEL
             | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_ssc1.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------
      // Allocate DMA channels for SPI0
     source_spi0.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
                                               DMAD_TRANSFER_MEMORY, ID_SPI0);
@@ -1059,7 +1044,7 @@ void Dma_configure( void )
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_spi0.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------*/
+----------------------------------------------------------------------------*/
 #if 1
      // Allocate DMA channels for SPI1
     source_spi1.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
@@ -1100,7 +1085,8 @@ void Dma_configure( void )
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_spi1.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------*/
+#endif
+/*----------------------------------------------------------------------------
 
     // Allocate DMA channels for USART1
     source_usart1.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
@@ -1135,9 +1121,10 @@ void Dma_configure( void )
            | DMAC_CFG_DST_H2SEL
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, source_usart1.dev.txDMAChannel, dwCfg );
+    DMAD_PrepareChannel( &g_dmad, source_usart1.dev.txDMAChannel, dwCfg );*/
 	
 /*----------------------------------------------------------------------------*/
+#if 0    
     /*
     // Allocate DMA channels for USART0
     source_usart0.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
@@ -1177,31 +1164,6 @@ void Dma_configure( void )
 /*----------------------------------------------------------------------------*/
 #endif
 }
-
-//#define TASKLEDPRIORITY                                    8
-//
-//#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       6
-//#define  APP_CFG_TASK_USB_SEV_PRIO                         1
-//#define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
-//#define  APP_CFG_TASK_UART_TX_PRIO                         3
-//#define  APP_CFG_TASK_NOAH_PRIO                            4
-//#define  APP_CFG_TASK_UART_RX_PRIO                         5
-//
-//#define  APP_CFG_TASK_USER_IF_PRIO                         10
-//#define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+1)
-//
-//#define  APP_CFG_TASK_UART_TX_RULER_PRIO                   13
-//#define  APP_CFG_TASK_NOAH_RULER_PRIO                      16
-//
-//#define  APP_CFG_TASK_SHELL_PRIO                           30
-//#define  APP_CFG_TASK_DBG_INFO_PRIO                        31
-//#define  APP_CFG_TASK_START_PRIO                           35
-//#define  APP_CFG_TASK_PROBE_STR_PRIO                       37
-//#define  PROBE_DEMO_INTRO_CFG_TASK_LED_PRIO                38
-//#define  OS_PROBE_TASK_PRIO                                40
-//#define  OS_PROBE_TASK_ID                                  40 //ID
-//#define  OS_TASK_TMR_PRIO                         (OS_LOWEST_PRIO - 2)
-
 
 void Hold_Task_for_Audio( void )
 {

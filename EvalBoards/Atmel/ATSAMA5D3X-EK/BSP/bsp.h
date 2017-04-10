@@ -91,10 +91,10 @@
 #include  <spi.h>
 //#include  <i2c_gpio.h>
 //#include  <im501_comm.h>
-#include  <uif.h>
 #include  <ruler.h>
 #include  <emb.h>
 #include  <mem_basic.h>
+#include  <uif.h>
 #include  <uif_dsp.h>
 
 #include  <commands.h>
@@ -335,7 +335,6 @@ extern OS_EVENT *Bsp_Ser_Tx_Sem_lock;
 extern OS_EVENT *Bsp_Ser_Rx_Sem_lock;
 extern OS_EVENT *DBGU_UART_Tx_Sem_lock;
 extern OS_EVENT *DBGU_USB_Tx_Sem_lock;
-
 
 extern const CPU_CHAR fw_version[];
 extern const CPU_CHAR hw_version[];

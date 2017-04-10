@@ -14,25 +14,46 @@
 * Note(s)           : spi communicate implement
 *********************************************************************************************************
 */
-
+#include "bsp.h"
 #include "uif_spi.h"
+#include "fm1388_spi.h"
 #include "kfifo.h"
 #include  <ucos_ii.h>
 
 #define STATE_SLAVE   0
 #define STATE_MASTER ( !STATE_SLAVE )
 
+#define DMA_SPI_LLI     2
+
 extern sDmad g_dmad;
 
-
-sDmad spi_dmad;
+SpiDamon spid;
+Fm1388 fm1388;
 
 const Pin spi0_pins[] = { PINS_SPI0,PIN_SPI0_NPCS0 };					 
 const Pin spi1_pins[] = { PINS_SPI1,PIN_SPI1_NPCS0 };   
 
+static sDmaTransferDescriptor spiDmaTxLinkList[DMA_SPI_LLI];
+static sDmaTransferDescriptor spiDmaRxLinkList[DMA_SPI_LLI];
 
 
-
+/*
+*********************************************************************************************************
+*                                               SPI_ISR_DMA()
+*
+* Description : interrupt function about spi dma
+*
+* Arguments   : none.
+*
+* Returns     : none.
+*
+* Note(s)     : Configure TC0 to generate an interrupt every 4ms
+*********************************************************************************************************
+*/
+static void SPI_ISR_DMA(void)
+{
+    DMAD_Handler(&g_dmad);
+}
 
 /*
 *********************************************************************************************************
@@ -128,46 +149,6 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
     status = status;    
     assert( NULL != pArg );
     
-    uint8_t error;
-    uint32_t temp = 0;
-    
-    DataSource *pSource = ( DataSource *)pArg;
-	
-/*    
-    //step 1:calculate buffer space  
-    temp = kfifo_get_free_space( pSource->pRingBulkIn );
-
-     //step 2:insert data to RingBuffer from PingPong buffer   
-     if( temp >= pSource->warmWaterLevel )
-     {        
-       kfifo_put( pSource->pRingBulkIn,
-                  ( uint8_t * )pSource->pBufferIn[ pSource-> rx_index ],
-                  pSource->rxSize );
- 
-       pSource->rx_index = 1 - pSource->rx_index; 
-       //update state machine of this port;                    
-       pSource->status[ IN ] = ( uint8_t )RUNNING;
-     }
-     else
-     {
-         //if this port was started,but no enough data in buffer,
-         //flag this port in buffering state;
-         if( ( uint8_t )START <= pSource->status[ IN ] )
-         {
-              pSource->status[ IN ] = ( uint8_t )BUFFERED;
-              ///TODO:error proccess;
-              return;
-         }
-         else
-         {
-             //if there has no enough space for data,error 
-             printf( "SPI0-Rx:There is No Space in RingBuffer,data size = %d \r\n",temp);
-             ///TODO:error proccess
-             return;
-         }
-     }
-   
-*/
 }
 
 /*
@@ -186,47 +167,7 @@ void _SPI0_DmaRxCallback( uint8_t status, void* pArg )
 void  _SPI0_DmaTxCallback( uint8_t status, void* pArg )
 {    
     status = status;    
-    assert( NULL != pArg );
-    
-    uint8_t error;
-    uint32_t temp = 0;
-    
-    DataSource *pSource = ( DataSource *)pArg;
-
-/*    
-     //step 1:calculate buffer space  
-     temp = kfifo_get_data_size( pSource->pRingBulkOut );
-
-     //step 2:get data from spi RingBuffer   
-     if( temp >= pSource->warmWaterLevel )
-     {        
-         kfifo_get( pSource->pRingBulkOut,
-                    ( uint8_t * )pSource->pBufferOut[ pSource-> tx_index ],
-                    pSource->txSize );
- 
-         pSource->tx_index = 1 - pSource->tx_index;
-         //update state machine of this port;                    
-         pSource->status[ OUT ] = ( uint8_t )RUNNING;
-     }
-     else
-     {
-         //if this port was started,but no enough data in buffer,
-         //flag this port in buffering state;
-         if( ( uint8_t )START <= pSource->status[ OUT ] )
-         {
-              pSource->status[ OUT ] = ( uint8_t )BUFFERED;
-              ///TODO:error proccess;
-              return;
-         }
-         else
-         {
-             //if there has no enough space for data,error 
-             printf( "SPI0-Tx:There is No data in RingBuffer,data size = %d \r\n",temp);
-             ///TODO:error proccess
-             return;
-         }
-     }
-*/     
+    assert( NULL != pArg ); 
  
 }
 
@@ -440,8 +381,8 @@ void stop_spi( void * pInstance )
     SPI_Disable( pSpi );
     
     //step2: stop dma channel    
-    DMAD_StopTransfer( &spi_dmad, pSource->dev.rxDMAChannel );
-    DMAD_StopTransfer( &spi_dmad, pSource->dev.txDMAChannel );
+    DMAD_StopTransfer( &g_dmad, pSource->dev.rxDMAChannel );
+    DMAD_StopTransfer( &g_dmad, pSource->dev.txDMAChannel );
     
     //step3:clear buffer about this port
     memset( pSource->pBufferIn, 0 , sizeof( uint16_t ) * I2S_PINGPONG_IN_SIZE_3K );
@@ -453,8 +394,6 @@ void stop_spi( void * pInstance )
     pSource->status[ IN ] = ( uint8_t )STOP;
     pSource->status[ OUT ] = ( uint8_t )STOP;    
 }
-
-
 
 /*
 *********************************************************************************************************
@@ -475,14 +414,16 @@ static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk,
     assert( NULL != pInstance );
     assert( clk > 0 );
    
-    uint32_t mode = SPI_MR_MSTR ;
-    uint32_t csr0 ;
+    uint32_t csr0 = 0 ;
+    uint32_t mode = STATE_MASTER;
+#if 0    
     uint32_t clk_div ;
-     
+
     clk_div = BOARD_MCK / clk ;    
     if( clk_div > 255 ){      
         clk_div = 255;
-    }  
+    }
+#endif
     
     static unsigned int spi_clk_save ;
     static unsigned int format_save ;
@@ -490,13 +431,17 @@ static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk,
     DataSource *pSource = ( DataSource * )pInstance;
     Spi *pSpi = _get_spi_instance( pSource->dev.identify );
         
-    if( format > 3 ) {
+    if( format > 3 ) 
+    {
        format = 0;
     }
-    if( (clk == spi_clk_save) && (format == format_save) ) {
+    
+    if( (clk == spi_clk_save) && (format == format_save) ) 
+    {
        APP_TRACE_INFO(("\r\nNo need re-init same SPI mode and clock."));
        return;
-    }    
+    }
+    
     spi_clk_save = clk ;
     format_save  = format ;
    
@@ -532,22 +477,35 @@ static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk,
         mode &= ( uint32_t ) ( ~( SPI_MR_MSTR ) ) ;
     }
     
-    csr0 = format|SPI_CSR_DLYBS( 0x0 ) ;
+    csr0 = format ;
+    csr0 |= ( SPID_CSR_DLYBS(BOARD_MCK, 10) | SPID_CSR_DLYBCT(BOARD_MCK, 100) | SPI_CSR_CSAAT );
     
     // spi clock 
     if ( spiState == STATE_MASTER )
     {
-        csr0 |= ( clk_div << 8 ) ;
+        csr0 |= SPID_CSR_SCBR( BOARD_MCK, clk ) ;
     }
+
     
     // configure SPI mode 
-    SPI_Configure( pSpi, pSource->dev.identify, mode ) ;
-    
-    // configure SPI csr0
-    SPI_ConfigureNPCS( pSpi, 0, csr0 ) ;
-    //SPI_ConfigureCSMode( pSpi, 0, 1 ) ;
-    SPI_Enable( pSpi ) ;
+//    SPI_Configure( pSpi, pSource->dev.identify, mode ) ;
 
+#if 0    
+    SPID_Configure( &spid ,
+                    pSpi , 
+                    pSource->dev.identify,
+                    &g_dmad ,
+                    mode );
+  
+    
+    pSource->privateData = ( void * )&spid;
+     
+    
+    SPID_ConfigureCS( &spid, 
+                       0, 
+                       csr0 );
+#endif 
+   
 }
 
 /*
@@ -564,6 +522,47 @@ static void _ConfigureSpi( DataSource *pInstance,uint32_t spiState,uint32_t clk,
 *********************************************************************************************************
 */
 void init_spi( void *pInstance,void *parameter )
+{
+    assert( NULL != pInstance );
+    
+    parameter = parameter;
+    DataSource *pSource = ( DataSource * )pInstance;
+    
+    SPI_PLAY_REC_CFG *pSpi_Cfg = ( SPI_PLAY_REC_CFG * )parameter;
+
+    if( ID_SPI0 == pSource->dev.identify )
+      PIO_Configure( spi0_pins, PIO_LISTSIZE( spi0_pins ) ) ;     //fill code initialize spi0 pins
+    else if( ID_SPI1 == pSource->dev.identify )
+      PIO_Configure( spi1_pins, PIO_LISTSIZE( spi1_pins ) ) ;
+    else
+      assert(0) ;
+        
+    PMC_EnablePeripheral( pSource->dev.identify );    
+   
+    _ConfigureSpi( pSource, STATE_MASTER, pSpi_Cfg->spi_speed, pSpi_Cfg->spi_format ) ;
+    //_ConfigureSpi( pSource, STATE_MASTER, 24000000, 0) ;
+}
+
+void init_spi0( void *pInstance , void *parameter )
+{
+//    DMAD_Initialize( &g_dmad, 0 );
+
+    /* Enable interrupts */
+//    IRQ_ConfigureIT(ID_DMAC0, 0, SPI_ISR_DMA);
+//    IRQ_EnableIT(ID_DMAC0);
+
+
+    PIO_Configure(spi0_pins, PIO_LISTSIZE(spi0_pins));
+    SPID_Configure(&spid, SPI0, ID_SPI0, &g_dmad);
+    
+    FM1388_Configure(&fm1388, &spid, 0, 0 );
+    
+    printf("SPI and FM1388 drivers initialized\n\r");
+    
+ 
+}
+
+void init_spi1( void *pInstance,void *parameter )
 {
     assert( NULL != pInstance );
     
@@ -733,78 +732,6 @@ uint8_t _spiDmaTx( void *pInstance, const uint8_t *buf,uint32_t len  )
 }
 
 
-/*
-*********************************************************************************************************
-*                                               _spi_ConfigureDma()
-*
-* Description : spi dma configure
-*
-* Arguments   : pInstance    : data source handle
-*               
-* Returns     : none
-*
-* Note(s)     : none
-*********************************************************************************************************
-*/
-#if UNUSED
-static void _spi_ConfigureDma( void *pInstance )
-{
-    uint32_t dwCfg;
-    uint8_t iController;
-    
-    assert( NULL != pInstance );    
-    
-    DataSource *pSource = ( DataSource * )pInstance;
-    Spi * pSpi = _get_spi_instance( pSource->dev.identify );
-    
-    /* Driver initialize */
-    DMAD_Initialize( &g_dmad, 0 );
-    /* IRQ configure */
-    IRQ_ConfigureIT( ID_DMAC0, 0, ISR_SPI_DMA0 );
-    IRQ_EnableIT( ID_DMAC0 );
-    IRQ_ConfigureIT( ID_DMAC1, 0, ISR_SPI_DMA1 );
-    IRQ_EnableIT( ID_DMAC1 );
-
-    
-    /* Allocate DMA channels for SPI instance */
-    pSource->dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
-                                              DMAD_TRANSFER_MEMORY, pSource->dev.identify );
-    pSource->dev.rxDMAChannel = DMAD_AllocateChannel( &g_dmad,
-                                              pSource->dev.identify, DMAD_TRANSFER_MEMORY );
-    if (   pSource->dev.txDMAChannel == DMAD_ALLOC_FAILED 
-        || pSource->dev.rxDMAChannel == DMAD_ALLOC_FAILED )
-    {
-        printf("DMA channel allocat error\n\r");
-        while(1);
-    }
-    /* Set RX callback */
-    DMAD_SetCallback( &g_dmad, pSource->dev.rxDMAChannel,
-                    (DmadTransferCallback)_SPI1_DmaRxCallback, 0 );
-    /* Configure DMA RX channel */
-    iController = ( pSource->dev.rxDMAChannel >> 8 );
-    dwCfg = 0
-           | DMAC_CFG_SRC_PER(
-                DMAIF_Get_ChannelNumber( iController, pSource->dev.identify, DMAD_TRANSFER_RX )& 0x0F)
-           | DMAC_CFG_SRC_PER_MSB(
-                (DMAIF_Get_ChannelNumber( iController, pSource->dev.identify, DMAD_TRANSFER_RX )& 0xF0) >> 4 )
-           | DMAC_CFG_SRC_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, pSource->dev.rxDMAChannel, dwCfg );
-    /* Configure DMA TX channel */
-    iController = ( pSource->dev.txDMAChannel >> 8 );
-    dwCfg = 0           
-           | DMAC_CFG_DST_PER(
-                DMAIF_Get_ChannelNumber( iController, pSource->dev.identify, DMAD_TRANSFER_TX )& 0x0F )
-           | DMAC_CFG_DST_PER_MSB(
-                (DMAIF_Get_ChannelNumber( iController, pSource->dev.identify, DMAD_TRANSFER_TX )& 0xF0 ) >> 4 )
-           | DMAC_CFG_DST_H2SEL
-           | DMAC_CFG_SOD
-           | DMAC_CFG_FIFOCFG_ALAP_CFG;
-    DMAD_PrepareChannel( &g_dmad, pSource->dev.txDMAChannel, dwCfg );
-
-}
-#endif
 #endif
 
 
@@ -832,71 +759,7 @@ void spi_clear_status( void * pInstance )
     
     pSpi->SPI_RDR ;
 }
-
-
-
-/*
-*********************************************************************************************************
-*                                               spi_slave_transfer()
-*
-* Description : spi transmmit function under slave state
-*
-* Arguments   : pInstance : device instance handle
-*             : p_tbuf    : tx buffer handle
-*             : p_rbuf    : rx buffer handle
-*             : size     : size of rx buffer 
-* Returns     : none
-*
-* Note(s)     : none
-*********************************************************************************************************
-*/
-#if UNUSED
-static void spi_slave_transfer( void *pInstance,
-                                void *p_tbuf,
-				void *p_rbuf,
-                                uint32_t size )
-{
-
-
-}
-#endif							   
-
-
-
-/*
-*********************************************************************************************************
-*                                               spi_master_transfer()
-*
-* Description : spi transmmit function under Master state
-*
-* Arguments   : pInstance : device instance handle
-*             : p_tbuf    : tx buffer handle
-*             : p_rbuf    : rx buffer handle
-*             : size     : size of rx buffer 
-* Returns     : none
-*
-* Note(s)     : the size of p_tbuf is equl p_rbuf;
-*********************************************************************************************************
-*/
-#if UNUSED
-static void spi_master_transfer( void *pInstance,
-                                 void *p_tbuf,
-				 void *p_rbuf,
-                                 uint32_t size )
-{
-        assert( ( NULL != pInstance ) );
-        assert( ( NULL != p_tbuf ) && ( 0 < size ) );
-        assert( ( NULL != p_tbuf ) );
-         
-        DataSource *pSource = ( DataSource * )pInstance;
-        
-        spi_clear_status( pSource );
-        _spiDmaRx( pSource );
-        _spiDmaTx( pSource );
-
-}
-#endif
-
+				   
 
 /*
 *********************************************************************************************************
@@ -953,62 +816,3 @@ unsigned char spi_register_set( void *instance,void *parameter )
      return 0;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-unsigned char SPI_WriteBuffer_API( unsigned char *pdata, unsigned int size )
-{
-    uint8_t err = 0;
-
-    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
-
-    while( 0 != DMAD_IsTransferDone( &g_dmad, source_spi0.dev.txDMAChannel ) ) { 
-        OSTimeDly(1);   
-    }
-    err = _spiDmaTx( &source_spi0 ,pdata ,size  );
-    if( 0 != err )
-    {            
-      SPI_ReleaseCS( pSpi );
-      return err;
-    }
-    
-    SPI_ReleaseCS( pSpi ); 
-    return 0;   
-}
-
-
-unsigned char SPI_WriteReadBuffer_API(  unsigned char *pdata_read, 
-                                        unsigned char *pdata_write,
-                                        unsigned int   size_read, 
-                                        unsigned int   size_write  )
-{
-    uint8_t err = 0;
-    
-    Spi * pSpi = ( Spi * )source_spi0.dev.instanceHandle;
-    
-    spi_clear_status( &source_spi0 );
-    
-    err = DMAD_IsTransferDone( &g_dmad , source_spi0.dev.txDMAChannel );
-    if( 0 != err )
-    {            
-      SPI_ReleaseCS( pSpi );
-      return err;
-    }
-    SPI_ConfigureCSMode( pSpi, 0, 1 ) ;
-    err =   _spiDmaTx( &source_spi0 , pdata_write, size_write  );
-    if( 0 != err )
-    {            
-      SPI_ReleaseCS( pSpi );
-      return err;
-    }
-        
-    err = _spiDmaRx( &source_spi0 , pdata_read, size_read  );
-    if( 0 != err )
-    {            
-      SPI_ReleaseCS( pSpi );
-      return err;
-    }
-      
-    SPI_ReleaseCS( pSpi ); 
-    
-    return err;
-                   
-}

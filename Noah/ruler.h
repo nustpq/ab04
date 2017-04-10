@@ -43,7 +43,7 @@
 #define RULER_ID_DEFAULT                  0xFF
 
 #define SAMPLE_LENGTH_DEFAULT             16
-#define SAMPLE_RATE_DEFAULT               16000
+#define SAMPLE_RATE_DEFAULT               48000
 #define SLOT_NUM_DEFAULT                  8
 #define SET_VOLUME_MUTE                   1000
 //ruler state defines
@@ -123,8 +123,6 @@
 typedef  unsigned char  VERSION_DATA[ DEF_VERSION_STR_LEN ] ;
 typedef  unsigned char  MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
 
-
-
 typedef struct {
     float           phase ;
     float           sensitivity ;
@@ -164,7 +162,58 @@ typedef struct {
     unsigned char    date[1];
 } RULER_INFO ;
 
-    
+
+////////////////////////////////////////////////////////////////////////////////
+typedef struct {
+  unsigned char  type;//Rec =0, Play =1
+  unsigned char  channel_num; //valid data cahnnel num 1~8
+  unsigned short sample_rate; //8000, 16000, 24000, 32000, 48000
+
+  unsigned char  bit_length; // 16, 24, 32
+  unsigned char  lin_ch_mask;
+
+  unsigned char  gpio_rec_num;
+  unsigned char  gpio_rec_start_index;
+  unsigned char  gpio_rec_bit_mask;
+
+  unsigned char  spi_rec_num;
+  unsigned char  spi_rec_start_index;
+  unsigned char  spi_rec_bit_mask;
+
+  unsigned char  format;  //1:I2S  2:PDM  3:PCM/TDM
+  unsigned char  slot_num;  //bus BCLK slot num
+  unsigned char  ssc_cki;
+  unsigned char  ssc_delay;
+
+  unsigned char  ssc_start;
+  unsigned char  master_slave;
+  unsigned char  bclk_polarity;  //0 or 1
+
+  unsigned char  id;  //0: SSC0 , 1: SSC1, 2
+}AUDIO_CFG;
+
+
+typedef struct {
+  unsigned int    spi_speed;
+
+  unsigned short  rec_ch_mask;
+  unsigned short  play_ch_mask;
+
+  unsigned short  chip_id;
+  unsigned char   spi_format;
+  unsigned char   gpio_irq;
+
+  unsigned char   time_dly;
+  unsigned char   slave;
+  unsigned char   reserved[2];
+
+}SPI_PLAY_REC_CFG;
+
+typedef struct {
+    unsigned char    type;    //bit[0..5]= [I2S0 rec, I2S0 play, I2S1 rec, I2S1 play, SPI rec, SPI play]       eg. rec = 1,  play = 2, rec&play = 3
+    unsigned char    padding; //usb first package padding
+}START_AUDIO;
+
 typedef struct {
     unsigned char    ruler_id;
 }READ_RULER_INFO;
@@ -192,6 +241,13 @@ typedef struct {
 }TOGGLE_MIC ;
 
 typedef struct {
+    signed int    mic;
+    signed int    lout;
+    signed int    spk;
+    signed int    lin;
+}SET_VOLUME ;
+
+typedef struct {
     unsigned char    port;
     unsigned char   *pdata;
 }RAW_DATA_TRANS ;
@@ -217,22 +273,101 @@ typedef struct {
 }FLASH_INFO ;
 
 
+typedef struct {
+    unsigned char    if_type;
+    unsigned char    reserved[3];
+    unsigned short   attribute;
+    unsigned short   speed;
+}INTERFACE_CFG ;
 
 
-extern unsigned char          Global_Ruler_CMD_Result;  
+typedef struct {
+    unsigned char    if_type;
+    unsigned char    dev_addr;
+    unsigned int     data_len;
+    unsigned char*   pdata;
+}RAW_WRITE ;
+
+typedef struct {
+    unsigned char    if_type;
+    unsigned char    dev_addr;
+    unsigned int     data_len_read;
+    unsigned int     data_len_write;
+    unsigned char*   pdata_read;
+    unsigned char*   pdata_write;
+}RAW_READ ;
+
+typedef struct {
+    unsigned short   mem_addr_l;
+    unsigned short   mem_addr_h;
+    unsigned int     data_len;
+    unsigned char*   pdata;
+    unsigned char    if_type;
+    unsigned char    dev_addr;
+    unsigned char    mem_addr_len;
+}BURST_WRITE ;
+
+typedef struct {
+    unsigned char    if_type;
+    unsigned char    dev_addr;
+    unsigned char    data_len;
+    unsigned char    read_data_len;
+    unsigned short   mem_addr_l;
+    unsigned short   mem_addr_h;
+    unsigned int     mem_addr_len;
+    unsigned char*   pdata;
+
+}BURST_READ ;
+
+typedef struct {
+    unsigned char    addr_index;
+    unsigned int     data_len;
+    unsigned char*   pdata;
+    unsigned char*   pStr;
+}MCU_FLASH ;
+
+typedef struct {
+    unsigned char    vec_index_a;
+    unsigned char    vec_index_b;
+    unsigned char    flag;
+    unsigned char    type; //41£º iM401,  51: iM501
+    unsigned int     delay;
+    unsigned char    gpio; //irq trigger GPIO index
+    unsigned char    trigger_en;
+    unsigned char    pdm_clk_off; //trun off pdm clk after pwd or not
+    unsigned char    if_type;//1: I2C, 2:SPI
+}SET_VEC_CFG ;
+
+typedef struct {
+    unsigned char    gpio_num;
+    unsigned char    gpio_value[7];
+    unsigned int     delay_us[7];
+}GPIO_SESSION ;
+
+
+
+extern unsigned char Audio_Version[];
+extern unsigned char Ruler_CMD_Result;
+
 extern volatile unsigned char Global_Ruler_Type[];
 extern volatile unsigned char Global_Ruler_State[];
 extern volatile unsigned char Global_Ruler_Index; //current ruler index
 extern volatile unsigned char Global_Mic_State[];
 extern volatile unsigned char Global_Bridge_POST;
-extern volatile unsigned int  Global_Mic_Mask[];  
+extern volatile unsigned int  Global_Mic_Mask[];
+extern volatile unsigned char Ruler_Setup_Sync_Data;
 extern volatile unsigned char Global_SPI_Rec_Start;
 extern volatile unsigned char Global_SPI_Rec_En;
-extern volatile unsigned char Ruler_Setup_Sync_Data;
 
+extern SET_VEC_CFG  Global_VEC_Cfg;
 
 extern void          Init_Global_Var( void );
-
+extern unsigned char Update_Audio( unsigned char id );
+extern unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg );
+extern unsigned char Start_Audio( START_AUDIO start_audio  );
+extern unsigned char Stop_Audio( void );
+extern unsigned char Reset_Audio( void );
+extern unsigned char Get_Audio_Version( void );
 extern unsigned char Init_Ruler( unsigned char ruler_slot_id ) ;
 extern unsigned char Setup_Ruler( unsigned char ruler_slot_id );
 extern unsigned char Read_Ruler_Status( unsigned char ruler_slot_id, unsigned short *status_data );
@@ -246,15 +381,20 @@ extern unsigned char Read_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned ch
 extern unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_id);
 extern unsigned char Ruler_Active_Control( unsigned char active_state );
 extern unsigned char Reset_Mic_Mask(  unsigned int *pInt );
+extern unsigned char Set_Volume( SET_VOLUME *pdata );
 extern unsigned char Get_Ruler_Version( unsigned char ruler_id );
-extern unsigned char Check_Actived_Mic_Number( void );
+extern unsigned char AB_POST( void );
 extern unsigned char Ruler_POST( unsigned char ruler_id );
 extern void          simple_test_use( void );
 
 extern unsigned char Update_Ruler_FW( unsigned char ruler_slot_id );
 extern unsigned char Save_Ruler_FW( unsigned int cmd, unsigned char *pBin, unsigned char *pStr, unsigned int size );
 extern unsigned char Ruler_Setup_Sync(unsigned char ruler_slot_id);
-extern void          Read_Flash_State( FLASH_INFO  *pFlash_Info, unsigned int flash_address );
+extern unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec );
+extern void Read_Flash_State( FLASH_INFO  *pFlash_Info, unsigned int flash_address );
+extern void Debug_Audio( void ) ;
+extern unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg );
 
+extern unsigned char SPI_Rec_Start( SPI_PLAY_REC_CFG *pSpi_rec_cfg );
 
 #endif
