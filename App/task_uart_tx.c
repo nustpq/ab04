@@ -69,7 +69,7 @@ void App_TaskUART_Tx( void *p_arg )
     
     CPU_INT08U       errCode ;  
     CPU_INT08U      *pTaskMsgIN ;
-    pNEW_CMD         pPcCmd ;    
+    pNEW_NOAH_CMD    pPcCmd ;    
     CPU_INT32U       counter ;
     CPU_INT32U       size ;
     CPU_INT32U       times ;
@@ -89,7 +89,7 @@ void App_TaskUART_Tx( void *p_arg )
 //            Time_Stamp();
 //            APP_TRACE_INFO(("\r\n:App_TaskUART_Tx : [%d] start ",pPcCmd->DataLen + 5));
                     
-            pPcCmd   =  (pNEW_CMD)pTaskMsgIN ; 
+            pPcCmd   =  (pNEW_NOAH_CMD)pTaskMsgIN ; 
             pChar    =  (unsigned char *)pTaskMsgIN ; 
             counter  =  (pPcCmd->data_len[0]<<16) + (pPcCmd->data_len[1]<<8) + pPcCmd->data_len[2];
             counter +=  8;//[EB][LEN1][LEN2][LEN3][90][SYNC][CMD1][CMD2] = 8 bytes          

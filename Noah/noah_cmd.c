@@ -274,8 +274,8 @@ void  Noah_CMD_Unpack_PC (CMDREAD    *pCMD_Read,
     
     uint8_t   err;    
     
-    uint8_t   state_mac       = pCMD_Read->state_mac ;
-    pNEW_CMD     pRecvPtr        = (pNEW_CMD)pCMD_Read->pRecvPtr;
+    uint8_t   state_mac        = pCMD_Read->state_mac ;
+    pNEW_NOAH_CMD pRecvPtr     = (pNEW_NOAH_CMD)pCMD_Read->pRecvPtr;
     uint32_t   PcCmdCounter    = pCMD_Read->PcCmdCounter;
     uint32_t   PcCmdDataLen    = pCMD_Read->PcCmdDataLen;
    
@@ -513,10 +513,10 @@ uint8_t  Noah_CMD_Pack_PC (      OS_EVENT    *pOS_EVENT,
                                )
 {
     
-    uint8_t  *pMemPtr;
-    pNEW_CMD  pSendPtr;    
-    uint8_t   err;
-    uint32_t  data_length;
+    uint8_t       *pMemPtr;
+    pNEW_NOAH_CMD  pSendPtr;    
+    uint8_t        err;
+    uint32_t       data_length;
     
     err         = 0;  
     pSendPtr    = NULL;
@@ -531,7 +531,7 @@ uint8_t  Noah_CMD_Pack_PC (      OS_EVENT    *pOS_EVENT,
         }
         OSTimeDly(1); //wait for free MemoryPart
     }
-    pSendPtr = (pNEW_CMD)pMemPtr;
+    pSendPtr = (pNEW_NOAH_CMD)pMemPtr;
  
     if( cmd_id != 0 ) {//data package   
         err = EMB_Data_Build( cmd_id, pSendPtr->data, pPcCmdData, &data_length );  
@@ -577,7 +577,7 @@ uint8_t  Noah_CMD_Pack_PC (      OS_EVENT    *pOS_EVENT,
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t  EMB_Data_Check (pNEW_CMD    pNewCmd, 
+uint8_t  EMB_Data_Check0(pNEW_NOAH_CMD    pNewCmd, 
                             EMB_BUF    *pEBuf,
                             uint8_t  delay)
 {
@@ -645,7 +645,62 @@ uint8_t  EMB_Data_Check (pNEW_CMD    pNewCmd,
   
   
 }
+CPU_INT08U  EMB_Data_Check (NOAH_CMD   *pNoahCmd, 
+                            EMB_BUF    *pEBuf,
+                            CPU_INT08U  delay)
+{
+  
+    CPU_INT08U   err;
+    CPU_INT16U   data_cmd_len;
+    CPU_INT08U  *p_data_cmd;
+  
+    err          = NO_ERR;
+    p_data_cmd   = pNoahCmd->Data ;
+    data_cmd_len = pNoahCmd->DataLen ;   
+    
+    p_data_cmd  += delay;
+    data_cmd_len-= delay;
+    
+    if( pEBuf->state ) { //new data pack        
+     
+        if( *p_data_cmd++ == EMB_DATA_FRAME ) { //sync data          
+            pEBuf->index   = *p_data_cmd++ ;
+            pEBuf->index  += ((*p_data_cmd++)<<8) ; 
+            pEBuf->length  = pEBuf->index; //reserve length
+            if( pEBuf->length > EMB_BUF_SIZE ) {
+                APP_TRACE_INFO(("EMB data length exceed the Max %d B\r\n",EMB_BUF_SIZE));
+                return EMB_LEN_OERFLOW_ERR ;
+            }
+            pEBuf->pdata   = &(pEBuf->data[0]); 
+            if( pEBuf->index > (data_cmd_len - 3) ) { // big data package
+                pEBuf->index -= data_cmd_len - 3 ;
+                pEBuf->state = false; //session not done.
+            }
+            memcpy( pEBuf->pdata, p_data_cmd, data_cmd_len-3 );
+            pEBuf->pdata += data_cmd_len-3 ;
+            
+        } else {          
+            err = EMB_FORMAT_ERR; 
+            
+        }
+      
+    } else { //next data pack
 
+        if( pEBuf->index > data_cmd_len ) {
+            pEBuf->index -=  data_cmd_len;        
+            memcpy( pEBuf->pdata, p_data_cmd, data_cmd_len );
+            pEBuf->pdata += data_cmd_len ;
+        } else {
+            memcpy( pEBuf->pdata, p_data_cmd, pEBuf->index );
+            pEBuf->state = true;  //session done.           
+        }
+        
+    }
+    
+    return err;
+  
+  
+}
 
 
 /*
@@ -695,7 +750,7 @@ uint8_t  Noah_CMD_Parse_Ruler (NOAH_CMD    *pNoahCmd,
             index += 1;        
         case RULER_CMD_RAED_RULER_INFO :  
             index += 1;
-//PQ            err = EMB_Data_Check( pNoahCmd, pEBuf_Data, index );       
+            err = EMB_Data_Check( pNoahCmd, pEBuf_Data, index );       
             if( err != OS_ERR_NONE ) 
             {
                 Init_EMB_BUF( pEBuf_Data ); 
@@ -912,7 +967,7 @@ uint8_t  EMB_Data_Build (  uint16_t   cmd_type,
 *********************************************************************************************************
 */
 
-uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd ) 
+uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd ) 
 {
     
     uint8_t     err; 
@@ -941,8 +996,8 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
     {
         APP_TRACE_INFO(("\r\nWARN: CMD Index(%d) != EMB Element ID(%d)\r\n",cmd_index,cmd_type));
     }
-    Time_Stamp();
-    APP_TRACE_INFO((" CMD[%d] Start ",cmd_type));
+    //Time_Stamp();
+    //APP_TRACE_INFO((" CMD[%d] Start ",cmd_type));
     
 
     switch( cmd_type )  {  
@@ -1006,7 +1061,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.start_audio.padding = (uint8_t)temp; 
-            //err = Ruler_Active_Control(1);              
+            err = Ruler_Active_Control(1);              
             if( err != NO_ERR ) { err = EMB_CMD_ERR;  break; }            
             err = Start_Audio( PCCmd.start_audio );
 
@@ -1054,7 +1109,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
           
             PCCmd.fpga_cfg.data_path_mask   = 0;      
             PCCmd.fpga_cfg.data_path_value  = 0;           
-            for (unsigned char i = 1; i < 7 ; i++ ){  //T0~T6                
+            for (unsigned char i = 1; i <= 7 ; i++ ){  //T0~T6                
                 temp = emb_get_attr_int(&root, i, -1);
                 if(temp != -1 ) { 
                     PCCmd.fpga_cfg.data_path_mask  += 1<<(i-1);
@@ -1065,7 +1120,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             }  
             PCCmd.fpga_cfg.clock_path_mask   = 0;      
             PCCmd.fpga_cfg.clock_path_value  = 0; 
-            for (unsigned char i = 8; i < 32 ; i++ ){  //clock path               
+            for (unsigned char i = 8; i <=(8+17) ; i++ ){  //clock path               
                 temp = emb_get_attr_int(&root, i, -1);
                 if(temp != -1 ) { 
                     PCCmd.fpga_cfg.clock_path_mask  += 1<<(i-8);  
@@ -1432,7 +1487,7 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
             Send_DACK(err);
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
-            PCCmd.toggle_mic.ruler_id = (uint8_t)temp;
+            PCCmd.toggle_mic.ruler_id = 0;//(uint8_t)temp; GUI BUG
             temp = emb_get_attr_int(&root, 2, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
             PCCmd.toggle_mic.mic_id = (uint8_t)temp;
@@ -1497,12 +1552,13 @@ uint8_t  EMB_Data_Parse ( pNEW_CMD  pNewCmd )
        
     }
 
-    Time_Stamp();
-    if( err == 0 ) {
-        APP_TRACE_INFO((" CMD[%d] End ",cmd_type));
-    } else {
-        APP_TRACE_INFO((" CMD[%d] End: err = %d ",cmd_type, err));
-    }
+    // Time_Stamp();
+     if( err == 0 ) {
+         //APP_TRACE_INFO((" CMD[%d] End ",cmd_type));
+     } else {
+         Time_Stamp();
+         APP_TRACE_INFO((" CMD[%d] Error(%d)\r\n",cmd_type, err));
+     }
     
     return err;
 

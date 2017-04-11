@@ -141,7 +141,7 @@ void  BSP_Ser_Printf (CPU_CHAR  *format, ...);
 #define  APP_TRACE_DBG(x)                ((APP_CFG_TRACE_LEVEL >= TRACE_LEVEL_DBG)   ? (void)(APP_CFG_TRACE x) : (void)0)
 //#define  APP_TRACE_INFO_T(x)             {(APP_CFG_TRACE_LEVEL  >= TRACE_LEVEL_INFO) ?  Time_Stamp() : (void)0 ;   APP_TRACE_INFO(x) ; }
 #define  APP_TRACE_INFO_T(x)             { Time_Stamp();   APP_TRACE_INFO(x) ; }
-//#define  APP_TRACE_INFO_T(x)               APP_TRACE_INFO(x)
+
 // for shell uart
 #define  UART_SHELL_SEND_STR(x)                (void)( BSP_Ser_Printf x )
 #define  UART_SHELL_GET_BYTE(x)                      ( BSP_Ser_RdByte x )

@@ -344,7 +344,7 @@ unsigned char  createPath( void *source,
         list_ins_next( &portsList,portsList.tail,path );
     }else{
         APP_TRACE_INFO(("\nPath already in use !\r\n"));
-        err = AUD_CFG_AUDIOPATH_ERR;
+        //err = AUD_CFG_AUDIOPATH_ERR;
     } 
     
     return err;

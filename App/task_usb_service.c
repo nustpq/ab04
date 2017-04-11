@@ -61,12 +61,14 @@ void  App_TaskUSBService ( void *p_arg )
     uint8_t  usb_state;
     uint8_t  usb_state_saved ;
     uint32_t counter, counter2;
+    uint32_t usb_led_counter = 0;
     //uint8_t temp[ 256 ] = { 0 };
     ListElmt  *e ;
     AUDIOPATH *pPath;      
     
-    err = 0;
+    err = 0;    
     usb_state_saved = 0;
+    
     extern uint8_t debug_cnt;
     
     OS_CPU_SR cpu_sr;  
@@ -88,15 +90,13 @@ void  App_TaskUSBService ( void *p_arg )
             }
         }
         
-        if ( usb_state >= USBD_STATE_CONFIGURED ) {
-          
-            UIF_LED_On( LED_USB );    
-        } else {
-          
-            UIF_LED_Off( LED_USB );             
-        }
-        
-        if ( usb_state < USBD_STATE_CONFIGURED ) {            
+        if ( usb_state >= USBD_STATE_CONFIGURED ) {           
+            if( !(usb_led_counter++ & 0x3FF) ) {
+                UIF_LED_On( LED_USB ); 
+            }
+            
+        } else {             
+            UIF_LED_Off( LED_USB );  
             OSTimeDly( 2 );
             continue;      
         }

@@ -486,7 +486,14 @@ int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataLi
                                  ( uint8_t * )pCmd,
                                  sizeof( uint32_t ) << 2 );
 //  APP_TRACE_INFO(("%s :  fpga cmd send : %ld\r\n",__func__, *(uint64_t *)pCmd++ ));
-//  APP_TRACE_INFO(("%s :  fpga cmd send : %ld\r\n",__func__, *(uint64_t *)pCmd ));  
+//  APP_TRACE_INFO(("%s :  fpga cmd send : %ld\r\n",__func__, *(uint64_t *)pCmd ));
+    
+    unsigned int *pInt = (unsigned int *)pCmd;
+    APP_TRACE_INFO(("Send 128bit CMD to FPGA: "));
+    for( unsigned char i=0;i<4; i++) {
+      APP_TRACE_INFO((" %08X :",*pInt++ ));
+    }
+    APP_TRACE_INFO(("\r\n"));
   return 0;
 }
 
@@ -1319,9 +1326,11 @@ unsigned char FPGA_POST_Setup( void )
     Init_fpga_clock_path( 0,0,"codec0_port0_0" );
     Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
     Init_fpga_clock_path( 0,0,"codec0_ssc0_2" );
-    Init_fpga_clock_path( 0,0,"codec0_port1_3" );
-    Init_fpga_clock_path( 0,0,"codec0_codec1_4" );
-    Init_fpga_clock_path( 0,0,"codec0_ssc1_5" );
+    // Init_fpga_clock_path( 0,0,"codec0_port1_3" );
+    // Init_fpga_clock_path( 0,0,"codec0_codec1_4" );
+    // Init_fpga_clock_path( 0,0,"codec0_ssc1_5" );
+    Init_fpga_clock_path( 0,0,"codec1_port1_7" );
+    Init_fpga_clock_path( 0,0,"codec1_ssc1_9" );
         
     Init_fpga_data_path( "uif_i2s0_rx->fm36_i2s_rx" );
     Init_fpga_data_path( "ssc0_tx->codec0_rx" );

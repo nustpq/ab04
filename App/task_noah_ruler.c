@@ -113,7 +113,7 @@ void App_TaskNoah_Ruler( void *p_arg )
                                 SessionDone = 0;
                                 Global_Ruler_CMD_Result = err ;
                                 OSTimeDly(2); //wait enough time for ACK to be sent
-                                APP_TRACE_DBG((" Res[0x%2x]", Global_Ruler_CMD_Result));
+                                APP_TRACE_DBG((" Res[0x%2x] ", Global_Ruler_CMD_Result));
                                 OSSemPost( Done_Sem_RulerUART );                                     
                             }
           

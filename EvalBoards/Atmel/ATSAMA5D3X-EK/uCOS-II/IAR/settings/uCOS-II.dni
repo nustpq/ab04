@@ -10,11 +10,11 @@ LimitSize=0
 ByteLimit=50
 [JLinkDriver]
 WatchCond=_ 0
-Watch0=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
-Watch1=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
+Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
+Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=-1534464306
+Checksum=-794388583
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -51,10 +51,27 @@ Fmt0=uint16_t[15360]	4	0
 Fmt1=uint16_t[3072]	4	0
 Fmt2=uint8_t[131072]	4	0
 Fmt3=uint8_t[6144]	4	0
+Fmt4=unsigned char[1024]	4	0
 [watch_formats]
 Fmt0={W}0:pTds[1].dwDstAddr	4	0
 Fmt1={W}0:pTds[1].dwSrcAddr	4	0
 Fmt2={W}0:status	4	0
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.91.1" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.162.7" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.168.1" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.208.1" 0 0 1 "" 0 "" 0
+Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.231.5" 0 0 1 "" 0 "" 0
+Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.255.1" 0 0 1 "" 0 "" 0
+Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usart.c}.48.2" 0 0 1 "" 0 "" 0
+Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usart.c}.53.3" 0 0 1 "" 0 "" 0
+Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usart.c}.147.5" 0 0 1 "" 0 "" 0
+Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Noah\audio.c}.768.13" 0 0 1 "" 0 "" 0
+Bp10=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Noah\ruler.c}.325.5" 0 0 1 "" 0 "" 0
+Bp11=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Noah\ruler.c}.328.9" 0 0 1 "" 0 "" 0
+Count=12
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -62,6 +79,12 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
+[Aliases]
+A0=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c"
+A1=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c"
+A2=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libchip_sama5d3x\source\USBD_HAL.c" "E:\uif_gitrepos\ab04\master\AB04\libraries\libchip_sama5d3x\source\USBD_HAL.c"
+Count=3
+SuppressDialog=1
 [CallStackLog]
 Enabled=0
 [DriverProfiling]
@@ -70,19 +93,3 @@ Mode=0
 Graph=0
 Symbiont=0
 Exclusions=
-[Disassemble mode]
-mode=0
-[Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.91.1" 0 0 1 "" 0 "" 0
-Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.161.7" 0 0 1 "" 0 "" 0
-Bp2=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.164.7" 0 0 1 "" 0 "" 0
-Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.204.9" 0 0 1 "" 0 "" 0
-Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.229.9" 0 0 1 "" 0 "" 0
-Bp5=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_usb.c}.253.9" 0 0 1 "" 0 "" 0
-Count=6
-[Aliases]
-A0=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c"
-A1=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c"
-A2=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libchip_sama5d3x\source\USBD_HAL.c" "E:\uif_gitrepos\ab04\master\AB04\libraries\libchip_sama5d3x\source\USBD_HAL.c"
-Count=3
-SuppressDialog=1

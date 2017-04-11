@@ -125,7 +125,7 @@ typedef struct _fpga_command
     uint32_t pdm_revers;                 //(left)
 /*------------------------------------------*/
   	uint8_t t_revs0;      
-        uint8_t t_revs1; 
+    uint8_t t_revs1; 
 	uint8_t t_revs2; 
 	
 	uint8_t t0 : 1;    
@@ -139,8 +139,8 @@ typedef struct _fpga_command
   
 /*------------------------------------------*/
 	uint8_t dir_revers6;
-        uint8_t dir_port1_ssc1     : 1;  
-        uint8_t dir_port1_fm36     : 1;
+    uint8_t dir_port1_ssc1     : 1;  
+    uint8_t dir_port1_fm36     : 1;
 	uint8_t dir_revers0        : 1;
 	uint8_t dir_revers1        : 1;
 	uint8_t dir_revers2        : 1;
@@ -157,7 +157,7 @@ typedef struct _fpga_command
 	uint8_t dir_port0_fm36     : 1;
 	uint8_t dir_port1_ssc0     : 1;  
         
-        uint8_t dir_codec0_port0   : 1;  
+    uint8_t dir_codec0_port0   : 1;  
 	uint8_t dir_codec0_fm36    : 1;
 	uint8_t dir_codec0_ssc0    : 1;
 	uint8_t dir_codec0_port1   : 1;
@@ -170,8 +170,8 @@ typedef struct _fpga_command
 /*--------------------------------------*/
 	uint8_t oe_revers6;
 
-        uint8_t oe_port1_ssc1      : 1;  
-        uint8_t oe_port1_fm36      : 1;
+    uint8_t oe_port1_ssc1      : 1;  
+    uint8_t oe_port1_fm36      : 1;
 	uint8_t oe_revers0         : 1;
 	uint8_t oe_revers1         : 1;
 	uint8_t oe_revers2         : 1;
@@ -188,7 +188,7 @@ typedef struct _fpga_command
 	uint8_t oe_port0_fm36      : 1;
 	uint8_t oe_port1_ssc0      : 1;  
         
-        uint8_t oe_codec0_port0    : 1;  // LSB
+    uint8_t oe_codec0_port0    : 1;  // LSB
 	uint8_t oe_codec0_fm36     : 1;
 	uint8_t oe_codec0_ssc0     : 1;
 	uint8_t oe_codec0_port1    : 1;

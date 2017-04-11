@@ -58,9 +58,9 @@ void App_TaskCMDParse( void *p_arg )
     
     (void)p_arg;
     
-    CPU_INT08U   err ;
-    CPU_INT08U  *pTaskMsgIN ;
-    pNEW_CMD     pNewCmd ; 
+    CPU_INT08U      err ;
+    CPU_INT08U     *pTaskMsgIN ;
+    pNEW_NOAH_CMD   pNewCmd ; 
     
     pTaskMsgIN  = NULL;
   
@@ -74,7 +74,7 @@ void App_TaskCMDParse( void *p_arg )
             UIF_LED_On( LED_RUN );
             //UIF_Beep_On();
             
-            pNewCmd  = (pNEW_CMD)pTaskMsgIN ; //change to NOAH CMD type           
+            pNewCmd  = (pNEW_NOAH_CMD)pTaskMsgIN ; //change to NOAH CMD type           
             err = EMB_Data_Parse( pNewCmd );           
             OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );  //release mem
             Send_Report( pNewCmd->pkt_sn, err );  //GACK

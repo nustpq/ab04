@@ -101,7 +101,7 @@ void App_TaskUART_Rx( void *p_arg )
 #if( false )            
              APP_TRACE_INFO(("\r\n========== receive data counter: %d =============\r\n",counter));             
              for(i = 0; i< counter; i++ ){  
-                APP_TRACE_INFO(("%0X ", rx_data[i] ));
+                APP_TRACE_INFO(("%02X ", rx_data[i] ));
                 if(i%32 == 31) {
                     APP_TRACE_INFO(("\r\n"));
                 }                
@@ -136,7 +136,17 @@ void App_TaskUART_Rx( void *p_arg )
             
              counter = counter < RX_DATA_LEN ? counter : RX_DATA_LEN;
              kfifo_get(&cmd_ruler_rece_fifo, (unsigned char *)rx_data, counter) ; 
-
+#if( true )            
+             APP_TRACE_INFO(("\r\n========== receive data counter: %d =============\r\n",counter));             
+             for(i = 0; i< counter; i++ ){  
+                APP_TRACE_INFO(("%02X ", rx_data[i] ));
+                if(i%32 == 31) {
+                    APP_TRACE_INFO(("\r\n"));
+                }                
+             }
+             APP_TRACE_INFO(("\r\n========== total_counter: %d=====================\r\n",total_counter));
+#endif            
+        
        
              
             for(i = 0; i< counter; i++ ){                 

@@ -43,6 +43,9 @@ CPU_INT32U  Tx_ReSend_Happens_Ruler = 0;   // debug use, resend happen times, NO
 CPU_INT08U  PcCmdTxID_Ruler[4];   // Frame TXD ID for 4 rulers
 
 
+
+
+
 /*
 *********************************************************************************************************
 *                                    App_TaskUART_Tx_Ruler()
@@ -67,12 +70,17 @@ void App_TaskUART_Tx_Ruler( void *p_arg )
     CPU_INT08U      *pTaskMsgIN ;
     NOAH_CMD        *pPcCmd ; 
     CPU_INT08U       resend_index;  
-
+ 
+    
     pTaskMsgIN  = NULL;
     pPcCmd      = NULL;	
     sum         = 0;
-    errCode     = UNKOW_ERR_RPT ;        
-     
+    errCode     = UNKOW_ERR_RPT ;      
+   
+    OSTimeDly(100);    
+    Init_DMA_Check_Timer();
+    Start_UART0_DMA_Rx_Loop();
+
     while (DEF_TRUE) { 
        
         // Noah to Uart transmit
@@ -80,17 +88,17 @@ void App_TaskUART_Tx_Ruler( void *p_arg )
     
         if( pTaskMsgIN != NULL && OS_ERR_NONE == errCode )   {      
             
-            pPcCmd  = (NOAH_CMD *)pTaskMsgIN ;             
+            pPcCmd  = (NOAH_CMD *)( pTaskMsgIN + 2 ) ;             
             if( GET_FRAME_TYPE(pPcCmd->head) == FRAM_TYPE_DATA  ) {  //data frame
                 
                 for( resend_index = 0; resend_index < MAX_RESEND_TIMES; resend_index++ ) {    
                     
                     APP_TRACE_DBG(("\r\n>>Tx R[%d]:[0x%2x][",Global_Ruler_Index,PcCmdTxID_Ruler[Global_Ruler_Index]));
                     for(unsigned int i = 0; i<pPcCmd->DataLen; i++){   
-                        APP_TRACE_DBG((" %2X", *(unsigned char*)(pPcCmd->Data+i) )); 
+                        APP_TRACE_DBG((" %02X", *(unsigned char*)(pPcCmd->Data+i) )); 
                     }
                     APP_TRACE_DBG((" ]")); 
-                    UART0_WriteBuffer_API((unsigned char *)pPcCmd,(pPcCmd->DataLen)+2+2+1 );
+                    UART0_WriteBuffer_API((unsigned char *)pTaskMsgIN,(pPcCmd->DataLen)+2+2+1 );
                     OSSemPend(ACK_Sem_RulerUART, 500, &errCode);//pending 500ms for ACK back                     
                     if( OS_ERR_NONE == errCode )   {               
                         OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );    //release mem 
@@ -112,7 +120,7 @@ void App_TaskUART_Tx_Ruler( void *p_arg )
                 
             } else { //ACK / NAK  frame, no resend action 
                 
-                    UART0_WriteBuffer_API((unsigned char *)pPcCmd,4 );  
+                    UART0_WriteBuffer_API((unsigned char *)pTaskMsgIN,4 );  
 //                    if( GET_FRAME_TYPE(pPcCmd->head) == FRAM_TYPE_ACK ) {
 //                        APP_TRACE_INFO(("\r\n>>ACK"));
 //                    } else if ( GET_FRAME_TYPE(pPcCmd->head) == FRAM_TYPE_NAK ) {
@@ -130,7 +138,7 @@ void App_TaskUART_Tx_Ruler( void *p_arg )
                             APP_TRACE_INFO_T(("ERROR£ºSend EST to Ruler[%d] failed.\r\n",Global_Ruler_Index)); 
                         }
                     }
-                    APP_TRACE_DBG((" [ %2X %2X ]", *pTaskMsgIN, *(pTaskMsgIN+1)));  
+                    // APP_TRACE_DBG((" [ %2X %2X ]", *pTaskMsgIN, *(pTaskMsgIN+1)));  
                     
                     OSMemPut( pMEM_Part_MsgUART, pTaskMsgIN );    //release mem 
             }                       

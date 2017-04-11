@@ -158,10 +158,10 @@ void UsbAudio0DataReceived(  uint32_t unused,
       }
       break;
     case USBD_STATUS_PARTIAL_DONE:
-      assert( 0 );
+      //assert( 0 );
       break;
     default:
-      assert( 0 );
+      //assert( 0 );
       break;
       
     }
@@ -201,7 +201,7 @@ void UsbAudio1DataReceived(  uint32_t unused,
     else 
     {      
         APP_TRACE_INFO(("\r\nERROR : UsbAudio1DataReceived: Transfer error\r\n" ));
-        assert( 0 );
+       // assert( 0 );
         
     }
 
@@ -226,7 +226,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
                                 0); 
         
         APP_TRACE_INFO(( "\r\nERROR : UsbAudio0DataTransmit: Rr-transfer hit\r\n" ));  
-        assert( 0 );
+        //assert( 0 );
     } 
     UIF_LED_Off( 3 ); 
     
@@ -250,7 +250,7 @@ void UsbAudio1DataTransmit(  uint32_t unused,
                                 0); 
         
         APP_TRACE_INFO(( "\r\nERROR : UsbAudio1DataTransmit: Rr-transfer hit\r\n" ));  
-        assert( 0 );
+        //assert( 0 );
     } 
 }
 

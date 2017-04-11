@@ -185,7 +185,7 @@ void Check_UART_Mixer_Ready( void )
 unsigned char Init_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
 {
     unsigned char err;
-   
+  
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -242,7 +242,7 @@ unsigned char Setup_Ruler( unsigned char ruler_slot_id ) //0 ~ 3
     unsigned char err;
     EMB_BUF      *pEBuf_Data;
     unsigned char buf[] = { RULER_CMD_SET_RULER, ruler_slot_id };
-   
+  
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -303,7 +303,7 @@ unsigned char Get_Ruler_Type(  unsigned char ruler_slot_id )
     unsigned char err;
     EMB_BUF      *pEBuf_Data;
     unsigned char buf[] = { RULER_CMD_GET_RULER_TYPE };
-    
+   
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -329,6 +329,7 @@ unsigned char Get_Ruler_Type(  unsigned char ruler_slot_id )
             APP_TRACE_INFO(("Read_Ruler_Type[%d] timeout\r\n",ruler_slot_id));
         } else {
             Global_Ruler_Type[ruler_slot_id] =  pEBuf_Data->data[0] ;
+            if( Global_Ruler_Type[ruler_slot_id]==0x30) {Global_Ruler_Type[ruler_slot_id] = 0x90;} //bugfix
             err = Global_Ruler_CMD_Result; //exe result from GACK
             if(OS_ERR_NONE != err ){
                 APP_TRACE_INFO(("Get_Ruler_Type[%d] err = %d\r\n",ruler_slot_id,err));
@@ -363,7 +364,7 @@ unsigned char Read_Ruler_Status( unsigned char ruler_slot_id, unsigned short *st
     unsigned char err ;
     EMB_BUF      *pEBuf_Data;
     unsigned char buf[] = { RULER_CMD_RAED_RULER_STATUS };
-    
+  
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -421,7 +422,8 @@ unsigned char Read_Ruler_Info( unsigned char ruler_slot_id )
 {
     unsigned char  err;
     unsigned char  buf[] = { RULER_CMD_RAED_RULER_INFO };
-     
+
+    
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -481,7 +483,7 @@ unsigned char Write_Ruler_Info( unsigned char ruler_slot_id )
     unsigned char  *pdata;
     unsigned char   buf[4];
     EMB_BUF        *pEBuf_Cmd;
-    
+   
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -556,7 +558,7 @@ unsigned char Read_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic_
 {
     unsigned char  err ;
     unsigned char  buf[] = { RULER_CMD_READ_MIC_CALI_DATA, mic_id };
-     
+    
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -618,8 +620,8 @@ unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic
     unsigned char  *pdata;
     unsigned char   buf[5];
     EMB_BUF        *pEBuf_Cmd;
-   
- #if OS_CRITICAL_METHOD == 3u
+  
+#if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
 
@@ -692,44 +694,44 @@ unsigned char Write_Mic_Cali_Data(unsigned char ruler_slot_id, unsigned char mic
 */
 unsigned char Update_Mic_Mask( unsigned char ruler_slot_id, unsigned int mic_mask )
 {
-    unsigned char err;
+    unsigned char err ;
     unsigned char buf_size_send ;
     unsigned char buf[] = { RULER_CMD_TOGGLE_MIC, mic_mask&0xFF, (mic_mask>>8)&0xFF,
                             (mic_mask>>16)&0xFF,  (mic_mask>>24)&0xFF };
-     
+    
 #if OS_CRITICAL_METHOD == 3u
-    //OS_CPU_SR  cpu_sr = 0u;
-#endif
-    //check ruler connection state
-    if( Global_Ruler_State[ruler_slot_id] < RULER_STATE_CONFIGURED ) {
-        return RULER_STATE_ERR ;
-    }
-
-    //OSSemPend( UART_MUX_Sem_lock, 0, &err );
+    //OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
+#endif 
+    //check ruler connection state 
+    if( Global_Ruler_State[ruler_slot_id] < RULER_STATE_CONFIGURED ) {      
+        return RULER_STATE_ERR ;         
+    }  
+    
+    //OSSemPend( UART_MUX_Sem_lock, 0, &err );  
     if( Global_Ruler_Index != ruler_slot_id ) {
         Check_UART_Mixer_Ready();
-        //OS_ENTER_CRITICAL();
-        Global_Ruler_Index = ruler_slot_id ; //for ruler status switch in TX/RX/Noah
-        //OS_EXIT_CRITICAL();
+        //OS_ENTER_CRITICAL(); 
+        Global_Ruler_Index = ruler_slot_id ; //for ruler status switch in TX/RX/Noah 
+        //OS_EXIT_CRITICAL();  
         UART1_Mixer( ruler_slot_id );
     }
-    if( Global_Ruler_Type[ruler_slot_id] == RULER_TYPE_H03 ) {
+    if( Global_Ruler_Type[ruler_slot_id] == RULER_TYPE_H03  ||
+        Global_Ruler_Type[ruler_slot_id] == RULER_TYPE_C01  ||
+        Global_Ruler_Type[ruler_slot_id] == RULER_TYPE_ECHO    ) {
         buf_size_send = 5; //H03 cmd data size = 1+4 for 16> mic
     } else {
         buf_size_send = 3; //Default cmd data size = 1+2 for <16 mic
     }
-    err = Noah_CMD_Pack_Ruler( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, buf_size_send, 0, NULL, 0 ) ;
+    err = Noah_CMD_Pack_Ruler( EVENT_MsgQ_Noah2RulerUART, FRAM_TYPE_DATA, buf, buf_size_send, 0, NULL, 0 ) ; 
     if( OS_ERR_NONE == err ) {
-        OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );
+        OSSemPend( Done_Sem_RulerUART, TIMEOUT_RULER_COM, &err );  
         if( OS_ERR_TIMEOUT == err ) {
-            APP_TRACE_INFO(("Update_Mic_Mask for Ruler[%d] timeout\r\n",ruler_slot_id));
+            APP_TRACE_INFO_T(("Update_Mic_Mask for Ruler[%d] timeout",ruler_slot_id));
         }
-
     } else {
-        APP_TRACE_INFO(("Ruler[%d] Noah_CMD_Pack_Ruler failed: %d\r\n",ruler_slot_id,err));
+        APP_TRACE_INFO_T(("Ruler[%d] pcSendDateToBuf failed: %d",ruler_slot_id,err));
     }
-    //OSSemPost( UART_MUX_Sem_lock );
-    
+    //OSSemPost( UART_MUX_Sem_lock );    
     return err ;
 }
 
@@ -748,10 +750,10 @@ unsigned char Update_Mic_Mask( unsigned char ruler_slot_id, unsigned int mic_mas
 */
 unsigned char Ruler_Active_Control( unsigned char active_state )
 {
-    unsigned char err ;
+    unsigned char err = 0;
     unsigned char ruler_id;
     unsigned char buf[] = { RULER_CMD_ACTIVE_CTR, active_state };
-     
+    
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -817,7 +819,9 @@ unsigned char Get_Ruler_Version( unsigned char ruler_slot_id )
     EMB_BUF      *pEBuf_Data;
     
     pEBuf_Data  = &Emb_Buf_Data;  //Global var
-
+#ifdef DEBUG_GUI_RULER_OFFLINE
+    return 0;
+#endif 
 #if OS_CRITICAL_METHOD == 3u
     //OS_CPU_SR  cpu_sr = 0u;
 #endif
@@ -933,7 +937,9 @@ unsigned char Toggle_Mic(  TOGGLE_MIC *pdata )
     unsigned char  id;
     unsigned int   mic_mask;
     unsigned int   fpga_mask;
-
+#ifdef DEBUG_GUI_RULER_OFFLINE
+    return 0;
+#endif 
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 /* Storage for CPU status register         */
 #endif
@@ -1258,7 +1264,7 @@ void Ruler_Port_LED_Service( void )
     LED_Freq      = 0x3F;
     post_err_flag = 0;
 
-    for( ruler_id = 0 ; ruler_id < 4 ; ruler_id++ ) {
+    for( ruler_id = 0 ; ruler_id < 1 ; ruler_id++ ) {
 
         ruler_state = Global_Ruler_State[ruler_id];
         if( Global_Bridge_POST != NO_ERR ) { //if POST err, start all LED

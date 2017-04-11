@@ -16,36 +16,47 @@
 
 
 
-//#define FOR_USE_USBTEST_EXE
 
 #define TIMEOUT_AUDIO_COM    2000    //Max 2s timeout
 #define TIMEOUT_RULER_COM    5000    //Max 5s timeout
 
-//#define RULER_MASK(mic_mask,ruler_id)    ((mic_mask>>(ruler_id<<3))&0xFF)
+//#define RULER_MASK(mic_mask,ruler_id)    ((mic_mask>>(ruler_id<<3))&0xFF) 
 
+////////////////////////////////////////////////////////////////////////////////
 #define RULER_TYPE_RULER                  0
 #define RULER_TYPE_HANDSET                1
 #define RULER_TYPE_MASK( type )           ( (type>>7) & 0x01 )
 
+///////////////////////////////////////For Ruler(without FPGA inside)
 #define RULER_TYPE_R01                    0x00
 #define RULER_TYPE_R02                    0x01
 #define RULER_TYPE_R03                    0x02
 
+
 #define RULER_TYPE_TA01                   0x10
 #define RULER_TYPE_TD01                   0x11
 
-#define RULER_TYPE_WT01                   0x20
+#define RULER_TYPE_W01                    0x20
+
+#define RULER_TYPE_TA01                   0x10
+#define RULER_TYPE_TD01                   0x11
+#define RULER_TYPE_W01                    0x20
+///////////////////////////////////////For Handset(with FPGA inside)
 
 #define RULER_TYPE_H01                    0x80
 #define RULER_TYPE_H02                    0x81
 #define RULER_TYPE_H03                    0x82
+#define RULER_TYPE_C01                    0x90
+#define RULER_TYPE_ECHO                   0xA0
+////////////////////////////////////////////////////////////////////////////////
 
 #define RULER_ID_DEFAULT                  0xFF
 
 #define SAMPLE_LENGTH_DEFAULT             16
-#define SAMPLE_RATE_DEFAULT               16000
+#define SAMPLE_RATE_DEFAULT               8000
 #define SLOT_NUM_DEFAULT                  8
 #define SET_VOLUME_MUTE                   1000
+
 //ruler state defines
 #define  RULER_STATE_DETACHED           0x00
 #define  RULER_STATE_ATTACHED           0x01
@@ -60,14 +71,14 @@
 #define  AUDIO_TYPE_REC                 0x00
 #define  AUDIO_TYPE_PLAY                0x01
 
-//host mcu cmd defines
+//host mcu cmd defines 
 #define  RULER_CMD_SET_AUDIO_CFG        0x01
 #define  RULER_CMD_START_AUDIO          0x02
 #define  RULER_CMD_STOP_AUDIO           0x03
 #define  RULER_CMD_SET_RULER            0x04
 #define  RULER_CMD_RAED_RULER_STATUS    0x05
 #define  RULER_CMD_RAED_RULER_INFO      0x06
-#define  RULER_CMD_WRITE_RULER_INFO     0x07
+#define  RULER_CMD_WRITE_RULER_INFO     0x07     
 #define  RULER_CMD_READ_MIC_CALI_DATA   0x08
 #define  RULER_CMD_WRITE_MIC_CALI_DATA  0x09
 #define  RULER_CMD_TOGGLE_MIC           0x0A
@@ -77,13 +88,10 @@
 #define  RULER_CMD_GET_RULER_VERSION    0x0E
 #define  RULER_CMD_SETUP_SYNC           0x0F
 #define  RULER_CMD_RESET_AUDIO          0x10
-#define  RULER_CMD_START_RD_VOICE_BUF   0x11
-
 ////////////////////////////////////////////////////////////////////////////////
 
-#define DEF_VERSION_STR_LEN             ( 11 + 1 )
-#define DEF_MODEL_STR_LEN               ( 7 + 1 )
-
+#define DEF_VERSION_STR_LEN  ( 11 + 1 )
+#define DEF_MODEL_STR_LEN    ( 7 + 1 )
 
 /////////////////  Flash store Vec file related defines  ///////////////////////
 

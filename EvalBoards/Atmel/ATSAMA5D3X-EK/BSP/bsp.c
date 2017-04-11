@@ -46,11 +46,11 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.996]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.997]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
-const CPU_CHAR hw_model[]    = "[AB04]";
+const CPU_CHAR hw_model[]    = "[AB04][EVM:FM1388]";
 #endif
 
 OS_EVENT *Bsp_Ser_Tx_Sem_lock;

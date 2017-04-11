@@ -302,7 +302,7 @@ typedef struct {
     unsigned char  pkt_sn ;        //1 ~31
     unsigned char  cmd[2] ;        //MSB first
     unsigned char  data[NEW_CMD_DATA_MLEN] ; 
-}*pNEW_CMD ;
+}*pNEW_NOAH_CMD, NEW_NOAH_CMD ;
 
 typedef struct {
     unsigned int   index;    
@@ -387,8 +387,10 @@ extern CPU_INT08U CheckSum(     CPU_INT08U init_data,
                           );
 extern CPU_INT08U  Noah_CMD_Parse_Ruler ( NOAH_CMD    *pNoahCmd,                                 
                                           CPU_INT08U  *pSessionDone); 
-extern CPU_INT08U EMB_Data_Check( pNEW_CMD pNoahCmd, EMB_BUF *pEBuf, CPU_INT08U delay);
-extern CPU_INT08U EMB_Data_Parse ( pNEW_CMD  pNewCmd )  ;
+//extern CPU_INT08U EMB_Data_Check( pNEW_NOAH_CMD pNoahCmd, EMB_BUF *pEBuf, CPU_INT08U delay);
+extern CPU_INT08U  EMB_Data_Check (NOAH_CMD   *pNoahCmd, EMB_BUF *pEBuf, CPU_INT08U  delay);
+
+extern CPU_INT08U EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )  ;
 extern CPU_INT08U  AB_Status_Change_Report (void);
 extern void  Send_DACK (CPU_INT08U  error_id);
 extern void  Send_GACK (CPU_INT08U  error_id);

@@ -235,9 +235,9 @@ static  OS_STK       App_TaskGenieShellStk[APP_CFG_TASK_SHELL_STK_SIZE];
 
 static  OS_STK       App_TaskUART_RxStk[APP_CFG_TASK_UART_RX_STK_SIZE];
 static  OS_STK       App_TaskUART_TxStk[APP_CFG_TASK_UART_TX_STK_SIZE];
-//static  OS_STK       App_TaskUART_TxRulerStk[APP_CFG_TASK_UART_TX_RULER_STK_SIZE];
-//static  OS_STK       App_TaskNoahStk[APP_CFG_TASK_NOAH_STK_SIZE];
-//static  OS_STK       App_TaskNoahRulerStk[APP_CFG_TASK_NOAH_RULER_STK_SIZE];
+static  OS_STK       App_TaskUART_TxRulerStk[APP_CFG_TASK_UART_TX_RULER_STK_SIZE];
+
+static  OS_STK       App_TaskNoahRulerStk[APP_CFG_TASK_NOAH_RULER_STK_SIZE];
 static  OS_STK       App_TaskCMDParseStk[APP_CFG_TASK_CMD_PARSE_STK_SIZE];
 static  OS_STK       App_TaskDebugInfoStk[APP_CFG_TASK_DBG_INFO_STK_SIZE];
 
@@ -427,7 +427,37 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_UART_TX_PRIO, "Uart_tx", &os_err);
 #endif
    
+     /**/
+    os_err = OSTaskCreateExt((void (*)(void *)) App_TaskUART_Tx_Ruler,
+                    (void           *) 0,
+                    (OS_STK         *)&App_TaskUART_TxRulerStk[APP_CFG_TASK_UART_TX_RULER_STK_SIZE - 1],
+                    (INT8U           ) APP_CFG_TASK_UART_TX_RULER_PRIO,
+                    (INT16U          ) APP_CFG_TASK_UART_TX_RULER_PRIO,
+                    (OS_STK         *)&App_TaskUART_TxRulerStk[0],
+                    (INT32U          ) APP_CFG_TASK_UART_TX_RULER_STK_SIZE,
+                    (void *)0,
+                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
+#if (OS_TASK_NAME_EN > 0)
+    OSTaskNameSet(APP_CFG_TASK_UART_TX_RULER_PRIO, "Uart_tx_ruler", &os_err);
+#endif
+
+     /**/
+    os_err =  OSTaskCreateExt((void (*)(void *)) App_TaskNoah_Ruler,
+                    (void           *) 0,
+                    (OS_STK         *)&App_TaskNoahRulerStk[APP_CFG_TASK_NOAH_RULER_STK_SIZE - 1],
+                    (INT8U           ) APP_CFG_TASK_NOAH_RULER_PRIO,
+                    (INT16U          ) APP_CFG_TASK_NOAH_RULER_PRIO,
+                    (OS_STK         *)&App_TaskNoahRulerStk[0],
+                    (INT32U          ) APP_CFG_TASK_NOAH_RULER_STK_SIZE,
+                    (void *)0,
+                    (INT16U          )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+
+#if (OS_TASK_NAME_EN > 0)
+    OSTaskNameSet(APP_CFG_TASK_NOAH_RULER_PRIO, "Noah_Ruler", &os_err);
+#endif
+    
+    /**/
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskUserIF,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskUserIF_Stk[APP_CFG_TASK_USER_IF_STK_SIZE - 1],
@@ -1138,7 +1168,7 @@ void Dma_configure( void )
     DMAD_PrepareChannel( &g_dmad, source_usart1.dev.txDMAChannel, dwCfg );
 	
 /*----------------------------------------------------------------------------*/
-    /*
+    
     // Allocate DMA channels for USART0
     source_usart0.dev.txDMAChannel = DMAD_AllocateChannel( &g_dmad,
                                               DMAD_TRANSFER_MEMORY, ID_USART0);
@@ -1155,6 +1185,7 @@ void Dma_configure( void )
                     (DmadTransferCallback)_USART0_DmaTxCallback, 0);
     DMAD_SetCallback(&g_dmad, source_usart0.dev.rxDMAChannel,
                     (DmadTransferCallback)_USART0_DmaRxCallback, 0);
+    
     // Configure DMA RX channel
     iController = ( source_usart0.dev.rxDMAChannel >> 8 );
     dwCfg = 0
@@ -1173,7 +1204,7 @@ void Dma_configure( void )
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( &g_dmad, source_usart0.dev.txDMAChannel, dwCfg );
-	*/
+	
 /*----------------------------------------------------------------------------*/
 #endif
 }

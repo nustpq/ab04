@@ -276,11 +276,11 @@ void Audio_Stop( void )
 
     OSTimeDly( 50 );
     
-//     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
-//     usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
-//    
-//    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
-//    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
+   
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
     
     OSTimeDly(10); 
   
@@ -573,11 +573,11 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
             return AUD_CFG_MIC_NUM_MAX_ERR;//if report err, need UI support!
         }
         //check rec mic num
-        if( (pAudioCfg->type == 0) && ( mic_num != pAudioCfg->channel_num ) ) {
-            APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channel_num(%d) !=  Active MICs Num(%d)\r\n",pAudioCfg->channel_num,mic_num));
-            //buf[4] = mic_num;
-            return AUD_CFG_MIC_NUM_DISMATCH_ERR;
-        }  
+        // if( (pAudioCfg->type == 0) && ( mic_num != pAudioCfg->channel_num ) ) {
+        //     APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channel_num(%d) !=  Active MICs Num(%d)\r\n",pAudioCfg->channel_num,mic_num));
+        //     //buf[4] = mic_num;
+        //     return AUD_CFG_MIC_NUM_DISMATCH_ERR;
+        // }  
         if( (pAudioCfg->type == 0) && (pAudioCfg->channel_num == 0) && (pAudioCfg->lin_ch_mask == 0) ) {
             APP_TRACE_INFO(("WARN:(Setup_Audio Rec)pAudioCfg->channel_num + ch_lin =  0\r\n" ));
             //return AUD_CFG_PLAY_CH_ZERO_ERR; UI not support
@@ -597,7 +597,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 #ifdef BOARD_TYPE_AB04 //BOARD_TYPE_UIF
     if( pAudioCfg->type == 0) {
         mic_num = pAudioCfg->channel_num ;
-        Global_Mic_Mask[0] = mic_num;
+        //Global_Mic_Mask[0] = mic_num;
     } else {
         mic_num = Global_Mic_Mask[0]; //save mic num to ruler0
     }
@@ -628,6 +628,7 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
         }
     }
 #endif
+    
     if( (pAudioCfg->spi_rec_num != 0) && (pAudioCfg->channel_num > pAudioCfg->slot_num) )   {
          APP_TRACE_INFO(("\r\nSetup_Audio ERROR: channel_num > slot_num\r\n"));
          return AUD_CFG_ERR ;
@@ -685,8 +686,8 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     //}
 
     
-    
-    err = Add_Audio_Path( getPathName( pAudioCfg->id *2 + pAudioCfg->type ) , pAudioCfg );
+    //setup FPGA data path and SSC port
+    err = Add_Audio_Path( getPathName( pAudioCfg->id *2 + pAudioCfg->type ), pAudioCfg );
     if( err != NO_ERR ) {         
         return err;
     }  
@@ -700,7 +701,6 @@ unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
     Codec_Set[pAudioCfg->id][pAudioCfg->type].delay         = pAudioCfg->ssc_delay;
     Codec_Set[pAudioCfg->id][pAudioCfg->type].bclk_polarity = pAudioCfg->bclk_polarity;
     Codec_Set[pAudioCfg->id][pAudioCfg->type].id            = pAudioCfg->id;              
-    
     
     return 0 ;
 }
@@ -794,8 +794,6 @@ unsigned char Update_Audio( unsigned char id )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-
-
 unsigned char Start_Audio( START_AUDIO start_audio )
 {
     unsigned char err;
@@ -859,10 +857,12 @@ unsigned char Stop_Audio( void )
     
     Audio_Stop();
     
-     /*
+
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 // Storage for CPU status register
 #endif
+    
+/*
     APP_TRACE_INFO(("\r\nStop_Audio\r\n"));
     UART2_Mixer(3);
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf)) ;
@@ -887,8 +887,8 @@ unsigned char Stop_Audio( void )
 //    err = Init_CODEC( 0 );
 //    if( err != NO_ERR ) {
 //        APP_TRACE_INFO(("\r\nStop_Audio Power Down CODEC ERROR: %d\r\n",err));
-//    }
-
+//    }  
+*/
     OS_ENTER_CRITICAL();
     for( ruler_id = 0 ; ruler_id < 4 ; ruler_id++ ) {
         if( Global_Ruler_State[ruler_id] ==  RULER_STATE_RUN ) {//given: if mic selected, then ruler used
@@ -903,7 +903,7 @@ unsigned char Stop_Audio( void )
         Global_Mic_Mask[ruler_id] = 0 ;
     }
 #endif
-     */     
+      
     
     return 0 ;
 }
