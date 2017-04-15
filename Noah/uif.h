@@ -13,6 +13,9 @@
 #ifndef __UIF_H__
 #define __UIF_H__
 
+#include "audio.h"
+#include "ruler.h"
+
 //Global_UIF_Setting CMD:  num = 7
 //note: CMD nums must not exceed boundary
 
@@ -61,87 +64,32 @@
 #define   GET_I2C_GPIO_SDA(x)        GET_BYTE_HIGH_4BIT( x ) 
 
 
-///////////////////////////////////////////////////////////////////////////////
 
-
-typedef struct {
-    unsigned char    if_type;
-    unsigned char    reserved[3];
-    unsigned short   attribute;
-    unsigned short   speed;
-}INTERFACE_CFG ;
-
-
-typedef struct {
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned int     data_len;
-    unsigned char*   pdata;
-}RAW_WRITE ;
-
-typedef struct {
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned int     data_len_read;
-    unsigned int     data_len_write;
-    unsigned char*   pdata_read;
-    unsigned char*   pdata_write;
-}RAW_READ ;
-
-typedef struct {
-    unsigned short   mem_addr_l;
-    unsigned short   mem_addr_h;
-    unsigned int     data_len;
-    unsigned char*   pdata;
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned char    mem_addr_len;
-}BURST_WRITE ;
-
-typedef struct {
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned char    data_len;
-    unsigned char    read_data_len;
-    unsigned short   mem_addr_l;
-    unsigned short   mem_addr_h;
-    unsigned int     mem_addr_len;
-    unsigned char*   pdata;
-
-}BURST_READ ;
-
-typedef struct {
-    unsigned char    gpio_num;
-    unsigned char    gpio_value[7];
-    unsigned int     delay_us[7];
-}GPIO_SESSION ;
-
-
-typedef struct {
-    signed int    mic;
-    signed int    lout;
-    signed int    spk;
-    signed int    lin;
-}SET_VOLUME ;
-
-////////////////////////////////////////////////////////////////////////////////
-
-
-extern unsigned char   Reg_RW_Data[];
+extern unsigned char Reg_RW_Data[];
 extern INTERFACE_CFG   Global_UIF_Setting[];
 
-
-
-void          Reverse_Endian( unsigned char *pdata, unsigned char size ) ;
+void Reverse_Endian( unsigned char *pdata, unsigned char size ) ;
 unsigned char Setup_Interface( INTERFACE_CFG *interface_cfg );
 unsigned char Raw_Write( RAW_WRITE *p_raw_write );
 unsigned char Raw_Read( RAW_READ *p_raw_read );
 unsigned char Write_Burst( BURST_WRITE nurst_write );
-void          Dump_Data ( unsigned char *pdata, unsigned int size );
-unsigned char Set_Volume( SET_VOLUME *pdata );
+void Dump_Data ( unsigned char *pdata, unsigned int size );
 unsigned char GPIO_Session( GPIO_SESSION *p_gpio_session );
-unsigned char AB_POST( void );
 
 
+unsigned char TWID_Write_UIF( 
+    uint8_t address,
+    uint32_t iaddress,
+    uint8_t isize,
+    uint8_t *pData,
+    uint32_t num,
+    Async *pAsync);
+unsigned char TWID_Read_UIF(
+    uint8_t address,
+    uint32_t iaddress,
+    uint8_t isize,
+    uint8_t *pData,
+    uint32_t num,
+    Async *pAsync);
 
 #endif

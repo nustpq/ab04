@@ -37,10 +37,14 @@
 
 #include "uif_twi.h"
 #include "uif_object.h"
+#include "fm1388_spi.h"
+
+extern Fm1388 fm1388;
 
 static const DataSource *pSource;
+CODEC_SETS Codec_Set_Saved[2];   //for 2 CODEC
 
-static void Pin_Reset_Codec( unsigned char id )
+void Pin_Reset_Codec( unsigned char id )
 {
     unsigned char reset_pin[] = { CODEC0_RST, CODEC1_RST } ;
 
@@ -107,7 +111,7 @@ uint8_t Codec_Write_SPI(uint8_t dev_addr,uint8_t reg,uint8_t data)
     uint8_t buf[] = { dev_addr<<1, reg, data };
     uint8_t state;
 
-    state = SPI_WriteBuffer_API( buf, 3);
+    state = SPI_WriteBuffer_API( &fm1388 ,buf , 3 );
 
 
     return state ;
@@ -1124,7 +1128,7 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
     uint8_t i, if_set;
 
     APP_TRACE_INFO(("\r\nInit CODEC[%d]",codec_set.id));
-    //if( memcmp(&codec_set_saved,&codec_set_saved,sizeof(CODEC_SETS){
+#if 0
     if( (Codec_Set_Saved[codec_set.id].sr == codec_set.sr)  &&\
         (Codec_Set_Saved[codec_set.id].sample_len == codec_set.sample_len) &&\
         (Codec_Set_Saved[codec_set.id].format == codec_set.format) &&\
@@ -1137,8 +1141,11 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
     } else {
         Codec_Set_Saved[codec_set.id] = codec_set;
     }
+#else
+    Codec_Set_Saved[codec_set.id] = codec_set;    //here, force to initialize codec every time;
+#endif    
     Pin_Reset_Codec( codec_set.id );
-//    OSTimeDly(2000); //test
+
     err = Check_SR_Support( codec_set.sr );
     if( OS_ERR_NONE != err ){
         return err;

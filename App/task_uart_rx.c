@@ -31,10 +31,11 @@
 
 #include <includes.h>
 
-#define          RX_DATA_LEN    512//64  //the larger the faster
 
 volatile CPU_INT08U  Global_Idle_Ready = 0 ; //flag check if no command from PC for sometime
-CPU_INT08U          rx_data[ RX_DATA_LEN ];
+
+#define          RX_DATA_LEN    512//64  //the larger the faster
+CPU_INT08U       rx_data[RX_DATA_LEN];
 
 
 /*
@@ -75,7 +76,6 @@ void App_TaskUART_Rx( void *p_arg )
     
     while (DEF_TRUE) {  
       
-        ////////////////////////////////////////////////////////////////////////
         counter  = kfifo_get_data_size(&cmdEpBulkOut_fifo); 
         //APP_TRACE_INFO((" %4d ",counter)) ;  
         
@@ -110,7 +110,7 @@ void App_TaskUART_Rx( void *p_arg )
 #endif            
              
             for(i = 0; i< counter; i++ ){                 
-                 Noah_CMD_Unpack_PC( &CMD_Read_PC, rx_data[i] ) ;                   
+                 Noah_CMD_Unpacking_New( &CMD_Read_PC, rx_data[i] ) ;                   
             }  
             
             //Restart UART Rx if fifo free space enough
@@ -150,7 +150,7 @@ void App_TaskUART_Rx( void *p_arg )
        
              
             for(i = 0; i< counter; i++ ){                 
-                 Noah_CMD_Unpack_Ruler( &CMD_Read_Ruler, rx_data[i] ) ;                   
+                 Noah_CMD_Unpacking( &CMD_Read_Ruler, rx_data[i] ) ;                   
             }  
             
             //Restart UART Rx if fifo free space enough

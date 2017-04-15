@@ -28,5 +28,4 @@ unsigned char aic3204_init_default( void );
 extern SPI_PLAY_REC_CFG spi0_cfg;
 extern SPI_PLAY_REC_CFG spi1_cfg;
 
-
 #endif

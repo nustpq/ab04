@@ -215,40 +215,10 @@ void  BSP_Init (void)
     //config port dma
     Dma_configure( );
 
+    init_spi0( NULL , NULL );
+
     //initialize Tc1 interval = 1ms
     _ConfigureTc1( 1000u );  
-
-
-//    AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;       /* Disable the Watchdog Timer                               */
-//
-//    BSP_PostInit();                                             /* Initialize BSP functions    BSP_IntInit();                             */
-//    BSP_OS_TmrTickInit(OS_TICKS_PER_SEC);                       /* Initialize the uC/OS-II ticker                       */
-//
-
-//
-//    BSP_ResetInit();                                     /* Enable the hardware reset button  used interrupt         */
-//
-//    // Configure IIC
-//    TWI_Init( TWCK ); //It seems that the TWI will auto desrease SCK if loading increase
-//    //Init_CODEC_5620();
-//
-//    SPI_Init( SPI_CLK, 0);
-//
-//
-//
-//    // Config USART
-//    UART_Init(PC_UART,       ISR_PC_UART,  3000000 );    //To PC (via Audio MCU)
-//    //UART_Init(SIGNAL_POWER_UART, NULL,         9600   );    //To Power Supply  & Signal Generator
-//    UART_Init(AUDIO_UART,    NULL,         115200 );    //To Audio_DP and Audio_DC
-//
-//    //Config Timer
-//    Timer_Init();
-//
-//    //Init ADCs
-//    //Init_ADC_Voltage() ;
-//    //Init_ADC_Current() ;
-//
-//                            /* Initialize uC/OS-II's Tick Rate and DEBUG UART                          */
 
 }
 
@@ -1145,7 +1115,7 @@ void  Get_Flash_Info (void)
 */
 void Head_Info ( void )
 {
-
+    extern OS_EVENT  *UART_MUX_Sem_lock ;
     APP_TRACE_INFO(("\r\n\r\n"));
     APP_TRACE_INFO(("-----------------------------------------------------------\r\n"));
     APP_TRACE_INFO(("----                    Fortemedia                    -----\r\n"));
@@ -1166,7 +1136,7 @@ void Head_Info ( void )
     //APP_TRACE_INFO(("Tx_ReSend_Happens_Ruler:   %7d   times happened\r\n", Tx_ReSend_Happens_Ruler ));
     //APP_TRACE_INFO(("TWI_Sem_lock:              %7d   ( default 1 )\r\n", TWI_Sem_lock->OSEventCnt ));
     //APP_TRACE_INFO(("TWI_Sem_done:              %7d   ( default 0 )\r\n", TWI_Sem_done->OSEventCnt ));
-    //APP_TRACE_INFO(("UART_MUX_Sem_lock:         %7d   ( default 1 )\r\n", UART_MUX_Sem_lock->OSEventCnt ));
+    APP_TRACE_INFO(("UART_MUX_Sem_lock:         %7d   ( default 1 )\r\n", UART_MUX_Sem_lock->OSEventCnt ));
     APP_TRACE_INFO(("Done_Sem_RulerUART:        %7d   ( default 0 )\r\n", Done_Sem_RulerUART->OSEventCnt ));
     APP_TRACE_INFO(("Global_Ruler_State[3..0]:        [%d - %d - %d - %d]\r\n", Global_Ruler_State[3],Global_Ruler_State[2],Global_Ruler_State[1],Global_Ruler_State[0] ));
     APP_TRACE_INFO(("Global_Ruler_Type[3..0] :        [%X - %X - %X - %X]\r\n", Global_Ruler_Type[3],Global_Ruler_Type[2],Global_Ruler_Type[1],Global_Ruler_Type[0] ));

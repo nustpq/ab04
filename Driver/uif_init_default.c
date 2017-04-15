@@ -153,7 +153,7 @@ void spi0_init( unsigned int speed_hz, unsigned int format )
     source_spi0.rx_index = 0;
 
 	source_spi0.peripheralParameter = ( void * )&spi0_cfg;
-    source_spi0.privateData    = spi0_RingBulkIn;
+//    source_spi0.privateData    = spi0_RingBulkIn;  //this member is used others
     spi0_cfg.spi_speed = speed_hz;
     spi0_cfg.spi_format  = format;
     source_spi0.warmWaterLevel = (( SAMPLE_RATE_DEFAULT / 1000 ) * ( SAMPLE_LENGTH_DEFAULT / 8 ) * SLOT_NUM_DEFAULT * 2 );
@@ -204,7 +204,7 @@ void spi1_init( unsigned int speed_hz, unsigned int format )
     source_spi1.rx_index = 0;
 
     source_spi1.peripheralParameter = ( void * )&spi1_cfg;
-    source_spi1.privateData = spi1_RingBulkIn;
+//    source_spi1.privateData = spi1_RingBulkIn;     //this member is used others
     source_spi1.buffer = ( uint8_t * )spi1_2MSOut;
     spi1_cfg.spi_speed = speed_hz;
     spi1_cfg.spi_format  = format;
@@ -414,7 +414,7 @@ void usart0_init( void )
 *
 * Return(s)   :  None.
 *
-* Note(s)     :  UART1 is used for LPC1313 communication @115200bps.
+* Note(s)     : None.
 *********************************************************************************************************
 */
 void usart1_init( void )
@@ -532,11 +532,16 @@ unsigned char aic3204_init_default( void )
     codec_set.bclk_polarity = 0;
     codec_set.flag = 0;
     codec_set.delay = 0;
+#if 1
     err = Init_CODEC( &source_twi2,codec_set ); //CODEC0 connetced to TWI2
+#else
+    err = Init_CODEC( &source_twi2,48000, 16 ); 
+#endif
     if(err != NO_ERR) {
         return err;
     }
 
+#if 0    
     codec_set.id = 1;  //CODEC 1
     codec_set.sr = SAMPLE_RATE_DEFAULT;
     codec_set.sample_len = SAMPLE_LENGTH_DEFAULT;
@@ -546,15 +551,15 @@ unsigned char aic3204_init_default( void )
     codec_set.bclk_polarity = 0;
     codec_set.flag = 0;
     codec_set.delay = 0;
+#if 0
     err = Init_CODEC( &source_twi1,codec_set );//CODEC1 connetced to TWI1
-    
+#else
+    err = Init_CODEC( &source_twi1,48000, 16 );
+#endif
+#endif    
     return err;
 
 }
-
-
-
-
 
 
 /*
@@ -576,8 +581,9 @@ void uif_ports_init_default( void )
 {
     ssc0_init( );
     ssc1_init( );  
-    spi0_init( DEFAULT_SPI_SPEED, 0 );
-    spi1_init( DEFAULT_SPI_SPEED, 0 );
+//    spi0_init( DEFAULT_SPI_SPEED, 1 );
+//    init_spi0( NULL , NULL );
+    spi1_init( DEFAULT_SPI_SPEED, 1 );
     twi0_init( DEFAULT_TWI_SPEED );
     twi1_init( DEFAULT_TWI_SPEED );
     twi2_init( DEFAULT_TWI_SPEED );

@@ -265,7 +265,7 @@ unsigned char  createPath( void *source,
         case 4:                           //ep7<-spi0
           {
               path->pSource = &source_spi0;
-              path->pSource->set_peripheral = spi_register_set;
+//              path->pSource->set_peripheral = spi_register_set;
               path->pfifoIn = &spi0_bulkIn_fifo;
               path->pfifoOut = &ep2BulkIn_fifo;
               path->ep = CDCDSerialDriverDescriptors_SPI_DATAIN;              
@@ -306,7 +306,7 @@ unsigned char  createPath( void *source,
         case 5:                           //ep8->spi0
           {
               path->pSource = &source_spi0;
-              path->pSource->set_peripheral = spi_register_set;
+//              path->pSource->set_peripheral = spi_register_set;
               path->pfifoIn = &ep2BulkOut_fifo;           
               path->pfifoOut = &spi0_bulkOut_fifo; 
               path->ep = CDCDSerialDriverDescriptors_SPI_DATAOUT; 

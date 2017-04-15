@@ -223,7 +223,6 @@ static void twi2_init_master( uint32_t freq )
 
 void twi_init_master( void *pInstance, void * pFreq )
 {
-  
     assert( ( NULL != pInstance ) && ( NULL != pFreq ) );
     
     DataSource *pSource = ( DataSource * )pInstance;
@@ -560,8 +559,25 @@ uint8_t twi2_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-unsigned char TWID_WriteBuffer_API( 
+/*
+*********************************************************************************************************
+*                                    TWID_Write_API()
+*
+* Description :  read  data via twi2
+*
+* Argument(s) :  address  : device instance;
+*		 iaddress : buffer point;
+*                isize    : size of data buffer
+*                pData    :
+*                num      :
+*                pAsync   :
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+unsigned char TWID_Write_API( 
     uint8_t address,
     uint32_t iaddress,
     uint8_t isize,
@@ -573,8 +589,27 @@ unsigned char TWID_WriteBuffer_API(
     return TWID_Write(  &twid[0], address, iaddress, isize, pData, num, pAsync);
       
 }
-   
-unsigned char TWID_ReadBuffer_API(
+
+
+/*
+*********************************************************************************************************
+*                                    TWID_Read_API()
+*
+* Description :  read  data via twi2
+*
+* Argument(s) :  address  : device instance;
+*		 iaddress : buffer point;
+*                isize    : size of data buffer
+*                pData    :
+*                num      :
+*                pAsync   :
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+unsigned char TWID_Read_API(
     uint8_t address,
     uint32_t iaddress,
     uint8_t isize,
@@ -586,3 +621,5 @@ unsigned char TWID_ReadBuffer_API(
     return TWID_Read(  &twid[0], address, iaddress, isize, pData, num, pAsync);
  
 }
+
+

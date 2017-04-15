@@ -34,9 +34,6 @@ extern kfifo_t  cmdEpBulkIn_fifo;
 */
 extern kfifo_t DBG_USB_Send_kFIFO;
 
-extern const USBDDriverDescriptors cdcdSerialDriverDescriptors;
-
-
 bool volatile restart_audio_0_bulk_out  = false ; 
 bool volatile restart_audio_0_bulk_in   = false ; 
 bool volatile restart_audio_1_bulk_out  = false ; 
@@ -51,7 +48,7 @@ bool volatile padding_audio_0_bulk_out  = false ;
 bool volatile padding_audio_1_bulk_out  = false ;
 bool volatile audio_play_buffer_ready   = false ; 
 
-//paly
+
 //paly
 #if 0
 void UsbAudio0DataReceived(  uint32_t unused,
@@ -72,7 +69,6 @@ void UsbAudio0DataReceived(  uint32_t unused,
          if( true == padding_audio_0_bulk_out )
          {
             kfifo_put( &ssc0_bulkout_fifo, usbCacheBulkOut0 + 128, received-128 );
-     
          }
          else
          {
@@ -99,9 +95,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
                               uint32_t remaining )
 {   
     remaining = remaining;
-    uint32_t pos = 0,offset = 0;
-    uint8_t fillOffset[ 16 ] = { 0 };
-    const uint8_t pos1 = 128;
+    uint32_t pos = 0;
     
 #if 0
     if ( status == USBD_STATUS_SUCCESS ) 
@@ -139,7 +133,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
       {
             if( false == padding_audio_0_bulk_out )
             {
-                padding_audio_0_bulk_out = First_Pack_Check_BO2( &usbCacheBulkOut0[0], received, &pos );
+                padding_audio_0_bulk_out = First_Pack_Check_BO2( usbCacheBulkOut0, received, &pos );
          
                 assert( ( pos % 16 ) == 0 );
                 if( true == padding_audio_0_bulk_out )
@@ -160,6 +154,11 @@ void UsbAudio0DataReceived(  uint32_t unused,
     case USBD_STATUS_PARTIAL_DONE:
       //assert( 0 );
       break;
+    case USBD_STATUS_CANCELED:
+    case 5:
+      ;
+      //memset( usbCacheBulkOut0 , 0 , sizeof( usbCacheBulkOut0 ) );
+      break;  
     default:
       //assert( 0 );
       break;
@@ -174,14 +173,13 @@ void UsbAudio1DataReceived(  uint32_t unused,
                               uint32_t remaining )
 {   
     remaining = remaining;
-    uint32_t pos = 0,offset = 0;
-    uint8_t fillOffset[ 16 ] = { 0 };
+    uint32_t pos = 0;
 
    if ( status == USBD_STATUS_SUCCESS ) 
     { 
       if( false == padding_audio_1_bulk_out )
       {
-         padding_audio_1_bulk_out = First_Pack_Check_BO2( &usbCacheBulkOut1[0], received , &pos );
+         padding_audio_1_bulk_out = First_Pack_Check_BO2( usbCacheBulkOut1, received , &pos );
          
          if( true == padding_audio_1_bulk_out )
          {
@@ -213,7 +211,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
                               uint32_t transmit,
                               uint32_t remaining )
 {          
-    UIF_LED_On( 3 ); 
+
     if ( status == USBD_STATUS_SUCCESS  ) 
     {              
         restart_audio_0_bulk_in  = true ;               
@@ -228,7 +226,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
         APP_TRACE_INFO(( "\r\nERROR : UsbAudio0DataTransmit: Rr-transfer hit\r\n" ));  
         //assert( 0 );
     } 
-    UIF_LED_Off( 3 ); 
+
     
 }
 
@@ -519,7 +517,7 @@ static void USBPower_Configure( void )
  */
 void USBDCallbacks_Initialized(void)
 {
-    IRQ_ConfigureIT(ID_UDPHS, USB_PRIORITY, USBD_IrqHandler);
+    IRQ_ConfigureIT(ID_UDPHS, 3, USBD_IrqHandler);
     IRQ_EnableIT(ID_UDPHS);
 }
 
@@ -536,9 +534,10 @@ void USBDCallbacks_RequestReceived( const USBGenericRequest *request )
 
 void Init_USB( void )
 {
+    extern const USBDDriverDescriptors cdcdSerialDriverDescriptors;
 
 	/* If they are present, configure Vbus & Wake-up pins */
-    PIO_InitializeInterrupts( GPIO_PRIORITY );
+    PIO_InitializeInterrupts(0);
 
     /* Initialize all USB power (off) */
     USBPower_Configure();

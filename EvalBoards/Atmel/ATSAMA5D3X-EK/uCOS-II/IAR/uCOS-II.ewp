@@ -1927,6 +1927,12 @@
       <name>$PROJ_DIR$\..\..\..\..\..\App\defined.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\fm1388_comm.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\fm1388_comm.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\App\includes.h</name>
     </file>
     <file>
@@ -2026,10 +2032,25 @@
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\codec.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\fm1388d.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\fm13_spi.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\fm13d.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\i2c_gpio.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\i2c_gpio.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\spi_dma.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\App\spid_dma.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Driver\uif_audio_path.c</name>

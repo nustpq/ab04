@@ -279,10 +279,9 @@ typedef struct _sys_info
   uint8_t model[ 32 ];
 }SYSINFO;
 
-
 //copy these struct from uif1.0 for compatiblity and will delete if don't need
-typedef  uint8_t VERSION_DATA[ DEF_VERSION_STR_LEN ] ;  
-typedef  uint8_t MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
+//typedef  uint8_t VERSION_DATA[ DEF_VERSION_STR_LEN ] ;  
+//typedef  uint8_t MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
 
 /*
 typedef struct {    
@@ -332,23 +331,8 @@ typedef struct twi_parameter
   uint8_t  revers;
 }TWI_CFG;
 
-/*
-typedef struct { 
-    uint8_t     channels ; //mic num 1~6 
-    uint8_t     bit_length;//16, 24, 32    
-    uint8_t     cki;
-    uint8_t     delay;
-    uint8_t     start;  
-    uint8_t     type ;  //rec = 0,  play = 1
-    uint8_t     lin_ch_mask;
-    uint8_t     gpio_rec_bit_mask;
-    uint8_t     format;
-    uint8_t     master_or_slave;
-    uint8_t     sr ;    //16000, 48000     
-    uint16_t    reserve1;
-    uint16_t    reserve2;
-}AUDIO_CFG ;
 
+/*
 typedef struct {
     uint8_t    type;    //rec = 1,  play = 2, rec&play = 3   
     uint8_t    padding; //usb first package padding
