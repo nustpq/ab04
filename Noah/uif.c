@@ -32,6 +32,7 @@
 #include <includes.h>
 #include "fm1388_spi.h"
 #include "fm1388d.h"
+#include "ruler.h"
 
 extern Fm1388 fm1388;
 INTERFACE_CFG   Global_UIF_Setting[ UIF_TYPE_CMD_NUM ];     //ruler type = 3

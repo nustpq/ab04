@@ -133,7 +133,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
       {
             if( false == padding_audio_0_bulk_out )
             {
-                padding_audio_0_bulk_out = First_Pack_Check_BO2( &usbCacheBulkOut0, received, &pos );
+                padding_audio_0_bulk_out = First_Pack_Check_BO2( usbCacheBulkOut0, received, &pos );
          
                 assert( ( pos % 16 ) == 0 );
                 if( true == padding_audio_0_bulk_out )
@@ -179,7 +179,7 @@ void UsbAudio1DataReceived(  uint32_t unused,
     { 
       if( false == padding_audio_1_bulk_out )
       {
-         padding_audio_1_bulk_out = First_Pack_Check_BO2( &usbCacheBulkOut1, received , &pos );
+         padding_audio_1_bulk_out = First_Pack_Check_BO2( usbCacheBulkOut1, received , &pos );
          
          if( true == padding_audio_1_bulk_out )
          {

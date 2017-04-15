@@ -1115,7 +1115,7 @@ void  Get_Flash_Info (void)
 */
 void Head_Info ( void )
 {
-
+    extern OS_EVENT  *UART_MUX_Sem_lock ;
     APP_TRACE_INFO(("\r\n\r\n"));
     APP_TRACE_INFO(("-----------------------------------------------------------\r\n"));
     APP_TRACE_INFO(("----                    Fortemedia                    -----\r\n"));

@@ -16,9 +16,11 @@
 
 #include "uif_object.h"
 
+#include "defined.h"
+
 
 ////////////////////////////////////////////////////////////////////////////////
-
+#if 1
 typedef struct {
   unsigned char  type;//Rec =0, Play =1
   unsigned char  channel_num; //valid data cahnnel num 1~8
@@ -47,7 +49,7 @@ typedef struct {
   unsigned char  id;  //0: SSC0 , 1: SSC1, 2
   
 }AUDIO_CFG;
-
+#endif
 
 typedef struct {
   unsigned int    spi_speed;
@@ -93,6 +95,45 @@ typedef struct {
     unsigned char*   pdata;
     unsigned char*   pStr;
 }MCU_FLASH ;
+
+typedef struct {
+    unsigned char    if_type;
+    unsigned char    reserved[3];
+    unsigned short   attribute;
+    unsigned short   speed;
+}INTERFACE_CFG ;
+
+typedef struct {
+    unsigned char    if_type;
+    unsigned char    dev_addr;
+    unsigned int     data_len_read;
+    unsigned int     data_len_write;
+    unsigned char*   pdata_read;
+    unsigned char*   pdata_write;
+}RAW_READ ;
+
+typedef struct {
+    unsigned char    if_type;
+    unsigned char    dev_addr;
+    unsigned int     data_len;
+    unsigned char*   pdata;
+}RAW_WRITE ;
+
+typedef struct {
+    unsigned short   mem_addr_l;
+    unsigned short   mem_addr_h;
+    unsigned int     data_len;
+    unsigned char*   pdata;
+    unsigned char    if_type;
+    unsigned char    dev_addr;
+    unsigned char    mem_addr_len;
+}BURST_WRITE ;
+
+typedef struct {
+    unsigned char    gpio_num;
+    unsigned char    gpio_value[7];
+    unsigned int     delay_us[7];
+}GPIO_SESSION ;
 
 ////////////////////////////////////////////////////////////////////////////////
 

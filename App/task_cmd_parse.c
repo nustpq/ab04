@@ -36,6 +36,9 @@ void       * MsgQ_Noah2CMDParse[MsgUARTQueue_SIZE];
 //Event
 OS_EVENT   * EVENT_MsgQ_Noah2CMDParse;
 
+EMB_BUF   Emb_Buf_Cmd;
+EMB_BUF   Emb_Buf_Data;
+
 
 /*
 *********************************************************************************************************

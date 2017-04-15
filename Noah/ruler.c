@@ -448,6 +448,7 @@ unsigned char Update_Audio( unsigned char id )
 
 unsigned char Start_Audio( START_AUDIO start_audio )
 {
+  extern unsigned char  audio_padding_byte;
     unsigned char err;
     unsigned char data  = 0xFF;
     unsigned char ruler_id;

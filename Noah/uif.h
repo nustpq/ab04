@@ -13,6 +13,9 @@
 #ifndef __UIF_H__
 #define __UIF_H__
 
+#include "audio.h"
+#include "ruler.h"
+
 //Global_UIF_Setting CMD:  num = 7
 //note: CMD nums must not exceed boundary
 

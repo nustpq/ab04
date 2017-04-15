@@ -14,6 +14,9 @@
 #ifndef __RULER_H__
 #define __RULER_H__
 
+//#include "audio.h"
+#include "defined.h"
+
 
 
 //#define FOR_USE_USBTEST_EXE
@@ -123,6 +126,7 @@
 typedef  unsigned char  VERSION_DATA[ DEF_VERSION_STR_LEN ] ;
 typedef  unsigned char  MODEL_DATA[ DEF_MODEL_STR_LEN ] ;
 
+
 typedef struct {
     float           phase ;
     float           sensitivity ;
@@ -164,6 +168,7 @@ typedef struct {
 
 
 ////////////////////////////////////////////////////////////////////////////////
+#if 0
 typedef struct {
   unsigned char  type;//Rec =0, Play =1
   unsigned char  channel_num; //valid data cahnnel num 1~8
@@ -191,8 +196,9 @@ typedef struct {
 
   unsigned char  id;  //0: SSC0 , 1: SSC1, 2
 }AUDIO_CFG;
+#endif
 
-
+#if 0
 typedef struct {
   unsigned int    spi_speed;
 
@@ -208,11 +214,14 @@ typedef struct {
   unsigned char   reserved[2];
 
 }SPI_PLAY_REC_CFG;
+#endif
 
+#if 0
 typedef struct {
     unsigned char    type;    //bit[0..5]= [I2S0 rec, I2S0 play, I2S1 rec, I2S1 play, SPI rec, SPI play]       eg. rec = 1,  play = 2, rec&play = 3
     unsigned char    padding; //usb first package padding
 }START_AUDIO;
+#endif
 
 typedef struct {
     unsigned char    ruler_id;
@@ -275,40 +284,6 @@ typedef struct {
 
 typedef struct {
     unsigned char    if_type;
-    unsigned char    reserved[3];
-    unsigned short   attribute;
-    unsigned short   speed;
-}INTERFACE_CFG ;
-
-
-typedef struct {
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned int     data_len;
-    unsigned char*   pdata;
-}RAW_WRITE ;
-
-typedef struct {
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned int     data_len_read;
-    unsigned int     data_len_write;
-    unsigned char*   pdata_read;
-    unsigned char*   pdata_write;
-}RAW_READ ;
-
-typedef struct {
-    unsigned short   mem_addr_l;
-    unsigned short   mem_addr_h;
-    unsigned int     data_len;
-    unsigned char*   pdata;
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned char    mem_addr_len;
-}BURST_WRITE ;
-
-typedef struct {
-    unsigned char    if_type;
     unsigned char    dev_addr;
     unsigned char    data_len;
     unsigned char    read_data_len;
@@ -319,13 +294,16 @@ typedef struct {
 
 }BURST_READ ;
 
+#if 0
 typedef struct {
     unsigned char    addr_index;
     unsigned int     data_len;
     unsigned char*   pdata;
     unsigned char*   pStr;
 }MCU_FLASH ;
+#endif
 
+#if 0
 typedef struct {
     unsigned char    vec_index_a;
     unsigned char    vec_index_b;
@@ -337,12 +315,9 @@ typedef struct {
     unsigned char    pdm_clk_off; //trun off pdm clk after pwd or not
     unsigned char    if_type;//1: I2C, 2:SPI
 }SET_VEC_CFG ;
+#endif
 
-typedef struct {
-    unsigned char    gpio_num;
-    unsigned char    gpio_value[7];
-    unsigned int     delay_us[7];
-}GPIO_SESSION ;
+
 
 
 
