@@ -96,7 +96,12 @@ void  App_TaskUSBService ( void *p_arg )
             OSTimeDly( 2 );
             continue;      
         }
-       
+        
+        //test
+        OSTimeDly( 20 );
+        continue;
+        
+        
         e = portsList.head;         
         while( e != NULL )
         {
@@ -126,7 +131,7 @@ void  App_TaskUSBService ( void *p_arg )
                            ( uint8_t * )usbCacheBulkIn2,
                            USB_DATAEP_SIZE_64B );         
                 
-                  // send ep0 data ---> pc
+                    // send ep0 data ---> pc
                     CDCDSerialDriver_WriteSPI( usbCacheBulkIn2,
                                             USB_DATAEP_SIZE_64B,  //64B size for low delay
                                             (TransferCallback)UsbSPIDataTransmit,
@@ -145,7 +150,12 @@ void  App_TaskUSBService ( void *p_arg )
                              pPath->pSource->rxSize );                 
                 } 
         
-             ///////////////////////////////////////////////////////////////////                  
+                
+                
+             ///////////////////////////////////////////////////////////////////  
+
+
+                
             } else if( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT == pPath->ep ) { //SSC0 Play
                 if( source_ssc0.status[ OUT ] == ( uint8_t )CONFIGURED )
                 {
@@ -171,6 +181,7 @@ void  App_TaskUSBService ( void *p_arg )
                           }                          
                       }  
                   }
+                
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT == pPath->ep ) {   //SSC1 Play
                 if( source_ssc1.status[ OUT ] == ( uint8_t )CONFIGURED )
                 {

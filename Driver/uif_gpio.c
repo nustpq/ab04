@@ -421,7 +421,7 @@ void Config_GPIO_Interrupt1( unsigned char gpio_index, CPU_FNCT_VOID isr_handler
     gpio_pins[gpio_index].pio->PIO_REHLSR = gpio_pins[gpio_index].mask;//rising edge int
     gpio_pins[gpio_index].pio->PIO_IFER = gpio_pins[gpio_index].mask;//enable input glitch filter
 //    BSP_IntVectSet( per_id,(CPU_FNCT_VOID)isr_handler);
-    IRQ_ConfigureIT( per_id, 3, (CPU_FNCT_VOID)isr_handler );
+    IRQ_ConfigureIT( per_id, GPIO_PRIORITY, (CPU_FNCT_VOID)isr_handler );
     IRQ_EnableIT( per_id );
 
 }

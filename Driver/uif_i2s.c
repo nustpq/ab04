@@ -140,7 +140,7 @@ void stop_ssc( void *pInstance )
     OSTimeDly( 4 );
     
     //step3:clear buffer about this port
-    memset( pSource->pBufferIn, 0 , sizeof( uint16_t ) * I2S_PINGPONG_IN_SIZE_3K );
+    memset( pSource->pBufferIn,  0 , sizeof( uint16_t ) * I2S_PINGPONG_IN_SIZE_3K );
     memset( pSource->pBufferOut, 0 , sizeof( uint16_t ) * I2S_PINGPONG_OUT_SIZE_3K );
     kfifo_reset( pSource->pRingBulkIn );
     kfifo_reset( pSource->pRingBulkOut );
@@ -148,7 +148,7 @@ void stop_ssc( void *pInstance )
     //step4:reset port state machine
     pSource->rx_index = 0;
     pSource->tx_index = 0;
-    pSource->status[ IN ] = ( uint8_t )STOP;
+    pSource->status[ IN ]  = ( uint8_t )STOP;
     pSource->status[ OUT ] = ( uint8_t )STOP;
 }
 
@@ -233,123 +233,76 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
     assert( NULL != pArg );
     
     uint32_t temp;
-    uint8_t padding[128];
-    memset( padding, global_audio_padding_byte, 128 );
+//    uint8_t padding[128];
+//    memset( padding, global_audio_padding_byte, 128 );
     DataSource *pSource = ( DataSource *)pArg;
     if ( audio_run_control == false) {  return ;}
+    
     //  UIF_LED_On( LED_HDMI );  
-	switch( pSource->status[ IN ] ) 
-
+	  switch( pSource->status[ IN ] ) 
 		{
-			case START   :
-#if 0                          
-//                          First_Pack_Padding_BI( ); 
-                          pSource->status[ IN ] == ( uint8_t )RUNNING;
-                          temp = kfifo_get_free_space( &ep0BulkIn_fifo );
-                          
-                          if( temp >= pSource->rxSize )
-                          {
-                            	kfifo_put( &ep0BulkIn_fifo,//pSource->pRingBulkIn,
-                                          ( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
-                  					pSource->rxSize );
-                                memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], 0, pSource->rxSize );
-                                
-                                uint32_t counter = kfifo_get_data_size( &ep0BulkIn_fifo  );                                 
-                                if(  counter >= pSource->rxSize  && restart_audio_0_bulk_in )  
-                                {                    
-                                        restart_audio_0_bulk_in = false ;
-                                        // ep0 ring --> usb cache
-                                        kfifo_get(  &ep0BulkIn_fifo,
-                                                    ( uint8_t * )usbCacheBulkIn0,
-                                                     pSource->rxSize );         
-                
-                                        // send ep0 data ---> pc
-                                        CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
-                                                                       pSource->rxSize,  //64B size for low delay
-                                                                        (TransferCallback)UsbAudio0DataTransmit,
-                                                                        ( void * )pSource );
-
-                               } 
-                            
-                          }
-                          
-#endif
-//                          break;
-			case BUFFERED:
+		    case START   :
+		    case BUFFERED:
 			case RUNNING :
-				 temp = kfifo_get_free_space( &ep0BulkIn_fifo );//pSource->pRingBulkIn
-				 if( temp >= pSource->rxSize )
-				 {
-                                   
-                                      if( pSource->status[ IN ] == ( uint8_t )RUNNING )
-                                      {
-				 		kfifo_put( &ep0BulkIn_fifo,//pSource->pRingBulkIn,
-                  					( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
-                  					pSource->rxSize );
-//                                                memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], 0, pSource->rxSize );
-#if 1
-                                                uint32_t counter = kfifo_get_data_size( &ep0BulkIn_fifo  );   
-                                                if(  counter >= pSource->rxSize  && restart_audio_0_bulk_in )  
-                                                {                    
-                                                          restart_audio_0_bulk_in = false ;
-                                                          // ep0 ring --> usb cache
-                                                          kfifo_get(  &ep0BulkIn_fifo,
-                                                                     //( uint8_t * )usbCacheBulkIn0,
-                                                                      usbCacheBulkIn0,
-                                                                      pSource->rxSize );         
-                
-                                                // send ep0 data ---> pc
-                                                CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
-                                                                               pSource->rxSize,  //64B size for low delay
-                                                                               (TransferCallback)UsbAudio0DataTransmit,
-                                                                               ( void * )pSource );
+				temp = kfifo_get_free_space( &ep0BulkIn_fifo );//pSource->pRingBulkIn
+				if( temp >= pSource->rxSize )   {   
+                  
+                    if( pSource->status[ IN ] == ( uint8_t )RUNNING )
+                    {
+                                    kfifo_put( &ep0BulkIn_fifo,//pSource->pRingBulkIn,
+                                        ( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
+                                        pSource->rxSize );
+                        //memset( ( uint8_t * )&ssc0_PingPongIn[ pSource-> rx_index ][0], 0, pSource->rxSize );
 
-                                               }
-                                      }
-                                      else if( pSource->status[ IN ] == ( uint8_t )START )
-                                      {
-//                                         First_Pack_Padding_BI( &ep0BulkIn_fifo ); 
-//                                         pSource->status[ IN ] = ( uint8_t )RUNNING;
-                                         
-                                    
+                        uint32_t counter = kfifo_get_data_size( &ep0BulkIn_fifo  );   
+                        if(  counter >= pSource->rxSize  &&  restart_audio_0_bulk_in )  
+                        {                    
+                            restart_audio_0_bulk_in = false ;
+                            // ep0 ring --> usb cache
+                            kfifo_get(  &ep0BulkIn_fifo,                                 
+                                        usbCacheBulkIn0,
+                                        pSource->rxSize );
+                            // send ep0 data ---> pc
+                            CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
+                                                   pSource->rxSize,  //64B size for low delay
+                                                   (TransferCallback)UsbAudio0DataTransmit,
+                                                   0 );
+                        }
 
-                                         kfifo_put( &ep0BulkIn_fifo,//pSource->pRingBulkIn,
-                  					( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
-                  					pSource->rxSize );
-                                         
-                                         uint32_t counter = kfifo_get_data_size( &ep0BulkIn_fifo  ); 
-                                         
-                                         if(  counter >= pSource->rxSize  && restart_audio_0_bulk_in )  
-                                                {                    
-                                                        restart_audio_0_bulk_in = false ;
-                                                        // ep0 ring --> usb cache
-                                                        kfifo_get(  &ep0BulkIn_fifo,
-                                                                    // ( uint8_t * )usbCacheBulkIn0,
-                                                                    usbCacheBulkIn0,
-                                                                    pSource->rxSize );         
-                
-                                                        // send ep0 data ---> pc
-                                                        CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
-                                                                               pSource->rxSize,  //64B size for low delay
-                                                                               (TransferCallback)UsbAudio0DataTransmit,
-                                                                               ( void * )pSource );
+                    }else if( pSource->status[ IN ] == ( uint8_t )START ) {
+                    //  First_Pack_Padding_BI( &ep0BulkIn_fifo ); 
+                    //   pSource->status[ IN ] = ( uint8_t )RUNNING;
+                        kfifo_put( &ep0BulkIn_fifo,//pSource->pRingBulkIn,
+                                           ( uint8_t * )&(ssc0_PingPongIn[ pSource-> rx_index ][0]), 
+                                           pSource->rxSize );                                         
+                        uint32_t counter = kfifo_get_data_size( &ep0BulkIn_fifo  ); 
+                        if(  counter >= pSource->rxSize  && restart_audio_0_bulk_in )  
+                        {                    
+                            restart_audio_0_bulk_in = false ;
+                            // ep0 ring --> usb cache
+                            kfifo_get(  &ep0BulkIn_fifo,
+                                        usbCacheBulkIn0,
+                                        pSource->rxSize );               
+                            // send ep0 data ---> pc
+                            CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
+                                                   pSource->rxSize,  //64B size for low delay
+                                                   (TransferCallback)UsbAudio0DataTransmit,
+                                                   0);
 
-                                               }
-                                      }
-#endif		
+                        }
+                    }	
 
-                                  }
-				 else
-				 {
-						pSource->status[ IN ] = ( uint8_t )BUFFERFULL;
-				 }                                  
-				break;
-			case BUFFERFULL:
-				memset( ( uint8_t  * )pSource->pBufferIn[ pSource-> rx_index ],
-					     0x10,
-					     sizeof( pSource->pBufferIn[ pSource-> rx_index ] ) );
-					     
-				break;
+            } else {
+
+						    pSource->status[ IN ] = ( uint8_t )BUFFERFULL;
+				    }                                  
+				    break;
+
+			  case BUFFERFULL:
+				    memset( ( uint8_t  * )pSource->pBufferIn[ pSource-> rx_index ],
+					           0x10,
+					           sizeof( pSource->pBufferIn[ pSource-> rx_index ] ) );					     
+				    break;
 			case STOP:
  //                              if( pSource->peripheral_stop != NULL )
  //                                            pSource->peripheral_stop( &source_ssc0 ); 
@@ -380,10 +333,11 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
     assert( NULL != pArg );
     
     uint32_t temp;
-    uint8_t padding[128];
-    memset( padding, global_audio_padding_byte, 128 );
+//    uint8_t padding[128];
+//    memset( padding, global_audio_padding_byte, 128 );
     DataSource *pSource = ( DataSource *)pArg;
     if ( audio_run_control == false) {  return ;}
+    
 	switch( pSource->status[ IN ] ) 
 
 		{
@@ -392,9 +346,8 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 			case RUNNING :
 				 temp = kfifo_get_free_space( &ep1BulkIn_fifo );//pSource->pRingBulkIn
 				 if( temp >= pSource->rxSize )
-				 {
-                                   
-                                      if( pSource->status[ IN ] == ( uint8_t )RUNNING )
+				 {                                    
+                  if( pSource->status[ IN ] == ( uint8_t )RUNNING )
                                       {
 				 		kfifo_put( &ep1BulkIn_fifo,//pSource->pRingBulkIn,
                   					( uint8_t * )&(ssc1_PingPongIn[ pSource-> rx_index ][0]), 
@@ -415,7 +368,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
                                                 CDCDSerialDriver_WriteAudio_1( usbCacheBulkIn1,
                                                                                pSource->rxSize,  //64B size for low delay
                                                                                (TransferCallback)UsbAudio1DataTransmit,
-                                                                               ( void * )pSource );
+                                                                               0 );
 
                                                }
                                       }
@@ -444,7 +397,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
                                                         CDCDSerialDriver_WriteAudio_1( usbCacheBulkIn1,
                                                                                pSource->rxSize,  //64B size for low delay
                                                                                (TransferCallback)UsbAudio1DataTransmit,
-                                                                               ( void * )pSource );
+                                                                               0 );
 
                                                }
                                       }
@@ -487,60 +440,72 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 *********************************************************************************************************
 */
 
-void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
+void _SSC0_DmaTxCallback( uint8_t status, void *pArg )
 {
     uint32_t temp = 0;
        
     assert( NULL != pArg );
-    if ( audio_run_control == false) {  return ;}  
+
+    if ( audio_run_control == false) {  return ; } 
+    
     DataSource *pSource = ( DataSource *)pArg;
-    Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
-
-    pSource->pBufferOut = ( uint8_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
+    //Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
+    //pSource->pBufferOut = ( uint8_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
      
-	switch( pSource->status[ OUT ] )
-		{ 
-			case START    :
-			case BUFFERED :
-			case RUNNING  :
-				temp = kfifo_get_data_size( pSource->pRingBulkOut );
+  	switch( pSource->status[ OUT ] ) { 
 
-				if( temp  >=  pSource->txSize )
-				{
-                                      kfifo_get( pSource->pRingBulkOut,
-                                      ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
-                                      pSource->txSize );
-                                      
-                                      uint32_t counter = kfifo_get_free_space( pSource->pRingBulkOut ); 
-                                      if(  counter >= source_ssc0.txSize && restart_audio_0_bulk_out  )  
-                                      {
-                                              restart_audio_0_bulk_out = false ;
-                                              // send ep0 data ---> pc
-                                              CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
-                                                                              source_ssc0.txSize,
-                                                                              (TransferCallback)UsbAudio0DataReceived,
-                                                                              ( void * )pSource );  
-                                      }
-				}
-				else
-				{
-					pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
-				}
-									
-				break;
-            case BUFFEREMPTY:
-                                Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                                                  pSource->txSize, 
-                                                  16000 );
-                                break;
-			case STOP     :
-				break;
-			default:
-                          ;
-				break;
-     
+  		case START :
+            temp = kfifo_get_data_size( pSource->pRingBulkOut );
+            if( temp  >=  pSource->warmWaterLevel )   {
+                pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+            }                 
+            uint32_t counter = kfifo_get_free_space( pSource->pRingBulkOut ); 
+            if(  counter >= source_ssc0.txSize && restart_audio_0_bulk_out  ) {
+                  restart_audio_0_bulk_out = false ;
+                  // send ep0 data ---> pc
+                  CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
+                                                  source_ssc0.txSize,
+                                                  (TransferCallback)UsbAudio0DataReceived,
+                                                  0 );  
+            }
+            break;
+                  
+        case BUFFERED :
+  			case RUNNING :
+      			temp = kfifo_get_data_size( pSource->pRingBulkOut );
+      			if( temp  >=  pSource->txSize ) { //IF have enough data in fifo
+                      kfifo_get(  pSource->pRingBulkOut,
+                                  ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
+                                  pSource->txSize );               
+                      uint32_t counter = kfifo_get_free_space( pSource->pRingBulkOut ); 
+                      if(  counter >= source_ssc0.txSize && restart_audio_0_bulk_out  )      {
+                            restart_audio_0_bulk_out = false ;
+                            // send ep0 data ---> pc
+                            CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
+                                                            source_ssc0.txSize,
+                                                            (TransferCallback)UsbAudio0DataReceived,
+                                                            0 );  
+                      }
+      			} else 	{
+      			   pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
+      			}     								
+      			break;
+
+        case BUFFEREMPTY:
+            Alert_Sound_Gen( ( uint8_t * )&(ssc0_PingPongOut[ pSource-> tx_index ][0]),
+                                                      pSource->txSize, 
+                                                      16000 );
+            break;
+
+  			case STOP  :
+  				  break;
+
+  			default:      
+  				  break;
+       
       }
-    pSource->tx_index = 1 - pSource->tx_index;
+      
+      pSource->tx_index = 1 - pSource->tx_index;
 
 
 }
@@ -559,62 +524,75 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg)
 * Note(s)     : none
 *********************************************************************************************************
 */
-void _SSC1_DmaTxCallback( uint8_t status, void *pArg)
+void _SSC1_DmaTxCallback( uint8_t status, void *pArg )
 {
     uint32_t temp = 0;
        
     assert( NULL != pArg );
+
+    if ( audio_run_control == false) {  return ; } 
     
     DataSource *pSource = ( DataSource *)pArg;
-    Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
-
-    pSource->pBufferOut = ( uint8_t * )&ssc1_PingPongOut[ 1 - pSource->tx_index ];
-    if ( audio_run_control == false) {  return ;}
-	switch( pSource->status[ OUT ] )
-		{ 
-			case START    :
-			case BUFFERED :
-			case RUNNING  :
-				temp = kfifo_get_data_size( pSource->pRingBulkOut );
-
-				if( temp  >=  pSource->txSize )
-				{
-                                      kfifo_get( pSource->pRingBulkOut,
-                                      ( uint8_t * )&(ssc1_PingPongOut[ pSource-> tx_index ][0]),
-                                      pSource->txSize );
-                                      
-                                      uint32_t counter = kfifo_get_free_space( pSource->pRingBulkOut ); 
-                                      if(  counter >= source_ssc1.txSize && restart_audio_1_bulk_out  )  
-                                      {
-                                              restart_audio_1_bulk_out = false ;
-                                              // send ep0 data ---> pc
-                                              CDCDSerialDriver_ReadAudio_1( usbCacheBulkOut1,
-                                                                              source_ssc1.txSize,
-                                                                              (TransferCallback)UsbAudio1DataReceived,
-                                                                              ( void * )pSource );  
-                                      }
-				}
-				else
-				{
-					pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
-				}
-									
-				break;
-            case BUFFEREMPTY:
-                                Alert_Sound_Gen( ( uint8_t * )&pSource->pBufferOut[ pSource-> tx_index ],
-                                                  pSource->txSize, 
-                                                  16000 );
-                                break;
-			case STOP     :
-				break;
-			default:
-                          ;
-				break;
+    //Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
+    //pSource->pBufferOut = ( uint8_t * )&ssc1_PingPongOut[ 1 - pSource->tx_index ];
      
-      }
-    pSource->tx_index = 1 - pSource->tx_index;
-}
+    switch( pSource->status[ OUT ] ) { 
 
+        case START :
+            temp = kfifo_get_data_size( pSource->pRingBulkOut );
+            if( temp  >=  pSource->warmWaterLevel )   {
+                pSource->status[ OUT ] = ( uint8_t )BUFFERED;
+            }                 
+            uint32_t counter = kfifo_get_free_space( pSource->pRingBulkOut ); 
+            if(  counter >= source_ssc1.txSize && restart_audio_1_bulk_out  ) {
+                  restart_audio_1_bulk_out = false ;
+                  // send ep0 data ---> pc
+                  CDCDSerialDriver_ReadAudio_1( usbCacheBulkOut1,
+                                                  source_ssc1.txSize,
+                                                  (TransferCallback)UsbAudio1DataReceived,
+                                                  0 );  
+            }
+            break;
+                  
+        case BUFFERED :
+        case RUNNING :
+            temp = kfifo_get_data_size( pSource->pRingBulkOut );
+            if( temp  >=  pSource->txSize ) { //IF have enough data in fifo
+                      kfifo_get(  pSource->pRingBulkOut,
+                                  ( uint8_t * )&(ssc1_PingPongOut[ pSource-> tx_index ][0]),
+                                  pSource->txSize );               
+                      uint32_t counter = kfifo_get_free_space( pSource->pRingBulkOut ); 
+                      if(  counter >= source_ssc1.txSize && restart_audio_1_bulk_out  )      {
+                            restart_audio_1_bulk_out = false ;
+                            // send ep0 data ---> pc
+                            CDCDSerialDriver_ReadAudio_1( usbCacheBulkOut1,
+                                                            source_ssc1.txSize,
+                                                            (TransferCallback)UsbAudio1DataReceived,
+                                                            0 );  
+                      }
+            } else  {
+               pSource->status[ OUT ] = ( uint8_t )BUFFEREMPTY;
+            }                     
+            break;
+
+        case BUFFEREMPTY:
+            Alert_Sound_Gen( ( uint8_t * )&(ssc1_PingPongOut[ pSource-> tx_index ][0]),
+                                                      pSource->txSize, 
+                                                      16000 );
+            break;
+
+        case STOP  :
+            break;
+
+        default:      
+            break;
+       
+      }
+      
+      pSource->tx_index = 1 - pSource->tx_index;
+
+
+}
 
 
 #ifdef USE_DMA
@@ -673,7 +651,7 @@ uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.rxDMAChannel, dmaTdSSC0Rx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.rxDMAChannel);
         
-        SSC_EnableReceiver(pSsc); 
+        //SSC_EnableReceiver(pSsc); 
         
         
         //memset( testbuf, 0x55, sizeof(testbuf)  ); 
@@ -735,7 +713,7 @@ uint8_t ssc1_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.rxDMAChannel, dmaTdSSC1Rx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.rxDMAChannel);
         
-        SSC_EnableReceiver(pSsc); 
+        //SSC_EnableReceiver(pSsc); 
         
         return 0;
 }
@@ -797,7 +775,7 @@ uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC0Tx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
 
-        SSC_EnableTransmitter( pSsc );
+        //SSC_EnableTransmitter( pSsc );
         
         return 0;
 }
@@ -855,7 +833,7 @@ uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC1Tx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
 
-        SSC_EnableTransmitter( pSsc );
+        //SSC_EnableTransmitter( pSsc );
         
         return 0;
 }
@@ -951,7 +929,7 @@ uint8_t ssc_txRegister_set( void *instance,void *parameter )
 //        DMA_CtrA_Reg_Mode  = DMA_CTRA_MODE_32BIT ;
 //        DMA_CtrA_Len_Shift = 2;  
 //    }
-    
+      APP_TRACE_INFO(( " OK"));
       return 0;// err;  //PQ  
          
 }
@@ -999,7 +977,7 @@ uint8_t ssc_rxRegister_set( void *instance,void *parameter )
     
     APP_TRACE_INFO(( "\r\nSSC[%d] [%dth]Rec[%dCH - %dHz - %dBit][%d%s - %dDelay - %d%sLeft] ...\r\n",\
              id,counter_rec++,channels_rec ,sample_rate,bit_length,cki,(cki==0)?"Fall" :"Rise",delay,start,(start==4)?"Low":"High" ));  
-    
+    OSTimeDly(1);
     if( (channels_rec == 0) || (channels_rec > 8) ) {        
         err = ERR_TDM_FORMAT ; 
     }  
@@ -1010,7 +988,7 @@ uint8_t ssc_rxRegister_set( void *instance,void *parameter )
         APP_TRACE_INFO(("Init Rec Setting Error !\r\n"));
         return err;
     }
-          
+    APP_TRACE_INFO(( " ,,"));      
     pSource->rxSize   =  ( sample_rate / 1000 ) * ( bit_length / 8 ) * channels_rec * I2S_PINGPONG_BUF_SIZE_MS ; 
     pSource->warmWaterLevel = 0;   //no need pre-buffer for Rec 
     pSource->rx_index = 0;
@@ -1045,7 +1023,7 @@ uint8_t ssc_rxRegister_set( void *instance,void *parameter )
 //        DMA_CtrA_Reg_Mode  = DMA_CTRA_MODE_32BIT ;
 //        DMA_CtrA_Len_Shift = 2;  
 //    }
-    
+    APP_TRACE_INFO(( " OK"));
     return err;    
           
 }

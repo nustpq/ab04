@@ -438,9 +438,9 @@ static void _configureUsart( void *pInstance )
     USART_EnableIt(pUsart,( 1 << 8 ) );
     // USART_SetReceivedTimeout( pUsart,receivedTimeOut );
     if( pSource->dev.identify == ID_USART0 )
-          IRQ_ConfigureIT( ID_USART0, 0, USART0_IrqHandler );
+          IRQ_ConfigureIT( ID_USART0, UART_PRIORITY, USART0_IrqHandler );
     else if( pSource->dev.identify == ID_USART1 )
-         IRQ_ConfigureIT( ID_USART1, 0, USART1_IrqHandler );  
+         IRQ_ConfigureIT( ID_USART1, UART_PRIORITY, USART1_IrqHandler );  
     else
       ;
     

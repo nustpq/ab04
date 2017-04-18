@@ -729,7 +729,7 @@ unsigned char AB_POST( void )
     } else {
         APP_TRACE_INFO(("\r\n---OK\r\n"));
     }
-  
+
     APP_TRACE_INFO(("\r\n3. FM36 DSP... \r\n")); 
     err = Init_FM36_AB03( SAMPLE_RATE_DEFAULT, 0, 1, 0, SAMPLE_LENGTH_DEFAULT, 1, 1  ); //force reset FM36, Lin from SP1.Slot0 
     if( err != NO_ERR ) {

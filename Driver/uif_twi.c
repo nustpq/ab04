@@ -140,7 +140,7 @@ static void twi0_init_master( uint32_t freq )
     TWID_Initialize(&twid[ UNAMED ], TWI0 );
 
     // Configure TWI interrupts 
-    IRQ_ConfigureIT( ID_TWI0, 0, TWI0_IrqHandler );
+    IRQ_ConfigureIT( ID_TWI0, TWI_PRIORITY, TWI0_IrqHandler );
     IRQ_EnableIT( ID_TWI0 );
 }
 
@@ -170,7 +170,7 @@ static void twi1_init_master( uint32_t freq )
     TWID_Initialize(&twid[ CODEC1 ], TWI1 );
 
     // Configure TWI interrupts 
-    IRQ_ConfigureIT( ID_TWI1, 0, TWI1_IrqHandler );
+    IRQ_ConfigureIT( ID_TWI1, TWI_PRIORITY, TWI1_IrqHandler );
     IRQ_EnableIT( ID_TWI1 );
 }
 
@@ -200,7 +200,7 @@ static void twi2_init_master( uint32_t freq )
     TWID_Initialize(&twid[ FM36 ], TWI2 );
 
     // Configure TWI interrupts 
-    IRQ_ConfigureIT( ID_TWI2, 0, TWI2_IrqHandler );
+    IRQ_ConfigureIT( ID_TWI2, TWI_PRIORITY, TWI2_IrqHandler );
     IRQ_EnableIT( ID_TWI2 );
 }
 

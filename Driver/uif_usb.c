@@ -50,6 +50,8 @@ bool volatile audio_play_buffer_ready   = false ;
 
 
 //paly
+
+/*
 #if 0
 void UsbAudio0DataReceived(  uint32_t unused,
                               uint8_t status,
@@ -89,44 +91,16 @@ void UsbAudio0DataReceived(  uint32_t unused,
     }   
 }
 #else
+
+
 void UsbAudio0DataReceived(  uint32_t unused,
                               uint8_t status,
                               uint32_t received,
                               uint32_t remaining )
 {   
     remaining = remaining;
-    uint32_t pos = 0;
-    
-#if 0
-    if ( status == USBD_STATUS_SUCCESS ) 
-    { 
-      if( false == padding_audio_0_bulk_out )
-      {
-         padding_audio_0_bulk_out = First_Pack_Check_BO2( &usbCacheBulkOut0, received , &pos );
-         
-         if( true == padding_audio_0_bulk_out )
-         {
-            kfifo_put( &ssc0_bulkout_fifo, usbCacheBulkOut0+pos, received-pos );
-         }
-         else
-         {
-              ; 
-         }
-      }
-      else
-          kfifo_put(&ssc0_bulkout_fifo, usbCacheBulkOut0, received);
-
-      restart_audio_0_bulk_out  = true ; 
-   
-    }  
-    else 
-    {      
-        APP_TRACE_INFO(("\r\nERROR : UsbAudio0DataReceived: Transfer error\r\n" ));
-        assert( 0 );
-        
-    }
-#endif
-    
+    uint32_t pos = 0;    
+ 
     switch( status )
     {
     case USBD_STATUS_SUCCESS:
@@ -156,7 +130,7 @@ void UsbAudio0DataReceived(  uint32_t unused,
       break;
     case USBD_STATUS_CANCELED:
     case 5:
-      ;
+    
       //memset( usbCacheBulkOut0 , 0 , sizeof( usbCacheBulkOut0 ) );
       break;  
     default:
@@ -166,6 +140,51 @@ void UsbAudio0DataReceived(  uint32_t unused,
     }
 }
 #endif
+*/
+
+
+void UsbAudio0DataReceived(  uint32_t unused,
+                              uint8_t status,
+                              uint32_t received,
+                              uint32_t remaining )
+{   
+    remaining = remaining;
+    uint32_t pos = 0;
+
+   if ( status == USBD_STATUS_SUCCESS ) 
+    { 
+      if( false == padding_audio_0_bulk_out )
+      {
+         padding_audio_0_bulk_out = First_Pack_Check_BO2( usbCacheBulkOut0, received , &pos );
+         if( true == padding_audio_0_bulk_out )
+         {
+            kfifo_put( &ssc0_bulkout_fifo, usbCacheBulkOut0+pos, received-pos );
+         }
+      } else {
+          kfifo_put(&ssc0_bulkout_fifo, usbCacheBulkOut0, received);
+      }   
+
+      uint32_t counter = kfifo_get_free_space( source_ssc0.pRingBulkOut ); 
+      if(  counter >= source_ssc0.txSize   )  
+      {  // send ep0 data ---> pc
+          CDCDSerialDriver_ReadAudio_0( usbCacheBulkOut0,
+                                                    source_ssc0.txSize,
+                                                    (TransferCallback)UsbAudio0DataReceived,
+                                                    0 );  
+      } else {
+            restart_audio_0_bulk_out  = true ; 
+      }
+   
+    }  
+    else 
+    {      
+        //APP_TRACE_INFO(("\r\nERROR : UsbAudio1DataReceived: Transfer error\r\n" ));
+       // assert( 0 );
+        
+    }
+
+}
+
 
 void UsbAudio1DataReceived(  uint32_t unused,
                               uint8_t status,
@@ -180,25 +199,29 @@ void UsbAudio1DataReceived(  uint32_t unused,
       if( false == padding_audio_1_bulk_out )
       {
          padding_audio_1_bulk_out = First_Pack_Check_BO2( usbCacheBulkOut1, received , &pos );
-         
          if( true == padding_audio_1_bulk_out )
          {
             kfifo_put( &ssc1_bulkout_fifo, usbCacheBulkOut1+pos, received-pos );
          }
-         else
-         {
-              ; 
-         }
-      }
-      else
+      } else {
           kfifo_put(&ssc1_bulkout_fifo, usbCacheBulkOut1, received);
+      }   
 
-      restart_audio_1_bulk_out  = true ; 
+      uint32_t counter = kfifo_get_free_space( source_ssc1.pRingBulkOut ); 
+      if(  counter >= source_ssc1.txSize   )  
+      {  // send ep0 data ---> pc
+          CDCDSerialDriver_ReadAudio_1( usbCacheBulkOut1,
+                                                    source_ssc1.txSize,
+                                                    (TransferCallback)UsbAudio1DataReceived,
+                                                    0 );  
+      } else {
+            restart_audio_1_bulk_out  = true ; 
+      }
    
     }  
     else 
     {      
-        APP_TRACE_INFO(("\r\nERROR : UsbAudio1DataReceived: Transfer error\r\n" ));
+        //APP_TRACE_INFO(("\r\nERROR : UsbAudio1DataReceived: Transfer error\r\n" ));
        // assert( 0 );
         
     }
@@ -214,12 +237,26 @@ void UsbAudio0DataTransmit(  uint32_t unused,
 
     if ( status == USBD_STATUS_SUCCESS  ) 
     {              
-        restart_audio_0_bulk_in  = true ;               
+        uint32_t counter = kfifo_get_data_size( &ep0BulkIn_fifo  ); 
+        if(  counter >= source_ssc0.rxSize )  
+        {   
+            // ep0 ring --> usb cache
+            kfifo_get(  &ep0BulkIn_fifo,
+                        usbCacheBulkIn0,
+                        source_ssc0.rxSize );               
+            // send ep0 data ---> pc
+            CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
+                                   source_ssc0.rxSize,  //64B size for low delay
+                                   (TransferCallback)UsbAudio0DataTransmit,
+                                    0 );
+        } else {
+            restart_audio_0_bulk_in  = true ; 
+        }              
     }  
     else 
     {
         CDCDSerialDriver_WriteAudio_0( usbCacheBulkIn0,
-                                1024,
+                                source_ssc0.rxSize,
                                 (TransferCallback) UsbAudio0DataTransmit,
                                 0); 
         
@@ -230,7 +267,7 @@ void UsbAudio0DataTransmit(  uint32_t unused,
     
 }
 
-void UsbAudio1DataTransmit(  uint32_t unused,
+void UsbAudio1DataTransmit(   uint32_t unused,
                               uint8_t status,
                               uint32_t transmit,
                               uint32_t remaining )
@@ -238,12 +275,26 @@ void UsbAudio1DataTransmit(  uint32_t unused,
     //Record        
     if ( status == USBD_STATUS_SUCCESS  ) 
     {              
-        restart_audio_1_bulk_in  = true ;               
+        uint32_t counter = kfifo_get_data_size( &ep1BulkIn_fifo  ); 
+        if(  counter >= source_ssc1.rxSize )  
+        {   
+            // ep0 ring --> usb cache
+            kfifo_get(  &ep1BulkIn_fifo,
+                        usbCacheBulkIn1,
+                        source_ssc1.rxSize );               
+            // send ep0 data ---> pc
+            CDCDSerialDriver_WriteAudio_1( usbCacheBulkIn1,
+                                   source_ssc1.rxSize,  //64B size for low delay
+                                   (TransferCallback)UsbAudio1DataTransmit,
+                                   0 );
+        } else {
+            restart_audio_1_bulk_in  = true ; 
+        }              
     }  
     else 
     {
         CDCDSerialDriver_WriteAudio_1( usbCacheBulkIn1,
-                                1024,
+                                source_ssc1.rxSize,
                                 (TransferCallback) UsbAudio1DataTransmit,
                                 0); 
         
@@ -251,6 +302,10 @@ void UsbAudio1DataTransmit(  uint32_t unused,
         //assert( 0 );
     } 
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+
 
 void UsbSPIDataReceived(  uint32_t unused,
                               uint8_t status,
@@ -517,7 +572,7 @@ static void USBPower_Configure( void )
  */
 void USBDCallbacks_Initialized(void)
 {
-    IRQ_ConfigureIT(ID_UDPHS, 3, USBD_IrqHandler);
+    IRQ_ConfigureIT(ID_UDPHS, USB_PRIORITY, USBD_IrqHandler);
     IRQ_EnableIT(ID_UDPHS);
 }
 

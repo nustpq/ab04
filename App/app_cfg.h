@@ -55,6 +55,7 @@
 #define  USB_PRIORITY       2
 #define  GPIO_PRIORITY      0
 #define  TWI_PRIORITY       0
+#define  UART_PRIORITY      0
 /*
 *********************************************************************************************************
 *                                        Debug Info Enables
@@ -70,12 +71,12 @@
 
 #define TASKLEDPRIORITY                                    8
 
-#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       1//1
-#define  APP_CFG_TASK_USB_SEV_PRIO                         4//5//6
-#define  APP_CFG_TASK_CMD_PARSE_PRIO                       2//2
-#define  APP_CFG_TASK_UART_TX_PRIO                         3//3
-#define  APP_CFG_TASK_NOAH_PRIO                            5//4
-#define  APP_CFG_TASK_UART_RX_PRIO                         6//6//5
+//#define  APP_CFG_TASK_AUDIO_MGR_PRIO                       1//1
+#define  APP_CFG_TASK_USB_SEV_PRIO                         4
+#define  APP_CFG_TASK_CMD_PARSE_PRIO                       2
+#define  APP_CFG_TASK_UART_TX_PRIO                         3
+#define  APP_CFG_TASK_NOAH_PRIO                            5
+#define  APP_CFG_TASK_UART_RX_PRIO                         6
 #define  APP_CFG_TASK_SPI_PRIO                             (APP_CFG_TASK_USER_IF_PRIO+1)// it is a temporay priority
 #define  APP_CFG_TASK_USER_IF_PRIO                         10
 #define  APP_CFG_TASK_JOY_PRIO                   (APP_CFG_TASK_USER_IF_PRIO+2)
@@ -101,17 +102,17 @@
 */
 
 #define  APP_CFG_TASK_START_STK_SIZE                     128
-#define  APP_CFG_TASK_USER_IF_STK_SIZE                   256
+#define  APP_CFG_TASK_USER_IF_STK_SIZE                   512
 #define  APP_CFG_TASK_JOY_STK_SIZE                       128
 #define  APP_CFG_TASK_SHELL_STK_SIZE                     256
 #define  APP_CFG_TASK_DBG_INFO_STK_SIZE                  128
 
 #define  APP_CFG_TASK_UART_TX_STK_SIZE                   128
 #define  APP_CFG_TASK_UART_TX_RULER_STK_SIZE             128
-#define  APP_CFG_TASK_UART_RX_STK_SIZE                   128
+#define  APP_CFG_TASK_UART_RX_STK_SIZE                   256
 #define  APP_CFG_TASK_NOAH_STK_SIZE                      128
 #define  APP_CFG_TASK_NOAH_RULER_STK_SIZE                128
-#define  APP_CFG_TASK_CMD_PARSE_STK_SIZE                 256
+#define  APP_CFG_TASK_CMD_PARSE_STK_SIZE                 512
 
 #define  PROBE_DEMO_INTRO_CFG_TASK_LED_STK_SIZE          256
 

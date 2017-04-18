@@ -973,8 +973,8 @@ void Dma_configure( void )
     /* Driver initialize */
     DMAD_Initialize( pDmad, 0 );
     /* IRQ configure */
-    IRQ_ConfigureIT( ID_DMAC0, 4, ISR_HDMA ); //highest priority
-    IRQ_ConfigureIT( ID_DMAC1, 4, ISR_HDMA );
+    IRQ_ConfigureIT( ID_DMAC0, DMA_PRIORITY, ISR_HDMA ); //highest priority
+    IRQ_ConfigureIT( ID_DMAC1, DMA_PRIORITY, ISR_HDMA );
     IRQ_EnableIT(ID_DMAC0);
     IRQ_EnableIT(ID_DMAC1);
 

@@ -1132,7 +1132,7 @@ void USBD_IrqHandler(void)
 
     uint32_t status;
     uint8_t  numIt;
-    static unsigned int usb_frame_counter = 0 ;
+    //static unsigned int usb_frame_counter = 0 ;
 
     status  = pUdp->UDPHS_INTSTA;
     status &= pUdp->UDPHS_IEN;
@@ -1140,7 +1140,7 @@ void USBD_IrqHandler(void)
     /* Handle all UDPHS interrupts */
     TRACE_DEBUG_WP("\n\r%c ", USBD_HAL_IsHighSpeed() ? 'H' : 'F');
     
-    //LED_SET_USB_DATA;        
+    LED_SET_USB_DATA;        
     
     while( status )
     {  
@@ -1249,13 +1249,14 @@ void USBD_IrqHandler(void)
         }
     }
     
-    usb_frame_counter++;
-    if( (usb_frame_counter & 0x1FF) == 0 ) {         
-        LED_CLEAR_USB_DATA ;
-    }else if( (usb_frame_counter & 0x1FF) == 0x100 ) {         
-        LED_SET_USB_DATA; //LED_Toggle(USBD_LEDUDATA); 
-    }
+//    usb_frame_counter++;
+//    if( (usb_frame_counter & 0x1FF) == 0 ) {         
+//        LED_CLEAR_USB_DATA ;
+//    }else if( (usb_frame_counter & 0x1FF) == 0x100 ) {         
+//        LED_SET_USB_DATA; //LED_Toggle(USBD_LEDUDATA); 
+//    }
     
+    LED_CLEAR_USB_DATA;
 }
 
 /**
