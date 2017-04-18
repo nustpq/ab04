@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.997]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.998]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V1.0]";
@@ -1056,6 +1056,36 @@ void Get_Uptime( void )
 }
 
 
+/*
+*********************************************************************************************************
+*                                    Get_Run_Time()
+*
+* Description : Format ms tick to [day:hour:min:sec:0.sec], and print.
+*
+* Argument(s) : time  -  number of 100ms tick from Timer #2 , using global : second_counter .
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+
+void Get_Run_Time( uint32_t time )
+{
+    
+    uint8_t  msec, sec, min, hour;
+    uint32_t   day;
+
+    msec = time % 10;
+    sec  = time /10 % 60 ;
+    min  = time / 600 %60 ;
+    hour = time / 36000 %24 ; 
+    day  = time / 36000 /24 ;
+    printf("[%d:%02d:%02d:%02d.%d]", day, hour, min, sec, msec ); 
+    
+}
+
+
 
 void Time_Stamp( void )
 {
@@ -1115,7 +1145,7 @@ void  Get_Flash_Info (void)
 */
 void Head_Info ( void )
 {
-    extern OS_EVENT  *UART_MUX_Sem_lock ;
+    
     APP_TRACE_INFO(("\r\n\r\n"));
     APP_TRACE_INFO(("-----------------------------------------------------------\r\n"));
     APP_TRACE_INFO(("----                    Fortemedia                    -----\r\n"));
@@ -1136,7 +1166,7 @@ void Head_Info ( void )
     //APP_TRACE_INFO(("Tx_ReSend_Happens_Ruler:   %7d   times happened\r\n", Tx_ReSend_Happens_Ruler ));
     //APP_TRACE_INFO(("TWI_Sem_lock:              %7d   ( default 1 )\r\n", TWI_Sem_lock->OSEventCnt ));
     //APP_TRACE_INFO(("TWI_Sem_done:              %7d   ( default 0 )\r\n", TWI_Sem_done->OSEventCnt ));
-    APP_TRACE_INFO(("UART_MUX_Sem_lock:         %7d   ( default 1 )\r\n", UART_MUX_Sem_lock->OSEventCnt ));
+    //APP_TRACE_INFO(("UART_MUX_Sem_lock:         %7d   ( default 1 )\r\n", UART_MUX_Sem_lock->OSEventCnt ));
     APP_TRACE_INFO(("Done_Sem_RulerUART:        %7d   ( default 0 )\r\n", Done_Sem_RulerUART->OSEventCnt ));
     APP_TRACE_INFO(("Global_Ruler_State[3..0]:        [%d - %d - %d - %d]\r\n", Global_Ruler_State[3],Global_Ruler_State[2],Global_Ruler_State[1],Global_Ruler_State[0] ));
     APP_TRACE_INFO(("Global_Ruler_Type[3..0] :        [%X - %X - %X - %X]\r\n", Global_Ruler_Type[3],Global_Ruler_Type[2],Global_Ruler_Type[1],Global_Ruler_Type[0] ));

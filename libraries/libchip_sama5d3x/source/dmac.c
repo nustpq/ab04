@@ -370,6 +370,16 @@ void DMAC_SetBufferSize( Dmac *pDmac,
    pDmac->DMAC_CH_NUM[channel].DMAC_CTRLA |= DMAC_CTRLA_BTSIZE( bsize );
 }
 
+//PQ
+void DMAC_GetBufferSize( Dmac *pDmac,
+                         uint8_t channel,
+                         uint32_t *pbsize)
+{
+   assert(pDmac);
+   assert(channel < DMAC_CHANNEL_NUM);
+   *pbsize = pDmac->DMAC_CH_NUM[channel].DMAC_CTRLA & DMAC_CTRLA_BTSIZE_Msk;
+
+}
 /**
  * \brief Set DMAC single transfer size used by a DMAC channel.
  *

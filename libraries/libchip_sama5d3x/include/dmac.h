@@ -188,6 +188,9 @@ extern void DMAC_SetControlA( Dmac *pDmac,
 extern void DMAC_SetBufferSize( Dmac *pDmac,
                                 uint8_t channel,
                                 uint16_t bsize);
+extern void DMAC_GetBufferSize( Dmac *pDmac,
+                         uint8_t channel,
+                         uint32_t *pbsize);
 extern void DMAC_SetSingleTransferSize ( Dmac *pDmac,
                                          uint8_t channel,
                                          uint8_t srcWidth,

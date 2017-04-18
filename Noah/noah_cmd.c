@@ -32,10 +32,17 @@
 
 #define MAXBUFLEN   MsgUARTBody_SIZE
  
+//For Com To Ruler Use
+EMB_BUF   Emb_Buf_Cmd;
+EMB_BUF   Emb_Buf_Data;
 
-extern EMB_BUF   Emb_Buf_Cmd;
-extern EMB_BUF   Emb_Buf_Data;
 
+//EMB_BUF      *pEBuf;     
+//    pEBuf         = &Emb_Buf_Data;    
+//    Init_EMB_BUF( pEBuf ); //need reset this when Noah connection reset
+//    pEBuf         = &Emb_Buf_Cmd;    
+//    Init_EMB_BUF( pEBuf ); //need reset this when Noah connection reset
+   
 static bool      Session_En = false;
 
 /*
@@ -82,10 +89,49 @@ void  Init_CMD_Read (CMDREAD   *pCMD_Read,
     
 }
 
+/*
+*********************************************************************************************************
+*                                           CheckSum()
+*
+* Description : calculate check sum for a specified data 
+* Argument(s) : init_data :  check sum data for previous data
+*               pdata     :  pointer to the data address
+*               length    :  data length 
+* Return(s)   : checksum data: 1 byte 
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+uint8_t  CheckSum (uint8_t   init_data, 
+                      uint8_t  *pdata, 
+                      uint16_t   length)
+{
+    
+    uint16_t i;
+    uint8_t  checksum;
+    
+    checksum = init_data;   
+    
+    for( i = 0; i < length; i++ ) {      
+        if (checksum & 0x01) {
+            checksum = (checksum >> 1) + 0x80 ;
+            
+        } else {
+            checksum >>= 1;
+            
+        }
+        checksum += *pdata++;
+        
+    }
+    
+    return( checksum ) ;
+    
+}
+
 
 /*
 *********************************************************************************************************
-*                                           Noah_CMD_Unpacking()
+*                                           Noah_CMD_Unpack_Ruler()
 *
 * Description : Initialize Noah_CMD_Unpack type data.
 * Argument(s) : pCMD_Read :
@@ -95,7 +141,7 @@ void  Init_CMD_Read (CMDREAD   *pCMD_Read,
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void  Noah_CMD_Unpacking ( CMDREAD    *pCMD_Read,
+void  Noah_CMD_Unpack_Ruler ( CMDREAD    *pCMD_Read,
                            uint8_t     ch )
 { 
     
@@ -212,7 +258,7 @@ void  Noah_CMD_Unpacking ( CMDREAD    *pCMD_Read,
 
 /*
 *********************************************************************************************************
-*                                           Noah_CMD_Unpacking_New()
+*                                           Noah_CMD_Unpack_PC()
 *
 * Description : Initialize Noah_CMD_Unpack type data. With new protocol
 * Argument(s) : pCMD_Read :
@@ -222,7 +268,7 @@ void  Noah_CMD_Unpacking ( CMDREAD    *pCMD_Read,
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void  Noah_CMD_Unpacking_New (CMDREAD    *pCMD_Read,
+void  Noah_CMD_Unpack_PC (CMDREAD    *pCMD_Read,
                               uint8_t  data_byte)
 { 
     
@@ -330,49 +376,11 @@ void  Noah_CMD_Unpacking_New (CMDREAD    *pCMD_Read,
 }
 
 
-/*
-*********************************************************************************************************
-*                                           CheckSum()
-*
-* Description : calculate check sum for a specified data 
-* Argument(s) : init_data :  check sum data for previous data
-*               pdata     :  pointer to the data address
-*               length    :  data length 
-* Return(s)   : checksum data: 1 byte 
-*
-* Note(s)     : None.
-*********************************************************************************************************
-*/
-uint8_t  CheckSum (uint8_t   init_data, 
-                      uint8_t  *pdata, 
-                      uint16_t   length)
-{
-    
-    uint16_t i;
-    uint8_t checksum;
-    
-    checksum = init_data;   
-    
-    for( i = 0; i < length; i++ ) {      
-	    if (checksum & 0x01) {
-      	    checksum = (checksum >> 1) + 0x80 ;
-            
-        } else {
-            checksum >>= 1;
-            
-        }
-	    checksum += *pdata++;
-        
-    }
-    
-    return( checksum ) ;
-    
-}
 
 
 /*
 *********************************************************************************************************
-*                                           Noah_CMD_Packing()
+*                                           Noah_CMD_Pack_Ruler()
 *
 * Description : Code data as Noah protocol defines and send out to transmit task for transmission
 * Argument(s) : *pOS_EVENT     :  pointer to the event that load the data 
@@ -388,13 +396,13 @@ uint8_t  CheckSum (uint8_t   init_data,
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t  Noah_CMD_Packing(  OS_EVENT  *pOS_EVENT,
-                             uint8_t   frame_head, 
-                             uint8_t  *pdat, 
-                             uint8_t   data_length, 
-                             uint8_t   msg_post_mode,
-                             uint8_t  *pex_dat,
-                             uint8_t   ex_data_length
+uint8_t  Noah_CMD_Pack_Ruler(   OS_EVENT  *pOS_EVENT,
+                                 uint8_t   frame_head, 
+                                 uint8_t  *pdat, 
+                                 uint8_t   data_length, 
+                                 uint8_t   msg_post_mode,
+                                 uint8_t  *pex_dat,
+                                 uint8_t   ex_data_length
                              )
 {
     
@@ -403,7 +411,8 @@ uint8_t  Noah_CMD_Packing(  OS_EVENT  *pOS_EVENT,
     uint8_t  err;
     uint8_t  i, opt;
     uint8_t  frame_type;    
-    
+    NOAH_CMD  *pPcCmd ;
+
     err         = 0;  
     pSendPtr    = NULL;
     pMemPtr     = NULL;
@@ -439,10 +448,13 @@ uint8_t  Noah_CMD_Packing(  OS_EVENT  *pOS_EVENT,
             return err;
         }
         pSendPtr  =  pMemPtr  ;   
-      
+        pPcCmd    = (NOAH_CMD *)(pSendPtr+2) ; //over SYNC bytes
+
         if( frame_type == FRAM_TYPE_DATA) 
         {      
-            *pSendPtr++ = frame_head;
+            *pSendPtr++ = CMD_DATA_SYNC1;
+            *pSendPtr++ = CMD_DATA_SYNC2_1;
+            *pSendPtr++ = SET_FRAME_HEAD( PcCmdTxID_Ruler[Global_Ruler_Index], FRAM_TYPE_DATA ) ; //set frame ID for data transmit  
             *pSendPtr++ = data_length + ex_data_length;         
              while(ex_data_length-- > 0) 
              {
@@ -452,11 +464,13 @@ uint8_t  Noah_CMD_Packing(  OS_EVENT  *pOS_EVENT,
              {
                 *pSendPtr++ = *pdat++ ;                 
              }    
-             *pSendPtr++ = 0; // here use 0 as checksum, and will do calcute sum in task uart tx  
+             *pSendPtr++ = CheckSum( pPcCmd->head, &(pPcCmd->DataLen), pPcCmd->DataLen + 1);//check sum 
             
         } 
         else 
         {
+            *pSendPtr++ = CMD_DATA_SYNC1; 
+            *pSendPtr++ = CMD_DATA_SYNC2_1; 
             *pSendPtr++ = frame_head;   
             *pSendPtr++ = frame_head;             
         } 
@@ -492,7 +506,7 @@ uint8_t  Noah_CMD_Packing(  OS_EVENT  *pOS_EVENT,
 * Note(s)     : None.
 *********************************************************************************************************
 */
-uint8_t  Noah_CMD_Packing_New (  OS_EVENT    *pOS_EVENT,  
+uint8_t  Noah_CMD_Pack_PC (      OS_EVENT    *pOS_EVENT,  
                                  PCCMDDAT    *pPcCmdData,
                                  uint8_t      pkt_index,
                                  uint16_t     cmd_id                                 
@@ -851,7 +865,7 @@ void  Send_Report (uint8_t pkt_sn, uint8_t error_id)
     if ( error_id != 0 ) {
         APP_TRACE_DBG(("error id = %d ",error_id)); 
     }
-    Noah_CMD_Packing_New( EVENT_MsgQ_Noah2PCUART, (pPCCMDDAT)&error_id, pkt_sn, 0 ) ;
+    Noah_CMD_Pack_PC( EVENT_MsgQ_Noah2PCUART, (pPCCMDDAT)&error_id, pkt_sn, 0 ) ;
     
 }
 
@@ -900,7 +914,7 @@ uint8_t  EMB_Data_Build (  uint16_t   cmd_type,
             pos = emb_append_attr_string(&builder, pos, 1, hw_model);
             pos = emb_append_attr_string(&builder, pos, 2, hw_version); 
             strcpy( (char*)ver_buf, (char*)fw_version );  
-            strcat( (char*)ver_buf, (char*)Audio_Version );             
+            //strcat( (char*)ver_buf, (char*)Audio_Version );             
             pos = emb_append_attr_string(&builder, pos, 3, (const char*)ver_buf);    
             pos = emb_append_end(&builder, pos);
             *p_emb_length = pos;           
@@ -970,7 +984,7 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
     uint8_t     pkt_sn;
   
     err          =  NO_ERR; 
-    pEBuf_Data  = &Emb_Buf_Data;  //Global var  
+    pEBuf_Data   = &Emb_Buf_Data;  //Global var  
     
     cmd_index    = ( pNewCmd->cmd[ 0 ] << 8 ) + pNewCmd->cmd[ 1 ];
     pkt_sn       = pNewCmd->pkt_sn;
@@ -993,18 +1007,16 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
             PCCmd.audio_cfg.type = (CPU_INT08U)temp;            
-            temp = emb_get_attr_int(&root, 2, -1);
-            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
+            temp = emb_get_attr_int(&root, 2, 8000); //default 8k            
             PCCmd.audio_cfg.sample_rate = (CPU_INT16U)temp;            
-            temp = emb_get_attr_int(&root, 3, -1);
-            if(temp == -1 ) { err = EMB_CMD_ERR;  break; }
+            temp = emb_get_attr_int(&root, 3, 0);             
             PCCmd.audio_cfg.channel_num = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 4, 0);            
             PCCmd.audio_cfg.lin_ch_mask = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 5, 0);            
             PCCmd.audio_cfg.bit_length = (CPU_INT08U)temp; 
             temp = emb_get_attr_int(&root, 6, 0);          
-            PCCmd.audio_cfg.gpio_rec_bit_mask = (CPU_INT08U)temp; 
+            PCCmd.audio_cfg.gpio_bit_mask = (CPU_INT08U)temp; 
             
             temp = emb_get_attr_int(&root, 7, 2); //1: PDM  2:I2S/I2S-TDM 3: PCM/PCM-TDM 
             PCCmd.audio_cfg.format = (CPU_INT08U)temp;
@@ -1018,7 +1030,7 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
             PCCmd.audio_cfg.master_slave = (CPU_INT08U)temp; 
             
             temp = emb_get_attr_int(&root, 12, 0);     //default 0: no SPI recording         
-            PCCmd.audio_cfg.spi_rec_bit_mask = (CPU_INT08U)temp;
+            PCCmd.audio_cfg.spi_bit_mask = (CPU_INT08U)temp;
             
             temp = emb_get_attr_int(&root, 13, 8);     //default 8: Bus slot number         
             PCCmd.audio_cfg.slot_num = (CPU_INT08U)temp;
@@ -1164,7 +1176,7 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
             err = Raw_Read( &PCCmd.raw_read );
             if( err != NO_ERR ) { err = EMB_CMD_ERR;  break; } 
             
-            err = Noah_CMD_Packing_New( EVENT_MsgQ_Noah2PCUART, 
+            err = Noah_CMD_Pack_PC( EVENT_MsgQ_Noah2PCUART, 
                                        &PCCmd,
                                         pkt_sn, 
                                         DATA_UIF_RAW_RD ) ;  
@@ -1242,14 +1254,14 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
 
            
         case PC_CMD_RAED_AB_INFO :              
-            err = Noah_CMD_Packing_New( EVENT_MsgQ_Noah2PCUART, 
+            err = Noah_CMD_Pack_PC( EVENT_MsgQ_Noah2PCUART, 
                                        &PCCmd,
                                         pkt_sn, 
                                         DATA_AB_INFO ) ;           
         break ; 
         
         case PC_CMD_READ_AB_STATUS :              
-            err = Noah_CMD_Packing_New( EVENT_MsgQ_Noah2PCUART, 
+            err = Noah_CMD_Pack_PC( EVENT_MsgQ_Noah2PCUART, 
                                        &PCCmd,
                                         pkt_sn, 
                                         DATA_AB_STATUS ) ;           
@@ -1404,13 +1416,13 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
             buf[0] = EMB_DATA_FRAME ;
             buf[1] = (pEBuf_Data->length) & 0xFF;    
             buf[2] = ((pEBuf_Data->length)>>8) & 0xFF;  
-//PQ             err = Noah_CMD_Packing_New( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;            
+//PQ             err = Noah_CMD_Pack_PC( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;            
             if( OS_ERR_NONE == err ) {  
                 pdata = pEBuf_Data->data;
                 data_length = pEBuf_Data->length;
                 while( data_length > 0 ){        
                     temp = data_length > NOAH_CMD_DATA_MLEN ? NOAH_CMD_DATA_MLEN : data_length ; 
-//PQ                     err = Noah_CMD_Packing_New( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pdata, temp, 0, NULL, 0 ) ; 
+//PQ                     err = Noah_CMD_Pack_PC( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pdata, temp, 0, NULL, 0 ) ; 
                     if( OS_ERR_NONE != err ) { break;}
                     data_length -= temp;
                     pdata += temp;
@@ -1443,13 +1455,13 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
             buf[0] = EMB_DATA_FRAME ;
             buf[1] = (pEBuf_Data->length) & 0xFF;    
             buf[2] = ((pEBuf_Data->length)>>8) & 0xFF;  
-            err = Noah_CMD_Packing_New( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;            
+            err = Noah_CMD_Pack_PC( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, buf, sizeof(buf), 0, NULL, 0 ) ;            
             if( OS_ERR_NONE == err ) {  
                 pdata = pEBuf_Data->data;
                 data_length = pEBuf_Data->length;
                 while( data_length > 0 ){        
                     temp = data_length > NOAH_CMD_DATA_MLEN ? NOAH_CMD_DATA_MLEN : data_length ; 
-                    err = Noah_CMD_Packing_New( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pdata, temp, 0, NULL, 0 ) ; 
+                    err = Noah_CMD_Pack_PC( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pdata, temp, 0, NULL, 0 ) ; 
                     if( OS_ERR_NONE != err ) { break;}
                     data_length -= temp;
                     pdata += temp;
@@ -1597,7 +1609,7 @@ uint8_t  AB_Status_Change_Report (void)
 //        return err;
 //    }
 //    
-//    err = Noah_CMD_Packing_New( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pEBuf->data, pEBuf->length, 0, NULL, 0 ) ;   
+//    err = Noah_CMD_Pack_PC( EVENT_MsgQ_Noah2PCUART, FRAM_TYPE_DATA, pEBuf->data, pEBuf->length, 0, NULL, 0 ) ;   
 //    
     return err;
   

@@ -85,5 +85,6 @@ uint8_t CODEC_Set_Volume( const DataSource *pSource,float vol_spk, float vol_lou
 uint8_t Check_SR_Support( uint32_t sample_rate );
 void Pin_Reset_Codec( unsigned char id );
 void enable_PA( bool en );
+unsigned char Live_Set_Codec_Master_Slave( const DataSource *pSource, unsigned char m_s_sel);
 
 #endif

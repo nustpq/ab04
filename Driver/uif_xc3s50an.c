@@ -1323,21 +1323,21 @@ unsigned char FPGA_POST_Setup( void )
     init_fpga();
     
     //test codec0 as master
-    Init_fpga_clock_path( 0,0,"codec0_port0_0" );
-    Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
-    Init_fpga_clock_path( 0,0,"codec0_ssc0_2" );
+    //Init_fpga_clock_path( 0,0,"codec0_port0_0" );
+    //Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
+    //Init_fpga_clock_path( 0,0,"codec0_ssc0_2" );
     // Init_fpga_clock_path( 0,0,"codec0_port1_3" );
     // Init_fpga_clock_path( 0,0,"codec0_codec1_4" );
     // Init_fpga_clock_path( 0,0,"codec0_ssc1_5" );
-    Init_fpga_clock_path( 0,0,"codec1_port1_7" );
-    Init_fpga_clock_path( 0,0,"codec1_ssc1_9" );
-        
+    //Init_fpga_clock_path( 0,0,"codec1_port1_7" );
+    //Init_fpga_clock_path( 0,0,"codec1_ssc1_9" );
+     /*   
     Init_fpga_data_path( "uif_i2s0_rx->fm36_i2s_rx" );
     Init_fpga_data_path( "ssc0_tx->codec0_rx" );
     Init_fpga_data_path( "ssc1_tx->codec1_rx" );
     Init_fpga_data_path( "fm36_pdmo_data->uif_pdmo_data" );
     Init_fpga_data_path( "fm36_pdmi_clk->hdmi_pdm_clk" );
-    
+    */
     err = xc3s50an.set_path( &xc3s50an, 
                        &xc3s50an.cmdWord , 
                        &xc3s50an.fpga_i2s_clk_list, 

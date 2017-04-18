@@ -192,6 +192,12 @@ uint8_t I2CWrite_Codec_AIC3204( const DataSource *pSource,uint8_t reg,uint8_t da
     return err;
 }
 
+uint8_t I2CRead_Codec_AIC3204( const DataSource *pSource,uint8_t reg,uint8_t *pdata )
+{
+    uint8_t err;
+    err = Codec_Read( pSource,CODEC_ADDRESS, reg, pdata);
+    return err;
+}
 
 
 /******************************      AD1937        ************************************/
@@ -1117,8 +1123,6 @@ uint8_t Set_Codec_PLL( const DataSource *pSource,uint32_t sr, uint8_t sample_len
 
 
 
-
-
 CODEC_SETS Codec_Set_Saved[2];   //for 2 CODEC
 
 uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
@@ -1128,7 +1132,7 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
     uint8_t i, if_set;
 
     APP_TRACE_INFO(("\r\nInit CODEC[%d]",codec_set.id));
-#if 0
+
     if( (Codec_Set_Saved[codec_set.id].sr == codec_set.sr)  &&\
         (Codec_Set_Saved[codec_set.id].sample_len == codec_set.sample_len) &&\
         (Codec_Set_Saved[codec_set.id].format == codec_set.format) &&\
@@ -1141,9 +1145,7 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
     } else {
         Codec_Set_Saved[codec_set.id] = codec_set;
     }
-#else
-    Codec_Set_Saved[codec_set.id] = codec_set;    //here, force to initialize codec every time;
-#endif    
+    
     Pin_Reset_Codec( codec_set.id );
 
     err = Check_SR_Support( codec_set.sr );
@@ -1228,3 +1230,34 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
 
 }
 
+unsigned char Live_Set_Codec_Master_Slave( const DataSource *pSource, unsigned char m_s_sel)
+{
+    unsigned char err;
+    unsigned char if_set, codec_id;
+
+
+    if ( pSource == &source_twi2 ) {
+        codec_id = 0;  //codec0 for i2s0
+    } else {
+        codec_id = 1;
+    }
+    
+    if( Codec_Set_Saved[codec_id].m_s_sel == 1 ) { //no need set master/slave
+        return 0;
+    }
+    
+    err = I2CRead_Codec_AIC3204( pSource,27, &if_set);
+    if( OS_ERR_NONE != err ) {
+        return err;
+    }  
+    if( m_s_sel == 0 ) {
+        if_set |= 0x0C; //master
+    } else {
+        if_set &= 0xF0; //slave
+    }
+    err = I2CWrite_Codec_AIC3204( pSource,27, if_set); //set format
+    if( OS_ERR_NONE != err ) {
+        return err;
+    }
+
+}

@@ -561,7 +561,7 @@ uint8_t twi2_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 
 /*
 *********************************************************************************************************
-*                                    TWID_Write_API()
+*                                    TWID_WriteBuffer_API()
 *
 * Description :  read  data via twi2
 *
@@ -577,7 +577,7 @@ uint8_t twi2_read( void *pInstance, const uint8_t *buf,uint32_t len  )
 * Note(s)     : None.
 *********************************************************************************************************
 */
-unsigned char TWID_Write_API( 
+unsigned char TWID_WriteBuffer_API( 
     uint8_t address,
     uint32_t iaddress,
     uint8_t isize,
@@ -593,7 +593,7 @@ unsigned char TWID_Write_API(
 
 /*
 *********************************************************************************************************
-*                                    TWID_Read_API()
+*                                    TWID_ReadBuffer_API()
 *
 * Description :  read  data via twi2
 *
@@ -609,7 +609,7 @@ unsigned char TWID_Write_API(
 * Note(s)     : None.
 *********************************************************************************************************
 */
-unsigned char TWID_Read_API(
+unsigned char TWID_ReadBuffer_API(
     uint8_t address,
     uint32_t iaddress,
     uint8_t isize,

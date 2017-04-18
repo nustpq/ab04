@@ -227,14 +227,14 @@ void fill_buf_debug( unsigned char *pChar, unsigned int size)
     
 }
 
-extern unsigned char  audio_padding_byte;
+extern unsigned char  global_audio_padding_byte;
 void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 {    
     assert( NULL != pArg );
     
     uint32_t temp;
     uint8_t padding[128];
-    memset( padding, audio_padding_byte, 128 );
+    memset( padding, global_audio_padding_byte, 128 );
     DataSource *pSource = ( DataSource *)pArg;
     if ( audio_run_control == false) {  return ;}
     //  UIF_LED_On( LED_HDMI );  
@@ -381,7 +381,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
     
     uint32_t temp;
     uint8_t padding[128];
-    memset( padding, audio_padding_byte, 128 );
+    memset( padding, global_audio_padding_byte, 128 );
     DataSource *pSource = ( DataSource *)pArg;
     if ( audio_run_control == false) {  return ;}
 	switch( pSource->status[ IN ] ) 

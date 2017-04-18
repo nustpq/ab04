@@ -65,7 +65,8 @@
 
 extern unsigned int  global_rec_spi_en;
 extern unsigned int  global_play_spi_en;
-
+extern unsigned int  global_rec_spi_mask;
+extern unsigned int  global_play_spi_mask;
 
 extern unsigned char im501_irq_counter;
 extern unsigned char SPI_Data_Buffer[];

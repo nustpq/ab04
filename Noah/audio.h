@@ -16,7 +16,7 @@
 
 #include "uif_object.h"
 
-#include "defined.h"
+//#include "defined.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -29,13 +29,13 @@ typedef struct {
   unsigned char  bit_length; // 16, 24, 32
   unsigned char  lin_ch_mask;
 
-  unsigned char  gpio_rec_num;
-  unsigned char  gpio_rec_start_index;
-  unsigned char  gpio_rec_bit_mask;
+  unsigned char  gpio_num;
+  unsigned char  gpio_start_index;
+  unsigned char  gpio_bit_mask;
 
-  unsigned char  spi_rec_num;
-  unsigned char  spi_rec_start_index;
-  unsigned char  spi_rec_bit_mask;
+  unsigned char  spi_num;
+  unsigned char  spi_start_index;
+  unsigned char  spi_bit_mask;
 
   unsigned char  format;  //1:I2S  2:PDM  3:PCM/TDM
   unsigned char  slot_num;  //bus BCLK slot num
@@ -96,45 +96,6 @@ typedef struct {
     unsigned char*   pStr;
 }MCU_FLASH ;
 
-typedef struct {
-    unsigned char    if_type;
-    unsigned char    reserved[3];
-    unsigned short   attribute;
-    unsigned short   speed;
-}INTERFACE_CFG ;
-
-typedef struct {
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned int     data_len_read;
-    unsigned int     data_len_write;
-    unsigned char*   pdata_read;
-    unsigned char*   pdata_write;
-}RAW_READ ;
-
-typedef struct {
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned int     data_len;
-    unsigned char*   pdata;
-}RAW_WRITE ;
-
-typedef struct {
-    unsigned short   mem_addr_l;
-    unsigned short   mem_addr_h;
-    unsigned int     data_len;
-    unsigned char*   pdata;
-    unsigned char    if_type;
-    unsigned char    dev_addr;
-    unsigned char    mem_addr_len;
-}BURST_WRITE ;
-
-typedef struct {
-    unsigned char    gpio_num;
-    unsigned char    gpio_value[7];
-    unsigned int     delay_us[7];
-}GPIO_SESSION ;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 static uint8_t Init_Play_Setting( void *pInstance );
@@ -150,7 +111,6 @@ void Audio_Start( void );
 
 void Audio_State_Control( uint8_t *msg );
 
-static void Get_Run_Time( unsigned int time );
 bool First_Pack_Check_BO( unsigned char *pData, unsigned int size );
 bool First_Pack_Check_BO1( unsigned char *pData, unsigned int size, uint32_t *pos );
 bool First_Pack_Check_BO2( unsigned char *pData, unsigned int size, uint32_t *pos );
@@ -170,7 +130,8 @@ extern unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg );
 
 
 extern unsigned char  global_audio_padding_byte;
-
+extern volatile unsigned char Global_SPI_Rec_Start;
+extern volatile unsigned char Global_SPI_Rec_En;
 extern SET_VEC_CFG     Global_VEC_Cfg;
 
 ////////////////////////////////////////////////////////////////////////////////

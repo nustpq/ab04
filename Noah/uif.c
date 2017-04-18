@@ -282,14 +282,14 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                     buf[0] = 0xF0;
                     buf[1] = *pChar++;
                     buf[2] = *pChar++;
-                    state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                    state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                     if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;                 
                     }
                     buf[0] = 0xF1;
                     buf[1] = *pChar++;
                     buf[2] = *pChar++;
-                    state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                  
+                    state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                  
                     if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                     }                    
@@ -300,7 +300,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                         buf[2] = *pChar++;
                         buf[3] = *pChar++;
                         buf[4] = *pChar++;
-                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 5,  NULL );               
+                        state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 5,  NULL );               
                         if (state != SUCCESS) {
                             return I2C_BUS_ERR;                   
                         }                      
@@ -312,7 +312,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                     //I2C_Mixer( I2C_MIX_UIF_M );
                     size = p_raw_write->data_len / EEPROM_ALLOWED_DATA_PACK_SIZE ;       
                     for( i = 0 ; i < size ; i++ ) { 
-                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, EEPROM_ALLOWED_DATA_PACK_SIZE, NULL );       
+                        state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, EEPROM_ALLOWED_DATA_PACK_SIZE, NULL );       
                         if (state != SUCCESS) {
                             return I2C_BUS_ERR;                  
                         } 
@@ -321,7 +321,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                     }
                     size = p_raw_write->data_len % EEPROM_ALLOWED_DATA_PACK_SIZE ; 
                     if( size ) {
-                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, size, NULL );       
+                        state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, size, NULL );       
                         if (state != SUCCESS) {
                             return I2C_BUS_ERR;
                         }
@@ -341,35 +341,35 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                         buf[0] = 1;
                         buf[1] =  (unsigned char)(mem_addr>>8);
                         buf[2] =  (unsigned char)(mem_addr>>0);
-                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         }
                         buf[0] = 2;
                         buf[1] =  (unsigned char)(mem_addr>>24);
                         buf[2] =  (unsigned char)(mem_addr>>16);
-                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         } 
                         buf[0] = 3;
                         buf[2] = *pChar++;
                         buf[1] = *pChar++;
-                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         } 
                         buf[0] = 4;
                         buf[2] = *pChar++;
                         buf[1] = *pChar++;
-                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         } 
                         buf[0] = 0;
                         buf[1] = 0;
                         buf[2] = 3; //32bit write
-                        state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
+                        state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 3,  NULL );                 
                         if ( state != SUCCESS ) {
                             return I2C_BUS_ERR;                  
                         } 
@@ -390,7 +390,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      buf[1] = 0x08;  //address, byte counter                 
                      buf[2] = (p_raw_write->data_len - 3 - 4) & 0xFF;
                      buf[3] = ((p_raw_write->data_len - 3 - 4) >> 8) & 0xFF; 
-                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 4,  NULL );                 
+                     state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 4,  NULL );                 
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;                  
                      }
@@ -405,16 +405,16 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      buf[6] = *pChar++;
                      buf[7] = *pChar++; //data MSB
                      
-                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 8,  NULL );                  
+                     state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 8,  NULL );                  
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                      }                    
                      buf[0] = 0x88; //data only        
-                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 1,  NULL );                 
+                     state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 1,  NULL );                 
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                      }
-                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, pChar, p_raw_write->data_len - 3 - 4,  NULL );               
+                     state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, pChar, p_raw_write->data_len - 3 - 4,  NULL );               
                      if (state != SUCCESS) {
                         return I2C_BUS_ERR;                  
                      }                      
@@ -428,7 +428,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      buf[1] = 0x08;  //address, byte counter                 
                      buf[2] = (p_raw_write->data_len - 3 - 2 ) & 0xFF;
                      buf[3] = ((p_raw_write->data_len - 3 - 2 ) >> 8) & 0xFF;
-                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 4,  NULL );                 
+                     state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 4,  NULL );                 
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                      }
@@ -441,16 +441,16 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                      buf[4] = *pChar++; //data LSB
                      buf[5] = *pChar++; //data MSB 
                      
-                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 6,  NULL );                  
+                     state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 6,  NULL );                  
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;   
                      }                    
                      buf[0] = 0xA8; //data only        
-                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, buf, 1,  NULL );                 
+                     state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, buf, 1,  NULL );                 
                      if ( state != SUCCESS ) {
                         return I2C_BUS_ERR;  
                      }
-                     state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, pChar, p_raw_write->data_len - 3 - 2,  NULL );               
+                     state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, pChar, p_raw_write->data_len - 3 - 2,  NULL );               
                      if (state != SUCCESS) {
                         return I2C_BUS_ERR;                   
                      }                      
@@ -459,7 +459,7 @@ unsigned char Raw_Write( RAW_WRITE *p_raw_write )
                  
                  default:// Normal case  
                     //I2C_Mixer( I2C_MIX_UIF_S );
-                    state =  TWID_Write_API( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, p_raw_write->data_len, NULL );       
+                    state =  TWID_WriteBuffer_API( p_raw_write->dev_addr>>1, 0, 0, p_raw_write->pdata, p_raw_write->data_len, NULL );       
                     if (state != SUCCESS) {
                         return I2C_BUS_ERR;                  
                     }
@@ -579,7 +579,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                   }
                   
               } else {
-                  state =  TWID_Write_API( p_raw_read->dev_addr>>1,
+                  state =  TWID_WriteBuffer_API( p_raw_read->dev_addr>>1,
                                        0, 
                                        0, 
                                        p_raw_read->pdata_write, 
@@ -590,7 +590,7 @@ unsigned char Raw_Read( RAW_READ *p_raw_read )
                       break;
                   } 
               
-                  state =  TWID_Read_API( p_raw_read->dev_addr>>1,
+                  state =  TWID_ReadBuffer_API( p_raw_read->dev_addr>>1,
                                       0, 
                                       0, 
                                       pbuf, 
@@ -687,5 +687,119 @@ unsigned char GPIO_Session( GPIO_SESSION *p_gpio_session )
    
    return err;
    
+}
+
+
+
+
+/*
+*********************************************************************************************************
+*                                       AB_POST()
+*
+* Description : Audio bridge Power-On-Self-Test use.
+*
+* Argument(s) : None.
+* Return(s)   : error number.
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+unsigned char AB_POST( void )
+{
+    unsigned char  err;
+    
+    APP_TRACE_INFO(("\r\nStart Audio Bridge POST :\r\n"));
+
+
+    APP_TRACE_INFO(("\r\n1. FPGA... \r\n"));
+    err = FPGA_POST_Setup();
+    if( err != NO_ERR ) {
+        Global_Bridge_POST = FPGA_CFG_ERR;
+        APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
+        return Global_Bridge_POST;
+    } else {
+        APP_TRACE_INFO(("\r\n---OK\r\n"));
+    }
+    
+    APP_TRACE_INFO(("\r\n2. CODEC... \r\n"));       
+    err = aic3204_init_default();  
+    if( err != NO_ERR ) {
+        Global_Bridge_POST = POST_ERR_CODEC;
+        APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
+        return Global_Bridge_POST;
+    } else {
+        APP_TRACE_INFO(("\r\n---OK\r\n"));
+    }
+  
+    APP_TRACE_INFO(("\r\n3. FM36 DSP... \r\n")); 
+    err = Init_FM36_AB03( SAMPLE_RATE_DEFAULT, 0, 1, 0, SAMPLE_LENGTH_DEFAULT, 1, 1  ); //force reset FM36, Lin from SP1.Slot0 
+    if( err != NO_ERR ) {
+        Global_Bridge_POST = POST_ERR_FM36;
+        APP_TRACE_INFO(("\r\n---Error : %d\r\n",err));
+        return Global_Bridge_POST;
+    } else {
+        APP_TRACE_INFO(("\r\n---OK\r\n"));
+    }
+
+}
+/*
+*********************************************************************************************************
+*                                       Set_Volume()
+*
+* Description : Set DMIC PGA gain, LOUT and SPKOUT attenuation gain at the same time
+*
+* Argument(s) : pdata : pointer to SET_VOLUME structure data
+* Return(s)   : NO_ERR :   execute successfully
+*               others :   =error code .
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+unsigned char Set_Volume(  SET_VOLUME *pdata )
+{
+    unsigned char  err = 0 ;
+    /*
+    APP_TRACE_INFO(( "Set Volume :: " ));
+    if( pdata->mic == SET_VOLUME_MUTE ) {
+        APP_TRACE_INFO(( "Mute MIC :  " ));
+    } else {
+        APP_TRACE_INFO(( "Mic_Gain = %d dB :  ", pdata->mic ));
+    }
+
+    if( pdata->lout == SET_VOLUME_MUTE ) {
+        APP_TRACE_INFO(( "Mute LOUT :  " ));
+    } else {
+        APP_TRACE_INFO(( "LOUT_Gain = -%d.%d dB :  ", pdata->lout/10, pdata->lout%10 ));
+    }
+
+    if( pdata->spk == SET_VOLUME_MUTE ) {
+        APP_TRACE_INFO(( "Mute SPK :  " ));
+    } else {
+        APP_TRACE_INFO(( "SPK_Gain = -%d.%d dB :  ", pdata->spk/10, pdata->spk%10 ));
+    }
+
+    //APP_TRACE_INFO(("Set Volume : Mic_Gain[%d]dB, LOUT_Gain[-%d.%d]dB, SPKOUT_Gain[-%d.%d]dB : ",
+    //                     pdata->mic, pdata->lout/10, pdata->lout%10, pdata->spk/10, pdata->spk%10 ));
+    //APP_TRACE_INFO(("\r\n%6.6f, %6.6f\r\n",2.31,0.005));
+
+    I2C_Mixer(I2C_MIX_FM36_CODEC);
+
+    err = DMIC_PGA_Control( pdata->mic );
+    //APP_TRACE_INFO((" %s [0x%X]\r\n", err == OS_ERR_NONE ? "OK" : "FAIL" , err ));
+    if( OS_ERR_NONE != err ) {
+        APP_TRACE_INFO(( "FAIL [0x%X]\r\n", err ));
+        I2C_Mixer(I2C_MIX_UIF_S);
+        return err;
+    }
+    err = CODEC_Set_Volume( pdata->spk, pdata->lout, pdata->lin );
+    if( OS_ERR_NONE != err ) {
+        APP_TRACE_INFO(( "FAIL [0x%X]\r\n", err ));
+        I2C_Mixer(I2C_MIX_UIF_S);
+        return err;
+    }
+    APP_TRACE_INFO(( "OK\r\n" ));
+
+    I2C_Mixer(I2C_MIX_UIF_S);
+    */
+    return err;
 }
 

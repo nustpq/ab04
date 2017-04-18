@@ -234,8 +234,6 @@ extern volatile unsigned char Global_Ruler_Index; //current ruler index
 extern volatile unsigned char Global_Mic_State[];
 extern volatile unsigned char Global_Bridge_POST;
 extern volatile unsigned int  Global_Mic_Mask[];  
-extern volatile unsigned char Global_SPI_Rec_Start;
-extern volatile unsigned char Global_SPI_Rec_En;
 extern volatile unsigned char Ruler_Setup_Sync_Data;
 
 

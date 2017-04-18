@@ -320,7 +320,7 @@ CPU_INT08U  BSP_Ser_RdByte (void);
 void BSP_Ser_WrByte(CPU_CHAR tx_byte);
 void BSP_Ser_Printf (CPU_CHAR *format, ...);
 
-
+void Get_Run_Time( unsigned int time );
 void Head_Info( void );
 void Beep( INT32U beep_cycles);
 void Head_Info( void );

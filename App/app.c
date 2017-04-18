@@ -322,6 +322,7 @@ int main()
 static  void  App_TaskStart (void *p_arg)
 {
     (void)p_arg;
+    CPU_INT32U  counter;
     CPU_INT08U  os_err;
 
     BSP_Init();
@@ -521,11 +522,22 @@ static  void  App_TaskStart (void *p_arg)
 #endif    
     
 ////////////////////////////////////////////////////////////////////////////////
-
+    counter = 0;
+    
     for (;;) {
 
+#if 1
+        counter++;
+        if(counter&0xFF) {
+            UIF_LED_On( LED_RUN );
+        }     
+        if(counter&0x3F) {
+            UIF_LED_Off( LED_RUN );
+        }
+        Ruler_Port_LED_Service();
         OSTimeDly(10);
 
+#else      
         for ( unsigned int i = 0; i< 20; i++ ) {
             for ( unsigned int j = 0; j< 5; j++ ) {
                 UIF_LED_On( LED_RUN );
@@ -542,8 +554,7 @@ static  void  App_TaskStart (void *p_arg)
                 OSTimeDly(20-i%20);
             }
         }
-        
-        
+#endif
     }
 
 }
@@ -1192,7 +1203,7 @@ void Dma_configure( void )
     DMAD_PrepareChannel( &g_dmad, source_usart0.dev.txDMAChannel, dwCfg );
 	
 /*----------------------------------------------------------------------------*/
-#endif
+
 }
 
 void Hold_Task_for_Audio( void )

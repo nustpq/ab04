@@ -55,6 +55,8 @@ unsigned char SPI_Data_Buffer2[ SPI_BUF_SIZE +1 ];
 unsigned char im501_irq_counter;
 unsigned int  global_rec_spi_en = 0 ;
 unsigned int  global_play_spi_en = 0 ;
+unsigned int  global_rec_spi_mask = 0 ;
+unsigned int  global_play_spi_mask = 0 ;
 unsigned int  FM1388_Rec_Data_Addr[5];
 unsigned char SPI_DATA[SPI_FIFO_SIZE];
 

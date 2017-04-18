@@ -60,22 +60,22 @@ void  App_TaskUSBService ( void *p_arg )
     uint8_t  usb_state;
     uint8_t  usb_state_saved ;
     uint32_t counter, counter2;
+    uint32_t usb_led_counter;
 
     ListElmt  *e ;
     AUDIOPATH *pPath;      
     
     err = 0;
     usb_state_saved = 0;
+    usb_led_counter = 0;
     extern uint8_t debug_cnt;
     
-    
-
  
     for(;;) 
     {          
         usb_state =   USBD_GetState();         
         
-        if( usb_state != usb_state_saved ) {
+        if( usb_state != usb_state_saved ) { //if usb state changed
           
             usb_state_saved = usb_state ;
             if ( usb_state >= USBD_STATE_CONFIGURED ) {                 
@@ -86,19 +86,11 @@ void  App_TaskUSBService ( void *p_arg )
             }
         }
         
-        if ( usb_state >= USBD_STATE_CONFIGURED ) {
-          
-            UIF_LED_On( LED_USB );    
-        } else {
-          
-            UIF_LED_Off( LED_USB );             
-        }
-        
-        if ( usb_state < USBD_STATE_CONFIGURED ) {            
+        if ( usb_state < USBD_STATE_CONFIGURED ) {           
+            UIF_LED_Off( LED_USB );  
             OSTimeDly( 2 );
             continue;      
-        }
-
+        } 
         
         if ( audio_run_control == false) {            
             OSTimeDly( 2 );
@@ -114,14 +106,14 @@ void  App_TaskUSBService ( void *p_arg )
           
                 if( source_ssc0.peripheral_record_alone!= NULL )
                 {
-                            source_ssc0.peripheral_record_alone( NULL );
+                    source_ssc0.peripheral_record_alone( NULL );
                 }
               
             } else if( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN == pPath->ep ) {  //SSC1 Rec 
                 if( source_ssc0.peripheral_record_alone!= NULL )
-                  {
-                      source_ssc0.peripheral_record_alone( NULL );
-                  }
+                {
+                    source_ssc0.peripheral_record_alone( NULL );
+                 }
               
             } else if( CDCDSerialDriverDescriptors_SPI_DATAIN == pPath->ep ) {  //SPI Rec       
                 

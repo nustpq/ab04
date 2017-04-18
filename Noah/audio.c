@@ -19,6 +19,7 @@
 #include "uif_i2s.h"
 #include "noah_cmd.h"
 #include "codec.h"
+#include "pio.h"
 #include "fm1388_comm.h"
 
 /*
@@ -38,15 +39,20 @@
 *********************************************************************************************************
 */
 //because AB04 has two ssc port,so extend to 4 sturct;
-AUDIO_CFG  Audio_Configure_Instance[ 2 ];
-extern CODEC_SETS Codec_Set_Saved[2];
+SET_VEC_CFG  Global_VEC_Cfg;
 
-extern void Init_Audio_Bulk_FIFO( void );
+//AUDIO_CFG  Audio_Configure_Instance[ 2 ];    
+CODEC_SETS   Codec_Set[2][2]; //2 //2 codec, play/rec
 
-unsigned char  audio_padding_byte;
+unsigned char flag_bypass_fm36; 
+unsigned char  global_audio_padding_byte;
+
+volatile unsigned char  Global_SPI_Rec_Start = 0;
+volatile unsigned char  Global_SPI_Rec_En = 0;
+
 extern unsigned int  global_rec_spi_en ;
 extern unsigned int  global_play_spi_en ;
-
+extern void Init_Audio_Bulk_FIFO( void );
 /*
 *********************************************************************************************************
 *                                  First_Pack_Check_BO()
@@ -70,7 +76,7 @@ bool First_Pack_Check_BO( unsigned char *pData, unsigned int size )
     unsigned int i;
     
     for( i = 0; i < size ; i++ )   {
-        if( audio_padding_byte != *pData++) {
+        if( global_audio_padding_byte != *pData++) {
             return false;
         }
     }
@@ -104,7 +110,7 @@ bool First_Pack_Check_BO1( unsigned char *pData, unsigned int size, uint32_t *po
     
     for( i = 0; i < size ; i++ )
     {
-      if( audio_padding_byte == *pData++ )
+      if( global_audio_padding_byte == *pData++ )
       {
         cnt++;
         if( cnt == 128 )
@@ -144,7 +150,7 @@ bool First_Pack_Check_BO2( unsigned char *pData, unsigned int size, uint32_t *po
     
     for( i = 0; size ; i ++ )
     {
-        if( audio_padding_byte == *pData++ )
+        if( global_audio_padding_byte == *pData++ )
             cnt++;
         else
         {
@@ -180,14 +186,14 @@ void First_Pack_Padding_BI( kfifo_t *pFifo )
 {    
 #if 1  
     uint8_t temp[ 128 ];
-    APP_TRACE_INFO(("\r\nPadding USB data [0x%0x]...\r\n",audio_padding_byte));  
-    memset( temp, audio_padding_byte, 128 );
+    APP_TRACE_INFO(("\r\nPadding USB data [0x%0x]...\r\n",global_audio_padding_byte));  
+    memset( temp, global_audio_padding_byte, 128 );
     //kfifo_put( &ep0BulkIn_fifo, temp, 128 ) ;
     kfifo_put( pFifo , temp , 128 );
 #else
     uint8_t temp[ 1024 ];
-    APP_TRACE_INFO(("\r\nPadding USB data [0x%0x]...\r\n",audio_padding_byte));  
-    memset( temp1, audio_padding_byte, 1024 );
+    APP_TRACE_INFO(("\r\nPadding USB data [0x%0x]...\r\n",global_audio_padding_byte));  
+    memset( temp1, global_audio_padding_byte, 1024 );
     kfifo_put( &ep0BulkIn_fifo, temp1, 1024 ) ;
     kfifo_put( pFifo, temp1, 1024 ) ;    
 //    kfifo_put(&ep0BulkIn_fifo, temp, USB_DATAEP_SIZE_64B) ;//2 package incase of PID error
@@ -252,57 +258,6 @@ void Rec_Voice_Buf_Start( void )
 }
 
 
-
-
-
-
-
-
-/*
-*********************************************************************************************************
-*                                    Audio_Start()
-*
-* Description :  Start USB data transfer.
-*
-* Argument(s) :  None.
-*
-* Return(s)   :  None.
-*
-* Note(s)     : None.
-*********************************************************************************************************
-*/
-void Audio_Start( void )
-{  
-    
-    Hold_Task_for_Audio(); 
-
-    Init_Audio_Bulk_FIFO( ); 
-    
-    source_ssc0.status[ IN ] = ( uint8_t )CONFIGURED;
-    source_ssc0.status[ OUT ] = ( uint8_t )CONFIGURED;
-    source_ssc1.status[ IN ] = ( uint8_t )CONFIGURED;
-    source_ssc1.status[ OUT ] = ( uint8_t )CONFIGURED;
-    OSTimeDly( 2 );
-    
-    audio_play_buffer_ready  = false ;
-    audio_run_control        = true ;
-    
-    restart_audio_0_bulk_out = true  ; 
-    restart_audio_0_bulk_in  = true  ;
-    restart_audio_1_bulk_out = true  ;
-    restart_audio_1_bulk_in  = true  ; 
-    restart_audio_2_bulk_out = true  ;
-    restart_audio_2_bulk_in  = true  ;
-    
-//    global_rec_spi_en = 1 ;
-//    global_play_spi_en = 1 ;
-  
-#if 0    
-    Play_Voice_Buf_Start( );
-    Rec_Voice_Buf_Start( );
-#endif  
-}
-
 /*
 *********************************************************************************************************
 *                                    Rec_Voice_Buf_Stop()
@@ -332,72 +287,7 @@ void Rec_Voice_Buf_Stop( void )
 }
 
 
-/*
-*********************************************************************************************************
-*                                    Audio_Stop()
-*
-* Description :  Stop USB data transfer.
-*
-* Argument(s) :  None.
-*
-* Return(s)   :  None.
-*
-* Note(s)     : None.
-*********************************************************************************************************
-*/
-void Audio_Stop( void )
-{  
-        
-    printf( "\r\nStop Play & Rec..."); 
-    OSTimeDly( 8 );
-    audio_run_control        = false  ; 
-    
-    OSTimeDly(10);    
-    Destroy_Audio_Path(); 
 
-    OSTimeDly( 4 );
-    
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
-   
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
-    
-    OSTimeDly(10); 
-  
-//    reset_fpga( );
-    Pin_Reset_Codec( 0 );
-    Pin_Reset_Codec( 1 );
-
-    Init_Audio_Bulk_FIFO( ); 
-    memset( usbCacheBulkOut0 , 0 , sizeof( usbCacheBulkOut0 ));
-    memset( usbCacheBulkOut1 , 0 , sizeof( usbCacheBulkOut1 )); 
-    memset( usbCacheBulkIn0, 0 , sizeof( usbCacheBulkIn0 ) );
-    memset( usbCacheBulkIn1, 0 , sizeof( usbCacheBulkIn0 ) );
-    memset( ssc0_PingPongOut,0 , sizeof( ssc0_PingPongOut ) );        
-    memset( ssc0_PingPongIn, 0 , sizeof( ssc0_PingPongIn ) );        
-    memset( ssc1_PingPongOut,0 , sizeof( ssc1_PingPongOut ) );    
-    memset( ssc1_PingPongIn, 0 , sizeof( ssc1_PingPongIn ) );   
-    
-    padding_audio_0_bulk_out = false  ; 
-    padding_audio_1_bulk_out = false  ;
-    
-    restart_audio_0_bulk_out = false  ; 
-    restart_audio_0_bulk_in  = false  ;
-    restart_audio_1_bulk_out = false  ;
-    restart_audio_1_bulk_in  = false  ; 
-    restart_audio_2_bulk_out = false  ;
-    restart_audio_2_bulk_in  = false  ;                       
- 
-    audio_play_buffer_ready  = false  ;         
-    
-    global_rec_spi_en = 0 ;
-    global_play_spi_en = 0 ;
-    Rec_Voice_Buf_Stop( );
-   
-    Release_Task_for_Audio();   
-   
-}
 
 /*
 *********************************************************************************************************
@@ -526,85 +416,21 @@ void Audio_Stop( void )
     
 //}
 
+
+
 /*
 *********************************************************************************************************
-*                                    Get_Run_Time()
+*                                           Setup_Audio()
 *
-* Description : Format ms tick to [day:hour:min:sec:0.sec], and print.
-*
-* Argument(s) : time  -  number of 100ms tick from Timer #2 , using global : second_counter .
-*
-* Return(s)   : None.
+* Description : Send command to configure USB audio.
+* Argument(s) : pAudioCfg : pointer to AUDIO_CFG type data.
+* Return(s)   : NO_ERR :   execute successfully
+*               others :   refer to error code defines.
 *
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void Get_Run_Time( uint32_t time )
-{
-    
-    uint8_t  msec, sec, min, hour;
-    uint32_t   day;
-
-    msec = time % 10;
-    sec  = time /10 % 60 ;
-    min  = time / 600 %60 ;
-    hour = time / 36000 %24 ; 
-    day  = time / 36000 /24 ;
-    printf("[%d:%02d:%02d:%02d.%d]", day, hour, min, sec, msec ); 
-    
-}
-
-/*
-*********************************************************************************************************
-*                                    peripheral_ssc0_recoder()
-*
-* Description : starting ssc0 recorder alone
-*
-* Argument(s) : instance  -  keeping align
-*
-* Return(s)   : None.
-*
-* Note(s)     : None.
-*********************************************************************************************************
-*/
-void peripheral_ssc0_recorder( void *instance )
-{
-
-    uint8_t  err = 0;
-#if 0
-    err = Init_CODEC( &source_twi2,
-                      Audio_Configure_Instance[0].sample_rate,
-                      Audio_Configure_Instance[0].bit_length ); 
-#else
-    err = Init_CODEC( &source_twi2,Codec_Set_Saved[ 0 ] );
-#endif
-
-    First_Pack_Padding_BI( &ep0BulkIn_fifo );
-        
-    if( source_ssc0.buffer_read != NULL )
-    {
-            source_ssc0.buffer_read(   &source_ssc0,
-                                      ( uint8_t * )ssc0_PingPongIn,                                              
-                                  source_ssc1.rxSize );
-            source_ssc0.status[ IN ]  = ( uint8_t )START;
-        } 
-
-        } 
-        
-/*
-*********************************************************************************************************
-*                                    peripheral_ssc1_recorder()
-*
-* Description : starting ssc1 recorder alone
-*
-* Argument(s) : instance  -  keeping align
-*
-* Return(s)   : None.
-*
-* Note(s)     : None.
-*********************************************************************************************************
-*/
-void peripheral_ssc1_recorder( void *instance )
+unsigned char Setup_Audio( AUDIO_CFG *pAudioCfg )
 {
 
     unsigned char err;
@@ -612,23 +438,33 @@ void peripheral_ssc1_recorder( void *instance )
     unsigned char data     = 0xFF;
     unsigned char lin_ch   = 0;
 
-    //unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_SET_AUDIO_CFG };
+    if( pAudioCfg->id == 2 ) { //SPI
+        if( pAudioCfg->type == 0 ) {
+            global_rec_spi_mask = pAudioCfg->spi_bit_mask;
+            APP_TRACE_INFO(("\r\n(1)Setup_Audio[%d] [REC ]: [SPI] Mask[0x03X] ", pAudioCfg->id, pAudioCfg->spi_bit_mask));
+        }else if( pAudioCfg->type == 1 ){
+            global_play_spi_mask = pAudioCfg->spi_bit_mask;
+            APP_TRACE_INFO(("\r\n(1)Setup_Audio[%d] [PLAY ]: [SPI] Mask[0x03X] ", pAudioCfg->id, pAudioCfg->spi_bit_mask));
+        }else {
+            APP_TRACE_INFO(("\r\nSetup_Audio[%d] ERROR: Unsupported pAudioCfg->type, %d\r\n",pAudioCfg->id, pAudioCfg->type));
+            return AUD_CFG_ERR;           
+        }
+        return 0;
+    }
     
-    //APP_TRACE_INFO(("Setup_Audio[%d] [%s]:[%d SR]:[%d CH]: %s\r\n",pAudioCfg->id,(pAudioCfg->type == 0) ? "REC " : "PLAY", pAudioCfg->sr, pAudioCfg->channels,((pAudioCfg->type == 0) && (pAudioCfg->lin_ch_mask == 0)) ? "LIN Disabled" : "LIN Enabled"));
     if( pAudioCfg->type == 0 ) {
         if ( pAudioCfg->lin_ch_mask != 0 ) {
             lin_ch = 2;// 2 channel LINE IN
-            pAudioCfg->channel_num += lin_ch;
-            //APP_TRACE_INFO(("LIN 2CH added up to %d CH\r\n",pAudioCfg->channel_num));
+            pAudioCfg->channel_num += lin_ch;             
         }
-        APP_TRACE_INFO(("\r\nSetup_Audio[%d] [REC ]:[%d SR]:[%d CH]:[%d-Bit]:[LIN %d]", pAudioCfg->id, pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length, lin_ch));
+        APP_TRACE_INFO(("\r\n(1)Setup_Audio[%d] [REC ]:[%d SR]:[%d CH]:[%d-Bit]:[LIN %d]", pAudioCfg->id, pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length, lin_ch));
     } else if( pAudioCfg->type == 1 ){
-        APP_TRACE_INFO(("\r\nSetup_Audio[%d] [PLAY]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->id, pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length ));
+        APP_TRACE_INFO(("\r\n(1)Setup_Audio[%d] [PLAY]:[%d SR]:[%d CH]:[%d-Bit]", pAudioCfg->id, pAudioCfg->sample_rate, pAudioCfg->channel_num, pAudioCfg->bit_length ));
     } else {
         APP_TRACE_INFO(("\r\nSetup_Audio[%d] ERROR: Unsupported pAudioCfg->type, %d\r\n",pAudioCfg->id, pAudioCfg->type));
         return AUD_CFG_ERR;
     }
-
+        
     err = Check_SR_Support( pAudioCfg->sample_rate );
     if( err != NO_ERR ) {
         APP_TRACE_INFO(("\r\nSetup_Audio[%d] ERROR: Unsupported sample rate!\r\n",pAudioCfg->id));
@@ -670,22 +506,34 @@ void peripheral_ssc1_recorder( void *instance )
         mic_num = Global_Mic_Mask[0]; //save mic num to ruler0
     }
 
-    if( source_ssc1.buffer_read != NULL )
-    {
-        source_ssc1.buffer_read(  &source_ssc1,
-                                  ( uint8_t * )ssc1_PingPongIn,                                              
-                                  source_ssc1.rxSize );
-        source_ssc1.status[ IN ]  = ( uint8_t )START;
+#endif
+
+
+#ifdef BOARD_TYPE_AB04 //BOARD_TYPE_UIF
+    if ( pAudioCfg->type == 0 ) {
+
+        pAudioCfg->gpio_num  = Get_Mask_Num( pAudioCfg->gpio_bit_mask ); //gpio num
+        pAudioCfg->gpio_start_index = pAudioCfg->channel_num;  //gpio start index
+        pAudioCfg->channel_num += pAudioCfg->gpio_num; //add gpio num to channel
+        if(  pAudioCfg->channel_num > 10 ) {
+            APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO+SPI Rec channel num(=%d) > 10 NOT allowed for UIF\r\n", pAudioCfg->channel_num));
+            return AUD_CFG_MIC_NUM_MAX_ERR ;
         }
 
+        pAudioCfg->spi_num   = Get_Mask_Num( pAudioCfg->spi_bit_mask );  //spi num
+        Global_SPI_Rec_En = 0; //clear flag as No SPI rec
+        if( pAudioCfg->spi_num  != 0 ){
+            if( pAudioCfg->channel_num != 0 ) {
+                APP_TRACE_INFO(("ERROR:(Setup_Audio Rec)Mic+Lin+GPIO Rec conflict with SPI Rec\r\n"));
+                //return AUD_CFG_SPI_REC_CONFLICT ;
             }
-            pAudioCfg->channel_num = pAudioCfg->spi_rec_num;  //use spi num for rec channel
+            pAudioCfg->channel_num = pAudioCfg->spi_num;  //use spi num for rec channel
             Global_SPI_Rec_En = 1; //set flag for SPI rec
         }
     }
 #endif
     
-    if( (pAudioCfg->spi_rec_num != 0) && (pAudioCfg->channel_num > pAudioCfg->slot_num) )   {
+    if( (pAudioCfg->spi_num != 0) && (pAudioCfg->channel_num > pAudioCfg->slot_num) )   {
          APP_TRACE_INFO(("\r\nSetup_Audio ERROR: channel_num > slot_num\r\n"));
          return AUD_CFG_ERR ;
     }
@@ -765,188 +613,236 @@ void peripheral_ssc1_recorder( void *instance )
 
 /*
 *********************************************************************************************************
-*                                    peripheral_ssc0_start()
+*                                           Update_Audio()
 *
-* Description : starting ssc0 playing and recording.
+* Description : Update Audio path setting(CODEC and FM36) based on Setup_Audio() command .
+* Argument(s) : None.
 *
-* Argument(s) : instance  -  keeping align.
-*
-* Return(s)   : None.
+* Return(s)   : NO_ERR :   execute successfully
+*               others :   refer to error code defines.
 *
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void peripheral_ssc0_start( void *instance )
-{
-extern Pin SSC_Sync_Pin;  
-    uint8_t  err = 0; 
-
-#if 0    
-    err = Init_CODEC( &source_twi2,
-                      Audio_Configure_Instance[0].sample_rate,
-                      Audio_Configure_Instance[0].bit_length ); 
-#else
-    err = Init_CODEC( &source_twi2,Codec_Set_Saved[ 0 ] );
-#endif    
-    
 unsigned char Update_Audio( unsigned char id )
 {
     unsigned char err;
     unsigned char index ;
     const DataSource data_source[] = {source_twi2, source_twi1};
     
-    APP_TRACE_INFO(("\r\nUpdate_Audio[id] : [REC] = %d [PLAY] = %d\r\n", Codec_Set[id][0].flag, Codec_Set[id][1].flag));
+    if( id == 2 ) { //SPI
+        return 0;
+    }
+    
+    APP_TRACE_INFO(("\r\n(16)Update_Audio[%d] : [REC] = %d [PLAY] = %d\r\n", id, Codec_Set[id][0].flag, Codec_Set[id][1].flag));
     err = 0;
     
-    First_Pack_Padding_BI( &ep0BulkIn_fifo );
+    if( (Codec_Set[id][0].flag == 1)  && (Codec_Set[id][1].flag == 1) ) {
+        if( (Codec_Set[id][0].sr !=  Codec_Set[id][1].sr) ||
+            (Codec_Set[id][0].slot_num != Codec_Set[id][1].slot_num) ||
+            (Codec_Set[id][0].format !=  Codec_Set[id][1].format)  ||
+            (Codec_Set[id][0].m_s_sel !=  Codec_Set[id][1].m_s_sel) ||
+            (Codec_Set[id][0].sample_len !=  Codec_Set[id][1].sample_len) ||
+            (Codec_Set[id][0].bclk_polarity !=  Codec_Set[id][1].bclk_polarity) ) {
+            err = AUD_CFG_ERR;
+            APP_TRACE_INFO(("\r\nERROR: [REC] and [PLAY] audio settings conflicts!\r\n"));
+        }
+        index = 0;
+    } else if( Codec_Set[id][0].flag == 1 ) {
+        index = 0;
+    } else if( Codec_Set[id][1].flag == 1 ) {
+        index = 1;
+    } else {
+        err = AUD_CFG_ERR;
+    }
+    Codec_Set[id][0].flag = 0; //reset Cfg flag
+    Codec_Set[id][1].flag = 0;
 
-    if( source_ssc0.buffer_read != NULL )
-    {
-        source_ssc0.buffer_read(  &source_ssc0,
-                                  ( uint8_t * )ssc0_PingPongIn,                                              
-                                  source_ssc1.rxSize );
-        source_ssc0.status[ IN ]  = ( uint8_t )START;
+    if( err != NO_ERR ) {
+        return err;
+    }
+    APP_TRACE_INFO(("\r\n\############## BCLK POLARITY = %d\r\n", Codec_Set[id][index].bclk_polarity));
+    //I2C_Mixer(I2C_MIX_FM36_CODEC);
+    err = Init_CODEC( &data_source[id], Codec_Set[id][index] );
+//    memcpy((void*)&Audio_Configure_Instance[id], (void*)&Codec_Set[id][index], sizeof(AUDIO_CFG) );
+    //I2C_Mixer(I2C_MIX_UIF_S);
+    if( err != NO_ERR ) {
+        APP_TRACE_INFO(("\r\nUpdate_Audio Init_CODEC ERROR: %d\r\n",err));
+        return err;
     }
 
-    while( !PIO_Get( &SSC_Sync_Pin ) );
-    while( PIO_Get( &SSC_Sync_Pin ) );
-         
-    if( source_ssc0.buffer_write != NULL )
-    {                          
-        source_ssc0.buffer_write(  &source_ssc0,
-                                   ( uint8_t * )ssc0_PingPongOut,                                                
-                                   source_ssc0.txSize ); 
-        source_ssc0.status[ OUT ] = ( uint8_t )START;  
-                          
+    if( 0 == id ) {  //FM36 connected to SSC0 
+        if( flag_bypass_fm36 == 0 ) {
+            err = Init_FM36_AB03( Codec_Set[0][index].sr, Global_Mic_Mask[0], 1, 0, Codec_Set[0][index].sample_len, Codec_Set[0][index].slot_num==2 ? 0:1, 0 ); //Lin from SP1_RX, slot0~1
+        } else{
+            err = FM36_PWD_Bypass();
         }
+         
+        if( err != NO_ERR ) {
+            APP_TRACE_INFO(("\r\nUpdate_Audio ReInit_FM36 ERROR: %d\r\n",err));
+            return err;
+        }
+    }
     
+    return 0 ;
+
 }
 
 /*
 *********************************************************************************************************
-*                                    peripheral_ssc1_start()
+*                                           Start_Audio()
 *
-* Description : starting ssc1 playing and recording.
-*
-* Argument(s) : instance  -  keeping align .
-*
-* Return(s)   : None.
+* Description : Send command to start USB audio play/record.
+* Argument(s) : cmd_type : record== 1/play== 2/record & play == 3
+*               padding :  used for usb audio BI/BO first package padding
+* Return(s)   : NO_ERR :   execute successfully
+*               others :   refer to error code defines.
 *
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void peripheral_ssc1_start( void *instance )
-{
-extern Pin SSC_Sync_Pin1;  
-
-#if 0
-    uint8_t err = Init_CODEC( &source_twi1,
-                      Audio_Configure_Instance[1].sample_rate,
-                      Audio_Configure_Instance[1].bit_length );
-#else
-    uint8_t err = Init_CODEC( &source_twi1,Codec_Set_Saved[ 1 ] );    
-#endif
-    
-    First_Pack_Padding_BI( &ep1BulkIn_fifo );
-    
-    if( source_ssc1.buffer_read != NULL )
-    {
-        source_ssc1.buffer_read(  &source_ssc1,
-                                  ( uint8_t * )ssc1_PingPongIn,                                              
-                                  source_ssc1.rxSize );
-        source_ssc1.status[ IN ]  = ( uint8_t )START;
-    }
- 
-    while( !PIO_Get( &SSC_Sync_Pin1 ) );
-    while( PIO_Get( &SSC_Sync_Pin1 ) );
-    
-    if( source_ssc1.buffer_write != NULL )
-    {                          
-        source_ssc1.buffer_write(  &source_ssc1,
-                                   ( uint8_t * )ssc1_PingPongOut,                                                
-                                   source_ssc1.txSize ); 
-        source_ssc1.status[ OUT ] = ( uint8_t )START;  
-                          
-    } 
-    
-}
-
 unsigned char Start_Audio( START_AUDIO start_audio )
 {
     unsigned char err;
     unsigned char data  = 0xFF;
     unsigned char ruler_id;
- 
 
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;
 #endif
-
-    APP_TRACE_INFO(("\r\nStart_Audio : type = [%d], padding = [0x%X]\r\n", start_audio.type, start_audio.padding));
     
+    APP_TRACE_INFO(("\r\n(2)Start_Audio : Type[0x%02X],  Padding[0x%X]\r\n", start_audio.type, start_audio.padding));
+       
+    //Hold_Task_for_Audio(); 
     
-//    UART2_Mixer(3);
-//    USART_SendBuf( AUDIO_UART, buf,  sizeof(buf) );
-//    err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM );
-//    if( err != NO_ERR  || data != 0  ) {
-//        APP_TRACE_INFO(("\r\nStart_Audio ERROR: timeout = %d, ack data = %d\r\n",err, data));
-//        return data;
-//
-//    } else {
-
-        OS_ENTER_CRITICAL();
-        for( ruler_id = 0 ; ruler_id < 4 ; ruler_id++ ) {
-            if( Global_Ruler_State[ruler_id] ==  RULER_STATE_SELECTED ) {//given: if mic selected, then ruler used
-                Global_Ruler_State[ruler_id] = RULER_STATE_RUN;
-            }
-        }
-        OS_EXIT_CRITICAL();
-
-//    }
-     
     global_audio_padding_byte = start_audio.padding;
-    //Audio_Manager();
-    Audio_Start();
-  
     
+    Init_Audio_Bulk_FIFO( ); 
+       
+
+    
+//    global_rec_spi_en = 1 ;
+//    global_play_spi_en = 1 ;
+  
+#if 0    
+    Play_Voice_Buf_Start( );
+    Rec_Voice_Buf_Start( );
+#endif  
+  
+    err = Live_Set_Codec_Master_Slave(&source_twi2, 1); //set codec0 as slave
+    if( err != NO_ERR ) {
+        APP_TRACE_INFO(("\r\nStart_Audio ERROR: %d\r\n ",err));
+        return err;
+    }
+    err = Live_Set_Codec_Master_Slave(&source_twi1, 1); //set codec1 as slave
+    if( err != NO_ERR ) {
+        APP_TRACE_INFO(("\r\nStart_Audio ERROR: %d\r\n ",err));
+        return err;
+    }
+    
+    Audio_Manager( start_audio.type  ); 
+
+    OS_ENTER_CRITICAL();
+    for( ruler_id = 0 ; ruler_id < 4 ; ruler_id++ ) {
+        if( Global_Ruler_State[ruler_id] ==  RULER_STATE_SELECTED ) {//given: if mic selected, then ruler used
+            Global_Ruler_State[ruler_id] = RULER_STATE_RUN;
+        }
+    }
+    OS_EXIT_CRITICAL();
+
+    OSTimeDly( 2 );
+    
+    restart_audio_0_bulk_out = true  ; 
+    restart_audio_0_bulk_in  = true  ;
+    restart_audio_1_bulk_out = true  ;
+    restart_audio_1_bulk_in  = true  ; 
+    restart_audio_2_bulk_out = true  ;
+    restart_audio_2_bulk_in  = true  ;
+    audio_play_buffer_ready  = false ;
+    audio_run_control        = true ;
+
     return 0 ;
 }
 
 /*
 *********************************************************************************************************
-*                                    peripheral_sync_start()
+*                                           Stop_Audio()
 *
-* Description : starting ssc0 and ssc1 playing and recording at same time.
-*
-* Argument(s) : instance  -  keeping align.
-*
-* Return(s)   : None.
+* Description : Send command to stop USB audio play/record.
+* Argument(s) : None.
+* Return(s)   : NO_ERR :   execute successfully
+*               others :   refer to error code defines.
 *
 * Note(s)     : None.
 *********************************************************************************************************
 */
-void peripheral_sync_start( void *instance )
+unsigned char Stop_Audio( void )
 {
-    extern Pin SSC_Sync_Pin;
-    uint8_t err = 0;
-    
-//    err = Init_CODEC( &source_twi2,
-//                      Audio_Configure_Instance[0].sample_rate,
-//                      Audio_Configure_Instance[0].bit_length );
-//                      
-#if 0
-    err = Init_CODEC( &source_twi2,48000, 16 );
-#else
-    err = Init_CODEC( &source_twi2,Codec_Set_Saved[ 0 ] );
-    Audio_Stop();
+    unsigned char err   = 0xFF;
+    unsigned char data  = 0xFF;
+    unsigned char ruler_id;
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_STOP_AUDIO };
     
 
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 // Storage for CPU status register
 #endif
     
-/*
-    APP_TRACE_INFO(("\r\nStop_Audio\r\n"));
+
+    APP_TRACE_INFO(("\r\n(3)Stop_Audio\r\n"));
+    // Audio_Stop();
+    audio_run_control        = false  ; 
+    
+    OSTimeDly(50);    
+    Destroy_Audio_Path(); 
+
+    OSTimeDly( 4 );
+    
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
+   
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
+    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
+    
+    OSTimeDly(10); 
+  
+//    reset_fpga( );
+    Pin_Reset_Codec( 0 );
+    Pin_Reset_Codec( 1 );
+
+    Init_Audio_Bulk_FIFO( ); 
+    memset( usbCacheBulkOut0 , 0 , sizeof( usbCacheBulkOut0 ));
+    memset( usbCacheBulkOut1 , 0 , sizeof( usbCacheBulkOut1 )); 
+    memset( usbCacheBulkIn0, 0 , sizeof( usbCacheBulkIn0 ) );
+    memset( usbCacheBulkIn1, 0 , sizeof( usbCacheBulkIn0 ) );
+    memset( ssc0_PingPongOut,0 , sizeof( ssc0_PingPongOut ) );        
+    memset( ssc0_PingPongIn, 0 , sizeof( ssc0_PingPongIn ) );        
+    memset( ssc1_PingPongOut,0 , sizeof( ssc1_PingPongOut ) );    
+    memset( ssc1_PingPongIn, 0 , sizeof( ssc1_PingPongIn ) );   
+    
+    padding_audio_0_bulk_out = false  ; 
+    padding_audio_1_bulk_out = false  ;
+    
+    restart_audio_0_bulk_out = false  ; 
+    restart_audio_0_bulk_in  = false  ;
+    restart_audio_1_bulk_out = false  ;
+    restart_audio_1_bulk_in  = false  ; 
+    restart_audio_2_bulk_out = false  ;
+    restart_audio_2_bulk_in  = false  ;                       
+ 
+    audio_play_buffer_ready  = false  ; 
+
+#if 0    
+    global_rec_spi_en = 0 ;
+    global_play_spi_en = 0 ;
+    Rec_Voice_Buf_Stop( );
+ #endif  
+    
+    //Release_Task_for_Audio();   
+
+
+
+/*    
     UART2_Mixer(3);
     USART_SendBuf( AUDIO_UART, buf,  sizeof(buf)) ;
     err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM);
@@ -959,15 +855,13 @@ void peripheral_sync_start( void *instance )
         return data;
     }
 
-    First_Pack_Padding_BI( &ep0BulkIn_fifo );
-    First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
+    //check if it is in SPI recording mode
+    if( Global_SPI_Rec_Start == 1 ) {
+        Global_SPI_Rec_Start = 0;
+        Enable_SPI_Port();
+    }
+    Disable_Interrupt_For_iM501_IRQ();
 
-    if( source_ssc0.buffer_read != NULL )
-    {
-        source_ssc0.buffer_read(   &source_ssc0,
-                                   ( uint8_t * )ssc0_PingPongIn,                                              
-                                   source_ssc0.rxSize );
-        source_ssc0.status[ IN ]  = ( uint8_t )START;
 
 //    err = Init_CODEC( 0 );
 //    if( err != NO_ERR ) {
@@ -979,8 +873,9 @@ void peripheral_sync_start( void *instance )
         if( Global_Ruler_State[ruler_id] ==  RULER_STATE_RUN ) {//given: if mic selected, then ruler used
             Global_Ruler_State[ruler_id] = RULER_STATE_SELECTED;
         }
+    }
+    OS_EXIT_CRITICAL();
 
-    if( source_ssc1.buffer_read != NULL )
 //clear mic toggle after each audio stop to avoid issues in scripts test using USBTEST.exe
 #ifdef FOR_USE_USBTEST_EXE
     for( ruler_id = 0; ruler_id < 4; ruler_id++ ) {
@@ -1007,33 +902,278 @@ void peripheral_sync_start( void *instance )
 */
 unsigned char Reset_Audio( void )
 {
+    unsigned char err   = 0xFF;
+    unsigned char data  = 0xFF;
+    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_RESET_AUDIO };
+    
+    APP_TRACE_INFO(("\r\n(15)Reset_Audio\r\n"));
+    /*
+    UART2_Mixer(3);
+    USART_SendBuf( AUDIO_UART, buf,  sizeof(buf)) ;
+    err = USART_Read_Timeout( AUDIO_UART, &data, 1, TIMEOUT_AUDIO_COM);
+    if( err != NO_ERR ) {
+        APP_TRACE_INFO(("\r\nReset_Audio ERROR: timeout\r\n"));
+        return err;
+    }
+    if( data != NO_ERR ) {
+        APP_TRACE_INFO(("\r\nReset_Audio ERROR: %d\r\n ",data));
+        return data;
+    }
+    */
+    return 0 ;
+}
+
+
+
+/*
+*********************************************************************************************************
+*                                    peripheral_ssc0_recoder()
+*
+* Description : starting ssc0 recorder alone
+*
+* Argument(s) : instance  -  keeping align
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_ssc0_recorder( void *instance )
+{
+ 
+    uint8_t  err = 0;
+#if 0
+    err = Init_CODEC( &source_twi2,
+                      Audio_Configure_Instance[0].sample_rate,
+                      Audio_Configure_Instance[0].bit_length ); 
+#else
+    //err = Init_CODEC( &source_twi2,Codec_Set_Saved[ 0 ] );
+    err = Live_Set_Codec_Master_Slave(&source_twi2, 0); //set codec as master
+#endif
+    
+    First_Pack_Padding_BI( &ep0BulkIn_fifo );
+    
+    if( source_ssc0.buffer_read != NULL )
+    {
+        source_ssc0.buffer_read(  &source_ssc0,
+                                  ( uint8_t * )ssc0_PingPongIn,                                              
+                                  source_ssc1.rxSize );
+        source_ssc0.status[ IN ]  = ( uint8_t )START;
+    }
+    
+}
+
+/*
+*********************************************************************************************************
+*                                    peripheral_ssc1_recorder()
+*
+* Description : starting ssc1 recorder alone
+*
+* Argument(s) : instance  -  keeping align
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_ssc1_recorder( void *instance )
+{
+    uint8_t err;
+#if 0 
+    uint8_t err = Init_CODEC( &source_twi1,
+                      Audio_Configure_Instance[1].sample_rate,
+                      Audio_Configure_Instance[1].bit_length );
+#else    
+    // err = Init_CODEC( &source_twi1,Codec_Set_Saved[ 1 ] );
+    err = Live_Set_Codec_Master_Slave(&source_twi1, 0); //set codec as master
+#endif
+    
+    First_Pack_Padding_BI( &ep1BulkIn_fifo );
+    
+    if( source_ssc1.buffer_read != NULL )
+    {
         source_ssc1.buffer_read(  &source_ssc1,
                                   ( uint8_t * )ssc1_PingPongIn,                                              
                                   source_ssc1.rxSize );
         source_ssc1.status[ IN ]  = ( uint8_t )START;
     }
+    
+}
 
+/*
+*********************************************************************************************************
+*                                    peripheral_ssc0_start()
+*
+* Description : starting ssc0 playing and recording.
+*
+* Argument(s) : instance  -  keeping align.
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_ssc0_start( void *instance )
+{
+extern Pin SSC_Sync_Pin;  
+    uint8_t  err = 0; 
+
+#if 0    
+    err = Init_CODEC( &source_twi2,
+                      Audio_Configure_Instance[0].sample_rate,
+                      Audio_Configure_Instance[0].bit_length ); 
+#else
+    //err = Init_CODEC( &source_twi2,Codec_Set_Saved[ 0 ] );
+    err = Live_Set_Codec_Master_Slave(&source_twi2, 0); //set codec as master
+#endif    
+    
+    First_Pack_Padding_BI( &ep0BulkIn_fifo );
+    
+    if( source_ssc0.buffer_read != NULL )
+    {
+        source_ssc0.buffer_read(  &source_ssc0,
+                                  ( uint8_t * )ssc0_PingPongIn,                                              
+                                  source_ssc1.rxSize );
+        source_ssc0.status[ IN ]  = ( uint8_t )START;
+    }
+ 
     while( !PIO_Get( &SSC_Sync_Pin ) );
     while( PIO_Get( &SSC_Sync_Pin ) );
-
+    
     if( source_ssc0.buffer_write != NULL )
-{
+    {                          
         source_ssc0.buffer_write(  &source_ssc0,
                                    ( uint8_t * )ssc0_PingPongOut,                                                
                                    source_ssc0.txSize ); 
-        source_ssc0.status[ OUT ] = ( uint8_t )START;
+        source_ssc0.status[ OUT ] = ( uint8_t )START;  
+                          
+    } 
+    
+}
 
+/*
+*********************************************************************************************************
+*                                    peripheral_ssc1_start()
+*
+* Description : starting ssc1 playing and recording.
+*
+* Argument(s) : instance  -  keeping align .
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_ssc1_start( void *instance )
+{
+    uint8_t err;
+extern Pin SSC_Sync_Pin1;  
+
+#if 0
+    uint8_t err = Init_CODEC( &source_twi1,
+                      Audio_Configure_Instance[1].sample_rate,
+                      Audio_Configure_Instance[1].bit_length );
+#else
+    //err = Init_CODEC( &source_twi1,Codec_Set_Saved[ 1 ] ); 
+    err = Live_Set_Codec_Master_Slave(&source_twi1, 0); //set codec as master   
+#endif
+    
+    First_Pack_Padding_BI( &ep1BulkIn_fifo );
+    
+    if( source_ssc1.buffer_read != NULL )
+    {
+        source_ssc1.buffer_read(  &source_ssc1,
+                                  ( uint8_t * )ssc1_PingPongIn,                                              
+                                  source_ssc1.rxSize );
+        source_ssc1.status[ IN ]  = ( uint8_t )START;
     }
-
+ 
+    while( !PIO_Get( &SSC_Sync_Pin1 ) );
+    while( PIO_Get( &SSC_Sync_Pin1 ) );
+    
     if( source_ssc1.buffer_write != NULL )
     {                          
         source_ssc1.buffer_write(  &source_ssc1,
                                    ( uint8_t * )ssc1_PingPongOut,                                                
                                    source_ssc1.txSize ); 
         source_ssc1.status[ OUT ] = ( uint8_t )START;  
+                          
+    } 
+    
+}
+
+/*
+*********************************************************************************************************
+*                                    peripheral_sync_start()
+*
+* Description : starting ssc0 and ssc1 playing and recording at same time.
+*
+* Argument(s) : instance  -  keeping align.
+*
+* Return(s)   : None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+void peripheral_sync_start( void *instance )
+{
+    extern Pin SSC_Sync_Pin;
+    uint8_t err = 0;
+
+//    err = Init_CODEC( &source_twi2,
+//                      Audio_Configure_Instance[0].sample_rate,
+//                      Audio_Configure_Instance[0].bit_length );
+//                      
+#if 0
+    err = Init_CODEC( &source_twi2,48000, 16 );
+#else
+    //err = Init_CODEC( &source_twi2,Codec_Set_Saved[ 0 ] );
+    err = Live_Set_Codec_Master_Slave(&source_twi2, 0); //set codec as master
+#endif    
+                          
+    First_Pack_Padding_BI( &ep0BulkIn_fifo );
+    First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
+                          
+    if( source_ssc0.buffer_read != NULL )
+    {
+        source_ssc0.buffer_read(   &source_ssc0,
+                                   ( uint8_t * )ssc0_PingPongIn,                                              
+                                   source_ssc0.rxSize );
+        source_ssc0.status[ IN ]  = ( uint8_t )START;
+    }
+                          
+    if( source_ssc1.buffer_read != NULL )
+    {
+        source_ssc1.buffer_read(  &source_ssc1,
+                                  ( uint8_t * )ssc1_PingPongIn,                                              
+                                  source_ssc1.rxSize );
+        source_ssc1.status[ IN ]  = ( uint8_t )START;
+    }
+ 
+    while( !PIO_Get( &SSC_Sync_Pin ) );
+    while( PIO_Get( &SSC_Sync_Pin ) );
+                        
+    if( source_ssc0.buffer_write != NULL )
+    {
+        source_ssc0.buffer_write(  &source_ssc0,
+                                   ( uint8_t * )ssc0_PingPongOut,                                                
+                                   source_ssc0.txSize ); 
+        source_ssc0.status[ OUT ] = ( uint8_t )START;
 
     }
+                          
+    if( source_ssc1.buffer_write != NULL )
+    {                          
+        source_ssc1.buffer_write(  &source_ssc1,
+                                   ( uint8_t * )ssc1_PingPongOut,                                                
+                                   source_ssc1.txSize ); 
+        source_ssc1.status[ OUT ] = ( uint8_t )START;  
+                          
+    }    
 }
+
+
+
 
 /*
 *********************************************************************************************************
@@ -1046,7 +1186,7 @@ unsigned char Reset_Audio( void )
 * Return(s)   : None.
 *
 * Note(s)     :    bit7    |bit6   |bit5     |bit4     |bit3   |bit2   |bit1     | bit0 
-*                  SYNC    | X     |ssc0_P   |ssc0_R   |  X    |X      |ssc0_P   | ssc0_R
+*                  SYNC    | X     |ssc1_P   |ssc1_R   |  X    |X      |ssc0_P   | ssc0_R
 *
 *                  Here, just install function according sence not starting peripheral really.
 *********************************************************************************************************
@@ -1058,32 +1198,60 @@ void Audio_Manager( unsigned char cfg_data )
     
     const uint8_t ssc0_recorder_bit = cfg_data & ( 1 << 0 );
     const uint8_t ssc0_play_bit = cfg_data & ( 1 << 1 );
+
     const uint8_t ssc1_recorder_bit = cfg_data & ( 1 << 4 );
     const uint8_t ssc1_play_bit = cfg_data & ( 1 << 5 );
-//    const uint8_t ssc_sync_bit = cfg_data & ( 1 << 7 ); 
-    
-    const uint8_t ssc_sync_bit =  1;
 
-        if( ssc_sync_bit )                          // play and record sync
-        {
-          source_ssc0.peripheral_start = peripheral_sync_start;
-          source_ssc1.peripheral_start = NULL;
-        }
-        else                                       // asynchronous
-        {
-           if( ssc0_recorder_bit && ssc0_play_bit )
-           {
-              source_ssc0.peripheral_start = peripheral_ssc0_start;
-           }
-           else if( ssc0_recorder_bit && ( !ssc0_play_bit ) )
-           {
-             source_ssc0.peripheral_record_alone = peripheral_ssc0_recorder;
-           }
-          
-           if( ssc1_recorder_bit && ssc1_play_bit )
-           {
-              source_ssc1.peripheral_start = peripheral_ssc1_start;
-           }
+    const uint8_t ssc_sync_bit = cfg_data & ( 1 << 7 ); 
+    //ssc_sync_bit =  1;
+
+    source_ssc0.status[ IN ] = ( uint8_t )CONFIGURED;
+    source_ssc0.status[ OUT ] = ( uint8_t )CONFIGURED;
+    source_ssc1.status[ IN ] = ( uint8_t )CONFIGURED;
+    source_ssc1.status[ OUT ] = ( uint8_t )CONFIGURED;
+
+    if( ssc_sync_bit )                          // play and record sync
+    {
+      source_ssc0.peripheral_start = peripheral_sync_start;
+      source_ssc1.peripheral_start = NULL;
+    }
+    else                                       // asynchronous
+    {
+       if( ssc0_recorder_bit && ssc0_play_bit )
+       {
+          source_ssc0.peripheral_start = peripheral_ssc0_start;
+       }
+       else if( ssc0_recorder_bit && ( !ssc0_play_bit ) )
+       {
+         source_ssc0.peripheral_record_alone = peripheral_ssc0_recorder;
+       }
+       else if( (!ssc0_recorder_bit) && ( ssc0_play_bit ) )
+       {
+         //TODO:
+       }
+
+       if( ssc1_recorder_bit && ssc1_play_bit )
+       {
+          source_ssc1.peripheral_start = peripheral_ssc1_start;
+       }
+       else if( ssc1_recorder_bit && ( !ssc1_play_bit ) )
+       {
+         source_ssc1.peripheral_record_alone = peripheral_ssc1_recorder;
+       }
+       else if( (!ssc1_recorder_bit) && ( ssc1_play_bit ) )
+       {
+         //TODO:
+       }         
+      
+    }
+
+     
+}
+    
+
+
+
+
 /*
 *********************************************************************************************************
 *                                       Save_DSP_VEC()
@@ -1103,7 +1271,7 @@ void Audio_Manager( unsigned char cfg_data )
 */
 unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
 {
-    unsigned char err;
+    unsigned char err =0;
     unsigned int flash_addr;
     unsigned int index;
     FLASH_INFO   flash_info;
@@ -1146,13 +1314,59 @@ unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec )
     return err;
 
 }
-           else
-{
-             source_ssc1.peripheral_record_alone = peripheral_ssc1_recorder;
-    }
 
+/*
+*********************************************************************************************************
+*                                       Set_DSP_VEC()
+*
+* Description : set config setting for load DSP¡¡vector from flash
+*
+* Argument(s) :  *p_dsp_vec_cfg :  .
+*
+*
+* Return(s)   : NO_ERR :   execute successfully
+*               others :   =error code .
+*
+* Note(s)     :
+*********************************************************************************************************
+*/
+
+unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg )
+{
+    unsigned char err = 0;
+    OS_SEM_DATA  sem_data;
+    /*
+    err = NO_ERR;
+
+    if( (p_dsp_vec_cfg->vec_index_a > 7) || (p_dsp_vec_cfg->vec_index_b > 7) || (p_dsp_vec_cfg->delay > 65535 ) ) {
+        Global_VEC_Cfg.flag        = 0; //means error
+        return FW_VEC_SET_CFG_ERR;
+    }
+    Global_VEC_Cfg.vec_index_a = p_dsp_vec_cfg->vec_index_a;
+    Global_VEC_Cfg.vec_index_b = p_dsp_vec_cfg->vec_index_b;
+    Global_VEC_Cfg.delay       = p_dsp_vec_cfg->delay;
+    Global_VEC_Cfg.type        = p_dsp_vec_cfg->type;
+    Global_VEC_Cfg.gpio        = p_dsp_vec_cfg->gpio;
+    Global_VEC_Cfg.flag        = 0x55; //means cfg ok
+    Global_VEC_Cfg.trigger_en  = p_dsp_vec_cfg->trigger_en;
+    Global_VEC_Cfg.pdm_clk_off = p_dsp_vec_cfg->pdm_clk_off;
+    Global_VEC_Cfg.if_type     = p_dsp_vec_cfg->if_type;
+
+    if( Global_VEC_Cfg.trigger_en ) {
+        err = MCU_Load_Vec(1);
+    } else {
+        //check if it's in MCU_Load_Vec() now
+        OSSemQuery(Load_Vec_Sem_lock, &sem_data);
+        if( sem_data.OSCnt == 0 ) {
+            OSTimeDlyResume(APP_CFG_TASK_USER_IF_PRIO);
+            OSSemPend( Load_Vec_Sem_lock, 0, &err );
+            OSSemPost( Load_Vec_Sem_lock );
         }
+        I2C_Mixer(I2C_MIX_FM36_CODEC);
+        err = FM36_PDMADC_CLK_OnOff(1,0); //enable PDM clock
+        I2C_Mixer(I2C_MIX_UIF_S);
+    }
+    */
+    return err;
 
 }
-
-
