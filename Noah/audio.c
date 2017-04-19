@@ -50,12 +50,19 @@ unsigned char  global_audio_padding_byte;
 volatile unsigned char  Global_SPI_Rec_Start = 0;
 volatile unsigned char  Global_SPI_Rec_En = 0;
 
+bool global_flag_sync_audio_0 = false;
+bool global_flag_sync_audio_1 = false;
+
 Pin SSC_Sync_Pin  = PIN_SSC_RF;
 Pin SSC_Sync_Pin1 = PIN_SSC1_RF;
 
 extern unsigned int  global_rec_spi_en ;
 extern unsigned int  global_play_spi_en ;
 extern void Init_Audio_Bulk_FIFO( void );
+
+
+
+unsigned char pq_0, pq_1;
 /*
 *********************************************************************************************************
 *                                  First_Pack_Check_BO()
@@ -70,9 +77,6 @@ extern void Init_Audio_Bulk_FIFO( void );
 * Note(s)     :  None.
 *********************************************************************************************************
 */
-
-
-
 bool First_Pack_Check_BO( unsigned char *pData, unsigned int size )
 {    
     
@@ -801,9 +805,14 @@ unsigned char Stop_Audio( void )
     restart_audio_1_bulk_out = false  ;
     restart_audio_1_bulk_in  = false  ; 
     restart_audio_2_bulk_out = false  ;
-    restart_audio_2_bulk_in  = false  ;                       
- 
+    restart_audio_2_bulk_in  = false  ;
+    
     audio_play_buffer_ready  = false  ;
+    
+    global_flag_sync_audio_0 = false  ;
+    global_flag_sync_audio_1 = false  ;
+ 
+   
     
     OSTimeDly(20);
     Destroy_Audio_Path(); 
@@ -1136,7 +1145,7 @@ void peripheral_sync_start( void *instance )
                           
     First_Pack_Padding_BI( &ep0BulkIn_fifo );
     First_Pack_Padding_BI( &ep1BulkIn_fifo ); 
-                          
+                              
     if( source_ssc0.buffer_read != NULL )
     {
         source_ssc0.buffer_read(   &source_ssc0,
@@ -1219,10 +1228,13 @@ void Audio_Manager( unsigned char cfg_data )
        First_Pack_Padding_BI( &ep0BulkIn_fifo );
        source_ssc0.buffer_read(  &source_ssc0,
                                  ( uint8_t * )ssc0_PingPongIn,                                              
-                                  source_ssc0.rxSize );
-       source_ssc0.status[ IN ]  = ( uint8_t )START;
-    }
-   
+                                  source_ssc0.rxSize ); 
+       if( ssc0_play_bit )  { //if play&rec , then need sync from start
+            source_ssc0.status[ IN ]  = ( uint8_t )START;  
+       } else {
+            source_ssc0.status[ IN ]  = ( uint8_t )RUNNING;
+       }
+    }   
     if( ssc0_play_bit  )
     {
        source_ssc0.buffer_write(  &source_ssc0,
@@ -1237,9 +1249,12 @@ void Audio_Manager( unsigned char cfg_data )
        source_ssc1.buffer_read(  &source_ssc1,
                                  ( uint8_t * )ssc1_PingPongIn,                                              
                                   source_ssc1.rxSize );
-       source_ssc1.status[ IN ]  = ( uint8_t )START;
-    }
-   
+       if( ssc1_play_bit )  { //if play&rec , then need sync from start
+            source_ssc1.status[ IN ]  = ( uint8_t )START;  
+       } else {
+            source_ssc1.status[ IN ]  = ( uint8_t )RUNNING;
+       }       
+    }    
     if( ssc1_play_bit  )
     {
        source_ssc1.buffer_write(  &source_ssc1,
@@ -1248,36 +1263,19 @@ void Audio_Manager( unsigned char cfg_data )
        source_ssc1.status[ OUT ] = ( uint8_t )START;         
     }
     
-//    //start SSC port 
-//    if( ssc0_rec_bit || ssc0_play_bit ){
-//        while( !PIO_Get( &SSC_Sync_Pin ) );
-//        while(  PIO_Get( &SSC_Sync_Pin ) );
-//
-//        if(ssc0_rec_bit){
-//            SSC_EnableReceiver( ( Ssc * )source_ssc0.dev.instanceHandle );
-//        }
-//        if( ssc0_play_bit  ){
-//            SSC_EnableTransmitter( ( Ssc * )source_ssc0.dev.instanceHandle );
-//        }
-//    }
-//
-//    if( ssc1_rec_bit || ssc1_play_bit ){
-//        if( ssc_sync_bit == 0) {
-//        while( !PIO_Get( &SSC_Sync_Pin1 ) );
-//        while(  PIO_Get( &SSC_Sync_Pin1 ) );
-//        }
-//
-//        if( ssc1_rec_bit  ){
-//            SSC_EnableReceiver( ( Ssc * )source_ssc1.dev.instanceHandle );
-//        }
-//        if( ssc1_play_bit  ){
-//            SSC_EnableTransmitter( ( Ssc * )source_ssc1.dev.instanceHandle );
-//        }
-//    }
-    
+#if 0    
+    //test
+    uint8_t temp[ 64 ];     
+    memset( temp, 0x55, 64 );     
+    kfifo_put( &ep0BulkIn_fifo, temp, 64 ) ;
+    kfifo_put( &ep1BulkIn_fifo, temp, 64 ) ; 
+#endif    
+    pq_0 = 0;
+    pq_1 = 0;
     if( ssc_sync_bit ) { 
-      
-        UIF_LED_Off( LED_RUN );
+        global_flag_sync_audio_0 = false  ;
+        global_flag_sync_audio_1 = false  ;
+        //UIF_LED_Off( LED_RUN );
         //maybe need based on BCLK poolarity to select???
         while(  PIO_Get( &SSC_Sync_Pin ) ); //wait until low        
         while( !PIO_Get( &SSC_Sync_Pin ) ); //wait until high
@@ -1288,7 +1286,7 @@ void Audio_Manager( unsigned char cfg_data )
         if( ssc1_rec_bit  ){
             SSC_EnableReceiver( ( Ssc * )source_ssc1.dev.instanceHandle );
         } 
-        UIF_LED_On( LED_RUN ); 
+        //UIF_LED_On( LED_RUN ); 
         OSTimeDly(2);               
         while(  PIO_Get( &SSC_Sync_Pin ) ); //wait until low        
         while( !PIO_Get( &SSC_Sync_Pin ) ); //wait until high 
@@ -1298,9 +1296,11 @@ void Audio_Manager( unsigned char cfg_data )
         if( ssc1_play_bit  ){
             SSC_EnableTransmitter( ( Ssc * )source_ssc1.dev.instanceHandle );
         }       
-        UIF_LED_Off( LED_RUN ) ;    
+        //UIF_LED_Off( LED_RUN ) ;    
       
     } else {
+        global_flag_sync_audio_0 = true  ;
+        global_flag_sync_audio_1 = true  ;
         if( ssc0_rec_bit || ssc0_play_bit ){
             while(  PIO_Get( &SSC_Sync_Pin ) ); //wait until low        
             while( !PIO_Get( &SSC_Sync_Pin ) ); //wait until high

@@ -134,6 +134,10 @@ extern volatile unsigned char Global_SPI_Rec_Start;
 extern volatile unsigned char Global_SPI_Rec_En;
 extern SET_VEC_CFG     Global_VEC_Cfg;
 
+extern bool global_flag_sync_audio_0 ;
+extern bool global_flag_sync_audio_1 ;
+
+extern unsigned char pq_0, pq_1;
 ////////////////////////////////////////////////////////////////////////////////
 
 
