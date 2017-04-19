@@ -525,7 +525,7 @@ static  void  App_TaskStart (void *p_arg)
     counter = 0;
     
     for (;;) {
-
+        OSTimeDly(10); continue; //test
 #if 1
         counter++;
         if(counter&0xFF) {

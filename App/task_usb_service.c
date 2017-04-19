@@ -30,8 +30,7 @@
      
 #include <includes.h>     
 
-Pin SSC_Sync_Pin = PIN_SSC_RF;
-Pin SSC_Sync_Pin1 = PIN_SSC1_RF;
+
 uint8_t tmpBuffer[ USB_RINGOUT_SIZE_16K];
 //uint8_t tmpBuffer1[ I2S_PINGPONG_IN_SIZE_3K ];
 void Init_Audio_Path();
@@ -78,6 +77,7 @@ void  App_TaskUSBService ( void *p_arg )
         if( usb_state != usb_state_saved ) { //if usb state changed
           
             usb_state_saved = usb_state ;
+            
             if ( usb_state >= USBD_STATE_CONFIGURED ) {                 
                 CDCDSerialDriver_ReadCmd(  usbCmdCacheBulkOut,
                                   USB_CMDEP_SIZE_64B ,
@@ -101,7 +101,7 @@ void  App_TaskUSBService ( void *p_arg )
         OSTimeDly( 20 );
         continue;
         
-        
+/*       
         e = portsList.head;         
         while( e != NULL )
         {
@@ -231,7 +231,9 @@ void  App_TaskUSBService ( void *p_arg )
                 APP_TRACE_INFO(("\r\nPath not defined[EP%d] !",pPath->ep ));                
             }            
             e = e -> next;            
-        }         
+        } 
+
+*/        
         OSTimeDly( 1 );
 //        OS_Sched();          
     } //for loop

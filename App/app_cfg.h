@@ -101,7 +101,7 @@
 *********************************************************************************************************
 */
 
-#define  APP_CFG_TASK_START_STK_SIZE                     128
+#define  APP_CFG_TASK_START_STK_SIZE                     256
 #define  APP_CFG_TASK_USER_IF_STK_SIZE                   512
 #define  APP_CFG_TASK_JOY_STK_SIZE                       128
 #define  APP_CFG_TASK_SHELL_STK_SIZE                     256

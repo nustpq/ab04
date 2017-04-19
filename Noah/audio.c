@@ -50,6 +50,9 @@ unsigned char  global_audio_padding_byte;
 volatile unsigned char  Global_SPI_Rec_Start = 0;
 volatile unsigned char  Global_SPI_Rec_En = 0;
 
+Pin SSC_Sync_Pin  = PIN_SSC_RF;
+Pin SSC_Sync_Pin1 = PIN_SSC1_RF;
+
 extern unsigned int  global_rec_spi_en ;
 extern unsigned int  global_play_spi_en ;
 extern void Init_Audio_Bulk_FIFO( void );
@@ -780,19 +783,13 @@ unsigned char Start_Audio( START_AUDIO start_audio )
 */
 unsigned char Stop_Audio( void )
 {
-    unsigned char err   = 0xFF;
-    unsigned char data  = 0xFF;
     unsigned char ruler_id;
-    unsigned char buf[] = { CMD_DATA_SYNC1, CMD_DATA_SYNC2, RULER_CMD_STOP_AUDIO };
-    
-
+ 
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 // Storage for CPU status register
 #endif
-    
-
     APP_TRACE_INFO(("\r\n<3>Stop_Audio\r\n"));
-    // Audio_Stop();
+ 
     audio_run_control        = false  ;     
     OSTimeDly(20); 
     
@@ -808,18 +805,17 @@ unsigned char Stop_Audio( void )
  
     audio_play_buffer_ready  = false  ;
     
-    OSTimeDly(30);
+    OSTimeDly(20);
     Destroy_Audio_Path(); 
 
-    OSTimeDly( 50 );
+    OSTimeDly( 10 );
     
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
-   
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
-    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
-    
-    OSTimeDly(50); 
+//    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAOUT );
+//    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_0_DATAIN );
+//   
+//    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAOUT );
+//    usb_CloseData( CDCDSerialDriverDescriptors_AUDIO_1_DATAIN );       
+//    OSTimeDly(50); 
   
 //    reset_fpga( );
     //Pin_Reset_Codec( 0 );
@@ -836,7 +832,6 @@ unsigned char Stop_Audio( void )
     memset( ssc0_PingPongIn, 0 , sizeof( ssc0_PingPongIn ) );        
     memset( ssc1_PingPongOut,0 , sizeof( ssc1_PingPongOut ) );    
     memset( ssc1_PingPongIn, 0 , sizeof( ssc1_PingPongIn ) );   
-    
 
 
 #if 0    
@@ -887,10 +882,11 @@ unsigned char Stop_Audio( void )
     }
 #endif
     
-    ssc0_init( );
-    ssc1_init( );
-    Dma_configure( ); 
+//    ssc0_init( );
+//    ssc1_init( );
+//    Dma_configure( ); 
     
+
     return 0 ;
 }
 
@@ -931,7 +927,7 @@ unsigned char Reset_Audio( void )
 }
 
 
-
+#if 0 /////////////////////
 /*
 *********************************************************************************************************
 *                                    peripheral_ssc0_recoder()
@@ -1022,7 +1018,7 @@ void peripheral_ssc1_recorder( void *instance )
 */
 void peripheral_ssc0_start( void *instance )
 {
-extern Pin SSC_Sync_Pin;  
+ 
     uint8_t  err = 0; 
 
 #if 0    
@@ -1124,7 +1120,7 @@ extern Pin SSC_Sync_Pin1;
 */
 void peripheral_sync_start( void *instance )
 {
-    extern Pin SSC_Sync_Pin;
+
     uint8_t err = 0;
 
 //    err = Init_CODEC( &source_twi2,
@@ -1179,7 +1175,7 @@ void peripheral_sync_start( void *instance )
     }    
 }
 
-
+#endif   //////////////////////////////
 
 
 /*
@@ -1200,8 +1196,7 @@ void peripheral_sync_start( void *instance )
 */
 void Audio_Manager( unsigned char cfg_data )
 {
-    const uint8_t err;
-    
+       
     APP_TRACE_INFO(( "\r\nAudio Manager: config data = 0X%0X ]", cfg_data ));
     
     const uint8_t ssc0_rec_bit      = cfg_data & ( 1 << 0 );
@@ -1280,10 +1275,12 @@ void Audio_Manager( unsigned char cfg_data )
 //        }
 //    }
     
-    if( ssc_sync_bit ) {       
-    
-        while( !PIO_Get( &SSC_Sync_Pin ) );
-        while(  PIO_Get( &SSC_Sync_Pin ) );         
+    if( ssc_sync_bit ) { 
+      
+        UIF_LED_Off( LED_RUN );
+        //maybe need based on BCLK poolarity to select???
+        while(  PIO_Get( &SSC_Sync_Pin ) ); //wait until low        
+        while( !PIO_Get( &SSC_Sync_Pin ) ); //wait until high
         
         if(ssc0_rec_bit){
             SSC_EnableReceiver( ( Ssc * )source_ssc0.dev.instanceHandle );
@@ -1291,28 +1288,30 @@ void Audio_Manager( unsigned char cfg_data )
         if( ssc1_rec_bit  ){
             SSC_EnableReceiver( ( Ssc * )source_ssc1.dev.instanceHandle );
         } 
-        
-        OSTimeDly(2);
-        
+        UIF_LED_On( LED_RUN ); 
+        OSTimeDly(2);               
+        while(  PIO_Get( &SSC_Sync_Pin ) ); //wait until low        
+        while( !PIO_Get( &SSC_Sync_Pin ) ); //wait until high 
         if( ssc0_play_bit  ){
             SSC_EnableTransmitter( ( Ssc * )source_ssc0.dev.instanceHandle );
         }        
         if( ssc1_play_bit  ){
             SSC_EnableTransmitter( ( Ssc * )source_ssc1.dev.instanceHandle );
         }       
-             
+        UIF_LED_Off( LED_RUN ) ;    
       
     } else {
         if( ssc0_rec_bit || ssc0_play_bit ){
-            while( !PIO_Get( &SSC_Sync_Pin ) );
-            while(  PIO_Get( &SSC_Sync_Pin ) );
+            while(  PIO_Get( &SSC_Sync_Pin ) ); //wait until low        
+            while( !PIO_Get( &SSC_Sync_Pin ) ); //wait until high
 
             if(ssc0_rec_bit){
                 SSC_EnableReceiver( ( Ssc * )source_ssc0.dev.instanceHandle );
             }
             
             OSTimeDly(1);   //I2S_PINGPONG_BUF_SIZE_MS = 4, 
-            
+            while(  PIO_Get( &SSC_Sync_Pin ) ); //wait until low        
+            while( !PIO_Get( &SSC_Sync_Pin ) ); //wait until high
             if( ssc0_play_bit  ){
                 SSC_EnableTransmitter( ( Ssc * )source_ssc0.dev.instanceHandle );
             }        
@@ -1320,16 +1319,16 @@ void Audio_Manager( unsigned char cfg_data )
         
         OSTimeDly(1);
         
-        if( ssc1_rec_bit || ssc1_play_bit ){      
-            while( !PIO_Get( &SSC_Sync_Pin1 ) );
+        if( ssc1_rec_bit || ssc1_play_bit ){            
             while(  PIO_Get( &SSC_Sync_Pin1 ) );      
-
+            while( !PIO_Get( &SSC_Sync_Pin1 ) );
             if( ssc1_rec_bit  ){
                 SSC_EnableReceiver( ( Ssc * )source_ssc1.dev.instanceHandle );
             }
             
             OSTimeDly(1);
-            
+            while(  PIO_Get( &SSC_Sync_Pin1 ) );      
+            while( !PIO_Get( &SSC_Sync_Pin1 ) );
             if( ssc1_play_bit  ){
                 SSC_EnableTransmitter( ( Ssc * )source_ssc1.dev.instanceHandle );
             }

@@ -238,7 +238,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
     DataSource *pSource = ( DataSource *)pArg;
     if ( audio_run_control == false) {  return ;}
     
-    //  UIF_LED_On( LED_HDMI );  
+      UIF_LED_On( LED_HDMI );  
 	  switch( pSource->status[ IN ] ) 
 		{
 		    case START   :
@@ -312,6 +312,7 @@ void _SSC0_DmaRxCallback( uint8_t status, void *pArg)
 
 		}
 	   pSource->rx_index = 1 - pSource->rx_index;
+      UIF_LED_Off( LED_HDMI );
 }
 
 /*
@@ -337,7 +338,7 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 //    memset( padding, global_audio_padding_byte, 128 );
     DataSource *pSource = ( DataSource *)pArg;
     if ( audio_run_control == false) {  return ;}
-    
+    //UIF_LED_On( LED_RUN );
 	switch( pSource->status[ IN ] ) 
 
 		{
@@ -423,7 +424,8 @@ void _SSC1_DmaRxCallback( uint8_t status, void *pArg)
 				break;
 
 		}
-	   pSource->rx_index = 1 - pSource->rx_index;
+	 pSource->rx_index = 1 - pSource->rx_index;
+     //UIF_LED_Off( LED_RUN );
 }
 
 /*
@@ -451,7 +453,8 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg )
     DataSource *pSource = ( DataSource *)pArg;
     //Ssc *pSsc = _get_ssc_instance( pSource->dev.identify );
     //pSource->pBufferOut = ( uint8_t * )&ssc0_PingPongOut[ 1 - pSource->tx_index ];
-     
+    //UIF_LED_On( LED_RUN );
+    
   	switch( pSource->status[ OUT ] ) { 
 
   		case START :
@@ -497,16 +500,15 @@ void _SSC0_DmaTxCallback( uint8_t status, void *pArg )
                                                       16000 );
             break;
 
-  			case STOP  :
-  				  break;
+  		case STOP  :
+            break;
 
-  			default:      
-  				  break;
+        default:      
+  			break;
        
-      }
-      
-      pSource->tx_index = 1 - pSource->tx_index;
-
+    }        
+    pSource->tx_index = 1 - pSource->tx_index;
+    //UIF_LED_Off( LED_RUN );
 
 }
 
@@ -646,7 +648,7 @@ uint8_t ssc0_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
                              | DMAC_CTRLB_DIF_AHB_IF0
                              ;      
         pTds[1].dwDscAddr = (uint32_t) &pTds[0];
-               
+         SSC_DisableTransmitter( pSsc );       
         /* Enable recording(SSC RX) */
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.rxDMAChannel, dmaTdSSC0Rx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.rxDMAChannel);
@@ -708,7 +710,7 @@ uint8_t ssc1_buffer_read( void *pInstance,const uint8_t *buf,uint32_t len )
                              | DMAC_CTRLB_DIF_AHB_IF0
                              ;      
         pTds[1].dwDscAddr = (uint32_t) &pTds[0];
-               
+          SSC_DisableTransmitter( pSsc );      
         /* Enable recording(SSC RX) */
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.rxDMAChannel, dmaTdSSC1Rx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.rxDMAChannel);
@@ -771,12 +773,12 @@ uint8_t ssc0_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 			  | DMAC_CTRLB_SRC_INCR_INCREMENTING
 			  | DMAC_CTRLB_DST_INCR_FIXED;
 	pTds[1].dwDscAddr = (uint32_t) &pTds[0];
-               
+         SSC_DisableTransmitter( pSsc );       
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC0Tx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
 
         //SSC_EnableTransmitter( pSsc );
-        
+       
         return 0;
 }
 
@@ -829,7 +831,7 @@ uint8_t ssc1_buffer_write( void *pInstance,const uint8_t *buf,uint32_t len )
 			  | DMAC_CTRLB_SRC_INCR_INCREMENTING
 			  | DMAC_CTRLB_DST_INCR_FIXED;
 	pTds[1].dwDscAddr = (uint32_t) &pTds[0];
-               
+         SSC_DisableTransmitter( pSsc );       
         DMAD_PrepareMultiTransfer(&g_dmad, pSource->dev.txDMAChannel, dmaTdSSC1Tx);
         DMAD_StartTransfer(&g_dmad, pSource->dev.txDMAChannel);
 
