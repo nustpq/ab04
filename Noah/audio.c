@@ -155,7 +155,7 @@ bool First_Pack_Check_BO2( unsigned char *pData, unsigned int size, uint32_t *po
     uint32_t i;
     uint32_t cnt = 0;
     
-    for( i = 0; size ; i ++ )
+    for( i = 0; i<size ; i ++ )
     {
         if( global_audio_padding_byte == *pData++ )
             cnt++;

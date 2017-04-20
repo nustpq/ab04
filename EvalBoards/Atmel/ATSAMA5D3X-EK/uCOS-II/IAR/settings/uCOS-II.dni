@@ -10,11 +10,11 @@ LimitSize=0
 ByteLimit=50
 [JLinkDriver]
 WatchCond=_ 0
-Watch0=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
-Watch1=_ 0 "" 0 "" 0 "" 0 "" 0 0 0 0
+Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
+Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=-2049277397
+Checksum=972420380
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -55,6 +55,11 @@ Fmt3=uint8_t[6144]	4	0
 Fmt0={W}0:pTds[1].dwDstAddr	4	0
 Fmt1={W}0:pTds[1].dwSrcAddr	4	0
 Fmt2={W}0:status	4	0
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Noah\uif.c}.115.5" 0 0 1 "" 0 "" 0
+Count=1
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -62,19 +67,6 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
-[CallStackLog]
-Enabled=0
-[DriverProfiling]
-Enabled=0
-Mode=0
-Graph=0
-Symbiont=0
-Exclusions=
-[Disassemble mode]
-mode=0
-[Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Noah\uif.c}.115.5" 0 0 1 "" 0 "" 0
-Count=1
 [Aliases]
 A0=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dbgu_console.c"
 A1=_ "D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c" "E:\uif_gitrepos\ab04\develop\AB04\libraries\libboard_sama5d3x-ek\source\dmad.c"
@@ -84,3 +76,11 @@ A4=_ "E:\uif_gitrepos\20170314\AB04\libraries\libchip_sama5d3x\source\spi.c" "E:
 A5=_ "E:\uif_gitrepos\20170314\AB04\libraries\usb\device\cdc-serial\CDCDSerialPort.c" "E:\uif_gitrepos\ab04\20170314\AB04\libraries\usb\device\cdc-serial\CDCDSerialPort.c"
 Count=6
 SuppressDialog=1
+[CallStackLog]
+Enabled=0
+[DriverProfiling]
+Enabled=0
+Mode=0
+Graph=0
+Symbiont=0
+Exclusions=
