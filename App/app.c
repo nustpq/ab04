@@ -324,6 +324,7 @@ static  void  App_TaskStart (void *p_arg)
     (void)p_arg;
     CPU_INT32U  counter;
     CPU_INT08U  os_err;
+    CPU_INT08U  usb_state, usb_state_saved ;
 
     BSP_Init();
     Mem_Init();
@@ -352,7 +353,7 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_DBG_INFO_PRIO, "Debug Info", &os_err);
 #endif
 
-    /**/
+/*
     os_err = OSTaskCreateExt((void (*)(void *)) App_TaskUSBService,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskUSBSevStk[APP_CFG_TASK_USB_SEV_STK_SIZE - 1],
@@ -367,7 +368,7 @@ static  void  App_TaskStart (void *p_arg)
     OSTaskNameSet(APP_CFG_TASK_USB_SEV_PRIO, "USB Service", &os_err);
 #endif
     
-/*   
+  
     os_err = OSTaskCreateExt((void (*)(void *)) App_AudioManager,
                     (void           *) 0,
                     (OS_STK         *)&App_TaskAudioMgrStk[APP_CFG_TASK_AUDIO_MGR_STK_SIZE - 1],
@@ -522,22 +523,49 @@ static  void  App_TaskStart (void *p_arg)
 #endif    
     
 ////////////////////////////////////////////////////////////////////////////////
+    
     counter = 0;
+    usb_state_saved = 0;
     
     for (;;) {
-        //OSTimeDly(10); continue; //test
-#if 1
+      
+        //OSTimeDly(10); continue; //test    
+      
+        Ruler_Port_LED_Service();
+        
+        usb_state =  USBD_GetState(); 
+        
+        if( usb_state != usb_state_saved ) { //if usb state changed
+          
+            usb_state_saved = usb_state ;
+            
+            if ( usb_state >= USBD_STATE_CONFIGURED ) {                 
+                CDCDSerialDriver_ReadCmd(  usbCmdCacheBulkOut,
+                                  USB_CMDEP_SIZE_64B ,
+                                  (TransferCallback) UsbCmdDataReceived,                                
+                                  0);
+            }
+        }
+        
+        if ( audio_run_control == false) {  
+            if ( usb_state < USBD_STATE_CONFIGURED ) {           
+                UIF_LED_Off( LED_USB );                  
+            } else {
+                UIF_LED_On( LED_USB );
+            }
+        }          
+        
+#if 1   
         counter++;
         if(counter&0xFF) {
             UIF_LED_On( LED_RUN );
         }     
         if(counter&0x3F) {
             UIF_LED_Off( LED_RUN );
-        }
-        Ruler_Port_LED_Service();
+        }        
         OSTimeDly(10);
 
-#else      
+#else    //Breathing   
         for ( unsigned int i = 0; i< 20; i++ ) {
             for ( unsigned int j = 0; j< 5; j++ ) {
                 UIF_LED_On( LED_RUN );
@@ -556,6 +584,7 @@ static  void  App_TaskStart (void *p_arg)
         }
 #endif
     }
+    
 
 }
 
