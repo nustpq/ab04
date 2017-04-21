@@ -506,7 +506,7 @@ static  void  App_TaskStart (void *p_arg)
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet(APP_CFG_TASK_JOY_PRIO, "Keyboard", &os_err);
 #endif
-    
+   
     
      os_err = OSTaskCreateExt((void (*)(void *)) App_TaskSpiAudio,
                     (void           *) 0,
@@ -521,7 +521,7 @@ static  void  App_TaskStart (void *p_arg)
 #if (OS_TASK_NAME_EN > 0)
     OSTaskNameSet( APP_CFG_TASK_SPI_PRIO, "spiAudio", &os_err);
 #endif    
-    
+   
 ////////////////////////////////////////////////////////////////////////////////
     
     counter = 0;
@@ -1074,7 +1074,7 @@ void Dma_configure( void )
             | DMAC_CFG_DST_H2SEL
             | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_ssc1.dev.txDMAChannel, dwCfg );
-/*----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
      // Allocate DMA channels for SPI0
     source_spi0.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,
                                               DMAD_TRANSFER_MEMORY, ID_SPI0);
@@ -1114,7 +1114,7 @@ void Dma_configure( void )
            | DMAC_CFG_SOD
            | DMAC_CFG_FIFOCFG_ALAP_CFG;
     DMAD_PrepareChannel( pDmad, source_spi0.dev.txDMAChannel, dwCfg );
-----------------------------------------------------------------------------*/
+---------------------------------------------------------------------------*/
 #if 1
      // Allocate DMA channels for SPI1
     source_spi1.dev.txDMAChannel = DMAD_AllocateChannel( pDmad,

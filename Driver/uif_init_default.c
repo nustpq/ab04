@@ -215,7 +215,7 @@ void spi1_init( unsigned int speed_hz, unsigned int format )
 
     source_spi1.init_source = init_spi;
     source_spi1.peripheral_stop = stop_spi;
-    source_spi1.buffer_write = _spiDmaTx;
+    source_spi1.buffer_write = Send_CMD_FPGA;//_spiDmaTx;
     source_spi1.buffer_read  = _spiDmaRx;
     //source_spi1.set_peripheral = spi_register_set;
 
@@ -579,9 +579,10 @@ void uif_ports_init_default( void )
 {
     ssc0_init( );
     ssc1_init( );  
-//    spi0_init( DEFAULT_SPI_SPEED, 1 );
-
+    
+    //spi0_init( DEFAULT_SPI_SPEED, 0 ); 
     spi1_init( DEFAULT_SPI_SPEED, 1 );
+    
     twi0_init( DEFAULT_TWI_SPEED );
     twi1_init( DEFAULT_TWI_SPEED );
     twi2_init( DEFAULT_TWI_SPEED );

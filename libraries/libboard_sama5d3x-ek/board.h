@@ -690,9 +690,9 @@
 #define PIN_GPIO_8              {PIO_PD8, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
 #define PIN_GPIO_9              {PIO_PD9, PIOD, ID_PIOD, PIO_INPUT, PIO_PULLUP | PIO_DEBOUNCE }
 
-#define FPGA_CS                 {(PIO_PC25), PIOC, ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT}
-#define FPGA_DAT                {(PIO_PC23), PIOC, ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT}
-#define FPGA_CLK                {(PIO_PC24), PIOC, ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT}  
+#define FPGA_CS                 {(PIO_PC25), PIOC, ID_PIOC, PIO_OUTPUT_1, PIO_DEFAULT}
+#define FPGA_DAT                {(PIO_PC23), PIOC, ID_PIOC, PIO_OUTPUT_1, PIO_DEFAULT}
+#define FPGA_CLK                {(PIO_PC24), PIOC, ID_PIOC, PIO_OUTPUT_1, PIO_DEFAULT}  
 #define PIN_FPGA_RST            PIN_FPGA_GPO0  
 
 

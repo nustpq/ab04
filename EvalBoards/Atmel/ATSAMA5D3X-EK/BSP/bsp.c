@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.999]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.9991]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V2.0]";
@@ -708,7 +708,7 @@ void UIF_Misc_On ( CPU_INT32U id )
             break;
 
         case FPGA_RST:
-            SAMA5_REG_PIOA_SODR = DEF_BIT_25;
+            //SAMA5_REG_PIOA_SODR = DEF_BIT_25;
             break;
 
         case CODEC1_RST:
@@ -775,7 +775,7 @@ void UIF_Misc_Off ( CPU_INT32U id )
             break;
 
         case FPGA_RST:
-            SAMA5_REG_PIOA_CODR = DEF_BIT_25;
+            //SAMA5_REG_PIOA_CODR = DEF_BIT_25;
             break;
 
         case CODEC1_RST:

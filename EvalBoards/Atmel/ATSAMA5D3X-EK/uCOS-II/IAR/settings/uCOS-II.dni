@@ -14,7 +14,7 @@ Watch0=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 Watch1=_ 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 "0x00000000" 0 4 0 0
 CStepIntDis=_ 0
 [DebugChecksum]
-Checksum=88778361
+Checksum=-1168215395
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -62,11 +62,9 @@ Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Noah\uif.c}.115.5" 0 0 1 "" 0 ""
 Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Noah\uif.c}.605.9" 0 0 1 "" 0 "" 0
 Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Noah\uif.c}.593.19" 0 0 1 "" 0 "" 0
 Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Noah\uif.c}.582.19" 0 0 1 "" 0 "" 0
-Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_gpio.c}.825.5" 0 0 1 "" 0 "" 0
-Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_gpio.c}.825.5" 0 0 1 "" 0 "" 0
-Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\App\app.c}.260.1" 0 0 1 "" 0 "" 0
-Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_xc3s50an.c}.1130.11" 0 0 1 "" 0 "" 0
-Count=8
+Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_gpio.c}.829.1" 0 0 1 "" 0 "" 0
+Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\Driver\uif_gpio.c}.829.1" 0 0 1 "" 0 "" 0
+Count=6
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

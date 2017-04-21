@@ -26,8 +26,8 @@ Pin gpio_pins[ ] = {
                         PIN_GPIO_0,PIN_GPIO_1,PIN_GPIO_2,PIN_GPIO_3,PIN_GPIO_4, //0~4
                         PIN_GPIO_5,PIN_GPIO_6,PIN_GPIO_7,PIN_GPIO_8,PIN_GPIO_9, //5~9
                         PIN_HDMI_PORT_DET0,  //10
-                        //FPGA_CS, FPGA_DAT, FPGA_CLK, 
-                        PIN_FPGA_RST,  PIN_FPGA_DONE,//11~15
+                        FPGA_CS, FPGA_DAT, FPGA_CLK, //1~13
+                        PIN_FPGA_RST,  PIN_FPGA_DONE,//14~15
                         
                         /*
                         PIN_FPGA_OE           ,
@@ -785,43 +785,45 @@ uint8_t Send_CMD_FPGA( void *pInstance, const uint8_t *buf, uint32_t len  )
 {
    
     unsigned int i,j ;
-    
+   #if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
+    OS_CPU_SR  cpu_sr = 0u;
+#endif 
     //APP_TRACE_DBG(("\r\nInit FPGA...[0x%0X] \r\n",channels));
+    //OS_ENTER_CRITICAL();
     
     PIO_Set(&gpio_pins[11]); //cs 
     PIO_Set(&gpio_pins[12]); //data 
-    PIO_Set(&gpio_pins[13]); //clock
-    
-    PIO_Clear(&gpio_pins[11]); //cs, delay compensation
-    
-    for ( i = len; i > 0; i-- ) {        
-        for ( j = 0 ; j<8; j++) {
-            PIO_Clear(&gpio_pins[13]); //clock       
-            if( ( *(buf+i-1) >> j ) & 0x01 ) {
+    PIO_Set(&gpio_pins[13]); //clock     
+    PIO_Clear(&gpio_pins[11]); //cs, delay compensation    
+ 
+    for ( i = 0; i < len; i++) {        
+        for ( j = 0 ; j<8; j++) {             
+            PIO_Set(&gpio_pins[13]); //clock
+            if( ( *(buf+i) << j ) & 0x80 ) {
                 PIO_Set(&gpio_pins[12]); //data 
             } else {
                 PIO_Clear(&gpio_pins[12]); //data 
             }
-            PIO_Set(&gpio_pins[13]); //clock
+            PIO_Clear(&gpio_pins[13]); //clock 
         }
     } 
+    PIO_Set(&gpio_pins[11]); //cs
     
-    PIO_Set(&gpio_pins[11]); //cs 
-    
+    //OS_EXIT_CRITICAL();
     return 0;
 }
 
 void Reset_FPGA( void)
 {
   
-   PIO_Clear(&gpio_pins[11]); 
+   PIO_Clear(&gpio_pins[14]); 
    OSTimeDly(1);
-   PIO_Set(&gpio_pins[11]); 
+   PIO_Set(&gpio_pins[14]); 
   
 }
 
 unsigned char Check_FPGA_Done( void )
 {
-    return 1;//PIO_Get( &gpio_pins[ 12 ] );
+    return 1;//PIO_Get( &gpio_pins[ 15 ] );
 }
 
