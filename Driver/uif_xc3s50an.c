@@ -484,7 +484,7 @@ int8_t set_fpga_path( void *handle,FPGA_COMMAND* pCmd,List *clkList,List *dataLi
   //step3: send command word to fpga and valid it via spi1 port;
   fpga->controller->buffer_write( ( void * )fpga->controller,
                                  ( uint8_t * )pCmd,
-                                 sizeof( uint32_t ) << 2 );
+                                 sizeof( FPGA_COMMAND ) );
 //  APP_TRACE_INFO(("%s :  fpga cmd send : %ld\r\n",__func__, *(uint64_t *)pCmd++ ));
 //  APP_TRACE_INFO(("%s :  fpga cmd send : %ld\r\n",__func__, *(uint64_t *)pCmd ));
     
@@ -1118,11 +1118,20 @@ void destroy_role_item( void *key )
 void reset_fpga( void )
 {
   APP_TRACE_INFO(("Reset FPGA...\r\n"));
+#ifdef  AB04_1ND
   UIF_Misc_Off ( FPGA_RST );
   UIF_DelayUs( 10 ) ;
   UIF_Misc_On ( FPGA_RST );
-}
+#else
+  UIF_Misc_Off ( FPGA_PCK0 );  //use PD30 as soft reset pin;
+  UIF_DelayUs( 10 ) ;
+  UIF_Misc_On ( FPGA_PCK0 );
+#endif
+   while( Check_FPGA_Done() == 0 ) {
+      OSTimeDly(1);
+   }
 
+}
 
 /*
 *********************************************************************************************************
@@ -1139,7 +1148,7 @@ void reset_fpga( void )
 void init_fpga( )
 {
   //TODO:what will do here
-  reset_fpga( );
+  reset_fpga( );  
   APP_TRACE_INFO(("Init FPGA...\r\n"));
   //list_init( &fpga_i2s_clk_list , NULL );
   //list_init( &fpga_i2s_data_list , NULL);
@@ -1324,20 +1333,96 @@ unsigned char FPGA_POST_Setup( void )
     
     //test codec0 as master
     Init_fpga_clock_path( 0,0,"codec0_port0_0" );
-    Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
-    Init_fpga_clock_path( 0,0,"codec0_ssc0_2" );
-    Init_fpga_clock_path( 0,0,"codec0_port1_3" );
-    Init_fpga_clock_path( 0,0,"codec0_codec1_4" );
-    Init_fpga_clock_path( 0,0,"codec0_ssc1_5" );
-    //Init_fpga_clock_path( 0,0,"codec1_port1_7" );
-    //Init_fpga_clock_path( 0,0,"codec1_ssc1_9" );
+    //Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
+    //Init_fpga_clock_path( 0,0,"codec0_ssc0_2" );
+    //Init_fpga_clock_path( 0,0,"codec0_port1_3" );
+    //Init_fpga_clock_path( 0,0,"codec0_codec1_4" );
+    //Init_fpga_clock_path( 0,0,"codec0_ssc1_5" );
+    Init_fpga_clock_path( 0,0,"codec1_port1_7" );
+    Init_fpga_clock_path( 0,0,"codec1_ssc1_9" );
         
     Init_fpga_data_path( "uif_i2s0_rx->fm36_i2s_rx" );
     Init_fpga_data_path( "ssc0_tx->codec0_rx" );
     Init_fpga_data_path( "ssc1_tx->codec1_rx" );
     Init_fpga_data_path( "fm36_pdmo_data->uif_pdmo_data" );
     Init_fpga_data_path( "fm36_pdmi_clk->hdmi_pdm_clk" );
+   
     
+    /*
+    xc3s50an.cmdWord.pdm_revers = 0xffffffff;
+    xc3s50an.cmdWord.t_revs0 = 0x01 ;      
+    xc3s50an.cmdWord.t_revs1 = 0x01 ;
+    xc3s50an.cmdWord.t_revs2 = 0x01 ; 
+    
+    xc3s50an.cmdWord.t0 = 0x01 ;      
+    xc3s50an.cmdWord.t1 = 0x01 ;
+    xc3s50an.cmdWord.t2 = 0x01 ; 
+    
+    xc3s50an.cmdWord.t3 = 0x01 ;      
+    xc3s50an.cmdWord.t4 = 0x01 ;
+    xc3s50an.cmdWord.t5 = 0x01 ;
+    
+    xc3s50an.cmdWord.t6 = 0x01 ;
+    xc3s50an.cmdWord.t7 = 0x01 ;    
+	
+    xc3s50an.cmdWord.dir_revers6 = 0xff;
+    xc3s50an.cmdWord.dir_port1_ssc1   =  0x01;  
+    xc3s50an.cmdWord.dir_port1_fm36   =  0x01;
+    xc3s50an.cmdWord.dir_revers0      =  0x01;
+    xc3s50an.cmdWord.dir_revers1      =  0x01;
+    xc3s50an.cmdWord.dir_revers2      =  0x01;
+    xc3s50an.cmdWord.dir_revers3      =  0x01;
+    xc3s50an.cmdWord.dir_revers4      =  0x01;
+    xc3s50an.cmdWord.dir_revers5      =  0x01;
+
+    xc3s50an.cmdWord.dir_codec1_ssc0  =  0x01;
+    xc3s50an.cmdWord.dir_codec1_ssc1  =  0x01;
+    xc3s50an.cmdWord.dir_port0_port1  =  0x01;
+    xc3s50an.cmdWord.dir_port0_ssc0   =  0x01;
+    xc3s50an.cmdWord.dir_port0_ssc1   =  0x01;
+    xc3s50an.cmdWord.dir_port0_fm36   =  0x01;
+    xc3s50an.cmdWord.dir_port1_ssc0   =  0x01;
+        
+    xc3s50an.cmdWord.dir_codec0_port0 =  0x01;
+    xc3s50an.cmdWord.dir_codec0_fm36  =  0x01;
+    xc3s50an.cmdWord.dir_codec0_ssc0  =  0x01;
+    xc3s50an.cmdWord.dir_codec0_port1 =  0x01;
+    xc3s50an.cmdWord.dir_codec0_codec1=  0x01;
+    xc3s50an.cmdWord.dir_codec0_ssc1  =  0x01;
+    xc3s50an.cmdWord.dir_codec1_port0 =  0x01;
+    xc3s50an.cmdWord.dir_codec1_port1 =  0x01;
+
+	
+    xc3s50an.cmdWord.oe_revers6 = 0xff ;
+
+    xc3s50an.cmdWord.oe_port1_ssc1    =  0x01;
+    xc3s50an.cmdWord.oe_port1_fm36    =  0x01;
+    xc3s50an.cmdWord.oe_revers0       =  0x01;
+    xc3s50an.cmdWord.oe_revers1       =  0x01;
+    xc3s50an.cmdWord.oe_revers2       =  0x01;
+    xc3s50an.cmdWord.oe_revers3       =  0x01;
+    xc3s50an.cmdWord.oe_revers4	   =  0x01;
+    xc3s50an.cmdWord.oe_revers5	   =  0x01;
+
+    xc3s50an.cmdWord.oe_codec1_ssc0     =  0x01;
+    xc3s50an.cmdWord.oe_codec1_ssc1     =  0x01;
+    xc3s50an.cmdWord.oe_codec1_fm36     =  0x01;
+    xc3s50an.cmdWord.oe_port0_port1     =  0x01;
+    xc3s50an.cmdWord.oe_port0_ssc0      =  0x01;
+    xc3s50an.cmdWord.oe_port0_ssc1      =  0x01;
+    xc3s50an.cmdWord.oe_port0_fm36      =  0x01;
+    xc3s50an.cmdWord.oe_port1_ssc0      =  0x01;
+        
+    xc3s50an.cmdWord.oe_codec0_port0    =  0x00;  // LSB
+    xc3s50an.cmdWord.oe_codec0_fm36     =  0x01;
+    xc3s50an.cmdWord.oe_codec0_ssc0     =  0x01;
+    xc3s50an.cmdWord.oe_codec0_port1    =  0x01;
+    xc3s50an.cmdWord.oe_codec0_codec1   =  0x01;
+    xc3s50an.cmdWord.oe_codec0_ssc1     =  0x01;	
+    xc3s50an.cmdWord.oe_codec1_port0    =  0x01;
+    xc3s50an.cmdWord.oe_codec1_port1   =  0x01; 
+    */ 
+
     err = xc3s50an.set_path( &xc3s50an, 
                        &xc3s50an.cmdWord , 
                        &xc3s50an.fpga_i2s_clk_list, 

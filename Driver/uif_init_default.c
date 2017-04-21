@@ -216,7 +216,7 @@ void spi1_init( unsigned int speed_hz, unsigned int format )
     source_spi1.init_source = init_spi;
     source_spi1.peripheral_stop = stop_spi;
     source_spi1.buffer_write = _spiDmaTx;
-    source_spi1.buffer_read = _spiDmaRx;
+    source_spi1.buffer_read  = _spiDmaRx;
     //source_spi1.set_peripheral = spi_register_set;
 
     source_spi1.pRingBulkOut = &spi1_bulkOut_fifo;
@@ -532,11 +532,9 @@ unsigned char aic3204_init_default( void )
     codec_set.bclk_polarity = 0;
     codec_set.flag = 0;
     codec_set.delay = 0;
-#if 1
+	
+    I2C_Switcher( I2C_SWITCH_CODEC0 ); //I2C bus switcher
     err = Init_CODEC( &source_twi2,codec_set ); //CODEC0 connetced to TWI2
-#else
-    err = Init_CODEC( &source_twi2,48000, 16 ); 
-#endif
     if(err != NO_ERR) {
         return err;
     }
@@ -550,59 +548,17 @@ unsigned char aic3204_init_default( void )
     codec_set.m_s_sel = 0; //slave
     codec_set.bclk_polarity = 0;
     codec_set.flag = 0;
-    codec_set.delay = 0;
-#if 1
-    err = Init_CODEC( &source_twi1,codec_set );//CODEC1 connetced to TWI1
-#else
-    err = Init_CODEC( &source_twi1,48000, 16 );
-#endif
+    codec_set.delay = 0;  
+
+    I2C_Switcher( I2C_SWITCH_CODEC1 ); //I2C bus switcher
+    err = Init_CODEC( &source_twi2,codec_set );//CODEC1 connetced to TWI2
+
  
     return err;
 
 }
 
-unsigned char aic3204_init_default0( void )
-{
-    unsigned char err;
-    CODEC_SETS codec_set;
 
-    codec_set.id = 0;  //CODEC 0
-    codec_set.sr = SAMPLE_RATE_DEFAULT;
-    codec_set.sample_len = SAMPLE_LENGTH_DEFAULT;
-    codec_set.format = 2; //I2S-TDM
-    codec_set.slot_num = SLOT_NUM_DEFAULT;
-    codec_set.m_s_sel = 0; //master
-    codec_set.bclk_polarity = 0;
-    codec_set.flag = 0;
-    codec_set.delay = 0;
-#if 1
-    err = Init_CODEC( &source_twi2,codec_set ); //CODEC0 connetced to TWI2
-#else
-    err = Init_CODEC( &source_twi2,48000, 16 ); 
-#endif
-    if(err != NO_ERR) {
-        return err;
-    }
-
-#if 0    
-    codec_set.id = 1;  //CODEC 1
-    codec_set.sr = SAMPLE_RATE_DEFAULT;
-    codec_set.sample_len = SAMPLE_LENGTH_DEFAULT;
-    codec_set.format = 2; //I2S-TDM
-    codec_set.slot_num = SLOT_NUM_DEFAULT;
-    codec_set.m_s_sel = 1; //slave
-    codec_set.bclk_polarity = 0;
-    codec_set.flag = 0;
-    codec_set.delay = 0;
-#if 0
-    err = Init_CODEC( &source_twi1,codec_set );//CODEC1 connetced to TWI1
-#else
-    err = Init_CODEC( &source_twi1,48000, 16 );
-#endif
-#endif    
-    return err;
-
-}
 
 /*
 *********************************************************************************************************
@@ -624,7 +580,7 @@ void uif_ports_init_default( void )
     ssc0_init( );
     ssc1_init( );  
 //    spi0_init( DEFAULT_SPI_SPEED, 1 );
-//    init_spi0( NULL , NULL );
+
     spi1_init( DEFAULT_SPI_SPEED, 1 );
     twi0_init( DEFAULT_TWI_SPEED );
     twi1_init( DEFAULT_TWI_SPEED );
@@ -661,7 +617,7 @@ void uif_miscPin_init_default( void )
 
     //Misc switch initialize
     UIF_Misc_Init( );
-    //UIF_Misc_On( HDMI_UIF_PWR_EN );
+    UIF_Misc_On( HDMI_UIF_PWR_EN );
     UIF_Misc_On ( CODEC0_RST );
     UIF_Misc_On ( CODEC1_RST );
     UIF_Misc_On ( FAST_PLUS_RST );

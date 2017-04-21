@@ -46,10 +46,10 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.9984]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V0.999]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
-const CPU_CHAR hw_version[]  = "[HW:V1.0]";
+const CPU_CHAR hw_version[]  = "[HW:V2.0]";
 const CPU_CHAR hw_model[]    = "[AB04][EVM:FM1388]";
 #endif
 
@@ -197,9 +197,10 @@ void  BSP_Init (void)
     Init_CMD_Bulk_FIFO();
     Init_Ruler_CMD_FIFO();
     Init_Audio_Bulk_FIFO();
-
+          
     uif_miscPin_init_default();
     uif_ports_init_default();
+    
     GPIO_Init();
     Init_USB(); //init USB
     usart0_init();
@@ -215,7 +216,7 @@ void  BSP_Init (void)
     //config port dma
     Dma_configure( );
 
-    init_spi0( NULL , NULL );
+    //init_spi0( NULL , NULL );
 
     //initialize Tc1 interval = 1ms
     _ConfigureTc1( 1000u );  
@@ -491,7 +492,7 @@ void Buzzer_OnOff( unsigned char onoff )
 *
 *********************************************************************************************************
 */
-void UIF_LED_On ( CPU_INT32U led )
+void UIF_LED_Off ( CPU_INT32U led )
 {
     switch (led) {
         case LED_RUN: //LED_D3
@@ -505,6 +506,11 @@ void UIF_LED_On ( CPU_INT32U led )
         case LED_HDMI: //LED_D5
             SAMA5_REG_PIOA_CODR = DEF_BIT_24;
             break;
+            
+        case LED_HDMI_2:  //hdmi interface status indicate;
+            SAMA5_REG_PIOA_CODR = DEF_BIT_23;
+            break;
+            
         default:
         break;
     }
@@ -528,7 +534,7 @@ void UIF_LED_On ( CPU_INT32U led )
 *********************************************************************************************************
 */
 
-void UIF_LED_Off ( CPU_INT32U led )
+void UIF_LED_On ( CPU_INT32U led )
 {
     switch (led) {
         case LED_RUN:
@@ -541,6 +547,9 @@ void UIF_LED_Off ( CPU_INT32U led )
 
         case LED_HDMI:  //hdmi interface status indicate;
             SAMA5_REG_PIOA_SODR = DEF_BIT_24;
+            break;
+        case LED_HDMI_2:  //hdmi interface status indicate;
+            SAMA5_REG_PIOA_SODR = DEF_BIT_23;
             break;
 
         default:
@@ -593,6 +602,13 @@ void UIF_LED_Toggle( CPU_INT32U led )
               SAMA5_REG_PIOA_CODR = DEF_BIT_24;
             else
               SAMA5_REG_PIOA_SODR = DEF_BIT_24;
+        break;
+        
+        case LED_HDMI_2:
+            if( status &  DEF_BIT_23 )
+              SAMA5_REG_PIOA_CODR = DEF_BIT_23;
+            else
+              SAMA5_REG_PIOA_SODR = DEF_BIT_23;
         break;
 
       default:
@@ -658,15 +674,13 @@ void UIF_Misc_Init( void )
 
     SAMA5_REG_PIOA_PER = ( DEF_BIT_00 | DEF_BIT_01 | DEF_BIT_02 | DEF_BIT_03    \
                            | DEF_BIT_04 | DEF_BIT_05 | DEF_BIT_07               \
-                           | DEF_BIT_09 | DEF_BIT_10 | DEF_BIT_11 );
+                           | DEF_BIT_09 | DEF_BIT_10 | DEF_BIT_11 | DEF_BIT_25 );
     SAMA5_REG_PIOA_OER = ( DEF_BIT_00 | DEF_BIT_01 | DEF_BIT_02 | DEF_BIT_03    \
                            | DEF_BIT_04 | DEF_BIT_05 |  DEF_BIT_07              \
-                           | DEF_BIT_09 | DEF_BIT_10 | DEF_BIT_11 );
+                           | DEF_BIT_09 | DEF_BIT_10 | DEF_BIT_11 | DEF_BIT_25  );
 
-//    SAMA5_REG_PIOA_PER = ( DEF_BIT_00 | DEF_BIT_01 | DEF_BIT_02 );//| DEF_BIT_03 );
-
-//    SAMA5_REG_PIOA_OER = ( DEF_BIT_00 | DEF_BIT_01 | DEF_BIT_02 );//| DEF_BIT_03 );
-
+    SAMA5_REG_PIOD_PER = ( DEF_BIT_30 ); 
+    SAMA5_REG_PIOD_OER = ( DEF_BIT_30 ); 
 
 }
 
@@ -694,7 +708,7 @@ void UIF_Misc_On ( CPU_INT32U id )
             break;
 
         case FPGA_RST:
-            SAMA5_REG_PIOA_SODR = DEF_BIT_01;
+            SAMA5_REG_PIOA_SODR = DEF_BIT_25;
             break;
 
         case CODEC1_RST:
@@ -728,7 +742,9 @@ void UIF_Misc_On ( CPU_INT32U id )
         case LEVEL_SHIFT_OE:
             SAMA5_REG_PIOA_SODR = DEF_BIT_11;
             break;
-
+        case FPGA_PCK0:
+            SAMA5_REG_PIOD_SODR = DEF_BIT_30;
+            break;  
         default:
             break;
     }
@@ -759,7 +775,7 @@ void UIF_Misc_Off ( CPU_INT32U id )
             break;
 
         case FPGA_RST:
-            SAMA5_REG_PIOA_CODR = DEF_BIT_01;
+            SAMA5_REG_PIOA_CODR = DEF_BIT_25;
             break;
 
         case CODEC1_RST:
@@ -793,6 +809,10 @@ void UIF_Misc_Off ( CPU_INT32U id )
         case LEVEL_SHIFT_OE:
             SAMA5_REG_PIOA_CODR = DEF_BIT_11;
             break;
+            
+        case FPGA_PCK0:
+            SAMA5_REG_PIOD_CODR = DEF_BIT_30;
+            break;  
 
         default:
             break;

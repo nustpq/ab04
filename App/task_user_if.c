@@ -74,7 +74,7 @@ void  App_TaskUserIF (void *p_arg)
     Init_Global_Var();
     Init_Audio_Path();
     //iM401_Ctrl_Enable = 1;
-    OSTimeDly(100);
+    OSTimeDly(2000);
     
     if( AB_POST() )  {
         Buzzer_Error();

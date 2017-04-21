@@ -156,6 +156,13 @@
 #define  SAMA5_REG_PIOE_CODR (*((CPU_REG32 *)0xFFFFFA34))
 #define  SAMA5_REG_PIOE_ODSR (*((CPU_REG32 *)0xFFFFFA38))
 
+#define  SAMA5_REG_PIOD_PER (*((CPU_REG32 *)0xFFFFF800))
+#define  SAMA5_REG_PIOD_OER (*((CPU_REG32 *)0xFFFFF810))
+
+#define  SAMA5_REG_PIOD_SODR (*((CPU_REG32 *)0xFFFFF830))
+#define  SAMA5_REG_PIOD_CODR (*((CPU_REG32 *)0xFFFFF834))
+#define  SAMA5_REG_PIOD_ODSR (*((CPU_REG32 *)0xFFFFF838))
+
 
 #define  SAMA5_REG_PIOA_PER (*((CPU_REG32 *)0xFFFFF200))
 #define  SAMA5_REG_PIOA_OER (*((CPU_REG32 *)0xFFFFF210))
@@ -257,9 +264,10 @@ typedef  struct  atsama5_reg_pio {
 #define LED_D4    2
 #define LED_D5    3
 
-#define LED_RUN   1
-#define LED_USB   2
-#define LED_HDMI  3
+#define LED_RUN    1
+#define LED_USB    2
+#define LED_HDMI   3
+#define LED_HDMI_2 4
 
 #define BUZZER_OFF 1
 #define BUZZER_ON 0
@@ -277,6 +285,13 @@ typedef  struct  atsama5_reg_pio {
 #define LEVEL_SHIFT_OE  11
 
 #define HDMI_PORT_DET0  16
+
+//define for AB04 2nd
+#define FPGA_GPO0 20
+#define FPGA_GPO1 21
+#define FPGA_PCK0 22     //using for fpga soft reset;
+#define FPGA_PCK1 23 
+#define FPGA_PCK2 24
 
 void  BSP_LED_Init ( void );
 

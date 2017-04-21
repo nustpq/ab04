@@ -76,7 +76,7 @@ uint8_t DM_SingleWrite( uint8_t dev_addr,uint16_t dm_addr,uint16_t dm_val)
 //    state =  TWID_Write( dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
     option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
-    
+
     state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );
 
    
@@ -91,7 +91,7 @@ uint8_t PM_SingleWrite(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata, unsigne
     
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
-    
+
     state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );
     
     return state;
@@ -106,7 +106,7 @@ uint8_t CM_SingleWrite(uint8_t dev_addr,uint16_t dm_addr,uint8_t *pdata)
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
-    
+
     state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf,sizeof( buf ) ); 
    
     return state ;
@@ -125,7 +125,7 @@ uint8_t DM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
-    
+
     state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf,sizeof( buf ) ); 
     if (state != SUCCESS)
     {
@@ -182,7 +182,7 @@ uint8_t PM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
-    
+
     Unlock_PM(DSP_PM_Type);    
       
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
@@ -250,7 +250,7 @@ uint8_t CM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     option->iaddress = 0;
     option->isize = 0;
     option->revers = 0;
-    
+
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL);
     state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, sizeof( buf ) );     
     if (state != SUCCESS)
@@ -306,7 +306,7 @@ uint8_t DM_BurstWrite(  uint8_t dev_addr,
     
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
-   
+
     uint8_t buf[] = { 0x00, 0x1C,0,0 };
 //    state =  TWID_Write( dev_addr>>1, 0, 0 , buf, 2, NULL); 
     state = twi2_write( (void * )pTwiSource, ( uint8_t * )buf, 2 );     
@@ -392,7 +392,7 @@ uint8_t PM_BurstWrite_s(uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
     option->address = dev_addr >> 1;
     option->iaddress = 0xFCF33B;
     option->isize = 3;
-    
+
 //    state =  TWID_Write(  dev_addr>>1, 0xFCF33B, 3 , buf, 4, NULL); 
     state = twi2_write( ( void * )pTwiSource,
                             ( uint8_t * )buf,
@@ -444,7 +444,7 @@ uint8_t PM_FastWrite_s( uint8_t dev_addr,uint16_t StAddr,uint8_t DatNum,void *pD
     
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
-    
+
     state = HOST_SingleWrite_2( dev_addr, 0x0F, data_num );      
     if (state != SUCCESS) {
         return state;
@@ -470,7 +470,7 @@ uint8_t DM_FastRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
-    
+
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 
     state = twi2_write( ( void * )pTwiSource, ( uint8_t * )buf, sizeof(buf) );    
     if (state != SUCCESS) {
@@ -533,7 +533,7 @@ uint8_t MEM_Block_LegacyRead( uint8_t dev_addr,
     uint8_t i     = 0;
     unsigned int cmd[]  = {FM_CMD_DM_RD, FM_CMD_PM_RD, FM_CMD_CM_RD}; //cmd for read : DM, PM, CM 
     uint8_t buf[] = {FM_CMD_SYN_0, FM_CMD_SYN_1, 0,(start_addr>>8)&0xFF, start_addr&0xFF};
-    
+
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
      
@@ -627,7 +627,7 @@ uint8_t MEM_Block_SingleWrite( uint8_t dev_addr,
     unsigned int cmd[]   = { FM_CMD_DM_WR, FM_CMD_PM_WR, FM_CMD_CM_WR }; //cmd for write : DM, PM, CM 
     uint8_t buf[8] ;
     uint8_t  data_length  = 2; //for PM 3, CM 2, DM 2
-    
+
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
@@ -666,9 +666,9 @@ uint8_t MEM_Block_SingleWrite( uint8_t dev_addr,
 /*********************     HOST Register Read / Write     *********************/
 uint8_t HOST_SingleWrite_1(uint8_t dev_addr,uint8_t host_addr,uint8_t host_val)
 {
-     uint8_t state ;    
-     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_HOST_WR_1, host_addr, host_val}; 
-     
+    uint8_t state ;    
+    uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_HOST_WR_1, host_addr, host_val}; 
+ 
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
      
@@ -700,7 +700,7 @@ uint8_t HOST_LegacyRead(uint8_t dev_addr, uint8_t host_addr,uint8_t *pVal)
 {
     uint8_t state;   
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_HOST_RD, host_addr};
-    
+
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
@@ -727,7 +727,7 @@ uint8_t DSP_SingleWrite_1(uint8_t dev_addr,uint8_t dsp_addr,uint8_t dsp_val)
     uint8_t state ;
    
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_DSP_WR_1, dsp_addr, dsp_val};
-    
+
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
     
@@ -743,7 +743,7 @@ uint8_t DSP_SingleWrite_2(uint8_t dev_addr,uint8_t dsp_addr,uint16_t dsp_val)
     uint8_t state ;
     
     uint8_t buf[] = { FM_CMD_SYN_0, FM_CMD_SYN_1, FM_CMD_DSP_WR_2, dsp_addr, (dsp_val>>8)&0xff, dsp_val&0xff}; 
-    
+
     TWI_CFG *option = ( TWI_CFG * )pTwiSource->privateData;
     option->address = dev_addr >> 1;
 //    state =  TWID_Write(  dev_addr>>1, 0, 0, buf, sizeof(buf), NULL); 

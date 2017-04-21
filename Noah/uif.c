@@ -709,7 +709,6 @@ unsigned char AB_POST( void )
     
     APP_TRACE_INFO(("\r\nStart Audio Bridge POST :\r\n"));
 
-
     APP_TRACE_INFO(("\r\n1. FPGA... \r\n"));
     err = FPGA_POST_Setup();
     if( err != NO_ERR ) {
@@ -730,7 +729,8 @@ unsigned char AB_POST( void )
         APP_TRACE_INFO(("\r\n---OK\r\n"));
     }
 
-    APP_TRACE_INFO(("\r\n3. FM36 DSP... \r\n")); 
+    APP_TRACE_INFO(("\r\n3. FM36 DSP... \r\n"));
+    I2C_Switcher( I2C_SWITCH_FM36 ); 
     err = Init_FM36_AB03( SAMPLE_RATE_DEFAULT, 0, 1, 0, SAMPLE_LENGTH_DEFAULT, 1, 1  ); //force reset FM36, Lin from SP1.Slot0 
     if( err != NO_ERR ) {
         Global_Bridge_POST = POST_ERR_FM36;

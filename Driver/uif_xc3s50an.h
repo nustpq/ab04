@@ -198,6 +198,7 @@ typedef struct _fpga_command
 	uint8_t oe_codec1_port1    : 1;  
 
 }FPGA_COMMAND;
+
 #pragma pack (  )
 
 

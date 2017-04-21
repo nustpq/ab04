@@ -67,7 +67,7 @@ void  App_TaskJoy (void *p_arg)
     //avoid a fake trigger after POR
 //    switch_value_prev      =  Get_Switches()  & 0x03; 
 //    switch_value_prev      =  switch_value_prev ^ 0x01;  //make sure check Switch 'SW1' Buzzer 1st  
-    ruler_port_value_prev  =  Get_Port_Detect() & 0x7FF;  //GPIOs   
+    ruler_port_value_prev    =  Get_HDMI_Detect();//Get_Port_Detect() & 0x7FF;  //GPIOs   
    
     //flash_test(); //debug use
     
@@ -120,10 +120,10 @@ void  App_TaskJoy (void *p_arg)
 //            }
 //        }
         
-        ruler_port_value = Get_Port_Detect() & 0x7FF; //mask  0~11        
+        ruler_port_value = Get_HDMI_Detect();//Get_Port_Detect() & 0x7FF; //mask  0~11        
         if( ruler_port_value != ruler_port_value_prev ) {
-            OSTimeDly(100); //for gpio detect, no need delay
-            if( ruler_port_value == Get_Port_Detect() & 0x7FF ) {  //jitter immune
+            OSTimeDly(50); //for gpio detect, no need delay
+            if( ruler_port_value == Get_HDMI_Detect() & 0x7FF ) {  //jitter immune
                 data = ruler_port_value ^ ruler_port_value_prev ;   
                 ruler_port_value_prev = ruler_port_value ;
                 data = ( data << 16 ) | (ruler_port_value & 0x7FF) ; 

@@ -21,31 +21,42 @@
 
 extern DataSource source_gpio;
 
+static const Pin fpga_done[] = {PIN_FPGA_DONE};
 Pin gpio_pins[ ] = {                      
-                        PIN_GPIO_0,PIN_GPIO_1,PIN_GPIO_2,PIN_GPIO_3,PIN_GPIO_4,
-                        PIN_GPIO_5,PIN_GPIO_6,PIN_GPIO_7,PIN_GPIO_8,PIN_GPIO_9, 
-                        PIN_HDMI_PORT_DET0
-                         /*
-                            PIN_FPGA_OE,
-                            PIN_FPGA_RST,
-                            PIN_CODEC1_RST,
-                            PIN_CODEC0_RST,
-                            PIN_FM36_RST,
-                            PIN_PA_SHUTDOWN,
-                            PIN_HDMI_PORT_DET0,
-                            PIN_FAST_PLUS_RST,
-                            PIN_BUZZER,
-                            PIN_5V_UIF_EN,
-                            PIN_HDMI_UIF_PWR_EN,
-                            PIN_LEVEL_SHIFT_OE,
-                            PIN_LED_GREEN,
-                            PIN_LED_RED,
-                            PIN_FPGA_GPO0,
-                            PIN_FPGA_GPO1,
-                            PIN_LED_PORT0,
-                          */              
-
-                          };
+                        PIN_GPIO_0,PIN_GPIO_1,PIN_GPIO_2,PIN_GPIO_3,PIN_GPIO_4, //0~4
+                        PIN_GPIO_5,PIN_GPIO_6,PIN_GPIO_7,PIN_GPIO_8,PIN_GPIO_9, //5~9
+                        PIN_HDMI_PORT_DET0,  //10
+                        //FPGA_CS, FPGA_DAT, FPGA_CLK, 
+                        PIN_FPGA_RST,  PIN_FPGA_DONE,//11~15
+                        
+                        /*
+                        PIN_FPGA_OE           ,
+                        PIN_FPGA_RST          ,
+                        PIN_CODEC1_RST        ,
+                        PIN_CODEC0_RST        ,
+                        PIN_FM36_RST          ,
+                        PIN_PA_SHUTDOWN       ,
+                        PIN_HDMI_PORT_DET0    , 
+                        PIN_FAST_PLUS_RST     ,
+                        PIN_BUZZER            , 
+                        PIN_5V_UIF_EN         ,       
+                        PIN_HDMI_UIF_PWR_EN   , 
+                        PIN_LEVEL_SHIFT_OE    ,
+                        PIN_LED_RUN           ,
+                        PIN_LED_USB           ,
+                        PIN_LED_HDMI          ,
+                        PIN_LED_HDMI_2        ,
+                        PIN_LED_PLAY          ,
+                        PIN_LED_REC           ,
+                        PIN_FPGA_GPO0         ,
+                        PIN_FPGA_GPO1         ,
+                        PIN_FPGA_PCK0         ,
+                        PIN_FPGA_PCK1         ,
+                        PIN_FPGA_PCK2         ,
+                        PIN_VDDIO_1_8         ,
+                        PIN_VDDIO_3_3 
+                        */
+                };
 
 
 static const Pin pinsSwitches[] = {
@@ -175,15 +186,15 @@ void GPIOPIN_Init_Fast( unsigned int pin )
 
     //pull up
     gpio_pins[ pin ].pio->PIO_PUER = gpio_pins[ pin ].mask;  //enable
-    //pinsGpios[pin].pio->PIO_PPUDR = pinsGpios[pin].mask;
+    //gpio_pins[pin].pio->PIO_PPUDR = gpio_pins[pin].mask;
 
     //multi-drive OP
-    //pinsGpios[pin].pio->PIO_MDER = pinsGpios[pin].mask;  //enable
+    //gpio_pins[pin].pio->PIO_MDER = gpio_pins[pin].mask;  //enable
     gpio_pins[ pin ].pio->PIO_MDDR = gpio_pins[ pin ].mask;
 
     // Enable filter(s)
     gpio_pins[ pin ].pio->PIO_IFER = gpio_pins[ pin ].mask;  //enable
-    //pinsGpios[pin].pio->PIO_IFDR = pinsGpios[pin].mask;
+    //gpio_pins[pin].pio->PIO_IFDR = gpio_pins[pin].mask;
 
     gpio_pins[ pin ].pio->PIO_PER = gpio_pins[ pin ].mask;
 
@@ -199,10 +210,10 @@ void  __ramfunc GPIOPIN_Set_Session( unsigned int pin , unsigned int dat )
         if( pin & 0x01<<i ) {
 
             if( dat  & 0x01<<i ) {
-                //PIO_Set( &pinsGpios[i]);
+                //PIO_Set( &gpio_pins[i]);
                 gpio_pins[i].pio->PIO_SODR = gpio_pins[i].mask;
             } else {
-                //PIO_Clear( &pinsGpios[i]);
+                //PIO_Clear( &gpio_pins[i]);
                 gpio_pins[i].pio->PIO_CODR = gpio_pins[i].mask;
             }
         }
@@ -230,9 +241,9 @@ unsigned int GPIOPIN_Read(void)
 }
 
 void  RecordGpio(
-               unsigned char pTime,    /*读取数据的时间间隔,单位为uS*/
-               unsigned short  dTime,  /*记录数据时间长度,单位为mS*/
-               void *p                 /*存放数据位置*/
+               unsigned char pTime,    /*露脕脠隆脢媒戮脻碌脛脢卤录盲录盲赂么,碌楼脦禄脦陋uS*/
+               unsigned short  dTime,  /*录脟脗录脢媒戮脻脢卤录盲鲁陇露脠,碌楼脦禄脦陋mS*/
+               void *p                 /*麓忙路脜脢媒戮脻脦禄脰脙*/
                )
 {
 
@@ -260,7 +271,7 @@ void  RecordGpio(
         while(!CtrFlage.Time3Over) ;
     }
 
-    TCCR0B &= 0xf8 ;      // 关闭定时器0
+    TCCR0B &= 0xf8 ;      // 鹿脴卤脮露篓脢卤脝梅0
     OCR0A = 0;
     OCR0B = 0;
     *(unsigned int *)DataBufCtr.pBufTop = MonitCount ;
@@ -277,8 +288,8 @@ void  RecordGpio(
 void Ruler_Power_Switch( unsigned char onoff )
 {
 
-//    pinsGpios[5].type = (onoff == 0) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
-//    PIO_Configure(&pinsGpios[5], 1);
+//    gpio_pins[5].type = (onoff == 0) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
+//    PIO_Configure(&gpio_pins[5], 1);
 
 }
 
@@ -289,8 +300,8 @@ void UART1_Mixer( unsigned char index )
 //    //OSTimeDly(1000);
 //    if( index<= 3) {
 //        for( i=0; i<=1; i++) {
-//            pinsGpios[i].type = (index & (1<<i) ) == 0 ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
-//            PIO_Configure(&pinsGpios[i], 1);
+//            gpio_pins[i].type = (index & (1<<i) ) == 0 ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
+//            PIO_Configure(&gpio_pins[i], 1);
 //
 //        }
 //
@@ -309,8 +320,8 @@ void UART2_Mixer( unsigned char index )
 
     if( index<= 3 ) {
         for( i=2; i<=3; i++) {
-            pinsGpios[12+i].type = (index & (1<<(i-2)) ) == 0 ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
-            PIO_Configure(&pinsGpios[i], 1);
+            gpio_pins[12+i].type = (index & (1<<(i-2)) ) == 0 ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ;
+            PIO_Configure(&gpio_pins[i], 1);
 
         }
 
@@ -349,9 +360,9 @@ unsigned char I2C_Mixer( unsigned char index )
 //        GPIOPIN_Set_Fast(12+index, 0);//enable index I2C channels
 //    }
     for( unsigned char i = 1; i <= 3; i++ ) {
-        pinsGpios[12+i].type = (index == i) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ; ////lowe level truned to high after NPN to control switch OE pin
+        gpio_pins[12+i].type = (index == i) ? PIO_OUTPUT_0 : PIO_OUTPUT_1 ; ////lowe level truned to high after NPN to control switch OE pin
     }
-    PIO_Configure(&pinsGpios[13], 3);
+    PIO_Configure(&gpio_pins[13], 3);
     //APP_TRACE_INFO(("\r\nI2C_Mixer switch to: %d ", index ));
 
     OSSemPost( GPIO_Sem_I2C_Mixer );
@@ -395,15 +406,22 @@ unsigned int Get_Port_Detect( void )
 }
 
 
+unsigned int Get_HDMI_Detect( void )
+{
+
+    return PIO_Get( &gpio_pins[ 10 ] );
+
+}
+
 
 //note: turn off and on to update a ruler firmware, hwo about other ruler connections , issue ???
 void Ruler_PowerOnOff( unsigned char switches )
 {
 
 //    if( switches == 0 ) { //power off
-//        PIO_Clear(&pinsGpios[5]);
+//        PIO_Clear(&gpio_pins[5]);
 //    } else { //power on
-//        PIO_Set(&pinsGpios[5]);
+//        PIO_Set(&gpio_pins[5]);
 //    }
 
 }
@@ -761,6 +779,49 @@ void stop_gpio( void * pInstance )
 }
 
 
+//Note: This routine do NOT support reentrance
+//SPI simulation for FPGA control timing requirement
+uint8_t Send_CMD_FPGA( void *pInstance, const uint8_t *buf, uint32_t len  )
+{
+   
+    unsigned int i,j ;
+    
+    //APP_TRACE_DBG(("\r\nInit FPGA...[0x%0X] \r\n",channels));
+    
+    PIO_Set(&gpio_pins[11]); //cs 
+    PIO_Set(&gpio_pins[12]); //data 
+    PIO_Set(&gpio_pins[13]); //clock
+    
+    PIO_Clear(&gpio_pins[11]); //cs, delay compensation
+    
+    for ( i = len; i > 0; i-- ) {        
+        for ( j = 0 ; j<8; j++) {
+            PIO_Clear(&gpio_pins[13]); //clock       
+            if( ( *(buf+i-1) >> j ) & 0x01 ) {
+                PIO_Set(&gpio_pins[12]); //data 
+            } else {
+                PIO_Clear(&gpio_pins[12]); //data 
+            }
+            PIO_Set(&gpio_pins[13]); //clock
+        }
+    } 
+    
+    PIO_Set(&gpio_pins[11]); //cs 
+    
+    return 0;
+}
 
+void Reset_FPGA( void)
+{
+  
+   PIO_Clear(&gpio_pins[11]); 
+   OSTimeDly(1);
+   PIO_Set(&gpio_pins[11]); 
+  
+}
 
+unsigned char Check_FPGA_Done( void )
+{
+    return 1;//PIO_Get( &gpio_pins[ 12 ] );
+}
 

@@ -25,6 +25,12 @@ uint8_t   gpio_Pin_Set( void *pinInstance, const uint8_t * pdata,uint32_t mask )
 uint8_t   gpio_Pin_Get( void *pinInstance, const uint8_t * pdata,uint32_t mask );
 void      stop_gpio( void * pInstance );
 void      GPIOPIN_Set_Session( uint32_t pin , uint32_t dat );
+uint8_t   Send_CMD_FPGA( void *pInstance, const uint8_t *buf, uint32_t len  );
+uint32_t  Get_HDMI_Detect( void );
+
+void      Reset_FPGA( void);
+uint8_t   Check_FPGA_Done( void );
+
 
 extern Pin gpio_pins[ ];
 

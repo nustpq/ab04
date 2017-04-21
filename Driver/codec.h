@@ -30,6 +30,9 @@
 #define AD1938_ADDRESS    0x04
 #define AD1937_ADDRESS    0x08
 
+#define I2C_SWITCH_FM36     0
+#define I2C_SWITCH_CODEC0   1
+#define I2C_SWITCH_CODEC1   2
 
 /****************************************/
 #define   ALC5610      10
@@ -73,7 +76,7 @@ typedef struct {
 uint8_t Set_Codec(const DataSource *pSource,uint8_t codec_control_type, uint8_t size_para, uint8_t *pdata);
 uint8_t Get_Codec(const DataSource *pSource,uint8_t codec_control_type, uint8_t reg, uint8_t *pdata);
 
-uint8_t Codec_Mixer(const DataSource *pSource,uint8_t i2c_channel );
+uint8_t I2C_Switcher( uint8_t i2c_channel );
 
 uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set ) ;
 

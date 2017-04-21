@@ -640,7 +640,9 @@ unsigned char Update_Audio( unsigned char id )
     if( id == 2 ) { //SPI
         return 0;
     }
-    
+    if( id > 2 ) {  
+        return AUD_CFG_ERR;
+    }
     APP_TRACE_INFO(("\r\n<16>Update_Audio[%d] : [REC] = %d [PLAY] = %d\r\n", id, Codec_Set[id][0].flag, Codec_Set[id][1].flag));
     err = 0;
     
@@ -670,6 +672,7 @@ unsigned char Update_Audio( unsigned char id )
     }
     APP_TRACE_INFO(("\r\n\############## BCLK POLARITY = %d\r\n", Codec_Set[id][index].bclk_polarity));
     //I2C_Mixer(I2C_MIX_FM36_CODEC);
+    I2C_Switcher( I2C_SWITCH_CODEC0 + id ); 
     err = Init_CODEC( &data_source[id], Codec_Set[id][index] );
 //    memcpy((void*)&Audio_Configure_Instance[id], (void*)&Codec_Set[id][index], sizeof(AUDIO_CFG) );
     //I2C_Mixer(I2C_MIX_UIF_S);
@@ -678,7 +681,8 @@ unsigned char Update_Audio( unsigned char id )
         return err;
     }
 
-    if( 0 == id ) {  //FM36 connected to SSC0 
+    if( 0 == id ) {  //FM36 connected to SSC0
+        I2C_Switcher( I2C_SWITCH_FM36 ); 
         if( flag_bypass_fm36 == 0 ) {
             err = Init_FM36_AB03( Codec_Set[0][index].sr, Global_Mic_Mask[0], 1, 0, Codec_Set[0][index].sample_len, Codec_Set[0][index].slot_num==2 ? 0:1, 0 ); //Lin from SP1_RX, slot0~1
         } else{

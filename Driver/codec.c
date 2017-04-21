@@ -119,29 +119,51 @@ uint8_t Codec_Write_SPI(uint8_t dev_addr,uint8_t reg,uint8_t data)
 }
 
 
-//i2c_channel = 0 ~ 7
-uint8_t Codec_Mixer(const DataSource *pSource,uint8_t i2c_channel )
+/*
+*********************************************************************************************************
+*                                    I2C_Switcher()
+*
+* Description :  set PCA9546 channel
+*
+* Argument(s) :  i2c_channel  : channel index:  For AB04_2nd
+*		            0 - FM36 , 1 - CODEC0, 2 - CODEC1       
+*                
+*
+* Return(s)   :  None.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+static unsigned char I2C_Switcher_Index_Save =  0;
+uint8_t I2C_Switcher(uint8_t i2c_channel )
 {
-     uint8_t buf   ;
-     uint8_t state ;
+    const uint8_t dev_addr = PCA9546A_ADDRESS;
 
-     state = 0xe0 ;
+    uint8_t buf[] = { 0x01 << i2c_channel }; 
+    uint8_t state ;
+    DataSource *pSource = &source_twi2 ;
 
-     TWI_CFG *twi_option = ( TWI_CFG * )pSource->privateData;
+    TWI_CFG *twi_option = ( TWI_CFG * )pSource->privateData;
 
-     twi_option->address = PCA9548A_ADDRESS >> 1 ;
-     twi_option->iaddress = 0;
-     twi_option->isize = 0;
+    twi_option->address = dev_addr >> 1 ;
+    twi_option->iaddress = 0;
+    twi_option->isize = 0;
 
-     if( i2c_channel <= 3 )
-     {//PCA9548A,
-        buf   = 0x01<<i2c_channel ; //select i2c_channel
-//        state = TWID_Write( PCA9548A_ADDRESS>>1, 0, 0, &buf, 1, NULL);
-        state = twi1_write( ( void * )pSource, &buf , 1 );
-     }
+    if( i2c_channel >3 )  
+    {
+        return 1 ; //err     
+    }
+    if( I2C_Switcher_Index_Save == i2c_channel ) { //no need re-set        
+        return 0;
+    }
+    I2C_Switcher_Index_Save = i2c_channel ;
 
-     return state ;
+    state = twi2_write( ( void * )pSource, buf , 1 );
+
+
+    return state ;
 }
+
 
 
 
