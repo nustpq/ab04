@@ -534,7 +534,7 @@ unsigned char aic3204_init_default( void )
     codec_set.delay = 0;
 	
     I2C_Switcher( I2C_SWITCH_CODEC0 ); //I2C bus switcher
-    err = Init_CODEC( &source_twi2,codec_set ); //CODEC0 connetced to TWI2
+    err = Init_CODEC( codec_set ); //CODEC0 connetced to TWI2
     if(err != NO_ERR) {
         return err;
     }
@@ -551,7 +551,7 @@ unsigned char aic3204_init_default( void )
     codec_set.delay = 0;  
 
     I2C_Switcher( I2C_SWITCH_CODEC1 ); //I2C bus switcher
-    err = Init_CODEC( &source_twi2,codec_set );//CODEC1 connetced to TWI2
+    err = Init_CODEC( codec_set );//CODEC1 connetced to TWI2
 
  
     return err;

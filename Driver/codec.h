@@ -78,7 +78,7 @@ uint8_t Get_Codec(const DataSource *pSource,uint8_t codec_control_type, uint8_t 
 
 uint8_t I2C_Switcher( uint8_t i2c_channel );
 
-uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set ) ;
+uint8_t Init_CODEC( CODEC_SETS codec_set ) ;
 
 uint8_t Set_AIC3204_DSP_Offset( uint8_t slot_index ) ;
 uint8_t Init_CODEC_AIC3204( uint32_t sample_rate ) ;

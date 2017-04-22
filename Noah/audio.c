@@ -635,7 +635,6 @@ unsigned char Update_Audio( unsigned char id )
 {
     unsigned char err;
     unsigned char index ;
-    const DataSource data_source[] = {source_twi2, source_twi1};
     
     if( id == 2 ) { //SPI
         return 0;
@@ -673,7 +672,7 @@ unsigned char Update_Audio( unsigned char id )
     APP_TRACE_INFO(("\r\n\############## BCLK POLARITY = %d\r\n", Codec_Set[id][index].bclk_polarity));
     //I2C_Mixer(I2C_MIX_FM36_CODEC);
     I2C_Switcher( I2C_SWITCH_CODEC0 + id ); 
-    err = Init_CODEC( &data_source[id], Codec_Set[id][index] );
+    err = Init_CODEC( Codec_Set[id][index] );
 //    memcpy((void*)&Audio_Configure_Instance[id], (void*)&Codec_Set[id][index], sizeof(AUDIO_CFG) );
     //I2C_Mixer(I2C_MIX_UIF_S);
     if( err != NO_ERR ) {
@@ -699,6 +698,57 @@ unsigned char Update_Audio( unsigned char id )
 
 }
 
+
+/*
+*********************************************************************************************************
+*                                           Setup_CODEC()
+*
+* Description : Send command to configure CODEC.
+* Argument(s) : pAudioCfg : pointer to AUDIO_CFG type data.
+* Return(s)   : NO_ERR :   execute successfully
+*               others :   refer to error code defines.
+*
+* Note(s)     : None.
+*********************************************************************************************************
+*/
+unsigned char Setup_CODEC( AUDIO_CFG *pAudioCfg )
+{
+
+    unsigned char err;
+    unsigned char mic_num;
+    unsigned char data     = 0xFF;
+    unsigned char lin_ch   = 0;
+
+    if( pAudioCfg->id >= 2 ) { 
+        APP_TRACE_INFO(("\r\nSetup_CODEC[%d] ERROR: Unsupported CODEC ID\r\n",pAudioCfg->id));
+        return AUD_CFG_ERR;        
+
+    } 
+    err = Check_SR_Support( pAudioCfg->sample_rate );
+    if( err != NO_ERR ) {
+        APP_TRACE_INFO(("\r\Setup_CODEC[%d] ERROR: Unsupported sample rate!\r\n",pAudioCfg->id));
+        return err;
+    }
+    Codec_Set[pAudioCfg->id][0].sr            = pAudioCfg->sample_rate;
+    Codec_Set[pAudioCfg->id][0].sample_len    = pAudioCfg->bit_length;
+    Codec_Set[pAudioCfg->id][0].format        = pAudioCfg->format;
+    Codec_Set[pAudioCfg->id][0].slot_num      = pAudioCfg->slot_num;
+    Codec_Set[pAudioCfg->id][0].m_s_sel       = pAudioCfg->master_slave;
+    Codec_Set[pAudioCfg->id][0].delay         = pAudioCfg->ssc_delay;
+    Codec_Set[pAudioCfg->id][0].bclk_polarity = pAudioCfg->bclk_polarity;
+    Codec_Set[pAudioCfg->id][0].id            = pAudioCfg->id;              
+    
+    I2C_Switcher( I2C_SWITCH_CODEC0 + pAudioCfg->id ); 
+    err = Init_CODEC( Codec_Set[pAudioCfg->id][0] );
+    if( err != NO_ERR ) {
+        APP_TRACE_INFO(("\r\nERROR:Init_CODEC failed[%d]\r\n",err));
+        return err;
+    }
+    return 0 ;
+}
+
+
+
 /*
 *********************************************************************************************************
 *                                           Start_Audio()
@@ -722,7 +772,7 @@ unsigned char Start_Audio( START_AUDIO start_audio )
     OS_CPU_SR  cpu_sr = 0u;
 #endif
     
-    //APP_TRACE_INFO(("\r\n<2>Start_Audio : Type[0x%02X],  Padding[0x%X]\r\n", start_audio.type, start_audio.padding));
+    APP_TRACE_INFO(("\r\n<2>Start_Audio : Type[0x%02X],  Padding[0x%X]\r\n", start_audio.type, start_audio.padding));
        
     //Hold_Task_for_Audio(); 
     

@@ -53,11 +53,15 @@
 #include <string.h>
 
 #define  DEF_BIT_22                         0x00400000u
+#define  DEF_BIT_28                         0x10000000u
 #define  SAMA5_REG_PIOA_SODR (*((uint32_t *)0xFFFFF230))
 #define  SAMA5_REG_PIOA_CODR (*((uint32_t *)0xFFFFF234))
+#define  SAMA5_REG_PIOD_SODR (*((uint32_t *)0xFFFFF830))
+#define  SAMA5_REG_PIOD_CODR (*((uint32_t *)0xFFFFF834))
 
-#define  LED_SET_USB_DATA      {SAMA5_REG_PIOA_CODR = DEF_BIT_22; }
-#define  LED_CLEAR_USB_DATA    {SAMA5_REG_PIOA_SODR = DEF_BIT_22; }
+
+#define  LED_SET_USB_DATA      {SAMA5_REG_PIOA_CODR = DEF_BIT_22; SAMA5_REG_PIOD_CODR = DEF_BIT_28; }
+#define  LED_CLEAR_USB_DATA    {SAMA5_REG_PIOA_SODR = DEF_BIT_22; SAMA5_REG_PIOD_SODR = DEF_BIT_28; }
 /*---------------------------------------------------------------------------
  *      Definitions
  *---------------------------------------------------------------------------*/

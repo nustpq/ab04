@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V0.9991]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V1.0.0]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V2.0]";
@@ -221,6 +221,8 @@ void  BSP_Init (void)
     //initialize Tc1 interval = 1ms
     _ConfigureTc1( 1000u );  
 
+    UIF_LED_Off_All();
+    
 }
 
 
@@ -435,9 +437,13 @@ void BSP_BUZZER_Toggle( CPU_INT32U state )
 void UIF_LED_Init( void )
 {
 
-    SAMA5_REG_PIOA_PER  = (DEF_BIT_21 | DEF_BIT_22 | DEF_BIT_24 | DEF_BIT_08 );
-    SAMA5_REG_PIOA_OER  = (DEF_BIT_21 | DEF_BIT_22 | DEF_BIT_24 | DEF_BIT_08 );
-    SAMA5_REG_PIOA_SODR = (DEF_BIT_21 | DEF_BIT_22 | DEF_BIT_24 | DEF_BIT_08 );  //Clear all LED and Buzzer
+    SAMA5_REG_PIOA_PER  = (DEF_BIT_21 | DEF_BIT_22 | DEF_BIT_23| DEF_BIT_24 | DEF_BIT_08 | DEF_BIT_27);
+    SAMA5_REG_PIOA_OER  = (DEF_BIT_21 | DEF_BIT_22 | DEF_BIT_23| DEF_BIT_24 | DEF_BIT_08 | DEF_BIT_27);
+    SAMA5_REG_PIOA_SODR = (DEF_BIT_21 | DEF_BIT_22 | DEF_BIT_23| DEF_BIT_24 | DEF_BIT_08 | DEF_BIT_27);  //Clear all LED and Buzzer
+
+    SAMA5_REG_PIOD_PER  = (DEF_BIT_25 | DEF_BIT_26 | DEF_BIT_27 | DEF_BIT_28 );
+    SAMA5_REG_PIOD_OER  = (DEF_BIT_25 | DEF_BIT_26 | DEF_BIT_27 | DEF_BIT_28 );
+    SAMA5_REG_PIOD_SODR = (DEF_BIT_25 | DEF_BIT_26 | DEF_BIT_27 | DEF_BIT_28 );  //Clear all LED and Buzzer
 
 }
 
@@ -476,6 +482,19 @@ void Buzzer_OnOff( unsigned char onoff )
 
 }
 
+void UIF_LED_Off_All ( void)
+{
+            UIF_LED_Off( LED_RUN );   
+            UIF_LED_Off( LED_USB );
+            UIF_LED_Off( LED_HDMI );                      
+            UIF_LED_Off( LED_HDMI_2 );
+            UIF_LED_Off( LED_AUDIO_PLAY );
+            UIF_LED_Off( LED_AUDIO_REC );
+            UIF_LED_Off( LED_VDDIO_3_3 );               
+            UIF_LED_Off( LED_VDDIO_1_8 );   
+}
+
+
 /*
 *********************************************************************************************************
 *                                             UIF_LED_On()
@@ -509,7 +528,20 @@ void UIF_LED_Off ( CPU_INT32U led )
             
         case LED_HDMI_2:  //hdmi interface status indicate;
             SAMA5_REG_PIOA_CODR = DEF_BIT_23;
+            break;        
+                        
+        case LED_AUDIO_PLAY:
+            SAMA5_REG_PIOA_CODR = DEF_BIT_27;
+            break; 
+        case LED_AUDIO_REC:
+            SAMA5_REG_PIOD_CODR = DEF_BIT_28;
             break;
+        case LED_VDDIO_3_3:
+            SAMA5_REG_PIOD_CODR = DEF_BIT_26;
+            break; 
+        case LED_VDDIO_1_8:
+            SAMA5_REG_PIOD_CODR = DEF_BIT_25;
+            break;   
             
         default:
         break;
@@ -551,7 +583,19 @@ void UIF_LED_On ( CPU_INT32U led )
         case LED_HDMI_2:  //hdmi interface status indicate;
             SAMA5_REG_PIOA_SODR = DEF_BIT_23;
             break;
-
+       
+        case LED_AUDIO_PLAY:
+            SAMA5_REG_PIOA_SODR = DEF_BIT_27;
+            break; 
+        case LED_AUDIO_REC:
+            SAMA5_REG_PIOD_SODR = DEF_BIT_28;
+            break;
+        case LED_VDDIO_3_3:
+            SAMA5_REG_PIOD_SODR = DEF_BIT_26;
+            break; 
+        case LED_VDDIO_1_8:
+            SAMA5_REG_PIOD_SODR = DEF_BIT_25;
+            break;
         default:
             break;
 
@@ -679,8 +723,8 @@ void UIF_Misc_Init( void )
                            | DEF_BIT_04 | DEF_BIT_05 |  DEF_BIT_07              \
                            | DEF_BIT_09 | DEF_BIT_10 | DEF_BIT_11 | DEF_BIT_25  );
 
-    SAMA5_REG_PIOD_PER = ( DEF_BIT_30 ); 
-    SAMA5_REG_PIOD_OER = ( DEF_BIT_30 ); 
+    SAMA5_REG_PIOD_PER = ( DEF_BIT_25 ); 
+    SAMA5_REG_PIOD_OER = ( DEF_BIT_25  ); 
 
 }
 
@@ -744,7 +788,8 @@ void UIF_Misc_On ( CPU_INT32U id )
             break;
         case FPGA_PCK0:
             SAMA5_REG_PIOD_SODR = DEF_BIT_30;
-            break;  
+            break; 
+           
         default:
             break;
     }
@@ -812,7 +857,7 @@ void UIF_Misc_Off ( CPU_INT32U id )
             
         case FPGA_PCK0:
             SAMA5_REG_PIOD_CODR = DEF_BIT_30;
-            break;  
+            break;   
 
         default:
             break;

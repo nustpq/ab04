@@ -227,6 +227,7 @@
 #define  PC_CMD_RESET_AUDIO          15
 #define  PC_CMD_UPDATE_AUDIO         16
 #define  PC_CMD_UPDATE_FPGA_SWITCH   17
+#define  PC_CMD_SET_CODEC_CFG        18
 
 #define  PC_CMD_AB_POST              20
 

@@ -531,6 +531,37 @@ static  void  App_TaskStart (void *p_arg)
       
         //OSTimeDly(10); continue; //test    
       
+//            UIF_Beep_Off();                
+//            UIF_LED_Off_All();   
+                   
+//            UIF_LED_On( LED_RUN );
+//            UIF_LED_Off( LED_RUN );
+//            
+//            UIF_LED_On( LED_USB );
+//            UIF_LED_Off( LED_USB );
+//            
+//            UIF_LED_On( LED_HDMI );
+//            UIF_LED_Off( LED_HDMI );
+//            
+//            UIF_LED_On( LED_HDMI_2 );
+//            UIF_LED_Off( LED_HDMI_2 );
+//            
+//            UIF_LED_On( LED_AUDIO_PLAY );
+//            UIF_LED_Off( LED_AUDIO_PLAY );
+//            
+//            UIF_LED_On( LED_AUDIO_REC );
+//            UIF_LED_Off( LED_AUDIO_REC );
+//            
+//            UIF_LED_On( LED_VDDIO_3_3 );
+//            UIF_LED_Off( LED_VDDIO_3_3 );             
+//            
+//            UIF_LED_On( LED_VDDIO_1_8 );
+//            UIF_LED_Off( LED_VDDIO_1_8 );
+            
+     
+            
+            
+            
         Ruler_Port_LED_Service();
         
         usb_state =  USBD_GetState(); 
@@ -549,9 +580,11 @@ static  void  App_TaskStart (void *p_arg)
         
         if ( audio_run_control == false) {  
             if ( usb_state < USBD_STATE_CONFIGURED ) {           
-                UIF_LED_Off( LED_USB );                  
+                UIF_LED_Off( LED_USB ); 
+                UIF_LED_Off( LED_AUDIO_REC );
             } else {
                 UIF_LED_On( LED_USB );
+                UIF_LED_On( LED_AUDIO_REC );
             }
         }          
         

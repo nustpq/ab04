@@ -269,6 +269,11 @@ typedef  struct  atsama5_reg_pio {
 #define LED_HDMI   3
 #define LED_HDMI_2 4
 
+#define LED_AUDIO_PLAY 5
+#define LED_AUDIO_REC  6
+#define LED_VDDIO_1_8  7
+#define LED_VDDIO_3_3  8
+ 
 #define BUZZER_OFF 1
 #define BUZZER_ON 0
 
@@ -326,6 +331,8 @@ void UIF_DelayUs( CPU_INT32U us );
 void UIF_Beep_On ( ) ;
 
 void UIF_Beep_Off ( ) ;
+
+void UIF_LED_Off_All ( void) ;
 
 void Buzzer_OnOff( unsigned char onoff );
 

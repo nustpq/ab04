@@ -143,10 +143,11 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
                 break;
             }
             if( temp <= 1000 && temp >= 10) { //10k ~ 1M
+                APP_TRACE_INFO(("\r\nI2C port is set to %d kHz\r\n",temp)); 
                 //TWI_Init( temp * 1000 );
                 temp = temp * 1000 ;
                 source_twi0.init_source( &source_twi0,&temp );
-                APP_TRACE_INFO(("\r\nI2C port is set to %d kHz\r\n",temp));        
+                       
             }  else {
                 APP_TRACE_INFO(("\r\nERROR: I2C speed not support %d kHz\r\n",temp));
                 err = SET_I2C_ERR ;
@@ -189,31 +190,29 @@ unsigned char Setup_Interface( INTERFACE_CFG *pInterface_Cfg )
         break ;
         
         case UIF_TYPE_FM36_PATH :  
-            //I2C_Mixer(I2C_MIX_FM36_CODEC);           
+            I2C_Switcher( I2C_SWITCH_FM36 );           
             if( (pInterface_Cfg->attribute == ATTRI_FM36_PATH_PWD_BP ) ){//&& ( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute != ATTRI_FM36_PATH_PWD_BP ) ) {                
                 err = FM36_PWD_Bypass();                
             } 
             if( (pInterface_Cfg->attribute == ATTRI_FM36_PATH_NORMAL ) && ( Global_UIF_Setting[ UIF_TYPE_FM36_PATH - 1 ].attribute != ATTRI_FM36_PATH_NORMAL ) ) {                  
                 err = Init_FM36_AB03_Preset();                
             }
-            //I2C_Mixer(I2C_MIX_UIF_S);
-        break ;
+            break ;
         
         case UIF_TYPE_FM36_PDMCLK :
-            //I2C_Mixer(I2C_MIX_FM36_CODEC);
+            I2C_Switcher( I2C_SWITCH_FM36 ); 
             //err = FM36_PDM_CLK_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute), 1 ); //pdm_dac_clk, pdm_adc_clk, type=ontheflychange
             Global_UIF_Setting[ UIF_TYPE_FM36_PDMCLK - 1 ].attribute = pInterface_Cfg->attribute; //save clock data in attribute to global for  Init_FM36_AB03_Preset() use
-            err = Init_FM36_AB03_Preset(); //be careful if the I2C switch status changed during OSTimeDly() in side this routine
-            //I2C_Mixer(I2C_MIX_UIF_S);                       
+            err = Init_FM36_AB03_Preset(); //be careful if the I2C switch status changed during OSTimeDly() in side this routine                    
         break ;
         
         case UIF_TYPE_GPIO :       
             err = GPIOPIN_Set( GET_BYTE_HIGH_4BIT(pInterface_Cfg->attribute), GET_BYTE_LOW_4BIT(pInterface_Cfg->attribute));
         break ; 
         
-//        case UIF_TYPE_I2C_Mixer :       
-//            err = I2C_Mixer( pInterface_Cfg->attribute );
-//        break ;
+        case UIF_TYPE_I2C_Mixer :       
+            err = I2C_Switcher( pInterface_Cfg->attribute );
+        break ;
         
         case UIF_TYPE_GPIO_CLK :       
             //CS_GPIO_Init( pInterface_Cfg->attribute );

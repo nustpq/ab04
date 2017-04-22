@@ -1086,7 +1086,34 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
             
         break;       
         
-        ////////////////////////////////////////////////////////////////////////        
+        ////////////////////////////////////////////////////////////////////////
+
+        case PC_CMD_SET_CODEC_CFG :             
+                   
+            temp = emb_get_attr_int(&root, 2, 8000); //default 8k            
+            PCCmd.audio_cfg.sample_rate = (CPU_INT16U)temp;   
+            temp = emb_get_attr_int(&root, 4, 0);            
+            PCCmd.audio_cfg.lin_ch_mask = (CPU_INT08U)temp; 
+            temp = emb_get_attr_int(&root, 5, 0);            
+            PCCmd.audio_cfg.bit_length = (CPU_INT08U)temp;             
+            temp = emb_get_attr_int(&root, 7, 2); //1: PDM  2:I2S/I2S-TDM 3: PCM/PCM-TDM 
+            PCCmd.audio_cfg.format = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 8, 0 ); // default polarity =0
+            PCCmd.audio_cfg.bclk_polarity = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 9, 1);   //default 1 cycle delay          
+            PCCmd.audio_cfg.ssc_delay = (CPU_INT08U)temp;
+            //temp = emb_get_attr_int(&root, 10, 4);  //default 4: falling edge trigger for low left          
+            //PCCmd.audio_cfg.ssc_start = (CPU_INT08U)temp;
+            temp = emb_get_attr_int(&root, 11, 0);  //default 0: as master      
+            PCCmd.audio_cfg.master_slave = (CPU_INT08U)temp;             
+            temp = emb_get_attr_int(&root, 13, 8);     //default 8: Bus slot number         
+            PCCmd.audio_cfg.slot_num = (CPU_INT08U)temp;            
+			temp = emb_get_attr_int(&root, 14, 0);  //default 0: SSC0         
+            PCCmd.audio_cfg.id = (uint8_t)temp; 
+            
+            err = Setup_CODEC( &PCCmd.audio_cfg );
+
+        break ;        
                 
         case PC_CMD_SET_IF_CFG :
           

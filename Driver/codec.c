@@ -1147,14 +1147,13 @@ uint8_t Set_Codec_PLL( const DataSource *pSource,uint32_t sr, uint8_t sample_len
 
 CODEC_SETS Codec_Set_Saved[2];   //for 2 CODEC
 
-uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
+uint8_t Init_CODEC( CODEC_SETS codec_set )
 
 {
     uint8_t err;
     uint8_t i, if_set;
-
-    APP_TRACE_INFO(("\r\nInit CODEC[%d]",codec_set.id));
-
+    DataSource *pSource  =   &source_twi2;
+      
     if( (Codec_Set_Saved[codec_set.id].sr == codec_set.sr)  &&\
         (Codec_Set_Saved[codec_set.id].sample_len == codec_set.sample_len) &&\
         (Codec_Set_Saved[codec_set.id].format == codec_set.format) &&\
@@ -1162,12 +1161,14 @@ uint8_t Init_CODEC( const DataSource *pSource,CODEC_SETS codec_set )
         (Codec_Set_Saved[codec_set.id].bclk_polarity == codec_set.bclk_polarity) &&\
         (Codec_Set_Saved[codec_set.id].delay == codec_set.delay) &&\
         (Codec_Set_Saved[codec_set.id].m_s_sel == codec_set.m_s_sel)   ) {
-        APP_TRACE_INFO(("No need Re-Init CODEC[%d]\r\n",codec_set.id));
+        APP_TRACE_INFO(("\r\nNo need Re-Init CODEC[%d]  ",codec_set.id));
         return 0;
     } else {
         Codec_Set_Saved[codec_set.id] = codec_set;
     }
     
+    APP_TRACE_INFO(("\r\nInit CODEC[%d]: [%d SR][%d CH][%d-Bit][as %s]  ", codec_set.id, codec_set.sr, codec_set.slot_num, codec_set.sample_len, codec_set.m_s_sel==0? "Master": "Slave"));
+  
     Pin_Reset_Codec( codec_set.id );
 
     err = Check_SR_Support( codec_set.sr );

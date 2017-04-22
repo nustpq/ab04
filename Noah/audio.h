@@ -127,7 +127,7 @@ extern unsigned char SPI_Rec_Start( SPI_PLAY_REC_CFG *pSpi_rec_cfg );
 extern unsigned char Save_DSP_VEC( MCU_FLASH *p_dsp_vec );  
 extern void          Debug_Audio( void ) ;
 extern unsigned char Set_DSP_VEC( SET_VEC_CFG *p_dsp_vec_cfg );
-
+extern unsigned char Setup_CODEC( AUDIO_CFG *pAudioCfg );
 
 extern unsigned char  global_audio_padding_byte;
 extern volatile unsigned char Global_SPI_Rec_Start;

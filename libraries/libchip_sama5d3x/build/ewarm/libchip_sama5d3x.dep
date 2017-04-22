@@ -263,6 +263,10 @@
       <file>$PROJ_DIR$\Debug\Obj\twid.pbi</file>
       <file>$PROJ_DIR$\..\..\include\instance\instance_hsmci0.h</file>
       <file>$PROJ_DIR$\..\..\include\instance\instance_twi1.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\EvalBoards\Atmel\ATSAMA5D3X-EK\BSP\bsp.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\EvalBoards\Atmel\ATSAMA5D3X-EK\BSP\bsp.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\uC-LIB\lib_def.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\libchip_sama5d3x.pbd</file>
     </outputs>
     <file>
       <name>[ROOT_NODE]</name>
