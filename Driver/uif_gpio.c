@@ -28,7 +28,7 @@ Pin gpio_pins[ ] = {
                         PIN_HDMI_PORT_DET0,  //10
                         FPGA_CS, FPGA_DAT, FPGA_CLK, //1~13
                         PIN_FPGA_RST,  PIN_FPGA_DONE,//14~15
-                        
+                        PIN_I2C_SWITCH_EN
                         /*
                         PIN_FPGA_OE           ,
                         PIN_FPGA_RST          ,
@@ -54,7 +54,7 @@ Pin gpio_pins[ ] = {
                         PIN_FPGA_PCK1         ,
                         PIN_FPGA_PCK2         ,
                         PIN_VDDIO_1_8         ,
-                        PIN_VDDIO_3_3 
+                        PIN_VDDIO_3_3    ,
                         */
                 };
 

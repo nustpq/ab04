@@ -1333,8 +1333,8 @@ unsigned char FPGA_POST_Setup( void )
     
     //test codec0 as master
     Init_fpga_clock_path( 0,0,"codec0_port0_0" );
-    //Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
-    //Init_fpga_clock_path( 0,0,"codec0_ssc0_2" );
+    Init_fpga_clock_path( 0,0,"codec0_fm36_1" );
+    Init_fpga_clock_path( 0,0,"codec0_ssc0_2" );
     //Init_fpga_clock_path( 0,0,"codec0_port1_3" );
     //Init_fpga_clock_path( 0,0,"codec0_codec1_4" );
     //Init_fpga_clock_path( 0,0,"codec0_ssc1_5" );

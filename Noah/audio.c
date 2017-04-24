@@ -44,8 +44,9 @@ SET_VEC_CFG  Global_VEC_Cfg;
 //AUDIO_CFG  Audio_Configure_Instance[ 2 ];    
 CODEC_SETS   Codec_Set[2][2]; //2 //2 codec, play/rec
 
-unsigned char flag_bypass_fm36; 
+unsigned char  flag_bypass_fm36; 
 unsigned char  global_audio_padding_byte;
+static unsigned char audio_state_check = 0;
 
 volatile unsigned char  Global_SPI_Rec_Start = 0;
 volatile unsigned char  Global_SPI_Rec_En = 0;
@@ -773,7 +774,12 @@ unsigned char Start_Audio( START_AUDIO start_audio )
 #endif
     
     APP_TRACE_INFO(("\r\n<2>Start_Audio : Type[0x%02X],  Padding[0x%X]\r\n", start_audio.type, start_audio.padding));
-       
+    
+    if( audio_state_check != 0 ) { //need stop
+        APP_TRACE_INFO(("\r\nReStart_Audio\r\n"));
+        Stop_Audio();
+        return 0;
+    }
     //Hold_Task_for_Audio(); 
     
     global_audio_padding_byte = start_audio.padding;
@@ -823,6 +829,8 @@ unsigned char Start_Audio( START_AUDIO start_audio )
     audio_run_control        = true ;
     
     Audio_Manager( start_audio.type  );
+    
+    audio_state_check = start_audio.type ;
      
     return 0 ;
 }
@@ -842,12 +850,22 @@ unsigned char Start_Audio( START_AUDIO start_audio )
 unsigned char Stop_Audio( void )
 {
     unsigned char ruler_id;
- 
+    unsigned char err;
+    
 #if OS_CRITICAL_METHOD == 3u
     OS_CPU_SR  cpu_sr = 0u;                                 // Storage for CPU status register
 #endif
     APP_TRACE_INFO(("\r\n<3>Stop_Audio\r\n"));
- 
+    
+    if( audio_state_check == 0 ) { //no need stop
+        APP_TRACE_INFO(("\r\nNo need Stop_Audio\r\n"));
+        return 0;
+    }
+    
+    err = Ruler_Active_Control(0); 
+    if( OS_ERR_NONE != err ){
+        return err;
+    }
     audio_run_control        = false  ;     
     OSTimeDly(20); 
     
@@ -949,7 +967,8 @@ unsigned char Stop_Audio( void )
 //    ssc1_init( );
 //    Dma_configure( ); 
     
-
+    audio_state_check = 0;
+    
     return 0 ;
 }
 

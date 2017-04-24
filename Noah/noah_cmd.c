@@ -1068,8 +1068,6 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
         
         case PC_CMD_STOP_AUDIO :
              
-            err = Ruler_Active_Control(0);                 
-            if( err != NO_ERR ) { err = EMB_CMD_ERR;  break; }
             err = Stop_Audio(); 
            
         break ;    

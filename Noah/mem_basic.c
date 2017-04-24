@@ -157,7 +157,7 @@ uint8_t DM_LegacyRead(uint8_t dev_addr, uint16_t dm_addr,uint8_t *pVal)
     } 
     
 //    state =  TWID_Read( dev_addr>>1, 0, 0, pVal++,1, NULL) ;
-    state = twi2_read( ( void * )pTwiSource, pVal++, 4 ); 
+    state = twi2_read( ( void * )pTwiSource, pVal++, 1 ); 
     if (state != SUCCESS)
     {
         return state  ;
