@@ -18,6 +18,12 @@
 
 //#include "defined.h"
 
+#define SSC0_REC_BIT_MASK   0x01
+#define SSC0_PLAY_BIT_MASK  0x02
+#define SSC1_REC_BIT_MASK   0x10
+#define SSC1_PLAY_BIT_MASK  0x20
+#define SSC_SYNC_BIT_MASK   0x80
+
 
 ////////////////////////////////////////////////////////////////////////////////
 #if 1
@@ -136,7 +142,7 @@ extern SET_VEC_CFG     Global_VEC_Cfg;
 
 extern bool global_flag_sync_audio_0 ;
 extern bool global_flag_sync_audio_1 ;
-
+extern unsigned char  global_audio_cfg_data;
 extern unsigned char pq_0, pq_1;
 ////////////////////////////////////////////////////////////////////////////////
 

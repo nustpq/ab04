@@ -308,6 +308,7 @@
       <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\instance\instance_pioa.h</file>
       <file>$PROJ_DIR$\Debug\Obj\bmp.o</file>
       <file>$PROJ_DIR$\Debug\Obj\hamming.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\libboard_sama5d3x.pbd</file>
     </outputs>
     <file>
       <name>$PROJ_DIR$\..\..\source\ov7740_config.c</name>

@@ -363,6 +363,7 @@
       <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\component\component_pmc.h</file>
       <file>$PROJ_DIR$\..\..\..\libchip_sama5d3x\include\udphs.h</file>
       <file>$PROJ_DIR$\..\..\..\libboard_sama5d3x-ek\include\emacd.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\libusb.pbd</file>
     </outputs>
     <file>
       <name>[ROOT_NODE]</name>

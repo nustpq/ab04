@@ -43,7 +43,7 @@ SET_VEC_CFG  Global_VEC_Cfg;
 
 //AUDIO_CFG  Audio_Configure_Instance[ 2 ];    
 CODEC_SETS   Codec_Set[2][2]; //2 //2 codec, play/rec
-
+unsigned char  global_audio_cfg_data;
 unsigned char  flag_bypass_fm36; 
 unsigned char  global_audio_padding_byte;
 static unsigned char audio_state_check = 0;
@@ -1281,19 +1281,13 @@ void Audio_Manager( unsigned char cfg_data )
        
     APP_TRACE_INFO(( "\r\nAudio Manager: config data = 0X%0X ]", cfg_data ));
     
-    const uint8_t ssc0_rec_bit      = cfg_data & ( 1 << 0 );
-    const uint8_t ssc0_play_bit     = cfg_data & ( 1 << 1 );
-
-    const uint8_t ssc1_rec_bit      = cfg_data & ( 1 << 4 );
-    const uint8_t ssc1_play_bit     = cfg_data & ( 1 << 5 );
-
-    const uint8_t ssc_sync_bit      = cfg_data & ( 1 << 7 ); 
-    //ssc_sync_bit =  1;
-
-//    source_ssc0.status[ IN ]  = ( uint8_t )CONFIGURED;
-//    source_ssc0.status[ OUT ] = ( uint8_t )CONFIGURED;
-//    source_ssc1.status[ IN ]  = ( uint8_t )CONFIGURED;
-//    source_ssc1.status[ OUT ] = ( uint8_t )CONFIGURED;
+    const uint8_t ssc0_rec_bit      = cfg_data & SSC0_REC_BIT_MASK;
+    const uint8_t ssc0_play_bit     = cfg_data & SSC0_PLAY_BIT_MASK;
+    const uint8_t ssc1_rec_bit      = cfg_data & SSC1_REC_BIT_MASK;
+    const uint8_t ssc1_play_bit     = cfg_data & SSC1_PLAY_BIT_MASK;
+    const uint8_t ssc_sync_bit      = cfg_data & SSC_SYNC_BIT_MASK;
+    
+    global_audio_cfg_data   =  cfg_data ; 
 
     //prepare SSC data transfer
     if( ssc0_rec_bit  )
@@ -1345,6 +1339,7 @@ void Audio_Manager( unsigned char cfg_data )
 #endif    
     pq_0 = 0;
     pq_1 = 0;
+    
     if( ssc_sync_bit ) { 
         global_flag_sync_audio_0 = false  ;
         global_flag_sync_audio_1 = false  ;
@@ -1408,7 +1403,11 @@ void Audio_Manager( unsigned char cfg_data )
         }
         
     }
-   
+    
+    if( ssc_sync_bit == 0 ){    
+        UIF_LED_Off( LED_AUDIO_REC  );
+        UIF_LED_On(  LED_AUDIO_PLAY );
+    }
         
 }
 

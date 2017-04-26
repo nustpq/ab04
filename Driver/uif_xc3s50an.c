@@ -88,7 +88,7 @@ const char dataSwitch[ 14 ][ 32 ]= {
   "uif_i2s0_rx->fm36_i2s_rx",  //T0 = 1
   
   "ssc0_tx->codec0_rx",       //T1 = 0
-  "uif_i2s0_tx->codec0_rx",   //T1 = 1
+  "uif_i2s0_rx->codec0_rx",   //T1 = 1
   
   "codec1_tx->ssc1_rx",     //T2 = 0
   "uif_i2s1_rx->ssc1_rx",   //T2 = 1
@@ -973,12 +973,12 @@ bool i2s_clk_path_check( void * pPath , List *validList )
     else
     {
       ///TODO:path invalid,exit this function;
-      APP_TRACE_INFO(("add path[ %s ]failed!\r\n",clk->switch_name));
+      APP_TRACE_INFO(("add path[ %s ][%d]failed!\r\n",clk->switch_name,clk->dir));
       return 0;
     }
   }
      
-  APP_TRACE_INFO(("add path[ %s ]succeed!\r\n",clk->switch_name));
+  APP_TRACE_INFO(("add path[ %s ][%d]succeed!\r\n",clk->switch_name,clk->dir));
 
   return 1;
 }
@@ -1326,8 +1326,6 @@ static int8_t Init_fpga_data_path( const char *s_data_path )
 unsigned char FPGA_POST_Setup( void )    
 {
     unsigned char err;
-  
-    //FPGA_COMMAND cmd;
 
     init_fpga();
     
@@ -1338,90 +1336,18 @@ unsigned char FPGA_POST_Setup( void )
     //Init_fpga_clock_path( 0,0,"codec0_port1_3" );
     //Init_fpga_clock_path( 0,0,"codec0_codec1_4" );
     //Init_fpga_clock_path( 0,0,"codec0_ssc1_5" );
+    
     Init_fpga_clock_path( 0,0,"codec1_port1_7" );
     Init_fpga_clock_path( 0,0,"codec1_ssc1_9" );
         
-    Init_fpga_data_path( "uif_i2s0_rx->fm36_i2s_rx" );
+    Init_fpga_data_path( "codec0_tx->fm36_i2s_rx" );
     Init_fpga_data_path( "ssc0_tx->codec0_rx" );
     Init_fpga_data_path( "ssc1_tx->codec1_rx" );
+    //Init_fpga_data_path( "uif_i2s1_rx->codec1_rx" );
+    
     Init_fpga_data_path( "fm36_pdmo_data->uif_pdmo_data" );
     Init_fpga_data_path( "fm36_pdmi_clk->hdmi_pdm_clk" );
    
-    
-    /*
-    xc3s50an.cmdWord.pdm_revers = 0xffffffff;
-    xc3s50an.cmdWord.t_revs0 = 0x01 ;      
-    xc3s50an.cmdWord.t_revs1 = 0x01 ;
-    xc3s50an.cmdWord.t_revs2 = 0x01 ; 
-    
-    xc3s50an.cmdWord.t0 = 0x01 ;      
-    xc3s50an.cmdWord.t1 = 0x01 ;
-    xc3s50an.cmdWord.t2 = 0x01 ; 
-    
-    xc3s50an.cmdWord.t3 = 0x01 ;      
-    xc3s50an.cmdWord.t4 = 0x01 ;
-    xc3s50an.cmdWord.t5 = 0x01 ;
-    
-    xc3s50an.cmdWord.t6 = 0x01 ;
-    xc3s50an.cmdWord.t7 = 0x01 ;    
-	
-    xc3s50an.cmdWord.dir_revers6 = 0xff;
-    xc3s50an.cmdWord.dir_port1_ssc1   =  0x01;  
-    xc3s50an.cmdWord.dir_port1_fm36   =  0x01;
-    xc3s50an.cmdWord.dir_revers0      =  0x01;
-    xc3s50an.cmdWord.dir_revers1      =  0x01;
-    xc3s50an.cmdWord.dir_revers2      =  0x01;
-    xc3s50an.cmdWord.dir_revers3      =  0x01;
-    xc3s50an.cmdWord.dir_revers4      =  0x01;
-    xc3s50an.cmdWord.dir_revers5      =  0x01;
-
-    xc3s50an.cmdWord.dir_codec1_ssc0  =  0x01;
-    xc3s50an.cmdWord.dir_codec1_ssc1  =  0x01;
-    xc3s50an.cmdWord.dir_port0_port1  =  0x01;
-    xc3s50an.cmdWord.dir_port0_ssc0   =  0x01;
-    xc3s50an.cmdWord.dir_port0_ssc1   =  0x01;
-    xc3s50an.cmdWord.dir_port0_fm36   =  0x01;
-    xc3s50an.cmdWord.dir_port1_ssc0   =  0x01;
-        
-    xc3s50an.cmdWord.dir_codec0_port0 =  0x01;
-    xc3s50an.cmdWord.dir_codec0_fm36  =  0x01;
-    xc3s50an.cmdWord.dir_codec0_ssc0  =  0x01;
-    xc3s50an.cmdWord.dir_codec0_port1 =  0x01;
-    xc3s50an.cmdWord.dir_codec0_codec1=  0x01;
-    xc3s50an.cmdWord.dir_codec0_ssc1  =  0x01;
-    xc3s50an.cmdWord.dir_codec1_port0 =  0x01;
-    xc3s50an.cmdWord.dir_codec1_port1 =  0x01;
-
-	
-    xc3s50an.cmdWord.oe_revers6 = 0xff ;
-
-    xc3s50an.cmdWord.oe_port1_ssc1    =  0x01;
-    xc3s50an.cmdWord.oe_port1_fm36    =  0x01;
-    xc3s50an.cmdWord.oe_revers0       =  0x01;
-    xc3s50an.cmdWord.oe_revers1       =  0x01;
-    xc3s50an.cmdWord.oe_revers2       =  0x01;
-    xc3s50an.cmdWord.oe_revers3       =  0x01;
-    xc3s50an.cmdWord.oe_revers4	   =  0x01;
-    xc3s50an.cmdWord.oe_revers5	   =  0x01;
-
-    xc3s50an.cmdWord.oe_codec1_ssc0     =  0x01;
-    xc3s50an.cmdWord.oe_codec1_ssc1     =  0x01;
-    xc3s50an.cmdWord.oe_codec1_fm36     =  0x01;
-    xc3s50an.cmdWord.oe_port0_port1     =  0x01;
-    xc3s50an.cmdWord.oe_port0_ssc0      =  0x01;
-    xc3s50an.cmdWord.oe_port0_ssc1      =  0x01;
-    xc3s50an.cmdWord.oe_port0_fm36      =  0x01;
-    xc3s50an.cmdWord.oe_port1_ssc0      =  0x01;
-        
-    xc3s50an.cmdWord.oe_codec0_port0    =  0x00;  // LSB
-    xc3s50an.cmdWord.oe_codec0_fm36     =  0x01;
-    xc3s50an.cmdWord.oe_codec0_ssc0     =  0x01;
-    xc3s50an.cmdWord.oe_codec0_port1    =  0x01;
-    xc3s50an.cmdWord.oe_codec0_codec1   =  0x01;
-    xc3s50an.cmdWord.oe_codec0_ssc1     =  0x01;	
-    xc3s50an.cmdWord.oe_codec1_port0    =  0x01;
-    xc3s50an.cmdWord.oe_codec1_port1   =  0x01; 
-    */ 
 
     err = xc3s50an.set_path( &xc3s50an, 
                        &xc3s50an.cmdWord , 

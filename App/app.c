@@ -543,8 +543,8 @@ static  void  App_TaskStart (void *p_arg)
 //            UIF_LED_On( LED_HDMI );
 //            UIF_LED_Off( LED_HDMI );
 //            
-//            UIF_LED_On( LED_HDMI_2 );
-//            UIF_LED_Off( LED_HDMI_2 );
+//            UIF_LED_On( LED_USB_2 );
+//            UIF_LED_Off( LED_USB_2 );
 //            
 //            UIF_LED_On( LED_AUDIO_PLAY );
 //            UIF_LED_Off( LED_AUDIO_PLAY );
@@ -581,10 +581,10 @@ static  void  App_TaskStart (void *p_arg)
         if ( audio_run_control == false) {  
             if ( usb_state < USBD_STATE_CONFIGURED ) {           
                 UIF_LED_Off( LED_USB ); 
-                UIF_LED_Off( LED_AUDIO_REC );
+                UIF_LED_Off( LED_USB_2 );
             } else {
                 UIF_LED_On( LED_USB );
-                UIF_LED_On( LED_AUDIO_REC );
+                UIF_LED_On( LED_USB_2 );
             }
         }          
         

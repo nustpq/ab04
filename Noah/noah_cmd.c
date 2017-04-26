@@ -1575,7 +1575,7 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
        
     }
 
-    // Time_Stamp();
+     //Time_Stamp();
      if( err == 0 ) {
          //APP_TRACE_INFO((" CMD[%d] End ",cmd_type));
      } else {

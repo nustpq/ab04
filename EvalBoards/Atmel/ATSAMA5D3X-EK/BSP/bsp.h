@@ -267,7 +267,7 @@ typedef  struct  atsama5_reg_pio {
 #define LED_RUN    1
 #define LED_USB    2
 #define LED_HDMI   3
-#define LED_HDMI_2 4
+#define LED_USB_2  4
 
 #define LED_AUDIO_PLAY 5
 #define LED_AUDIO_REC  6

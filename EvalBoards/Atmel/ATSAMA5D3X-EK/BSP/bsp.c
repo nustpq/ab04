@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V1.0.1]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V1.0.2]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V2.0]";
@@ -484,14 +484,14 @@ void Buzzer_OnOff( unsigned char onoff )
 
 void UIF_LED_Off_All ( void)
 {
-            UIF_LED_Off( LED_RUN );   
-            UIF_LED_Off( LED_USB );
-            UIF_LED_Off( LED_HDMI );                      
-            UIF_LED_Off( LED_HDMI_2 );
-            UIF_LED_Off( LED_AUDIO_PLAY );
-            UIF_LED_Off( LED_AUDIO_REC );
-            UIF_LED_Off( LED_VDDIO_3_3 );               
-            UIF_LED_Off( LED_VDDIO_1_8 );   
+    UIF_LED_Off( LED_RUN );   
+    UIF_LED_Off( LED_USB );
+    UIF_LED_Off( LED_HDMI );                      
+    UIF_LED_Off( LED_USB_2 );
+    UIF_LED_Off( LED_AUDIO_PLAY );
+    UIF_LED_Off( LED_AUDIO_REC );
+    UIF_LED_Off( LED_VDDIO_3_3 );               
+    UIF_LED_Off( LED_VDDIO_1_8 );   
 }
 
 
@@ -514,32 +514,32 @@ void UIF_LED_Off_All ( void)
 void UIF_LED_Off ( CPU_INT32U led )
 {
     switch (led) {
-        case LED_RUN: //LED_D3
+        case LED_RUN: //LED_D2
             SAMA5_REG_PIOA_CODR = DEF_BIT_21;
             break;
 
-        case LED_USB: //LED_D4
+        case LED_USB: //LED_D4 : USB SMD LED
             SAMA5_REG_PIOA_CODR = DEF_BIT_22;
             break;
 
-        case LED_HDMI: //LED_D5
+        case LED_HDMI: //LED_D15  : HDMI
             SAMA5_REG_PIOA_CODR = DEF_BIT_24;
             break;
             
-        case LED_HDMI_2:  //hdmi interface status indicate;
+        case LED_USB_2:  //LED_D15  : USB
             SAMA5_REG_PIOA_CODR = DEF_BIT_23;
             break;        
                         
-        case LED_AUDIO_PLAY:
+        case LED_VDDIO_3_3: //LED_D13
             SAMA5_REG_PIOA_CODR = DEF_BIT_27;
             break; 
-        case LED_AUDIO_REC:
+        case LED_VDDIO_1_8: //LED_D13
             SAMA5_REG_PIOD_CODR = DEF_BIT_28;
             break;
-        case LED_VDDIO_3_3:
+        case LED_AUDIO_PLAY: //LED_D14
             SAMA5_REG_PIOD_CODR = DEF_BIT_26;
             break; 
-        case LED_VDDIO_1_8:
+        case LED_AUDIO_REC:  //LED_D14
             SAMA5_REG_PIOD_CODR = DEF_BIT_25;
             break;   
             
@@ -580,20 +580,20 @@ void UIF_LED_On ( CPU_INT32U led )
         case LED_HDMI:  //hdmi interface status indicate;
             SAMA5_REG_PIOA_SODR = DEF_BIT_24;
             break;
-        case LED_HDMI_2:  //hdmi interface status indicate;
+        case LED_USB_2:  //hdmi interface status indicate;
             SAMA5_REG_PIOA_SODR = DEF_BIT_23;
             break;
        
-        case LED_AUDIO_PLAY:
+        case LED_VDDIO_3_3:
             SAMA5_REG_PIOA_SODR = DEF_BIT_27;
             break; 
-        case LED_AUDIO_REC:
+        case LED_VDDIO_1_8:
             SAMA5_REG_PIOD_SODR = DEF_BIT_28;
             break;
-        case LED_VDDIO_3_3:
+        case LED_AUDIO_PLAY:
             SAMA5_REG_PIOD_SODR = DEF_BIT_26;
             break; 
-        case LED_VDDIO_1_8:
+        case LED_AUDIO_REC:
             SAMA5_REG_PIOD_SODR = DEF_BIT_25;
             break;
         default:
@@ -648,12 +648,28 @@ void UIF_LED_Toggle( CPU_INT32U led )
               SAMA5_REG_PIOA_SODR = DEF_BIT_24;
         break;
         
-        case LED_HDMI_2:
+        case LED_USB_2:
             if( status &  DEF_BIT_23 )
               SAMA5_REG_PIOA_CODR = DEF_BIT_23;
             else
               SAMA5_REG_PIOA_SODR = DEF_BIT_23;
         break;
+        
+        case LED_AUDIO_PLAY:  
+            status = SAMA5_REG_PIOD_ODSR; 
+            if( status &  DEF_BIT_26 )
+              SAMA5_REG_PIOD_CODR = DEF_BIT_26;
+            else
+              SAMA5_REG_PIOD_SODR = DEF_BIT_26;
+            break; 
+            
+        case LED_AUDIO_REC:
+            status = SAMA5_REG_PIOD_ODSR;         
+            if( status &  DEF_BIT_25 )
+              SAMA5_REG_PIOD_CODR = DEF_BIT_25;
+            else
+              SAMA5_REG_PIOD_SODR = DEF_BIT_25;
+            break;  
 
       default:
         break;

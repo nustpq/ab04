@@ -1298,6 +1298,25 @@ void Ruler_Port_LED_Service( void )
         }
 
     }
+    
+    if(  audio_run_control  ) { 
+      
+        if( (counter & LED_Freq) == 0 ) {
+            if( global_audio_cfg_data & ( SSC0_REC_BIT_MASK| SSC1_REC_BIT_MASK ) ) {
+                UIF_LED_Toggle( LED_AUDIO_REC );
+                
+            }
+            if( global_audio_cfg_data & ( SSC0_PLAY_BIT_MASK| SSC1_PLAY_BIT_MASK ) ) {
+                UIF_LED_Toggle( LED_AUDIO_PLAY );
+            }
+        }
+        
+    } else {
+      
+       UIF_LED_Off( LED_AUDIO_REC );
+       UIF_LED_Off( LED_AUDIO_PLAY );
+    }
+    
     counter++;
     
 }
