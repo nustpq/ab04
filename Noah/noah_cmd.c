@@ -36,14 +36,7 @@
 EMB_BUF   Emb_Buf_Cmd;
 EMB_BUF   Emb_Buf_Data;
 
-#define FW_SIZE    1024*1024          //1M   firmware  size
-
-#define FW_SIZE_2    1024*16 
-
-unsigned char fw_data[FW_SIZE];
-unsigned char *pfw_data=fw_data;
-
-extern  void AppTaskFirmwareVecUpdate  ( void  *p_arg );
+ 
 
 //EMB_BUF      *pEBuf;     
 //    pEBuf         = &Emb_Buf_Data;    
@@ -1542,49 +1535,48 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
         ////////////////////////////////////////////////////////////////////////
         
         case PC_CMD_RAW_DATA_TRANS :   
-             Send_DACK(err);  
-             
-             Send_GACK(err);              
+            Send_DACK(err); 
+            Send_GACK(err);              
         break ;  
        
         case PC_CMD_DOWNLOAD_RULER_FW :
-             Send_DACK(err);   
-             temp = emb_get_attr_int(&root, 1, -1);            
-             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }  
-             unsigned char *pBin,*pStr;
-             unsigned int   size; 
-             pBin = (unsigned char *)emb_get_attr_binary(&root, 2, (int *)&size);            
-             if(pBin == NULL ) { Send_GACK(EMB_CMD_ERR);  break; }              
-             pStr = (unsigned char *)emb_get_attr_string(&root, 3);            
-             if(pStr == NULL ) { Send_GACK(EMB_CMD_ERR);  break; }            
-             err = Save_Ruler_FW( temp, pBin, pStr, size );           
-             Send_GACK(err);             
+            Send_DACK(err);   
+            temp = emb_get_attr_int(&root, 1, -1);            
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }  
+            unsigned char *pBin,*pStr;
+            unsigned int   size; 
+            pBin = (unsigned char *)emb_get_attr_binary(&root, 2, (int *)&size);            
+            if(pBin == NULL ) { Send_GACK(EMB_CMD_ERR);  break; }              
+            pStr = (unsigned char *)emb_get_attr_string(&root, 3);            
+            if(pStr == NULL ) { Send_GACK(EMB_CMD_ERR);  break; }            
+            err = Save_Ruler_FW( temp, pBin, pStr, size );           
+            Send_GACK(err);             
         break ; 
         
         case PC_CMD_UPDATE_RULER_FW :   
-             Send_DACK(err);   
-             temp = emb_get_attr_int(&root, 1, -1);            
-             if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }                  
-             err = Update_Ruler_FW( temp );          
-             Send_GACK(err);             
+            Send_DACK(err);   
+            temp = emb_get_attr_int(&root, 1, -1);            
+            if(temp == -1 ) { Send_GACK(EMB_CMD_ERR);  break; }                  
+            err = Update_Ruler_FW( temp );          
+            Send_GACK(err);             
         break ;  
         
         case PC_CMD_UPDATE_AB_FW :   
-             Send_DACK(err);  
-         
+            Send_DACK(err);   
+            
             unsigned int length;
-            unsigned char *p;
-						unsigned char *pBin_update;
-            unsigned char  package_num;
-            static unsigned char pack_index=0;
+            unsigned char *p;		
+            unsigned char  package_num;        
 
-						
+            static unsigned char  pack_index = 0; 
+			static unsigned char *pfw_data   = nand_pageBuffer;
+
             temp = emb_get_attr_int(&root, 1, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
-            length=(unsigned int)temp;      
-            pBin_update =(unsigned char *)emb_get_attr_binary(&root, 2, (int*)&temp);
-            if(pBin_update == NULL ) { err = EMB_CMD_ERR;   break; }
-            p = (unsigned char *)pBin_update;  
+            length=(unsigned int)temp; 
+            
+            p =(unsigned char *)emb_get_attr_binary(&root, 2, (int*)&temp);
+            if(p == NULL ) { err = EMB_CMD_ERR;   break; }           
 
             temp = emb_get_attr_int(&root, 3, -1);
             if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
@@ -1592,20 +1584,26 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
             
             for(unsigned int i=0;i<length;i++){
                 *pfw_data = *p;
-								pfw_data++;
-								p++;
+				pfw_data++;
+				p++;
             }   
-
-            pack_index++;
-            APP_TRACE_INFO(("\r\n::::: pack_index=%d ",pack_index));
+                        
+            if( pack_index++ == 0 ) {
+                APP_TRACE_INFO(("\r\nStart update FW > pack_index=%d. ",pack_index));
+            } else {
+                APP_TRACE_INFO(("%d. ",pack_index));
+            }
             if(pack_index == package_num ){
-               memset( nand_pageBuffer , 0 , sizeof( nand_pageBuffer ) );
-               memcpy( nand_pageBuffer , fw_data ,sizeof( fw_data ) ); 
-               AppTaskFirmwareVecUpdate( pfw_data );//err?
+               pack_index = 0;
+               pfw_data   = nand_pageBuffer;
+               //memset( nand_pageBuffer , 0 , sizeof( nand_pageBuffer ) );
+               //memcpy( nand_pageBuffer , ab_fw_buf_data ,sizeof( ab_fw_buf_data ) );
+               unsigned char  type = UPDATE_FIRMWARE;
+               AB_Update_Firmware( &type );//err?
                break;
             }
             err=0;
-             Send_GACK(err);               
+            Send_GACK(err);               
         break ;         
         
         

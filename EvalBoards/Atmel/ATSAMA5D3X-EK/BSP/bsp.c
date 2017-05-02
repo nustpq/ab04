@@ -46,7 +46,7 @@
 /*
 *********************************      Version Declaration       ****************************************
 */
-const CPU_CHAR fw_version[]  = "[FW:V1.0.2]"; //fixed size string
+const CPU_CHAR fw_version[]  = "[FW:V1.0.3]"; //fixed size string
 
 #ifdef  BOARD_TYPE_AB04
 const CPU_CHAR hw_version[]  = "[HW:V2.0]";
@@ -58,7 +58,7 @@ OS_EVENT *Bsp_Ser_Rx_Sem_lock;
 OS_EVENT *DBGU_UART_Tx_Sem_lock;
 OS_EVENT *DBGU_USB_Tx_Sem_lock;
 
-
+volatile unsigned char BUZZER_MUTE = 0 ;
 CPU_INT08U Debug_COM_Sel = 0 ; //debug uart use:    0: DBGUART, 1: UART1, >1: debug muted
 
 
@@ -157,7 +157,6 @@ CPU_INT32U  BSP_MCK_ClkFreq (void)
     CPU_INT32U  MCK;
 
     mclk_div = (SAMA5_REG_PMC_MCKR >> 8)  & 0x00000003;    /* Get the master clk preescaler                      */
-
 
     MCK =  BSP_CPU_ClkFreq() / ( mclk_div + 1 );
     return (MCK);
@@ -449,36 +448,35 @@ void UIF_LED_Init( void )
 
 
 
-void UIF_Beep_On ( )
-{
-    SAMA5_REG_PIOA_CODR = DEF_BIT_08;
+void UIF_LED_TEST( void )
+{             
+    
+    UIF_Beep_Off();                
+    UIF_LED_Off_All();   
+           
+    UIF_LED_On( LED_RUN );
+    UIF_LED_Off( LED_RUN );
 
-}
+    UIF_LED_On( LED_USB );
+    UIF_LED_Off( LED_USB );
 
-void UIF_Beep_Off ( )
-{
-    SAMA5_REG_PIOA_SODR = DEF_BIT_08;
+    UIF_LED_On( LED_HDMI );
+    UIF_LED_Off( LED_HDMI );
 
-}
+    UIF_LED_On( LED_USB_2 );
+    UIF_LED_Off( LED_USB_2 );
 
+    UIF_LED_On( LED_AUDIO_PLAY );
+    UIF_LED_Off( LED_AUDIO_PLAY );
 
-volatile unsigned char BUZZER_MUTE = 0 ;
+    UIF_LED_On( LED_AUDIO_REC );
+    UIF_LED_Off( LED_AUDIO_REC );
 
-void Buzzer_OnOff( unsigned char onoff )
-{
+    UIF_LED_On( LED_VDDIO_3_3 );
+    UIF_LED_Off( LED_VDDIO_3_3 );             
 
-    if( BUZZER_MUTE != 0 ) {
-        return;
-    }
-
-    if( onoff == 0 ) {
-        UIF_Beep_Off ( );
-
-    } else {
-        UIF_Beep_On ( );
-
-    }
-
+    UIF_LED_On( LED_VDDIO_1_8 );
+    UIF_LED_Off( LED_VDDIO_1_8 );
 
 }
 
@@ -712,6 +710,37 @@ void Beep( INT32U beep_cycles)
 
 }
 
+
+
+void UIF_Beep_On ( )
+{
+    SAMA5_REG_PIOA_CODR = DEF_BIT_08;
+
+}
+
+void UIF_Beep_Off ( )
+{
+    SAMA5_REG_PIOA_SODR = DEF_BIT_08;
+
+}
+
+
+void Buzzer_OnOff( unsigned char onoff )
+{
+
+    if( BUZZER_MUTE != 0 ) {
+        return;
+    }
+
+    if( onoff == 0 ) {
+        UIF_Beep_Off ( );
+
+    } else {
+        UIF_Beep_On ( );
+
+    }
+
+}
 
 /*
 *********************************************************************************************************
@@ -1279,3 +1308,4 @@ void dump_buf_debug( unsigned char *pChar, unsigned int size)
     }
 
 }
+

@@ -401,7 +401,7 @@ void UsbLogDataTransmit(      uint32_t unused,
             kfifo_get(&DBG_USB_Send_kFIFO, usbCacheBulkIn3, USB_LOGEP_SIZE_256B); 
         
             CDCDSerialDriver_WriteLog( usbCacheBulkIn3,
-                                             USB_DATAEP_SIZE_64B,
+                                             USB_LOGEP_SIZE_256B,
                                              (TransferCallback) UsbLogDataTransmit,
                                              0);       
         } 
@@ -417,7 +417,7 @@ void UsbLogDataTransmit(      uint32_t unused,
                                          USB_LOGEP_SIZE_256B,
                                          (TransferCallback) UsbLogDataTransmit,
                                          0);  
-        APP_TRACE_INFO(( "\r\nERROR : UsbLogDataTransmit: Rr-transfer hit\r\n" ));  
+        //APP_TRACE_INFO(( "\r\nERROR : UsbLogDataTransmit: Rr-transfer hit\r\n" ));  
         
     }        
 }

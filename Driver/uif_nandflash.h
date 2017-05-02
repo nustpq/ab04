@@ -17,6 +17,8 @@
 #define FIRMWARE_SIZE_BIT (1024 * 1024)
 #define FIRMWARE_USE_BLOCK_NUM (FIRMWARE_SIZE_BIT / BLOCK_SIZE_USE_BIT)
 
+#define AB_FW_BUF_SIZE   (1024*1024)          //1M   firmware  size 
+
  typedef struct _SmcTestMode 
 {
     uint8_t     nfc: 1,    /**< NAND Flash Controller 0: disable, 1: enable */
@@ -47,8 +49,8 @@ extern sDmad g_nand_dmad;
 extern uint8_t g_onfiEccCorrectability;
 extern uint8_t g_onficompatible;
 
-extern uint8_t nand_pageBuffer[ 1024 * 1024 ];
-extern uint8_t nand_patternBuf[ 1024 * 1024 ];
+extern uint8_t nand_pageBuffer[ AB_FW_BUF_SIZE ];
+extern uint8_t nand_patternBuf[ AB_FW_BUF_SIZE ];
 
 uint8_t nfc_init( void * parameter );
 uint8_t pmecc_init( uint8_t *status );

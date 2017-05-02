@@ -60,6 +60,15 @@
 #define   GET_I2C_GPIO_SCL(x)        GET_BYTE_LOW_4BIT( x ) 
 #define   GET_I2C_GPIO_SDA(x)        GET_BYTE_HIGH_4BIT( x ) 
 
+/////////////////////////  AB_Update_Firmware  ////////////////////////////////
+
+#define UPDATE_FIRMWARE  1
+#define BACKUP_FIRMWARE  2
+#define RESTORE_FIRMWARE 3
+#define STORE_VEC        4
+#define READ_VEC         5
+#define WRITE_SYSINFO    6
+#define READ_SYSINFO     7
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -141,7 +150,7 @@ void          Dump_Data ( unsigned char *pdata, unsigned int size );
 unsigned char Set_Volume( SET_VOLUME *pdata );
 unsigned char GPIO_Session( GPIO_SESSION *p_gpio_session );
 unsigned char AB_POST( void );
-
+void          AB_Update_Firmware ( void *p_arg );
 
 
 #endif

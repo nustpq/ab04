@@ -487,7 +487,7 @@ static uint8_t Config_SR( uint16_t sr )
     uint16_t temp ;
 
     if( flag_state_pwd ) return 0 ;
-    APP_TRACE_INFO(("\r\nConf FM36 SR = %dkHz\r\n", sr));
+    APP_TRACE_INFO(("\r\nConf FM36 SR = %dHz\r\n", sr));
 
     switch ( sr ) {
         case 8000 :

@@ -49,7 +49,7 @@
 
 #include "fm1388_comm.h"
 #include "fm1388_spi.h"
-
+#include  <commands.h>
 
 /*
 *********************************************************************************************************
@@ -530,37 +530,7 @@ static  void  App_TaskStart (void *p_arg)
     for (;;) {
       
         //OSTimeDly(10); continue; //test    
-      
-//            UIF_Beep_Off();                
-//            UIF_LED_Off_All();   
-                   
-//            UIF_LED_On( LED_RUN );
-//            UIF_LED_Off( LED_RUN );
-//            
-//            UIF_LED_On( LED_USB );
-//            UIF_LED_Off( LED_USB );
-//            
-//            UIF_LED_On( LED_HDMI );
-//            UIF_LED_Off( LED_HDMI );
-//            
-//            UIF_LED_On( LED_USB_2 );
-//            UIF_LED_Off( LED_USB_2 );
-//            
-//            UIF_LED_On( LED_AUDIO_PLAY );
-//            UIF_LED_Off( LED_AUDIO_PLAY );
-//            
-//            UIF_LED_On( LED_AUDIO_REC );
-//            UIF_LED_Off( LED_AUDIO_REC );
-//            
-//            UIF_LED_On( LED_VDDIO_3_3 );
-//            UIF_LED_Off( LED_VDDIO_3_3 );             
-//            
-//            UIF_LED_On( LED_VDDIO_1_8 );
-//            UIF_LED_Off( LED_VDDIO_1_8 );
-            
-     
-            
-            
+        //UIF_LED_TEST();         
             
         Ruler_Port_LED_Service();
         
@@ -588,7 +558,7 @@ static  void  App_TaskStart (void *p_arg)
             }
         }          
         
-#if 1   
+#if 1  
         counter++;
         if(counter&0xFF) {
             UIF_LED_On( LED_RUN );
@@ -616,6 +586,7 @@ static  void  App_TaskStart (void *p_arg)
             }
         }
 #endif
+        
     }
     
 
@@ -670,150 +641,6 @@ static  void  App_TaskSpiAudio ( void *p_arg )
     }
 }
 
-
-/*
-*********************************************************************************************************
-*                                             AppTaskFirmwareVecUpdate()
-*
-* Description : firmware update and vec store task.
-*
-* Arguments   : none.
-*
-* Returns     : none.
-*
-* Note(s)     : none.
-*********************************************************************************************************
-*/
-#if UIF_NANDFLASH
-
- void  AppTaskFirmwareVecUpdate  ( void        *p_arg )
-{
-#define UPDATE_FIRMWARE  1
-#define BACKUP_FIRMWARE  2
-#define RESTORE_FIRMWARE 3
-#define STORE_VEC        4
-#define READ_VEC         5
-#define WRITE_SYSINFO    6
-#define READ_SYSINFO     7
-
-    uint8_t type = 0;
-    uint8_t ret = 0;
-
-    //step1:initialize hardware about nandflash
-    nfc_init( NULL );
-    pmecc_init( &g_pmeccStatus );
-
-    //step2:initialize memory for firmware or vec
-    //memset( nand_pageBuffer, 0 , sizeof( nand_pageBuffer ) );
-    //memset( nand_patternBuf, 0 , sizeof( nand_patternBuf ) );
-
-    //step3: infinite cycle of task;
-    for( ; ; )
-    {
-        //received control command from protocol parse task;
-        //type =
-//        OSTaskSuspend( OS_PRIO_SELF );
-        type = 1;
-        switch( type )
-        {
-          case UPDATE_FIRMWARE:
-            //1.stop all port
-            //2.write firmware to backup region
-            ret = uif_write_backupfirmware( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
-            //3.read back to compare
-            if( 0 == ret )
-            {
-              uif_read_backupfirmware( nand_patternBuf,sizeof( nand_patternBuf ) );
-            }
-            //4.write to main firmware region
-            if( ( 0 == ret )
-              &&( 0 == memcmp( nand_pageBuffer,nand_patternBuf,sizeof( nand_pageBuffer ) ) ) )
-            {
-                ret = uif_write_mainfirmware( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
-            }
-            //5.reset device
-            type = 0;
-          break;
-          case BACKUP_FIRMWARE:
-            //1.stop all port
-            //2.read main firmware to backup buffer
-            memset( nand_pageBuffer, 0 , sizeof( nand_pageBuffer ) );
-            ret  = uif_read_mainfirmware( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
-
-            //3.write to backup firmware region
-            if( 0 == ret )
-            {
-                ret  = uif_write_backupfirmware( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
-            }
-            //4.reset device
-          break;
-          case RESTORE_FIRMWARE:
-            //1.stop all port
-            //2.read back backup region to buffer
-            memset( nand_pageBuffer, 0 , sizeof( nand_pageBuffer ) );
-            ret  = uif_read_backupfirmware( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
-            //3.write to main firmware
-            if( 0 == ret )
-            {
-                 ret  = uif_write_mainfirmware( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
-            }
-            else
-            {
-              //process error;
-            }
-            //4.reset device
-          break;
-          case STORE_VEC:
-            //1.stop all port
-            //2.initialize buffer
-            memset( nand_pageBuffer, 0 , sizeof( nand_pageBuffer ) );
-            //3.copy data from usb buffer to vec buffer
-            //4.write vec to vec region
-            ret  = uif_write_vec( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
-            //5.proccess error
-            if( 0 != ret )
-                  APP_TRACE_INFO(("Store VEC failed!\r\n"));
-
-          break;
-          case READ_VEC:
-            //1.stop all port
-            //2.read vec region to buffer
-             ret  = uif_read_vec( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
-            //3.proccess error
-             if( 0 != ret )
-                  APP_TRACE_INFO(("Read VEC failed!\r\n"));
-             //4.copy data to target if needed
-          break;
-          case WRITE_SYSINFO:
-            {
-              SYSINFO info;
-              memset( ( void * )&info, 0 , sizeof( SYSINFO ) );
-              sprintf( ( char * )info.date,"2016-07-28" );
-              sprintf( ( char * )info.firmware_version , "AB04-f-0704-0.01" );
-              sprintf( ( char * )info.adaptor_soft_version , "Tuner-0704-1.0.0" );
-              sprintf( ( char * )info.hardware_version , "AB04-h-0801-0.0.1" );
-              uif_write_sysinfo( ( void * )&info,sizeof( SYSINFO ) );
-            }
-          break;
-          case READ_SYSINFO:
-            {
-              SYSINFO info;
-              memset( ( void * )&info, 0 , sizeof( SYSINFO ) );
-              uif_read_sysinfo( ( void * )&info,sizeof( SYSINFO ) );
-            }
-          break;
-         default:
-           //do nothing;
-
-           break;
-        }
-
-        OSTimeDly(2);
-
-    }
-
-}
-#endif
 
 
 

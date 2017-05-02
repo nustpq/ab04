@@ -334,6 +334,8 @@ void UIF_Beep_Off ( ) ;
 
 void UIF_LED_Off_All ( void) ;
 
+void UIF_LED_TEST( void );
+
 void Buzzer_OnOff( unsigned char onoff );
 
 void dump_buf_debug( unsigned char *pChar, unsigned int size) ;

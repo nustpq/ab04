@@ -22,6 +22,7 @@
 
 #include <string.h>
 
+
 static const uint16_t main_firmware = FIRMWARE_DOWNLOAD_ADDR;
 static const uint16_t backup_firmware = FIRMWARE_UPDATE_ADDR;
 static const uint16_t vec_store_block = VEC_STORE_ADDR;
@@ -54,8 +55,8 @@ uint8_t g_onfiEccCorrectability = 0xFF;
 uint8_t g_onficompatible = 0;
 
 //buffer for nandflash operation.the size is 1MB
-uint8_t nand_pageBuffer[ 1024 * 1024 ];
-uint8_t nand_patternBuf[ 1024 * 1024 ];
+uint8_t nand_pageBuffer[ AB_FW_BUF_SIZE ];
+uint8_t nand_patternBuf[ AB_FW_BUF_SIZE ];
 
 
 /*
