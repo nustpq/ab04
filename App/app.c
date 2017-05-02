@@ -686,7 +686,7 @@ static  void  App_TaskSpiAudio ( void *p_arg )
 */
 #if UIF_NANDFLASH
 
-static  void  AppTaskFirmwareVecUpdate  ( void        *p_arg )
+ void  AppTaskFirmwareVecUpdate  ( void        *p_arg )
 {
 #define UPDATE_FIRMWARE  1
 #define BACKUP_FIRMWARE  2
@@ -704,8 +704,8 @@ static  void  AppTaskFirmwareVecUpdate  ( void        *p_arg )
     pmecc_init( &g_pmeccStatus );
 
     //step2:initialize memory for firmware or vec
-    memset( nand_pageBuffer, 0 , sizeof( nand_pageBuffer ) );
-    memset( nand_patternBuf, 0 , sizeof( nand_patternBuf ) );
+    //memset( nand_pageBuffer, 0 , sizeof( nand_pageBuffer ) );
+    //memset( nand_patternBuf, 0 , sizeof( nand_patternBuf ) );
 
     //step3: infinite cycle of task;
     for( ; ; )
@@ -713,6 +713,7 @@ static  void  AppTaskFirmwareVecUpdate  ( void        *p_arg )
         //received control command from protocol parse task;
         //type =
 //        OSTaskSuspend( OS_PRIO_SELF );
+        type = 1;
         switch( type )
         {
           case UPDATE_FIRMWARE:
@@ -742,7 +743,7 @@ static  void  AppTaskFirmwareVecUpdate  ( void        *p_arg )
             //3.write to backup firmware region
             if( 0 == ret )
             {
-                ret  = uif_read_backupfirmware( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
+                ret  = uif_write_backupfirmware( nand_pageBuffer ,sizeof( nand_pageBuffer ) );
             }
             //4.reset device
           break;

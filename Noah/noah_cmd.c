@@ -36,6 +36,14 @@
 EMB_BUF   Emb_Buf_Cmd;
 EMB_BUF   Emb_Buf_Data;
 
+#define FW_SIZE    1024*1024          //1M   firmware  size
+
+#define FW_SIZE_2    1024*16 
+
+unsigned char fw_data[FW_SIZE];
+unsigned char *pfw_data=fw_data;
+
+extern  void AppTaskFirmwareVecUpdate  ( void  *p_arg );
 
 //EMB_BUF      *pEBuf;     
 //    pEBuf         = &Emb_Buf_Data;    
@@ -1563,7 +1571,40 @@ uint8_t  EMB_Data_Parse ( pNEW_NOAH_CMD  pNewCmd )
         
         case PC_CMD_UPDATE_AB_FW :   
              Send_DACK(err);  
-             
+         
+            unsigned int length;
+            unsigned char *p;
+						unsigned char *pBin_update;
+            unsigned char  package_num;
+            static unsigned char pack_index=0;
+
+						
+            temp = emb_get_attr_int(&root, 1, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
+            length=(unsigned int)temp;      
+            pBin_update =(unsigned char *)emb_get_attr_binary(&root, 2, (int*)&temp);
+            if(pBin_update == NULL ) { err = EMB_CMD_ERR;   break; }
+            p = (unsigned char *)pBin_update;  
+
+            temp = emb_get_attr_int(&root, 3, -1);
+            if(temp == -1 ) { err = EMB_CMD_ERR;   break; }
+            package_num=(unsigned char)temp;
+            
+            for(unsigned int i=0;i<length;i++){
+                *pfw_data = *p;
+								pfw_data++;
+								p++;
+            }   
+
+            pack_index++;
+            APP_TRACE_INFO(("\r\n::::: pack_index=%d ",pack_index));
+            if(pack_index == package_num ){
+               memset( nand_pageBuffer , 0 , sizeof( nand_pageBuffer ) );
+               memcpy( nand_pageBuffer , fw_data ,sizeof( fw_data ) ); 
+               AppTaskFirmwareVecUpdate( pfw_data );//err?
+               break;
+            }
+            err=0;
              Send_GACK(err);               
         break ;         
         

@@ -9,10 +9,13 @@
 #define PAGESIZE        ( BASIC_PAGESIZE + SPARE_SIZE )
 #define BLOCKSIZE       ( 64 * PAGESIZE )
 #define PLANESIZE       ( 1024 * BLOCKSIZE )
+#define BLOCK_SIZE_USE_BIT       ( 64 * BASIC_PAGESIZE )
  
 #define FIRMWARE_DOWNLOAD_ADDR  2
 #define FIRMWARE_UPDATE_ADDR    20
 #define VEC_STORE_ADDR          40
+#define FIRMWARE_SIZE_BIT (1024 * 1024)
+#define FIRMWARE_USE_BLOCK_NUM (FIRMWARE_SIZE_BIT / BLOCK_SIZE_USE_BIT)
 
  typedef struct _SmcTestMode 
 {

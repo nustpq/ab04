@@ -22,9 +22,9 @@
 
 #include <string.h>
 
-static const uint16_t main_firmware = 2;
-static const uint16_t backup_firmware = 20;
-static const uint16_t vec_store_block = 40;
+static const uint16_t main_firmware = FIRMWARE_DOWNLOAD_ADDR;
+static const uint16_t backup_firmware = FIRMWARE_UPDATE_ADDR;
+static const uint16_t vec_store_block = VEC_STORE_ADDR;
 static const uint16_t sysinfo_store_block = 60;
 
 //pmecc is initialized or not
@@ -197,29 +197,20 @@ uint8_t uif_write_backupfirmware( void *buf ,uint32_t len )
         
         assert( ( NULL != buf ) || ( 0 < len ) );
         
-        ret = SkipBlockNandFlash_EraseBlock( &g_skipBlockNf, 
-                                            backup_firmware, 
-                                            NORMAL_ERASE );
-
-	if( !ret )
+  for(uint8_t i = 0; i < FIRMWARE_USE_BLOCK_NUM; i++) 
 	{
 		ret = SkipBlockNandFlash_EraseBlock( &g_skipBlockNf, 
-                                                      backup_firmware + 1, 
+                                        backup_firmware + i, 
                                                       NORMAL_ERASE );
-	}
+  
 	
 	if( !ret )
 	{
 		ret = SkipBlockNandFlash_WriteBlock( &g_skipBlockNf, 
-                                                      backup_firmware,  
-                                                      (uint8_t *)buf); 
+                                          backup_firmware + i,  
+                                          (uint8_t *)buf + (BLOCK_SIZE_USE_BIT * i)); 
 	}
 
-	if( !ret )
-	{
-		ret = SkipBlockNandFlash_WriteBlock( &g_skipBlockNf, 
-                                                      backup_firmware+1,  
-                                                      (uint8_t *)buf + (len >> 1)); 
 	}
 	return ret;
 }
@@ -247,18 +238,15 @@ uint8_t uif_read_backupfirmware( void *buf,uint32_t len )
         
         assert( ( NULL != buf ) || ( 0 < len ) );
 
+	for(uint8_t i = 0; i < FIRMWARE_USE_BLOCK_NUM; i++) 
+	{
 	if( !ret )
 	{
 		ret = SkipBlockNandFlash_ReadBlock( &g_skipBlockNf, 
-                                                    backup_firmware,  
-                                                    (uint8_t *)buf ); 
+																					backup_firmware + i,	
+																					(uint8_t *)buf + (BLOCK_SIZE_USE_BIT * i)); 
 	}
 
-	if( !ret )
-	{
-		ret = SkipBlockNandFlash_ReadBlock( &g_skipBlockNf, 
-                                                    backup_firmware+1,  
-                                                    (uint8_t *)buf + (len >> 1) ); 
 	}
         
 	return ret;
@@ -287,29 +275,20 @@ uint8_t uif_write_mainfirmware( void *buf ,uint32_t len )
         
         assert( ( NULL != buf ) || ( 0 < len ) );
         
-        ret = SkipBlockNandFlash_EraseBlock( &g_skipBlockNf, 
-                                            main_firmware, 
-                                            NORMAL_ERASE );
-
-	if( !ret )
+	for(uint8_t i = 0; i < FIRMWARE_USE_BLOCK_NUM; i++) 
 	{
 		ret = SkipBlockNandFlash_EraseBlock( &g_skipBlockNf, 
-                                                      main_firmware + 1, 
+				                                main_firmware + i, 
                                                       NORMAL_ERASE );
-	}
+
 	
 	if( !ret )
 	{
 		ret = SkipBlockNandFlash_WriteBlock( &g_skipBlockNf, 
-                                                      main_firmware,  
-                                                      (uint8_t *)buf); 
+																					main_firmware + i,	
+																					(uint8_t *)buf + (BLOCK_SIZE_USE_BIT * i)); 
 	}
 
-	if( !ret )
-	{
-		ret = SkipBlockNandFlash_WriteBlock( &g_skipBlockNf, 
-                                                      main_firmware+1,  
-                                                      (uint8_t *)buf + (len >> 1)); 
 	}
 	return ret;
 }
@@ -336,18 +315,15 @@ uint8_t uif_read_mainfirmware( void *buf,uint32_t len )
         
         assert( ( NULL != buf ) || ( 0 < len ) );
 
+	for(uint8_t i = 0; i < FIRMWARE_USE_BLOCK_NUM; i++) 
+	{
 	if( !ret )
 	{
 		ret = SkipBlockNandFlash_ReadBlock( &g_skipBlockNf, 
-                                                    main_firmware,  
-                                                    (uint8_t *)buf ); 
+																					main_firmware + i,	
+																					(uint8_t *)buf + (BLOCK_SIZE_USE_BIT * i)); 
 	}
 
-	if( !ret )
-	{
-		ret = SkipBlockNandFlash_ReadBlock( &g_skipBlockNf, 
-                                                    main_firmware+1,  
-                                                    (uint8_t *)buf + (len >> 1) ); 
 	}
 	return ret;
 

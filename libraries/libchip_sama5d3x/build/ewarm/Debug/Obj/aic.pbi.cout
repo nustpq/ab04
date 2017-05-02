@@ -1,22 +1,22 @@
-"D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libchip_sama5d3x\source\aic.c"
+"E:\asw_a6\ab04\libraries\libchip_sama5d3x\source\aic.c"
 -std=c99
 -ferror-limit=100
 -I
-D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libchip_sama5d3x\build\ewarm/../../
+E:\asw_a6\ab04\libraries\libchip_sama5d3x\build\ewarm/../../
 -I
-D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libchip_sama5d3x\build\ewarm/../../cp15
+E:\asw_a6\ab04\libraries\libchip_sama5d3x\build\ewarm/../../cp15
 -I
-D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libchip_sama5d3x\build\ewarm/../../../usb/include
+E:\asw_a6\ab04\libraries\libchip_sama5d3x\build\ewarm/../../../usb/include
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.0\arm\inc
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.0\arm\inc\c
 -I
-D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libchip_sama5d3x
+E:\asw_a6\ab04\libraries\libchip_sama5d3x
 -I
-D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\libchip_sama5d3x\cp15
+E:\asw_a6\ab04\libraries\libchip_sama5d3x\cp15
 -I
-D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\usb\include
+E:\asw_a6\ab04\libraries\usb\include
 -Dsama5d3x=1
 -DTRACE_LEVEL=1
 -D__CHAR_BITS__=8
@@ -222,8 +222,8 @@ D:\Projects\iSAM_TestBench\AB04\SW\AB04\libraries\usb\include
 -D__HAS_LOCATED_DECLARATION__=1
 -D__HAS_LOCATED_WITH_INIT__=1
 -D__IAR_COMPILERBASE__=593669
--D__DATE__="Apr 26 2017"
--D__TIME__="15:50:02"
+-D__DATE__="May  2 2017"
+-D__TIME__="14:48:38"
 -D__STDC__=1
 -D__STDC_VERSION__=199901L
 -D__STDC_HOSTED__=1
